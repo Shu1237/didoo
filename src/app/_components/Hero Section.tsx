@@ -47,7 +47,7 @@ export default function HeroSection({ ImageData }: HeroSectionProps) {
                                         alt={image.title}
                                         fill
                                         priority
-                                        className="object-cover object-top brightness-[0.8] "
+                                        className="object-cover object-top brightness-[1] "
                                     />
                                 </div>
                             </CarouselItem>
@@ -62,7 +62,7 @@ export default function HeroSection({ ImageData }: HeroSectionProps) {
                     </CarouselNext>
 
                     {/* Text overlay */}
-                    <div className="absolute inset-0 z-10 p-8 md:p-16 lg:p-20 text-white flex flex-col justify-end pointer-events-none">
+                    {/* <div className="absolute inset-0 z-10 p-8 md:p-16 lg:p-20 text-white flex flex-col justify-end pointer-events-none">
                         <div className="max-w-xl pb-10 pointer-events-auto">
                             <p className="text-xl font-serif mb-2">PRESENTED BY VIBES</p>
                             <h1 className="text-7xl lg:text-[8rem] font-black leading-none font-display mb-4">
@@ -78,7 +78,7 @@ export default function HeroSection({ ImageData }: HeroSectionProps) {
                                 PRESALE OPEN OCT.07 | PUBLIC ON SALE OCT.09
                             </p>
                         </div>
-                    </div>
+                    </div> */}
                 </Carousel>
 
                 

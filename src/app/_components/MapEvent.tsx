@@ -35,11 +35,11 @@ export default function MapEvent({ eventData }: MapEventProps) {
           </div>
 
           {/* Event List - Overlapping on the right */}
-          <div className="absolute top-4 right-4 w-full max-w-md flex flex-col gap-4 max-h-[480px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+          <div className="absolute top-4 -right-8 max-w-md flex flex-col gap-4  overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
             {eventData.map((event) => (
               <div
                 key={event.id}
-                className="flex gap-3 bg-linear-to-br from-[#6b7d3f] to-[#4a5a2c] rounded-2xl p-4 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer group"
+                className="mt-3  w-full flex gap-3 bg-linear-to-br from-[#6b7d3f] to-[#4a5a2c] rounded-2xl p-4 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer group"
               >
                 {/* Event Image */}
                 <div className="relative w-32 h-24 shrink-0 rounded-xl overflow-hidden">

@@ -36,9 +36,9 @@ export default function ListEvent({ title, eventData }: ListEventProps) {
         }}
         className="w-full max-w-7xl mx-auto px-4"
       >
-        <CarouselContent className="-ml-2 md:-ml-4">
+        <CarouselContent className="-ml-1 md:-ml-2">
           {eventData.map((event) => (
-            <CarouselItem key={event.id} className="pl-2 md:pl-4 basis-full sm:basis-1/2 lg:basis-1/3 xl:basis-1/4">
+            <CarouselItem key={event.id} className="pl-1 md:pl-2 basis-full sm:basis-1/2 lg:basis-1/3 xl:basis-1/4">
               <EventCard {...event} />
             </CarouselItem>
           ))}
