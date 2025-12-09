@@ -4,8 +4,6 @@ import "./globals.css";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { ThemeProvider } from "next-themes";
 import QueryClientProviderWrapper from "@/components/QueryClientProviderWrapper";
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
 
 
 const myFont = localFont({
@@ -56,13 +54,7 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <div className="min-h-screen flex flex-col">
-              <Header />
-              <main className="p-24">
-                {children}
-              </main>
-              <Footer />
-            </div>
+           {children}
           </ThemeProvider>
           <ReactQueryDevtools initialIsOpen={false} />
         </QueryClientProviderWrapper>

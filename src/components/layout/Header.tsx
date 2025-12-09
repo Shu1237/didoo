@@ -5,12 +5,12 @@ import { ChevronDown } from 'lucide-react';
 import Link from 'next/link';
 
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
 const Header = () => {
@@ -18,14 +18,14 @@ const Header = () => {
         // Header Cố định
         <header className="fixed top-0 left-0 right-0 p-3 md:p-4 z-50">
             <div className="mx-auto max-w-6xl">
-                
+
                 {/* Thanh Menu Chính với Gradient */}
-                <div className="bg-linear-to-r from-[#D5FF40] via-[#C0C2B8] to-[#D5FF40] text-foreground flex items-center justify-between px-6 py-2 rouded shadow-lg" >
-                    
+                <div className="bg-linear-to-r from-[#D5FF40] via-[#C0C2B8] to-[#D5FF40] text-foreground flex items-center justify-between px-6 py-2 rounded-4xl shadow-lg" >
+
                     {/* Phần bên trái: Logo và Tên ứng dụng */}
                     <div className="flex items-center space-x-2">
                         <div className="flex items-center gap-2">
-                            <Link href="/" className="flex items-center gap-2">
+                            <Link href="/home" className="flex items-center gap-2">
                                 <Image
                                     src="/DiDoo.png"
                                     alt="DiDoo logo"
@@ -47,12 +47,12 @@ const Header = () => {
                             {/* Nút kích hoạt Dropdown */}
                             <DropdownMenuTrigger asChild>
                                 {/* Thêm lớp Tailwind để đảm bảo style đồng bộ với các link khác */}
-                                <div 
+                                <div
                                     className="text-sm font-medium cursor-pointer hover:opacity-80 flex items-center group text-foreground"
                                 >
                                     Khám phá sự kiện
-                                    <ChevronDown 
-                                        className="w-3 h-3 ml-1 transition-transform duration-200 group-data-[state=open]:rotate-180" 
+                                    <ChevronDown
+                                        className="w-3 h-3 ml-1 transition-transform duration-200 group-data-[state=open]:rotate-180"
                                     />
                                 </div>
                             </DropdownMenuTrigger>
@@ -74,7 +74,7 @@ const Header = () => {
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem>
-                                    <Link href="/events/all">Xem tất cả</Link>
+                                    <Link href="/events">Xem tất cả</Link>
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
@@ -89,12 +89,18 @@ const Header = () => {
                     </nav>
 
                     {/* Phần bên phải: Nút hành động */}
-                    <div className="flex items-center">
+                    <div className="flex items-center gap-2">
                         <Link
-                            href="#"
+                            href="/login"
                             className="text-sm font-semibold tracking-wider hover:opacity-80 transition-opacity whitespace-nowrap text-foreground"
                         >
-                            Đăng nhập | Đăng ký
+                            Đăng nhập 
+                        </Link>
+                        <Link
+                            href="/register"
+                            className="text-sm font-semibold tracking-wider hover:opacity-80 transition-opacity whitespace-nowrap text-foreground"
+                        >
+                            Đăng ký
                         </Link>
                     </div>
                 </div>

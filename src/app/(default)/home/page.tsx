@@ -14,7 +14,7 @@ export default function Home() {
     <div>
       <div className="relative">
         <HeroSection ImageData={image} />
-        <div className=" mt-18 absolute top-[600px] bottom-[-200px] left-0 right-0 bg-white p-4 md:p-10 rounded-2xl shadow-xl border border-gray-100 max-w-5xl mx-auto ">
+        <div className=" mt-18 absolute top-[600px] bottom-[-165px] left-0 right-0 bg-[#E3E3E3] p-4 md:p-10 rounded-2xl shadow-xl border border-gray-100 max-w-5xl mx-auto ">
           <SearchFilter />
         </div>
 
