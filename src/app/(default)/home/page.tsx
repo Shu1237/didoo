@@ -1,5 +1,5 @@
 import { comingSoonEvents, mapEvents, MockImage, nowShowingEvents } from "@/utils/mock";
-import HeroSection from "./_components/Hero Section";
+import HeroSection from "./_components/HeroSection";
 import SearchFilter from "./_components/SearchFilter";
 import ListEvent from "./_components/ListEvent";
 import MapEvent from "./_components/MapEvent";

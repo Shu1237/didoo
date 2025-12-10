@@ -1,3 +1,4 @@
+import { date } from "zod";
 import { EventCardData } from "./type";
 
 
@@ -157,3 +158,16 @@ export const mapEvents: EventCardData[] = [
     imageUrl: "/event3.jpg",
   },
 ]
+
+export const DetailEventMock = {
+  id: 101,
+  title: "2025 K-POP SUPER CONCERT",
+  date: "22 tháng 11, 2025",
+  time: "18:00 - 22:00",
+  location: "Vạn Phúc City",
+  subLocation: "Thủ Đức, TP.HCM",
+  price: "1.040.000 đ - 4.550.000 đ",
+  imageUrl: "/event1.jpg",
+ 
+
+}

@@ -4,7 +4,7 @@
 'use client';
 
 import { EventCardData } from "@/utils/type";
-import EventCard from "./CardEvent";
+import EventCard from "../../../../components/ui/CardEvent";
 import {
   Carousel,
   CarouselContent,
