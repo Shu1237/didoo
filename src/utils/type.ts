@@ -10,6 +10,7 @@ export type EventCardData = {
   subtitle?: string;
   date: string;
   time?: string;
+  category: string;
   location: string;
   priceRange: string;
   imageUrl: string;

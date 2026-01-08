@@ -71,7 +71,7 @@ const EventCard = ({
                 {/* Giá vé */}
                 <div className="pt-1 flex items-center gap-1">
                   <Ticket className="w-3 h-3 text-white inline-block mr-1 shrink-0" />
-                  <span className="text-xs font-bold text-[#4ECCA3]">
+                  <span className="text-xs font-bold text-primary">
                     {priceRange}
                   </span>
                 </div>

@@ -1,4 +1,4 @@
-import { mapEvents, MockImage } from "@/utils/mock";
+import { comingSoonEvents, mapEvents, MockImage, nowShowingEvents } from "@/utils/mock";
 import HeroSection from "./_components/HeroSection";
 import SearchFilter from "./_components/SearchFilter";
 import ListEvent from "./_components/ListEvent";
@@ -7,8 +7,8 @@ import MapEvent from "./_components/MapEvent";
 
 export default function Home() {
   const image = MockImage;
-  // const eventNowShowing = nowShowingEvents;
-  // const eventComingSoon = comingSoonEvents;
+  const eventNowShowing = nowShowingEvents;
+  const eventComingSoon = comingSoonEvents;
   const eventMapData = mapEvents;
   return (
     <div>
@@ -22,8 +22,8 @@ export default function Home() {
      
       <MapEvent eventData={eventMapData} />
 
-      {/* <ListEvent title="Đang Diễn Ra" eventData={eventNowShowing} /> */}
-      {/* <ListEvent title="Sắp Diễn Ra" eventData={eventComingSoon} /> */}
+      <ListEvent title="Đang Diễn Ra" eventData={eventNowShowing} />
+      <ListEvent title="Sắp Diễn Ra" eventData={eventComingSoon} />
     </div>
 
   );

@@ -20,7 +20,7 @@ const Header = () => {
             <div className="mx-auto max-w-6xl">
 
                 {/* Thanh Menu Chính với Gradient */}
-                <div className="bg-linear-to-r from-[#D5FF40] via-[#C0C2B8] to-[#D5FF40] text-foreground flex items-center justify-between px-6 py-2 rounded-4xl shadow-lg" >
+                <div className="bg-gradient-to-r from-primary via-accent to-primary text-white flex items-center justify-between px-6 py-2 rounded-4xl shadow-lg" >
 
                     {/* Phần bên trái: Logo và Tên ứng dụng */}
                     <div className="flex items-center space-x-2">

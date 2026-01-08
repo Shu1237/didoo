@@ -12,6 +12,8 @@ import {
 import { useEffect, useRef, useState, useMemo } from "react";
 import envconfig from "../../../../../config";
 import { getDistanceKm } from "@/utils/helper";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Spinner } from "@/components/ui/spinner";
 
 interface MapEventProps {
   eventData: EventCardData[];
@@ -24,7 +26,7 @@ const mapContainerStyle = {
 
 // ================== DISTANCE UTILS ==================
 
-const RADIUS_KM =15;
+const RADIUS_KM =5;
 
 // ================== COMPONENT ==================
 export default function MapEvent({ eventData }: MapEventProps) {
@@ -37,34 +39,25 @@ export default function MapEvent({ eventData }: MapEventProps) {
   const [mapVisible, setMapVisible] = useState(false);
   const [visibleEvents, setVisibleEvents] = useState<number[]>([]);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const sectionRef = useRef<HTMLDivElement | null>(null);
 
   // ================== 1️⃣ GET USER GPS ==================
   useEffect(() => {
+    //  default to HCMC if geolocation not available
     if (!navigator.geolocation) {
       setUserLocation({ lat: 10.776889, lng: 106.700806 });
+      setTimeout(() => setIsLoading(false), 800);
       return;
     }
-
-    const watchId = navigator.geolocation.watchPosition(
-      (pos) => {
-        setUserLocation({
-          lat: pos.coords.latitude,
-          lng: pos.coords.longitude,
-        });
-      },
-      () => {
-        setUserLocation({ lat: 10.776889, lng: 106.700806 });
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 15000,
-        maximumAge: 0,
-      }
-    );
-
-    return () => navigator.geolocation.clearWatch(watchId);
+    navigator.geolocation.getCurrentPosition((position) => {
+      setUserLocation({
+        lat: position.coords.latitude,
+        lng: position.coords.longitude,
+      });
+      setTimeout(() => setIsLoading(false), 800);
+    });
   }, []);
 
   // ================== 2️⃣ INTERSECTION ==================
@@ -107,10 +100,12 @@ export default function MapEvent({ eventData }: MapEventProps) {
 
   // ================== 4️⃣ STAGGER ANIMATION ==================
   useEffect(() => {
+    
     if (!isExpanded || !mapVisible) {
       setVisibleEvents([]);
       return;
     }
+    console.log(nearbyEvents);
 
     const timers = nearbyEvents.map((_, idx) =>
       setTimeout(() => {
@@ -123,7 +118,7 @@ export default function MapEvent({ eventData }: MapEventProps) {
     return () => timers.forEach(clearTimeout);
   }, [isExpanded, mapVisible, nearbyEvents]);
 
-  // ================== RENDER ==================
+ 
   return (
     <>
       {/* TITLE */}
@@ -144,10 +139,16 @@ export default function MapEvent({ eventData }: MapEventProps) {
                 relative h-[520px] rounded-2xl overflow-hidden shadow-xl
                 transition-all duration-700
                 ${mapVisible ? "opacity-100" : "opacity-0 translate-y-6"}
-                ${isExpanded ? "lg:w-[70%]" : "w-full"}
+                ${isExpanded && nearbyEvents.length > 0 ? "lg:w-[70%]" : "w-full"}
               `}
               onClick={() => setIsExpanded(true)}
             >
+              {isLoading ? (
+                <div className="w-full h-full relative">
+                        <Skeleton className="w-full h-full" />
+                       <Spinner className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+                      </div>
+              ) : (
               <LoadScript
                 googleMapsApiKey={envconfig.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!}
               >
@@ -176,15 +177,15 @@ export default function MapEvent({ eventData }: MapEventProps) {
                     />
 
                     {/* RADIUS 5KM */}
-                    <Circle
+                    {/* <Circle
                       center={userLocation}
                       radius={RADIUS_KM * 1000}
                       options={{
-                        fillColor: "#4ECCA3",
+                        fillColor: "#7030EF",
                         fillOpacity: 0.12,
                         strokeOpacity: 0,
                       }}
-                    />
+                    /> */}
 
                     {/* EVENTS */}
                     {nearbyEvents.map((event) => (
@@ -200,6 +201,7 @@ export default function MapEvent({ eventData }: MapEventProps) {
                   </GoogleMap>
                 )}
               </LoadScript>
+              )}
             </div>
 
             {/* EVENT LIST */}
@@ -208,12 +210,28 @@ export default function MapEvent({ eventData }: MapEventProps) {
                 absolute top-0 right-0 h-full flex flex-col justify-center gap-4
                 lg:w-[450px] -ml-[15px] z-20
                 transition-all duration-700
-                ${isExpanded
+                ${isExpanded && nearbyEvents.length >0
                   ? "opacity-100 translate-x-0"
                   : "opacity-0 translate-x-10 pointer-events-none"}
               `}
             >
-              {nearbyEvents.map((event, idx) => {
+              {isLoading ? (
+                <div className="space-y-4">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="bg-card/90 backdrop-blur-sm rounded-2xl p-4 shadow-lg">
+                      <div className="flex gap-3">
+                        <Skeleton className="w-24 h-20 rounded-xl shrink-0" />
+                        <div className="flex-1 space-y-2">
+                          <Skeleton className="h-4 w-3/4" />
+                          <Skeleton className="h-3 w-1/2" />
+                          <Skeleton className="h-3 w-2/3" />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+              nearbyEvents.map((event, idx) => {
                 const show = visibleEvents.includes(idx);
 
                 return (
@@ -222,7 +240,7 @@ export default function MapEvent({ eventData }: MapEventProps) {
                     onClick={() => setSelectedEvent(event)}
                     className={`
                       flex gap-3 rounded-2xl p-4 cursor-pointer
-                      bg-gradient-to-br from-[#6b7d3f] to-[#4a5a2c]
+                      bg-linear-to-br from-primary/90 to-accent/90
                       shadow-lg hover:shadow-xl
                       transition-all duration-500
                       ${show ? "opacity-100 translate-x-0" : "opacity-0 translate-x-6"}
@@ -256,13 +274,14 @@ export default function MapEvent({ eventData }: MapEventProps) {
                         Cách bạn {event.distance.toFixed(1)} km
                       </div>
 
-                      <div className="mt-1 text-xs font-bold text-[#4ECCA3]">
+                      <div className="mt-1 text-xs font-bold text-white">
                         {event.priceRange}
                       </div>
                     </div>
                   </div>
                 );
-              })}
+              })
+              )}
             </div>
 
           </div>

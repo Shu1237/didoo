@@ -2,20 +2,13 @@
 import Image from 'next/image';
 import { Calendar, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { EventCardData } from '@/utils/type';
 
 interface DetailEventProps {
-  data: {
-    imageUrl: string;
-    title: string;
-    date: string;
-    time: string;
-    location: string;
-    subLocation: string;
-    price: string;
-  };
+  event: EventCardData ;
 }
 
-export default function EventBanner({ data }: DetailEventProps) {
+export default function EventBanner({ event }: DetailEventProps) {
   return (
     <section className="w-full mt-[-100px] pt-[100px] z-0">
       <div className="mx-auto max-w-[90vw] md:max-w-[95vw] lg:max-w-[1400px] 
@@ -27,8 +20,8 @@ export default function EventBanner({ data }: DetailEventProps) {
           <div className="w-full lg:col-span-7">
             <div className="relative w-full h-[350px] md:h-[480px] rounded-3xl overflow-hidden shadow-lg">
               <Image
-                src={data.imageUrl}
-                alt={data.title}
+                src={event.imageUrl}
+                alt={event.title}
                 fill
                 className="object-fit"
                 priority
@@ -40,24 +33,24 @@ export default function EventBanner({ data }: DetailEventProps) {
           <div className="text-white space-y-6 lg:col-span-3">
 
             <h1 className="text-3xl md:text-4xl font-bold leading-tight">
-              {data.title}
+              {event.title}
             </h1>
 
             <div className="flex items-center gap-3 text-lg">
               <Calendar className="w-5 h-5" />
-              <span>{data.time}, {data.date}</span>
+              <span>{event.time}, {event.date}</span>
             </div>
 
             <div className="flex items-center gap-3 text-lg">
               <MapPin className="w-5 h-5" />
               <div>
-                <p className="font-semibold">{data.location}</p>
-                <p className="text-sm opacity-80">{data.subLocation}</p>
+                <p className="font-semibold">{event.location}</p>
+                {/* <p className="text-sm opacity-80">{event.subLocation}</p> */}
               </div>
             </div>
 
             <div className="text-2xl font-bold text-[#E5C3FF]">
-              {data.price}
+              {event.priceRange}
             </div>
 
             <Button
