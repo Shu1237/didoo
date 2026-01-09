@@ -1,17 +1,18 @@
 'use client';
 
-import { EVENTS } from "@/data/mock-data";
+
 import HeroSection from "./_components/HeroSection";
 import ListEvent from "./_components/ListEvent";
 import MapEvent from "./_components/MapEvent";
 import { motion } from "framer-motion";
 import SearchFilter from "./_components/SearchFilter";
+import { EVENTS } from "@/utils/mock";
 
 
 export default function Home() {
   // Filter events for different sections
   const upcomingEvents = EVENTS;
-  const popularEvents = [...EVENTS].reverse(); // Just for demo variety
+  const popularEvents = [...EVENTS].reverse(); 
 
   return (
     <div className="min-h-screen bg-background pb-20">

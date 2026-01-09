@@ -40,14 +40,14 @@ export default function OrganizerHeader() {
               className="object-cover"
             />
           </div>
-          <span className="font-bold text-xl bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">DiDoo Organizer</span>
+          <span className="font-bold text-xl bg-linear-to-r from-primary to-accent bg-clip-text text-transparent">DiDoo Organizer</span>
         </Link>
 
         <div className="flex items-center gap-4">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="flex items-center gap-3 pl-2 pr-4 py-6 rounded-full hover:bg-secondary/50 border border-transparent hover:border-border/50 transition-all">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-accent p-[2px]">
+                <div className="w-10 h-10 rounded-full bg-linear-to-br from-primary to-accent p-0.5">
                   <div className="w-full h-full rounded-full bg-background flex items-center justify-center overflow-hidden">
                     <span className="font-bold text-primary text-lg">
                       {user?.name?.[0] || user?.email?.[0] || "O"}

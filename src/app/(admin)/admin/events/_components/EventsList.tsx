@@ -4,12 +4,13 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { EVENTS } from "@/data/mock-data";
+import { Event } from "@/utils/type";
+interface EventsListProps {
+  events:Event[]
+}
 
+export default function EventsList({events}:EventsListProps) {
 
-
-export default function EventsList() {
-  const events = EVENTS;
 
 
   if (!events || events.length === 0) {

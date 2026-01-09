@@ -1,8 +1,21 @@
 import { Card } from "@/components/ui/card";
-import { adminStats } from "@/utils/mockAdmin";
+
+
 import { Wallet, Users, Calendar, Ticket } from "lucide-react";
 
-export default function AdminStats() {
+
+interface AdminStatsProps {
+  adminStats: {
+    title: string;
+    value: string;
+    change: string;
+    trend: string;
+    icon: string;
+    description: string;
+  }[]
+
+}
+export default function AdminStats({ adminStats }: AdminStatsProps) {
   const iconMap: any = {
     Wallet,
     Users,

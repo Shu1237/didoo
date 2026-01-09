@@ -14,21 +14,30 @@ export type JWTUserType = {
   iat?: number;
   exp?: number;
 };
+export interface Category {
+  id: string;
+  name: string;
+  icon: string;
+  color: string;
+}
 
-export type EventCardData = {
-  id: number;
+export interface Event {
+  id: string;
   title: string;
-  subtitle?: string;
+  description: string;
   date: string;
-  time?: string;
-  category: string;
   location: string;
-  priceRange: string;
-  imageUrl: string;
+  image: string;
+  price: string;
   lat: number;
   lng: number;
-};
-
+  status: string;
+  category: string;
+  organizer: {
+    name: string;
+    avatar: string;
+  };
+}
 export interface AuthContextType {
   setTokenFromContext: (accessToken: string, refreshToken: string) => void;
 }

@@ -1,5 +1,6 @@
-import { date } from "zod";
-import { EventCardData } from "./type";
+
+import { Category } from "./type";
+import { Event } from "./type";
 
 
 export const MockImage = [
@@ -25,193 +26,118 @@ export const MockImage = [
     }
 ]
 
-export const nowShowingEvents: EventCardData[] = [
+
+
+
+
+
+export const CATEGORIES: Category[] = [
+  { id: '1', name: 'Music', icon: '🎵', color: 'bg-purple-100 text-purple-600' },
+  { id: '2', name: 'Art', icon: '🎨', color: 'bg-pink-100 text-pink-600' },
+  { id: '3', name: 'Sports', icon: '⚽', color: 'bg-blue-100 text-blue-600' },
+  { id: '4', name: 'Food', icon: '🍔', color: 'bg-orange-100 text-orange-600' },
+  { id: '5', name: 'Tech', icon: '💻', color: 'bg-cyan-100 text-cyan-600' },
+  { id: '6', name: 'Education', icon: '📚', color: 'bg-green-100 text-green-600' },
+];
+
+export const EVENTS: Event[] = [
   {
-    id: 101,
-    title: "2025 K-POP SUPER CONCERT",
-    subtitle: "IN HO CHI MINH CITY",
-    date: "22 tháng 11, 2025",
-    time: "18:00 - 22:00",
-    location: "Vạn Phúc City",
-    priceRange: "1.040.000 đ - 4.550.000 đ",
-    imageUrl: "/event1.jpg",
-    category: "hòa nhạc",
-    lat: 10.842915,
+    id: '1',
+    title: 'Neon Nights Music Festival',
+    description: 'Experience the most vibrant electronic music festival of the year with top DJs from around the world.',
+    date: '2024-08-15T20:00:00',
+    location: 'Cyber City Arena',
+    status: 'pending',
+    lat: 10.842916,
     lng: 106.708161,
+    image: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=2070&auto=format&fit=crop',
+    price: '$50',
+    category: 'Music',
+    organizer: {
+      name: 'Electric Dreams',
+      avatar: 'https://i.pravatar.cc/150?u=1',
+    },
   },
   {
-    id: 102,
-    title: "SƠN TÙNG M-TP SKY TOUR 2025",
-    subtitle: "THE FINAL CHAPTER",
-    date: "28 tháng 12, 2025",
-    time: "19:30",
-    location: "Sân vận động Phú Thọ, TP.HCM",
-    priceRange: "800.000 đ - 4.800.000 đ",
-    imageUrl: "/event2.jpg",
-    category: "hòa nhạc",
-    lat: 10.776889,
-    lng: 106.700806,
-  },
-  {
-    id: 103,
-    title: "RAVOLUTION 2025",
-    subtitle: "ASIA'S LARGEST EDM FESTIVAL",
-    date: "31 tháng 12, 2025",
-    time: "16:00 - 04:00",
-    location: "Empire City, Thủ Đức",
-    priceRange: "1.200.000 đ - 6.800.000 đ",
-    imageUrl: "/event3.jpg",
-    category: "hòa nhạc",
-    lat: 10.823099,
-    lng: 106.629664,
-  },
-  {
-    id: 104,
-    title: "ĐÊM NHẠC VŨ TRỤ - MONO",
-    subtitle: "LIVE CONCERT 2025",
-    date: "15 tháng 11, 2025",
-    location: "Nhà thi đấu Quân khu 7",
-    priceRange: "900.000 đ - 3.500.000 đ",
-    imageUrl: "/event4.jpg",
-    category: "hòa nhạc",
-    lat: 10.800123,
-    lng: 106.666456,
-  },
-  {
-    id: 105,
-    title: "HOZO MUSIC FESTIVAL 2025",
-    subtitle: "HO CHI MINH CITY",
-    date: "12 - 14 tháng 12, 2025",
-    location: "Phố đi bộ Nguyễn Huệ",
-    priceRange: "500.000 đ - 2.800.000 đ",
-    imageUrl: "/event4.jpg",
-    category: "hòa nhạc",
-    lat: 10.777456,
-    lng: 106.700789,
-  },
-];
-
-
-
-
-export const comingSoonEvents: EventCardData[] = [
-  {
-    id: 201,
-    title: "G-DRAGON WORLD TOUR 2025",
-    subtitle: "ÜBERMENSCH · HANOI",
-    date: "08 tháng 11, 2025",
-    time: "20:00",
-    location: "8WONDER Ocean City, Hà Nội",
-    priceRange: "1.800.000 đ - 8.800.000 đ",
-    imageUrl: "/event1.jpg",
-    category: "hòa nhạc",
-    lat: 21.028511,
-    lng: 105.804817,
-  },
-  {
-    id: 202,
-    title: "BLACKPINK WORLD TOUR 2025",
-    subtitle: "BORN PINK ENCORE · VIETNAM",
-    date: "Q1 2026",
-    location: "Sân vận động Mỹ Đình, Hà Nội",
-    priceRange: "Chưa công bố",
-    imageUrl: "/event2.jpg",
-    category: "hòa nhạc",
-    lat: 21.028511,
-    lng: 105.804817,
-  },
-  {
-    id: 203,
-    title: "TAYLOR SWIFT | THE ERAS TOUR",
-    subtitle: "ASIA LEG 2026",
-    date: "Q2 2026",
-    location: "Sân vận động Quốc gia Mỹ Đình",
-    priceRange: "Chưa công bố",
-    imageUrl: "/event3.jpg",
-    category: "hòa nhạc",
-    lat: 21.028511,
-    lng: 105.804817,
-  },
-  {
-    id: 204,
-    title: "LẠC TRÔI FESTIVAL 2026",
-    subtitle: "SƠN TÙNG M-TP x ĐEN VÂU x BINZ",
-    date: "Mùa hè 2026",
-    location: "Đà Nẵng",
-    priceRange: "Sắp công bố",
-    imageUrl: "/event4.jpg",
-    category: "hòa nhạc",
-    lat: 16.054407,
-    lng: 108.202167,
-  },
-  {
-    id: 205,
-    title: "COLDPLAY MUSIC OF THE SPHERES",
-    subtitle: "WORLD TOUR 2026 · VIETNAM",
-    date: "Q3 2026",
-    location: "Sân vận động Quốc gia Singapore (chờ VN)",
-    priceRange: "Chưa công bố",
-    imageUrl: "/event1.jpg",
-    category: "hòa nhạc",
-    lat: 1.352083,
-    lng: 103.819839,
-  },
-];
-
-
-
-export const mapEvents: EventCardData[] = [
-  {
-    id: 1,
-    title: "2025 K-POP SUPER CONCERT IN HO CHI MINH",
-    subtitle: "Live music show",
-    date: "22/03/2025",
-    time: "18:30",
-    location: "Vạn Phúc City, TP. Thủ Đức",
-    priceRange: "700.000đ – 4.500.000đ",
-    imageUrl: "/event1.jpg",
-    category: "hòa nhạc",
-    lat: 10.842915,
+    id: '2',
+    title: 'Abstract Art Exhibition',
+    description: 'A journey through modern abstract art featuring upcoming local artists.',
+    date: '2024-08-20T10:00:00',
+    location: 'Modern Gallery',
+    status: 'pending',
+    lat: 10.870000, // +3km
     lng: 106.708161,
+    image: 'https://images.unsplash.com/photo-1545989253-02cc26577f88?q=80&w=2070&auto=format&fit=crop',
+    price: 'Free',
+    category: 'Art',
+    organizer: {
+      name: 'Art Collective',
+      avatar: 'https://i.pravatar.cc/150?u=2',
+    },
   },
   {
-    id: 2,
-    title: "WaterBomb Ho Chi Minh City 2025",
-    subtitle: "Music & Water Festival",
-    date: "15/06/2025",
-    time: "14:00",
-    location: "Khu đô thị Sala, TP. Thủ Đức",
-    priceRange: "890.000đ – 4.490.000đ",
-    imageUrl: "/event2.jpg",
-    category: "triển lãm",
-    lat: 10.786693,
-    lng: 106.735200,
+    id: '3',
+    title: 'Tech Startup Summit',
+    description: 'Network with innovators and investors at the biggest tech meetup in the region.',
+    date: '2024-09-05T09:00:00',
+    location: 'Innovation Hub',
+    image: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=2070&auto=format&fit=crop',
+    status: 'draft',
+    price: '$120',
+    category: 'Tech',
+    lat: 10.897000, // +6km
+    lng: 106.708161,
+    organizer: {
+      name: 'Tech Ventures',
+      avatar: 'https://i.pravatar.cc/150?u=3',
+    },
   },
   {
-    id: 3,
-    title: "TP.HCM Những Thành Phố Mơ Màng Year End 2025",
-    subtitle: "Acoustic & Indie Music",
-    date: "29/12/2025",
-    time: "17:00",
-    location: "Nhà Văn Hóa Thanh Niên, Quận 1",
-    priceRange: "520.000đ – 1.080.000đ",
-    imageUrl: "/event3.jpg",
-    category: "hội thảo",
-    lat: 10.776889,
-    lng: 106.700806,
+    id: '4',
+    title: 'Summer Food Carnival',
+    description: 'Taste dishes from over 50 local vendors and enjoy live music.',
+    status: 'completed',
+    date: '2024-07-30T16:00:00',
+    location: 'Central Park',
+    image: '/event1.jpg',
+    price: '$10',
+    category: 'Food',
+    lat: 10.897000,
+    lng: 106.735500, // +3km east
+    organizer: {
+      name: 'Foodie Group',
+      avatar: 'https://i.pravatar.cc/150?u=4',
+    },
+  },
+  {
+    id: '5',
+    title: 'Marathon for Charity',
+    description: 'Run for a cause! Join us in this annual marathon to support local charities.',
+    status: 'completed',
+    date: '2024-10-12T06:00:00',
+    location: 'City Stadium',
+    lat: 10.870000,
+    lng: 106.735500,
+    image: '/event2.jpg',
+    price: '$25',
+    category: 'Sports',
+    organizer: {
+      name: 'Runners Club',
+      avatar: 'https://i.pravatar.cc/150?u=5',
+    },
   },
 ];
 
+export const USERS = [
+  {
+    id: '1',
+    name: 'Alice Johnson',
+    avatar: 'https://i.pravatar.cc/150?u=alice',
+  },
+  {
+    id: '2',
+    name: 'Bob Smith',
+    avatar: 'https://i.pravatar.cc/150?u=bob',
+  },
+];
 
-export const DetailEventMock = {
-  id: 101,
-  title: "2025 K-POP SUPER CONCERT",
-  date: "22 tháng 11, 2025",
-  time: "18:00 - 22:00",
-  location: "Vạn Phúc City",
-  subLocation: "Thủ Đức, TP.HCM",
-  price: "1.040.000 đ - 4.550.000 đ",
-  imageUrl: "/event1.jpg",
- 
-
-}

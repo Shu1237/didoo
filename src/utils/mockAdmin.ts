@@ -122,7 +122,7 @@ export const mockUsers = [
     },
     {
         id: 'user_003',
-        name: null,
+        name: 'Admin EventHub',
         email: 'admin@eventhub.com',
         role: 'ADMIN',
     },

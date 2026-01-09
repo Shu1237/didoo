@@ -2,8 +2,10 @@ import { Suspense } from "react";
 import Loading from "@/components/loading";
 import EventsList from "./_components/EventsList";
 import CreateEventButton from "./_components/CreateEventButton";
+import { mockOrganizerEvents } from "@/utils/mockOrganizer";
 
 export default function OrganizerEventsPage() {
+   const events = mockOrganizerEvents;
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -16,9 +18,7 @@ export default function OrganizerEventsPage() {
         <CreateEventButton />
       </div>
 
-      <Suspense fallback={<Loading />}>
-        <EventsList />
-      </Suspense>
+       <EventsList events={events} />
     </div>
   );
 }

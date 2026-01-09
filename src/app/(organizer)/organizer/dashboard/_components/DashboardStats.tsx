@@ -1,8 +1,21 @@
 import { Card } from "@/components/ui/card";
-import { organizerStats } from "@/utils/mockOrganizer";
+
 import { Wallet, Ticket, Calendar, Users } from "lucide-react";
 
-export default function DashboardStats() {
+
+
+interface DashboardStatsProps {
+  reportData :{
+    title: string;
+    value: string;
+    change: string;
+    trend: string
+    icon: string;
+    description: string;
+  }[]
+}
+
+export default function DashboardStats( {reportData}: DashboardStatsProps) {
   const iconMap: any = {
     Wallet,
     Ticket,
@@ -12,7 +25,7 @@ export default function DashboardStats() {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      {organizerStats.map((stat, index) => {
+      {reportData.map((stat, index) => {
         const Icon = iconMap[stat.icon];
         return (
           <Card key={index} className="p-6 bg-background/60 backdrop-blur-md border-border/50 hover:shadow-lg transition-all duration-300 group">

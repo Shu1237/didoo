@@ -1,13 +1,29 @@
 import { Card } from "@/components/ui/card";
 import Link from "next/link";
-import { upcomingEvents } from "@/utils/mockOrganizer";
+
 import { Calendar, MapPin, Ticket } from "lucide-react";
 
-export default function RecentEvents() {
+
+
+interface RecentEventsProps {
+  upcomingEvents: {
+    id: number;
+  title: string;
+  date: string;
+  time: string;
+  location: string;
+  sold: number;
+  total: number;
+  status: string;
+  revenue: string;
+  }[]
+}
+
+export default function RecentEvents({ upcomingEvents }: RecentEventsProps) {
   return (
     <Card className="p-6 bg-background/60 backdrop-blur-md border-border/50 shadow-sm h-full">
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+        <h3 className="text-xl font-bold bg-linear-to-r from-primary to-accent bg-clip-text text-transparent">
           Sự kiện sắp tới
         </h3>
         <Link href="/organizer/events/create" className="text-sm font-medium text-primary hover:underline">
@@ -40,8 +56,8 @@ export default function RecentEvents() {
                   </div>
                 </div>
                 <span className={`text-xs px-2 py-1 rounded-full border ${event.status === 'Sắp diễn ra' ? 'bg-blue-50 text-blue-600 border-blue-200' :
-                    event.status === 'Sắp hết vé' ? 'bg-orange-50 text-orange-600 border-orange-200' :
-                      'bg-green-50 text-green-600 border-green-200'
+                  event.status === 'Sắp hết vé' ? 'bg-orange-50 text-orange-600 border-orange-200' :
+                    'bg-green-50 text-green-600 border-green-200'
                   }`}>
                   {event.status}
                 </span>

@@ -1,9 +1,11 @@
-import { Suspense } from "react";
-import Loading from "@/components/loading";
+
 import UsersList from "./_components/UsersList";
 import UsersFilters from "./_components/UsersFilters";
+import { mockUsers } from "@/utils/mockAdmin";
+
 
 export default function AdminUsersPage() {
+  const users = mockUsers;
   return (
     <div className="space-y-6">
       <div>
@@ -14,10 +16,8 @@ export default function AdminUsersPage() {
       </div>
 
       <UsersFilters />
-      
-      <Suspense fallback={<Loading />}>
-        <UsersList />
-      </Suspense>
+
+      <UsersList users={users} />
     </div>
   );
 }

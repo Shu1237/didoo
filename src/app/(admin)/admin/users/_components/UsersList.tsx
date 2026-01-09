@@ -3,13 +3,24 @@
 
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { mockUsers } from "@/utils/mockAdmin";
 
 
+interface UsersListProps {
+  users:{
+    id: string;
+    name: string;
+    email: string;
+    role: string;
+  }[]
+}
 
-export default function UsersList() {
-  const users = mockUsers;
+export default function UsersList({users}: UsersListProps) {
 
+  if(!users || users.length === 0) {
+    return (
+      <p className="text-muted-foreground">Không có người dùng nào để hiển thị.</p>
+    );
+  }
   return (
     <div className="space-y-4">
       {users.map((user: any) => (

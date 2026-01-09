@@ -4,11 +4,17 @@ import { Card } from "@/components/ui/card";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { mockOrganizerEvents } from "@/utils/mockOrganizer";
+import { Event } from "@/utils/type";
 
+interface EventsListProps {
+  events:{
+    id:string;
+    title:string;
+    date:string;
+  }[]
+}
 
-
-export default function EventsList() {
-  const events = mockOrganizerEvents
+export default function EventsList({ events }: EventsListProps) {
 
   if (!events || events.length === 0) {
     return (

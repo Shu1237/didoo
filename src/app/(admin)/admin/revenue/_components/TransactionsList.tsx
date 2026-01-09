@@ -4,9 +4,16 @@ import { useQuery } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
 import { mockTransactions } from "@/utils/mockAdmin";
 
+ interface TransactionsListProps {
+  transactions:{
+    id: string;
+    description: string;
+    date: string;
+    amount: number
+  }[]
+ }
+export default function TransactionsList({transactions}:TransactionsListProps) {
 
-export default function TransactionsList() {
-  const transactions = mockTransactions;
   if (!transactions || transactions.length === 0) {
     return (
       <Card className="p-12 text-center">

@@ -1,11 +1,22 @@
 import { Card } from "@/components/ui/card";
-import { recentActivities } from "@/utils/mockAdmin";
+
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 
-export default function RecentActivity() {
+
+interface RecentActivityProps {
+  recentActivities: {
+  user: string;
+  action: string;
+  target: string;
+  time: string;
+  avatar: string;
+  }[]
+}
+
+export default function RecentActivity({recentActivities}: RecentActivityProps) {
   return (
     <Card className="p-6 bg-background/60 backdrop-blur-md border-border/50 shadow-sm">
-      <h3 className="text-xl font-bold mb-6 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent w-fit">
+      <h3 className="text-xl font-bold mb-6 bg-linear-to-r from-primary to-accent bg-clip-text text-transparent w-fit">
         Hoạt động gần đây
       </h3>
 

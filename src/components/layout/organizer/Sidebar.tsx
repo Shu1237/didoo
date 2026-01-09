@@ -21,11 +21,7 @@ const navItems = [
     href: "/organizer/events",
     icon: Calendar,
   },
-  {
-    title: "Check-in",
-    href: "/organizer/check-in",
-    icon: QrCode,
-  },
+
 
 ];
 
@@ -53,7 +49,7 @@ export default function OrganizerSidebar() {
                 )}
               >
                 {isActive && (
-                  <div className="absolute inset-0 bg-gradient-to-r from-primary to-accent opacity-100 transition-opacity" />
+                  <div className="absolute inset-0 bg-linear-to-r from-primary to-accent opacity-100 transition-opacity" />
                 )}
                 <Icon className={cn("w-5 h-5 relative z-10", isActive ? "text-white" : "group-hover:text-primary transition-colors")} />
                 <span className="relative z-10">{item.title}</span>
@@ -64,7 +60,7 @@ export default function OrganizerSidebar() {
 
         {/* Bottom Info */}
         <div className="mt-auto pt-6 border-t border-border/50">
-          <div className="p-4 rounded-xl bg-gradient-to-br from-primary/10 to-transparent border border-primary/10">
+          <div className="p-4 rounded-xl bg-linear-to-br from-primary/10 to-transparent border border-primary/10">
             <h4 className="font-semibold text-primary mb-1">DiDoo Organizer</h4>
             <p className="text-xs text-muted-foreground">Manage your events</p>
           </div>

@@ -1,9 +1,10 @@
-import { Suspense } from "react";
-import Loading from "@/components/loading";
+
 import EventsList from "./_components/EventsList";
 import EventsFilters from "./_components/EventsFilters";
+import { EVENTS } from "@/utils/mock";
 
 export default function AdminEventsPage() {
+  const events = EVENTS;
   return (
     <div className="space-y-6">
       <div>
@@ -15,9 +16,7 @@ export default function AdminEventsPage() {
 
       <EventsFilters />
       
-      <Suspense fallback={<Loading />}>
-        <EventsList />
-      </Suspense>
+      <EventsList events={events} />
     </div>
   );
 }

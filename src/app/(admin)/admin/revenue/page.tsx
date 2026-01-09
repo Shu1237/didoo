@@ -1,10 +1,11 @@
-import { Suspense } from "react";
-import Loading from "@/components/loading";
+
 import RevenueStats from "./_components/RevenueStats";
 import RevenueChart from "./_components/RevenueChart";
 import TransactionsList from "./_components/TransactionsList";
+import { mockTransactions } from "@/utils/mockAdmin";
 
 export default function AdminRevenuePage() {
+    const transactions = mockTransactions;
   return (
     <div className="space-y-6">
       <div>
@@ -14,11 +15,9 @@ export default function AdminRevenuePage() {
         </p>
       </div>
 
-      <Suspense fallback={<Loading />}>
-        <RevenueStats />
-        <RevenueChart />
-        <TransactionsList />
-      </Suspense>
+      <RevenueStats />
+      <RevenueChart />
+      <TransactionsList transactions={transactions}  />
     </div>
   );
 }
