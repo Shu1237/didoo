@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Search, SlidersHorizontal } from 'lucide-react';
+import { Search, SlidersHorizontal, ArrowUpDown, Filter } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import {
   DropdownMenu,
@@ -36,68 +36,68 @@ const Header = ({ category, setCategory, searchQuery, setSearchQuery, sortBy, se
   ];
 
   return (
-    <div className="p-4 bg-linear-to-br from-card/95 via-primary/5 to-card/95 backdrop-blur-lg rounded-2xl shadow-2xl border border-primary/20 space-y-3">
-      {/* Search Bar */}
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+    <div className="p-4 bg-background/80 backdrop-blur-xl rounded-2xl shadow-lg border border-border/50 flex gap-2">
+      {/* Search Bar - Expands to fill available space */}
+      <div className="relative flex-1 group">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground transition-colors group-focus-within:text-primary" />
         <Input
           type="text"
-          placeholder="Tìm kiếm sự kiện..."
+          placeholder="Tìm kiếm..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-10 pr-4 py-6 text-base"
+          className="pl-10 pr-4 h-12 text-base bg-secondary/50 border-transparent focus:bg-background focus:border-primary/50 transition-all rounded-xl w-full"
         />
       </div>
 
-      {/* Filter and Sort */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-1">
-        {/* Event Type Filter */}
-        {eventTypes.map((item) => (
-          <button
-            key={item.label}
-            onClick={() => setCategory(item.value)}
-            className={`
-              px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap
-              transition-colors duration-200
-              ${
-                category === item.value
-                  ? 'bg-primary text-white'
-                  : 'bg-secondary/20 text-foreground hover:bg-secondary/30'
-              }
-            `}
+      {/* Filter Dropdown */}
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="outline"
+            className={`h-12 w-12 rounded-xl border-border bg-secondary/50 hover:bg-secondary hover:text-foreground p-0 ${category ? 'border-primary text-primary bg-primary/10' : 'text-muted-foreground'}`}
           >
-            {item.label}
-          </button>
-        ))}
-
-        {/* Sort Dropdown */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="outline"
-              size="sm"
-              className="ml-auto flex items-center gap-2 whitespace-nowrap"
+            <Filter className="w-5 h-5" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-56">
+          <DropdownMenuItem onClick={() => setCategory(null)} className={!category ? 'bg-primary/10 text-primary font-medium' : ''}>
+            Tất cả danh mục
+          </DropdownMenuItem>
+          {eventTypes.filter(t => t.value !== null).map((item) => (
+            <DropdownMenuItem
+              key={item.label}
+              onClick={() => setCategory(item.value)}
+              className={category === item.value ? 'bg-primary/10 text-primary font-medium' : ''}
             >
-              <SlidersHorizontal className="w-4 h-4" />
-              Sắp xếp
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {sortOptions.map((option) => (
-              <DropdownMenuItem
-                key={option.value}
-                onClick={() => setSortBy(option.value)}
-                // mode 
-                className={sortBy === option.value ? 'bg-primary text-white' : ''}
-              >
-                {option.label}
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
+              {item.label}
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      {/* Sort Dropdown */}
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="outline"
+            className="h-12 w-12 rounded-xl border-border bg-secondary/50 hover:bg-secondary hover:text-foreground p-0 text-muted-foreground"
+          >
+            <ArrowUpDown className="w-5 h-5" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-48">
+          {sortOptions.map((option) => (
+            <DropdownMenuItem
+              key={option.value}
+              onClick={() => setSortBy(option.value)}
+              className={sortBy === option.value ? 'bg-primary/10 text-primary font-medium' : ''}
+            >
+              {option.label}
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   );
 };
-
 export default Header;

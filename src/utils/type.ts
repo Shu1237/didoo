@@ -4,6 +4,17 @@ export type ResponseData<T> = {
   message: string;
 };
 
+export type UserRole = "user" | "organizer" | "admin" | "staff";
+
+export type JWTUserType = {
+  id: number;
+  email: string;
+  role: UserRole;
+  name?: string;
+  iat?: number;
+  exp?: number;
+};
+
 export type EventCardData = {
   id: number;
   title: string;
@@ -17,6 +28,7 @@ export type EventCardData = {
   lat: number;
   lng: number;
 };
+
 export interface AuthContextType {
   setTokenFromContext: (accessToken: string, refreshToken: string) => void;
 }

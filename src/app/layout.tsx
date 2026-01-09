@@ -54,7 +54,7 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-           {children}
+            {children}
           </ThemeProvider>
           <ReactQueryDevtools initialIsOpen={false} />
         </QueryClientProviderWrapper>

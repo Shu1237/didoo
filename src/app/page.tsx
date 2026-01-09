@@ -1,13 +1,5 @@
+import { redirect } from "next/navigation";
 
-import React from 'react';
-
-const Page = () => {
-    return (
-        <div>
-            
-            <h1>Welcome to the Didoo Page</h1>
-        </div>
-    );
+export default function RootPage() {
+  redirect("/home");
 }
-
-export default Page;

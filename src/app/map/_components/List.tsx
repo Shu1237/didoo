@@ -12,23 +12,25 @@ interface ListProps {
   setSelectedEvent: React.Dispatch<React.SetStateAction<EventCardData | null>>;
 }
 
-const List = ({ eventsData,  isLoading, setSelectedEvent }: ListProps) => {
+const List = ({ eventsData, isLoading, setSelectedEvent }: ListProps) => {
   return (
-   <div className="h-full overflow-y-auto bg-gradient-to-br from-card/95 via-primary/5 to-card/95 backdrop-blur-lg rounded-2xl shadow-2xl border border-primary/20 p-4 space-y-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+    <div className="h-full overflow-y-auto bg-background/80 backdrop-blur-xl rounded-2xl shadow-lg border border-border/50 p-4 space-y-4 no-scrollbar">
       {isLoading ? (
         <div className="space-y-4">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="bg-gradient-to-br from-primary/10 to-accent/5 backdrop-blur-sm rounded-xl p-4 shadow-md border border-primary/20">
-              <Skeleton className="h-48 w-full mb-4 rounded-lg" />
-              <Skeleton className="h-6 w-3/4 mb-2" />
-              <Skeleton className="h-4 w-1/2 mb-2" />
-              <Skeleton className="h-4 w-2/3" />
+            <div key={i} className="bg-card/50 rounded-xl p-4 shadow-sm border border-border/50 space-y-3">
+              <Skeleton className="h-40 w-full rounded-lg" />
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-3/4" />
+                <Skeleton className="h-3 w-1/2" />
+              </div>
             </div>
           ))}
         </div>
       ) : eventsData.length === 0 ? (
-        <div className="flex items-center justify-center h-full text-gray-500">
-          <p>Không tìm thấy sự kiện nào</p>
+        <div className="flex flex-col items-center justify-center h-40 text-muted-foreground text-center">
+          <p className="font-medium">Không tìm thấy sự kiện</p>
+          <p className="text-sm">Thử thay đổi bộ lọc hoặc tìm kiếm khác</p>
         </div>
       ) : (
         eventsData.map((event, index) => (
@@ -37,6 +39,7 @@ const List = ({ eventsData,  isLoading, setSelectedEvent }: ListProps) => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.05, duration: 0.3 }}
+            className="group"
           >
             <DetailPlace eventData={event} setSelectedEvent={setSelectedEvent} />
           </motion.div>

@@ -1,24 +1,25 @@
-// src/components/EventCard.tsx
+// src/components/ui/CardEvent.tsx
 'use client';
 
 import Image from 'next/image';
 import Link from 'next/link';
 import { Calendar, MapPin, Ticket } from 'lucide-react';
+import { motion } from 'framer-motion';
 import {
   Card,
   CardContent,
 } from '@/components/ui/card';
 
-
 interface EventCardProps {
-  id: number;
+  id: string | number;
   title: string;
   subtitle?: string;
-  date: string;     
-  time?: string;    
-  location: string;  
+  date: string;
+  time?: string;
+  location: string;
   priceRange: string;
   imageUrl: string;
+  category?: string;
 }
 
 const EventCard = ({
@@ -28,58 +29,62 @@ const EventCard = ({
   location,
   priceRange,
   imageUrl,
+  category
 }: EventCardProps) => {
   return (
-    <Link href={`/events/${id}`} className="block group">
-      <Card className="overflow-hidden rounded-xl bg-linear-to-br from-[#3d2463] via-[#2d1850] to-[#1f0d3d] border border-purple-800/30 shadow-xl 
-                       transition-all duration-300   group p-0 w-[303px] h-[285px]">
-        
-        <CardContent className="p-0">
-          <div className="flex flex-col">
-            {/* Poster Image - Top */}
-            <div className="p-3">
-              <div className="relative w-full h-40 overflow-hidden rounded-xl border-2 border-purple-500/30">
-                <Image
-                  src={imageUrl}
-                  alt={title}
-                  fill
-                  className="object-fit object-center transition-transform duration-500 "
-                />
+    <Link href={`/events/${id}`} className="block group h-full">
+      <motion.div
+        whileHover={{ y: -8, scale: 1.02 }}
+        transition={{ type: "spring", stiffness: 300 }}
+        className="h-full"
+      >
+        <Card className="h-full overflow-hidden rounded-2xl border-none shadow-lg hover:shadow-2xl transition-shadow duration-300 bg-card dark:bg-card/50 backdrop-blur-sm">
+          <CardContent className="p-0 h-full flex flex-col">
+            {/* Image Section */}
+            <div className="relative w-full h-48 overflow-hidden">
+              <Image
+                src={imageUrl}
+                alt={title}
+                fill
+                className="object-cover transition-transform duration-700 group-hover:scale-110"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-60" />
+
+              {/* Category Badge */}
+              {category && (
+                <div className="absolute top-3 right-3 bg-white/90 dark:bg-black/80 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold text-primary shadow-sm">
+                  {category}
+                </div>
+              )}
+
+              {/* Price Badge */}
+              <div className="absolute bottom-3 left-3 bg-primary/90 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold text-white shadow-sm flex items-center gap-1">
+                <Ticket className="w-3 h-3" />
+                {priceRange}
               </div>
             </div>
 
-            {/* Content - Bottom */}
-            <div className="p-3 text-white flex flex-col justify-between bg-linear-to-br from-transparent to-black/10 flex-1">
-              <div className="space-y-0.5">
-                {/* Tiêu đề chính */}
-                <h3 className="text-sm font-bold leading-tight uppercase line-clamp-1">
-                  {title}
-                </h3>
+            {/* Content Section */}
+            <div className="p-4 flex flex-col flex-1 gap-3">
+              <h3 className="text-lg font-bold leading-tight line-clamp-2 group-hover:text-primary transition-colors">
+                {title}
+              </h3>
 
-                {/* Thời gian với icon */}
-                <div className="flex items-center gap-1 text-xs">
-                  <Calendar className="w-3 h-3 text-white shrink-0" />
-                  <span className="font-normal">{date}</span>
+              <div className="mt-auto space-y-2 text-muted-foreground">
+                <div className="flex items-center gap-2 text-sm">
+                  <Calendar className="w-4 h-4 text-secondary shrink-0" />
+                  <span className="truncate">{new Date(date).toLocaleDateString('vi-VN', { weekday: 'short', day: 'numeric', month: 'long' })}</span>
                 </div>
 
-                {/* Địa điểm với icon */}
-                <div className="flex items-center gap-1 text-xs">
-                  <MapPin className="w-3 h-3 text-white shrink-0" />
-                  <span className="font-normal line-clamp-1">{location}</span>
-                </div>
-
-                {/* Giá vé */}
-                <div className="pt-1 flex items-center gap-1">
-                  <Ticket className="w-3 h-3 text-white inline-block mr-1 shrink-0" />
-                  <span className="text-xs font-bold text-primary">
-                    {priceRange}
-                  </span>
+                <div className="flex items-center gap-2 text-sm">
+                  <MapPin className="w-4 h-4 text-accent shrink-0" />
+                  <span className="truncate">{location}</span>
                 </div>
               </div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </motion.div>
     </Link>
   );
 };

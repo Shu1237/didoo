@@ -1,9 +1,12 @@
-// src/components/Header.tsx
+"use client";
 
 import Image from 'next/image';
 import { ChevronDown } from 'lucide-react';
 import Link from 'next/link';
-
+import { useSessionStore } from "@/stores/sesionStore";
+import { useRouter } from "next/navigation";
+import { authRequest } from "@/apiRequest/auth";
+import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -12,17 +15,32 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { isOrganizerOrAdmin } from "@/utils/permissions";
 
 const Header = () => {
+    const user = useSessionStore((state) => state.user);
+    const router = useRouter();
+
+    const handleLogout = async () => {
+        try {
+            await authRequest.logoutClient();
+            router.push("/login");
+        } catch (error) {
+            console.error("Logout error:", error);
+        }
+    };
+
+    const getDashboardLink = () => {
+        if (!user) return null;
+        if (user.role === "admin") return "/admin/dashboard";
+        if (user.role === "organizer") return "/organizer/dashboard";
+        return "/user/profile";
+    };
+
     return (
-        // Header Cố định
         <header className="fixed top-0 left-0 right-0 p-3 md:p-4 z-50">
             <div className="mx-auto max-w-6xl">
-
-                {/* Thanh Menu Chính với Gradient */}
-                <div className="bg-gradient-to-r from-primary via-accent to-primary text-white flex items-center justify-between px-6 py-2 rounded-4xl shadow-lg" >
-
-                    {/* Phần bên trái: Logo và Tên ứng dụng */}
+                <div className="bg-gradient-to-r from-primary via-accent to-primary text-white flex items-center justify-between px-6 py-2 rounded-4xl shadow-lg">
                     <div className="flex items-center space-x-2">
                         <div className="flex items-center gap-2">
                             <Link href="/home" className="flex items-center gap-2">
@@ -39,27 +57,14 @@ const Header = () => {
                         </div>
                     </div>
 
-                    {/* Phần giữa: Menu điều hướng */}
                     <nav className="flex items-center space-x-6 md:flex">
-
-                        {/* Thay thế link "Khám phá sự kiện" bằng DropdownMenu */}
                         <DropdownMenu>
-                            {/* Nút kích hoạt Dropdown */}
                             <DropdownMenuTrigger asChild>
-                                {/* Thêm lớp Tailwind để đảm bảo style đồng bộ với các link khác */}
-                                <div
-                                    className="text-sm font-medium cursor-pointer hover:opacity-80 flex items-center group text-foreground"
-                                >
+                                <div className="text-sm font-medium cursor-pointer hover:opacity-80 flex items-center group text-foreground">
                                     Khám phá sự kiện
-                                    <ChevronDown
-                                        className="w-3 h-3 ml-1 transition-transform duration-200 group-data-[state=open]:rotate-180"
-                                    />
+                                    <ChevronDown className="w-3 h-3 ml-1 transition-transform duration-200 group-data-[state=open]:rotate-180" />
                                 </div>
                             </DropdownMenuTrigger>
-
-                            {/* Nội dung Dropdown Menu */}
-                            {/* Bạn nên đặt DropdownMenuContent bên ngoài Header cố định 
-                                hoặc đảm bảo các style của Shadcn/ui được áp dụng đúng */}
                             <DropdownMenuContent className="w-56 mt-3 bg-white text-gray-800 shadow-xl rounded-lg">
                                 <DropdownMenuLabel>Danh mục Sự kiện</DropdownMenuLabel>
                                 <DropdownMenuSeparator />
@@ -79,29 +84,70 @@ const Header = () => {
                             </DropdownMenuContent>
                         </DropdownMenu>
 
-                        {/* Mục Tạo sự kiện (giữ nguyên link) */}
+                        {isOrganizerOrAdmin(user?.role) && (
+                            <Link
+                                href="/organizer/events/create"
+                                className="text-sm font-medium hover:opacity-80 text-foreground"
+                            >
+                                Tạo sự kiện
+                            </Link>
+                        )}
+
                         <Link
-                            href="/create-event"
+                            href="/map"
                             className="text-sm font-medium hover:opacity-80 text-foreground"
                         >
-                            Tạo sự kiện
+                            Bản đồ
                         </Link>
                     </nav>
 
-                    {/* Phần bên phải: Nút hành động */}
                     <div className="flex items-center gap-2">
-                        <Link
-                            href="/login"
-                            className="text-sm font-semibold tracking-wider hover:opacity-80 transition-opacity whitespace-nowrap text-foreground"
-                        >
-                            Đăng nhập 
-                        </Link>
-                        <Link
-                            href="/register"
-                            className="text-sm font-semibold tracking-wider hover:opacity-80 transition-opacity whitespace-nowrap text-foreground"
-                        >
-                            Đăng ký
-                        </Link>
+                        {user ? (
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" className="text-foreground">
+                                        {user.name || user.email}
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end" className="bg-white text-gray-800">
+                                    <DropdownMenuLabel>Tài khoản</DropdownMenuLabel>
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuItem asChild>
+                                        <Link href="/user/tickets">Vé của tôi</Link>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem asChild>
+                                        <Link href="/user/profile">Hồ sơ</Link>
+                                    </DropdownMenuItem>
+                                    {getDashboardLink() && (
+                                        <>
+                                            <DropdownMenuSeparator />
+                                            <DropdownMenuItem asChild>
+                                                <Link href={getDashboardLink()!}>Bảng điều khiển</Link>
+                                            </DropdownMenuItem>
+                                        </>
+                                    )}
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuItem onClick={handleLogout}>
+                                        Đăng xuất
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        ) : (
+                            <>
+                                <Link
+                                    href="/login"
+                                    className="text-sm font-semibold tracking-wider hover:opacity-80 transition-opacity whitespace-nowrap text-foreground"
+                                >
+                                    Đăng nhập
+                                </Link>
+                                <Link
+                                    href="/register"
+                                    className="text-sm font-semibold tracking-wider hover:opacity-80 transition-opacity whitespace-nowrap text-foreground"
+                                >
+                                    Đăng ký
+                                </Link>
+                            </>
+                        )}
                     </div>
                 </div>
             </div>

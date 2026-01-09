@@ -2,11 +2,11 @@
 
 
 import { GoogleMap, LoadScript, Marker, Circle } from '@react-google-maps/api';
-import envconfig from '../../../../config';
+
 import { EventCardData } from '@/utils/type';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Spinner } from '@/components/ui/spinner';
-import { Music } from 'lucide-react';
+import { envconfig } from '../../../../config';
 interface MapProps {
   coordinates: { lat: number; lng: number } | null;
   events: EventCardData[];

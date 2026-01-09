@@ -6,6 +6,7 @@ import List from './_components/List';
 import Map from './_components/Map';
 import { mapEvents } from '@/utils/mock';
 import { EventCardData } from '@/utils/type';
+import { motion } from 'framer-motion';
 
 
 const Page = () => {
@@ -39,7 +40,7 @@ const Page = () => {
 
     // Filter by category
     if (category) {
-      filtered = filtered.filter(event => 
+      filtered = filtered.filter(event =>
         event.category.toLowerCase().includes(category.toLowerCase())
       );
     }
@@ -69,26 +70,37 @@ const Page = () => {
   }, [category, searchQuery, sortBy, coordinates]);
   console.log(selectedEvent)
   return (
-    <div className="relative w-full h-screen overflow-hidden">
+    <div className="relative w-full h-screen overflow-hidden bg-background">
       {/* Map - Full Screen */}
-      <Map coordinates={coordinates} events={filteredEvents} isLoading={isLoading} selectedEvent={selectedEvent} />
-
-      {/* Header - Absolute Top Left */}
-      <div className="absolute top-4 left-4 w-full lg:w-[35%] z-20">
-        <Header 
-          category={category}
-          setCategory={setCategory}
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-          sortBy={sortBy}
-          setSortBy={setSortBy}
-        />
+      <div className="absolute inset-0 z-0">
+        <Map coordinates={coordinates} events={filteredEvents} isLoading={isLoading} selectedEvent={selectedEvent} />
       </div>
 
-      {/* List - Absolute Below Header */}
-      <div className="absolute top-[180px] left-4 bottom-4 w-full lg:w-[35%] z-10">
-        <List eventsData={filteredEvents}  isLoading={isLoading}  setSelectedEvent={setSelectedEvent} />
-      </div>
+      {/* Sidebar Panel - Unified */}
+      <motion.div
+        initial={{ x: -300, opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
+        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+        className="absolute top-4 left-4 h-[calc(100vh-2rem)] w-full lg:w-[30%] min-w-[320px] flex flex-col gap-4 z-10 pointer-events-none"
+      >
+        {/* Header Section - Pointer events enabled for interaction */}
+        <div className="pointer-events-auto">
+          <Header
+            category={category}
+            setCategory={setCategory}
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            sortBy={sortBy}
+            setSortBy={setSortBy}
+          />
+        </div>
+
+        {/* List Section - Pointer events enabled for interaction */}
+        <div className="flex-1 min-h-0 pointer-events-auto">
+          <List eventsData={filteredEvents} isLoading={isLoading} setSelectedEvent={setSelectedEvent} />
+        </div>
+
+      </motion.div>
     </div>
   );
 }
