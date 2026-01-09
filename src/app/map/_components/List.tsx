@@ -8,11 +8,11 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 interface ListProps {
   eventsData: EventCardData[];
-  onSelectEvent: (coords: { lat: number; lng: number }) => void;
   isLoading: boolean;
+  setSelectedEvent: React.Dispatch<React.SetStateAction<EventCardData | null>>;
 }
 
-const List = ({ eventsData, onSelectEvent, isLoading }: ListProps) => {
+const List = ({ eventsData,  isLoading, setSelectedEvent }: ListProps) => {
   return (
    <div className="h-full overflow-y-auto bg-gradient-to-br from-card/95 via-primary/5 to-card/95 backdrop-blur-lg rounded-2xl shadow-2xl border border-primary/20 p-4 space-y-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
       {isLoading ? (
@@ -37,9 +37,8 @@ const List = ({ eventsData, onSelectEvent, isLoading }: ListProps) => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.05, duration: 0.3 }}
-            onClick={() => onSelectEvent({ lat: event.lat, lng: event.lng })}
           >
-            <DetailPlace eventData={event} />
+            <DetailPlace eventData={event} setSelectedEvent={setSelectedEvent} />
           </motion.div>
         ))
       )}

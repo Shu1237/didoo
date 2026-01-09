@@ -5,6 +5,7 @@ import Header from './_components/Header';
 import List from './_components/List';
 import Map from './_components/Map';
 import { mapEvents } from '@/utils/mock';
+import { EventCardData } from '@/utils/type';
 
 
 const Page = () => {
@@ -14,7 +15,7 @@ const Page = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<'date' | 'distance' | 'price'>('date');
   const [isLoading, setIsLoading] = useState(true);
-
+  const [selectedEvent, setSelectedEvent] = useState<EventCardData | null>(null);
   // Get user location on mount
   useEffect(() => {
     if (navigator.geolocation) {
@@ -66,11 +67,11 @@ const Page = () => {
 
     setFilteredEvents(filtered);
   }, [category, searchQuery, sortBy, coordinates]);
-
+  console.log(selectedEvent)
   return (
     <div className="relative w-full h-screen overflow-hidden">
       {/* Map - Full Screen */}
-      <Map coordinates={coordinates} setCoordinates={setCoordinates} events={filteredEvents} isLoading={isLoading} />
+      <Map coordinates={coordinates} events={filteredEvents} isLoading={isLoading} selectedEvent={selectedEvent} />
 
       {/* Header - Absolute Top Left */}
       <div className="absolute top-4 left-4 w-full lg:w-[35%] z-20">
@@ -86,7 +87,7 @@ const Page = () => {
 
       {/* List - Absolute Below Header */}
       <div className="absolute top-[180px] left-4 bottom-4 w-full lg:w-[35%] z-10">
-        <List eventsData={filteredEvents} onSelectEvent={setCoordinates} isLoading={isLoading} />
+        <List eventsData={filteredEvents}  isLoading={isLoading}  setSelectedEvent={setSelectedEvent} />
       </div>
     </div>
   );
