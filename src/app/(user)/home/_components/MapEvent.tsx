@@ -1,26 +1,19 @@
 'use client';
 
-import { Event } from "@/data/mock-data";
 import { MapPin, Calendar } from "lucide-react";
 import Image from "next/image";
-import {
-  GoogleMap,
-  LoadScript,
-  Marker,
-} from "@react-google-maps/api";
+import MapComponent, { Marker, NavigationControl } from 'react-map-gl/mapbox';
+import "mapbox-gl/dist/mapbox-gl.css";
 import { useEffect, useRef, useState, useMemo } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Spinner } from "@/components/ui/spinner";
 import { getDistanceKm } from "@/utils/helper";
+import { Event } from "@/utils/type";
+import envconfig from "../../../../../config";
 
 interface MapEventProps {
   eventData: Event[];
 }
-
-const mapContainerStyle = {
-  width: "100%",
-  height: "520px",
-};
 
 // ================== DISTANCE UTILS ==================
 
@@ -153,73 +146,53 @@ export default function MapEvent({ eventData }: MapEventProps) {
                   </div>
                 </div>
               ) : (
-                <LoadScript
-                  googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ""}
-                >
-                  {userLocation && (
-                    <GoogleMap
-                      mapContainerStyle={mapContainerStyle}
-                      center={
-                        selectedEvent
-                          ? { lat: selectedEvent.lat, lng: selectedEvent.lng }
-                          : userLocation
-                      }
-                      zoom={13}
-                      options={{
-                        fullscreenControl: false,
-                        streetViewControl: false,
-                        mapTypeControl: false,
-                        gestureHandling: isExpanded ? "greedy" : "cooperative",
-                        styles: [
-                          {
-                            featureType: "all",
-                            elementType: "geometry",
-                            stylers: [{ color: "#242f3e" }],
-                          },
-                          {
-                            featureType: "all",
-                            elementType: "labels.text.stroke",
-                            stylers: [{ color: "#242f3e" }, { lightness: -80 }],
-                          },
-                          {
-                            featureType: "all",
-                            elementType: "labels.text.fill",
-                            stylers: [{ color: "#746855" }],
-                          },
-                          // Add more dark mode styles here if needed
-                        ]
-                      }}
-                    >
-                      {/* USER */}
-                      <Marker
-                        position={userLocation}
-                        icon={{
-                          url: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png",
-                        }}
-                      />
+                userLocation && (
+                  <MapComponent
+                    mapboxAccessToken={envconfig.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN!}
+                    initialViewState={{
+                      longitude: selectedEvent ? selectedEvent.lng : userLocation.lng,
+                      latitude: selectedEvent ? selectedEvent.lat : userLocation.lat,
+                      zoom: 13,
+                    }}
+                    style={{ width: "100%", height: "520px" }}
+                    mapStyle="mapbox://styles/mapbox/streets-v12"
+                  >
+                    <NavigationControl position="top-right" />
 
-                      {/* EVENTS */}
-                      {nearbyEvents.map((event) => (
-                        <Marker
-                          key={event.id}
-                          position={{ lat: event.lat, lng: event.lng }}
-                          onClick={() => {
-                            setSelectedEvent(event);
-                            setIsExpanded(true);
-                          }}
-                          icon={
+                    {/* USER MARKER */}
+                    <Marker
+                      longitude={userLocation.lng}
+                      latitude={userLocation.lat}
+                      anchor="bottom"
+                    >
+                      <div className="w-6 h-6 bg-blue-500 rounded-full border-2 border-white shadow-lg" title="Vị trí của bạn" />
+                    </Marker>
+
+                    {/* EVENT MARKERS */}
+                    {nearbyEvents.map((event) => (
+                      <Marker
+                        key={event.id}
+                        longitude={event.lng}
+                        latitude={event.lat}
+                        anchor="bottom"
+                        onClick={(e) => {
+                          e.originalEvent.stopPropagation();
+                          setSelectedEvent(event);
+                          setIsExpanded(true);
+                        }}
+                      >
+                        <div
+                          className={`w-8 h-8 rounded-full border-2 border-white shadow-lg transition-all ${
                             selectedEvent?.id === event.id
-                              ? {
-                                url: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png',
-                                scaledSize: new window.google.maps.Size(48, 48),
-                              }
-                              : undefined
-                          }
+                              ? 'bg-red-500 scale-125 animate-bounce'
+                              : 'bg-orange-500'
+                          }`}
+                          title={event.title}
                         />
-                      ))}
-                    </GoogleMap>
-                  )}
-                </LoadScript>
+                      </Marker>
+                    ))}
+                  </MapComponent>
+                )
               )}
             </div>
 

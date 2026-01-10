@@ -179,4 +179,7 @@
     -ms-overflow-style: none;  /* IE and Edge */
     scrollbar-width: none;  /* Firefox */
   }
+  .mapboxgl-popup-content {
+    padding: 0 !important;
+}
 }

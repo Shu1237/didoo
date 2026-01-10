@@ -1,15 +1,14 @@
 'use client';
 
-import { EventCardData } from '@/utils/type';
 import React from 'react';
 import DetailPlace from './DetailPlace';
 import { motion } from 'framer-motion';
 import { Skeleton } from '@/components/ui/skeleton';
-
+import { Event } from "@/utils/type";
 interface ListProps {
-  eventsData: EventCardData[];
+  eventsData: Event[];
   isLoading: boolean;
-  setSelectedEvent: React.Dispatch<React.SetStateAction<EventCardData | null>>;
+  setSelectedEvent: React.Dispatch<React.SetStateAction<Event | null>>;
 }
 
 const List = ({ eventsData, isLoading, setSelectedEvent }: ListProps) => {

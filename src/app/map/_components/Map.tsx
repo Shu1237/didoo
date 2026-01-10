@@ -1,25 +1,26 @@
 'use client';
 
+import MapComponent, { Marker, NavigationControl } from 'react-map-gl/mapbox';
+import 'mapbox-gl/dist/mapbox-gl.css';
 
-import { GoogleMap, LoadScript, Marker, Circle } from '@react-google-maps/api';
-
-import { EventCardData } from '@/utils/type';
+import { Event } from '@/utils/type';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Spinner } from '@/components/ui/spinner';
 import { envconfig } from '../../../../config';
+
+
+
 interface MapProps {
   coordinates: { lat: number; lng: number } | null;
-  events: EventCardData[];
+  events: Event[];
   isLoading: boolean;
-  selectedEvent: EventCardData | null;
+  selectedEvent: Event | null;
+  mapStyle?: string;
 }
 
-const mapContainerStyle = {
-  width: '100%',
-  height: '100%',
-};
-
-const Map = ({ coordinates, events, isLoading, selectedEvent }: MapProps) => {
+const Map = ({ coordinates, events, isLoading, selectedEvent,mapStyle  }: MapProps) => {
+  
+ 
   if (isLoading || !coordinates) {
     return (
       <div className="w-full h-full relative">
@@ -30,48 +31,49 @@ const Map = ({ coordinates, events, isLoading, selectedEvent }: MapProps) => {
   }
 
   return (
-    <LoadScript googleMapsApiKey={envconfig.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!}>
-      <GoogleMap
-        mapContainerStyle={mapContainerStyle}                                     // user location
-        center={selectedEvent ? { lat: selectedEvent.lat, lng: selectedEvent.lng } : coordinates}
-        zoom={13}
-        options={{
-          fullscreenControl: false,
-          streetViewControl: false,
-          mapTypeControl: false,
-          gestureHandling: 'greedy',
-        }}
-      >
-        {/* User Location Marker */}
-        <Marker
-          position={coordinates}
-          icon={{
-            url: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png',
-          }}
-          title="Vị trí của bạn"
-        />
+    <MapComponent
 
+      mapboxAccessToken={envconfig.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN!}
+      initialViewState={{
+        longitude: selectedEvent ? selectedEvent.lng : coordinates.lng,
+        latitude: selectedEvent ? selectedEvent.lat : coordinates.lat,
+        zoom: 13,
+      }}
+      style={{ width: '100%', height: '100%' }}
+      mapStyle={mapStyle}
+      maxZoom={20}
+      minZoom={3}
+    >
+      <NavigationControl position="top-right" />
       
+      {/* User Location Marker */}
+      <Marker
+        longitude={coordinates.lng}
+        latitude={coordinates.lat}
+        anchor="bottom"
+      >
+        <div className="w-6 h-6 bg-blue-500 rounded-full border-2 border-white shadow-lg" title="Vị trí của bạn" />
+      </Marker>
 
-        {/* Event Markers */}
-        {events.map((event) => (
-          <Marker
-            key={event.id}
-            position={{ lat: event.lat, lng: event.lng }}
-            title={event.title}
-            animation={selectedEvent?.id === event.id ? window.google.maps.Animation.BOUNCE : undefined}
-            icon={
+      {/* Event Markers */}
+      {events.map((event) => (
+        <Marker
+          key={event.id}
+          longitude={event.lng}
+          latitude={event.lat}
+          anchor="bottom"
+        >
+          <div
+            className={`w-8 h-8 rounded-full border-2 border-white shadow-lg transition-all ${
               selectedEvent?.id === event.id
-                ? {
-                    url: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png',
-                    scaledSize: new window.google.maps.Size(48, 48),
-                  }
-                : undefined
-            }
+                ? 'bg-red-500 scale-125 animate-bounce'
+                : 'bg-orange-500'
+            }`}
+            title={event.title}
           />
-        ))}
-      </GoogleMap>
-    </LoadScript>
+        </Marker>
+      ))}
+    </MapComponent>
   );
 };
 

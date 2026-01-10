@@ -23,7 +23,7 @@ export default function UsersList({users}: UsersListProps) {
   }
   return (
     <div className="space-y-4">
-      {users.map((user: any) => (
+      {users.map((user) => (
         <Card key={user.id} className="p-4">
           <div className="flex items-center justify-between">
             <div>

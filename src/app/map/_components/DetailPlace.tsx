@@ -1,14 +1,14 @@
 'use client';
 
-import { EventCardData } from '@/utils/type';
+
 import React from 'react';
 import Image from 'next/image';
 import { Calendar, MapPin, Clock, DollarSign } from 'lucide-react';
 import Link from 'next/link';
-
+import { Event } from "@/utils/type";
 interface DetailPlaceProps {
-  eventData: EventCardData;
-  setSelectedEvent: React.Dispatch<React.SetStateAction<EventCardData | null>>;
+  eventData: Event;
+  setSelectedEvent: React.Dispatch<React.SetStateAction<Event | null>>;
 }
 
 const DetailPlace = ({ eventData ,setSelectedEvent}: DetailPlaceProps) => {
@@ -18,13 +18,13 @@ const DetailPlace = ({ eventData ,setSelectedEvent}: DetailPlaceProps) => {
       {/* Image */}
       <div className="relative h-48 w-full overflow-hidden">
         <Image
-          src={eventData.imageUrl}
+          src={eventData.image}
           alt={eventData.title}
           fill
           className="object-cover group-hover:scale-105 transition-transform duration-300"
         />
         {/* Badge */}
-        <div className="absolute top-3 right-3 bg-gradient-to-r from-primary to-accent text-white px-3 py-1.5 rounded-full text-xs font-bold shadow-lg">
+        <div className="absolute top-3 right-3 bg-linear-to-r from-primary to-accent text-white px-3 py-1.5 rounded-full text-xs font-bold shadow-lg">
           {eventData.category}
         </div>
       </div>
@@ -52,8 +52,8 @@ const DetailPlace = ({ eventData ,setSelectedEvent}: DetailPlaceProps) => {
         <div className="flex items-center justify-between pt-2 border-t border-primary/20">
           <div className="flex items-center gap-2">
             <DollarSign className="w-4 h-4 text-accent" />
-            <span className="text-base font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              {eventData.priceRange}
+            <span className="text-base font-bold bg-linear-to-r from-primary to-accent bg-clip-text text-transparent">
+              {eventData.price}
             </span>
           </div>
           <Link href={`/events/${eventData.id}`}>

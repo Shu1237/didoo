@@ -41,23 +41,23 @@ export const CATEGORIES: Category[] = [
 ];
 
 export const EVENTS: Event[] = [
-  {
-    id: '1',
-    title: 'Neon Nights Music Festival',
-    description: 'Experience the most vibrant electronic music festival of the year with top DJs from around the world.',
-    date: '2024-08-15T20:00:00',
-    location: 'Cyber City Arena',
-    status: 'pending',
-    lat: 10.842916,
-    lng: 106.708161,
-    image: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=2070&auto=format&fit=crop',
-    price: '$50',
-    category: 'Music',
-    organizer: {
-      name: 'Electric Dreams',
-      avatar: 'https://i.pravatar.cc/150?u=1',
-    },
-  },
+  // {
+  //   id: '1',
+  //   title: 'Neon Nights Music Festival',
+  //   description: 'Experience the most vibrant electronic music festival of the year with top DJs from around the world.',
+  //   date: '2024-08-15T20:00:00',
+  //   location: 'Cyber City Arena',
+  //   status: 'pending',
+  //   lat: 10.874772,
+  //   lng: 106.800659,
+  //   image: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=2070&auto=format&fit=crop',
+  //   price: '$50',
+  //   category: 'Music',
+  //   organizer: {
+  //     name: 'Electric Dreams',
+  //     avatar: 'https://i.pravatar.cc/150?u=1',
+  //   },
+  // },
   {
     id: '2',
     title: 'Abstract Art Exhibition',
@@ -65,8 +65,8 @@ export const EVENTS: Event[] = [
     date: '2024-08-20T10:00:00',
     location: 'Modern Gallery',
     status: 'pending',
-    lat: 10.870000, // +3km
-    lng: 106.708161,
+    lat: 10.878200, // ~400m Bắc
+    lng: 106.800500,
     image: 'https://images.unsplash.com/photo-1545989253-02cc26577f88?q=80&w=2070&auto=format&fit=crop',
     price: 'Free',
     category: 'Art',
@@ -81,12 +81,12 @@ export const EVENTS: Event[] = [
     description: 'Network with innovators and investors at the biggest tech meetup in the region.',
     date: '2024-09-05T09:00:00',
     location: 'Innovation Hub',
-    image: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=2070&auto=format&fit=crop',
     status: 'draft',
+    lat: 10.871900, // ~300m Nam
+    lng: 106.803300, // ~300m Đông
+    image: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=2070&auto=format&fit=crop',
     price: '$120',
     category: 'Tech',
-    lat: 10.897000, // +6km
-    lng: 106.708161,
     organizer: {
       name: 'Tech Ventures',
       avatar: 'https://i.pravatar.cc/150?u=3',
@@ -99,11 +99,11 @@ export const EVENTS: Event[] = [
     status: 'completed',
     date: '2024-07-30T16:00:00',
     location: 'Central Park',
+    lat: 10.879100, // ~500m Bắc
+    lng: 106.798300, // ~250m Tây
     image: '/event1.jpg',
     price: '$10',
     category: 'Food',
-    lat: 10.897000,
-    lng: 106.735500, // +3km east
     organizer: {
       name: 'Foodie Group',
       avatar: 'https://i.pravatar.cc/150?u=4',
@@ -116,8 +116,8 @@ export const EVENTS: Event[] = [
     status: 'completed',
     date: '2024-10-12T06:00:00',
     location: 'City Stadium',
-    lat: 10.870000,
-    lng: 106.735500,
+    lat: 10.872300, // ~250m Nam
+    lng: 106.797800, // ~300m Tây
     image: '/event2.jpg',
     price: '$25',
     category: 'Sports',

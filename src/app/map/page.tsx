@@ -4,19 +4,25 @@ import { useState, useEffect } from 'react';
 import Header from './_components/Header';
 import List from './_components/List';
 import Map from './_components/Map';
-import { mapEvents } from '@/utils/mock';
-import { EventCardData } from '@/utils/type';
+
 import { motion } from 'framer-motion';
-
-
+import { EVENTS } from '@/utils/mock';
+import { Event } from '@/utils/type';
+import { Button } from '@/components/ui/button';
+import { Layers } from 'lucide-react';
+const mapStyle = {
+  normalStyle: "mapbox://styles/mapbox/streets-v12",
+  satelliteStyle: "mapbox://styles/mapbox/standard-satellite"
+}
 const Page = () => {
   const [category, setCategory] = useState<string | null>(null);
   const [coordinates, setCoordinates] = useState<{ lat: number; lng: number } | null>(null);
-  const [filteredEvents, setFilteredEvents] = useState(mapEvents);
+  const [filteredEvents, setFilteredEvents] = useState(EVENTS);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<'date' | 'distance' | 'price'>('date');
+  const [mapStyleType, setMapStyleType] = useState<string>(mapStyle.normalStyle);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedEvent, setSelectedEvent] = useState<EventCardData | null>(null);
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   // Get user location on mount
   useEffect(() => {
     if (navigator.geolocation) {
@@ -33,10 +39,14 @@ const Page = () => {
       setTimeout(() => setIsLoading(false), 1000);
     }
   }, []);
-
+  const toggleMapStyle = () => {
+    setMapStyleType((prevStyle) =>
+      prevStyle === mapStyle.normalStyle ? mapStyle.satelliteStyle : mapStyle.normalStyle
+    );
+  }
   // Filter and sort events
   useEffect(() => {
-    let filtered = mapEvents;
+    let filtered = EVENTS;
 
     // Filter by category
     if (category) {
@@ -68,12 +78,24 @@ const Page = () => {
 
     setFilteredEvents(filtered);
   }, [category, searchQuery, sortBy, coordinates]);
-  console.log(selectedEvent)
+
   return (
     <div className="relative w-full h-screen overflow-hidden bg-background">
       {/* Map - Full Screen */}
       <div className="absolute inset-0 z-0">
-        <Map coordinates={coordinates} events={filteredEvents} isLoading={isLoading} selectedEvent={selectedEvent} />
+        <Map coordinates={coordinates} events={filteredEvents} isLoading={isLoading} selectedEvent={selectedEvent} mapStyle={mapStyleType} />
+      </div>
+
+      {/* Map Style Toggle Button */}
+      <div className="absolute bottom-6 right-6 z-20 pointer-events-auto">
+        <Button
+          variant="secondary"
+          size="icon"
+          onClick={toggleMapStyle}
+          className="rounded-full shadow-2xl bg-white dark:bg-card hover:scale-110 transition-transform border-2 border-white/20"
+        >
+          <Layers className="w-5 h-5" />
+        </Button>
       </div>
 
       {/* Sidebar Panel - Unified */}

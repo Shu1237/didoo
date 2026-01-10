@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import localFont from 'next/font/local'
 import "./globals.css";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { ThemeProvider } from "next-themes";
 import QueryClientProviderWrapper from "@/components/QueryClientProviderWrapper";
 
@@ -50,13 +49,13 @@ export default function RootLayout({
         <QueryClientProviderWrapper>
           <ThemeProvider
             attribute="class"
-            defaultTheme="system"
+            defaultTheme="dark"
             enableSystem
             disableTransitionOnChange
           >
             {children}
           </ThemeProvider>
-          <ReactQueryDevtools initialIsOpen={false} />
+
         </QueryClientProviderWrapper>
 
 
