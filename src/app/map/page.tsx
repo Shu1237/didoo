@@ -4,12 +4,12 @@ import { useState, useEffect } from 'react';
 import Header from './_components/Header';
 import List from './_components/List';
 import Map from './_components/Map';
-
+import { MapPin, Satellite } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { EVENTS } from '@/utils/mock';
 import { Event } from '@/utils/type';
 import { Button } from '@/components/ui/button';
-import { Layers } from 'lucide-react';
+
 const mapStyle = {
   normalStyle: "mapbox://styles/mapbox/streets-v12",
   satelliteStyle: "mapbox://styles/mapbox/standard-satellite"
@@ -23,6 +23,9 @@ const Page = () => {
   const [mapStyleType, setMapStyleType] = useState<string>(mapStyle.normalStyle);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
   // Get user location on mount
   useEffect(() => {
     if (navigator.geolocation) {
@@ -87,23 +90,23 @@ const Page = () => {
       </div>
 
       {/* Map Style Toggle Button */}
-      <div className="absolute bottom-6 right-6 z-20 pointer-events-auto">
+      {/* <div className="absolute bottom-6 right-6 z-20 pointer-events-auto">
         <Button
           variant="secondary"
           size="icon"
           onClick={toggleMapStyle}
           className="rounded-full shadow-2xl bg-white dark:bg-card hover:scale-110 transition-transform border-2 border-white/20"
         >
-          <Layers className="w-5 h-5" />
+          {mapStyleType === mapStyle.satelliteStyle ? <MapPin className="w-5 h-5 text-primary" /> : <Satellite className="w-5 h-5 text-primary" />}
         </Button>
-      </div>
+      </div> */}
 
       {/* Sidebar Panel - Unified */}
       <motion.div
         initial={{ x: -300, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         transition={{ type: "spring", stiffness: 300, damping: 30 }}
-        className="absolute top-4 left-4 h-[calc(100vh-2rem)] w-full lg:w-[30%] min-w-[320px] flex flex-col gap-4 z-10 pointer-events-none"
+        className="absolute top-[calc(var(--spacing)*20)] left-4 bottom-4 w-full lg:w-[30%] min-w-[320px] flex flex-col gap-2 z-10 pointer-events-none"
       >
         {/* Header Section - Pointer events enabled for interaction */}
         <div className="pointer-events-auto">
@@ -119,7 +122,7 @@ const Page = () => {
 
         {/* List Section - Pointer events enabled for interaction */}
         <div className="flex-1 min-h-0 pointer-events-auto">
-          <List eventsData={filteredEvents} isLoading={isLoading} setSelectedEvent={setSelectedEvent} />
+          <List eventsData={filteredEvents} isLoading={isLoading} setSelectedEvent={setSelectedEvent} currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} totalItems={totalItems} />
         </div>
 
       </motion.div>

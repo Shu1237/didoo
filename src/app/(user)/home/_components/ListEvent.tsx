@@ -2,7 +2,7 @@
 
 'use client';
 
-import { Event } from "@/data/mock-data";
+
 import EventCard from "@/components/ui/CardEvent";
 import {
   Carousel,
@@ -11,7 +11,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from '@/components/ui/carousel';
-
+import { Event } from "@/utils/type";
 interface ListEventProps {
   title: string;
   eventData: Event[];
@@ -48,8 +48,8 @@ export default function ListEvent({ title, eventData }: ListEventProps) {
                   title={event.title}
                   date={event.date}
                   location={event.location}
-                  priceRange={event.price}
-                  imageUrl={event.image}
+                  price={event.price}
+                  image={event.image}
                   category={event.category}
                 />
               </div>

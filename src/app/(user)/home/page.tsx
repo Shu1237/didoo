@@ -12,7 +12,7 @@ import { EVENTS } from "@/utils/mock";
 export default function Home() {
   // Filter events for different sections
   const upcomingEvents = EVENTS;
-  const popularEvents = [...EVENTS].reverse(); 
+  const popularEvents = [...EVENTS].reverse();
 
   return (
     <div className="min-h-screen bg-background pb-20">

@@ -182,11 +182,10 @@ export default function MapEvent({ eventData }: MapEventProps) {
                         }}
                       >
                         <div
-                          className={`w-8 h-8 rounded-full border-2 border-white shadow-lg transition-all ${
-                            selectedEvent?.id === event.id
+                          className={`w-8 h-8 rounded-full border-2 border-white shadow-lg transition-all ${selectedEvent?.id === event.id
                               ? 'bg-red-500 scale-125 animate-bounce'
                               : 'bg-orange-500'
-                          }`}
+                            }`}
                           title={event.title}
                         />
                       </Marker>

@@ -9,28 +9,18 @@ import {
   Card,
   CardContent,
 } from '@/components/ui/card';
+import { Event } from '@/utils/type';
 
-interface EventCardProps {
-  id: string | number;
-  title: string;
-  subtitle?: string;
-  date: string;
-  time?: string;
-  location: string;
-  priceRange: string;
-  imageUrl: string;
-  category?: string;
-}
 
 const EventCard = ({
   id,
   title,
   date,
   location,
-  priceRange,
-  imageUrl,
-  category
-}: EventCardProps) => {
+  price,
+  image,
+  category,
+}: Event) => {
   return (
     <Link href={`/events/${id}`} className="block group h-full">
       <motion.div
@@ -43,7 +33,7 @@ const EventCard = ({
             {/* Image Section */}
             <div className="relative w-full h-48 overflow-hidden">
               <Image
-                src={imageUrl}
+                src={image}
                 alt={title}
                 fill
                 className="object-cover transition-transform duration-700 group-hover:scale-110"
@@ -60,7 +50,7 @@ const EventCard = ({
               {/* Price Badge */}
               <div className="absolute bottom-3 left-3 bg-primary/90 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold text-white shadow-sm flex items-center gap-1">
                 <Ticket className="w-3 h-3" />
-                {priceRange}
+                {price}
               </div>
             </div>
 

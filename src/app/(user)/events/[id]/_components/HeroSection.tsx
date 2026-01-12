@@ -2,10 +2,10 @@
 import Image from 'next/image';
 import { Calendar, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { EventCardData } from '@/utils/type';
+import { Event } from '@/utils/type';
 
 interface DetailEventProps {
-  event: EventCardData ;
+  event: Event;
 }
 
 export default function EventBanner({ event }: DetailEventProps) {
@@ -20,7 +20,7 @@ export default function EventBanner({ event }: DetailEventProps) {
           <div className="w-full lg:col-span-7">
             <div className="relative w-full h-[350px] md:h-[480px] rounded-3xl overflow-hidden shadow-lg">
               <Image
-                src={event.imageUrl}
+                src={event.image}
                 alt={event.title}
                 fill
                 className="object-fit"
@@ -38,7 +38,7 @@ export default function EventBanner({ event }: DetailEventProps) {
 
             <div className="flex items-center gap-3 text-lg">
               <Calendar className="w-5 h-5" />
-              <span>{event.time}, {event.date}</span>
+              <span>{event.date}</span>
             </div>
 
             <div className="flex items-center gap-3 text-lg">
@@ -50,7 +50,7 @@ export default function EventBanner({ event }: DetailEventProps) {
             </div>
 
             <div className="text-2xl font-bold text-[#E5C3FF]">
-              {event.priceRange}
+              {event.price}
             </div>
 
             <Button

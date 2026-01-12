@@ -1,12 +1,13 @@
 'use client';
 
 import EventCard from "@/components/ui/CardEvent";
-import { EventCardData } from "@/utils/type";
+import { Event } from "@/utils/type";
+
 
 
 interface ListEventProps {
   title: string;
-  eventData: EventCardData[];
+  eventData: Event[];
 }
 
 export default function ListEvent({ title, eventData }: ListEventProps) {

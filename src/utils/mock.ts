@@ -4,26 +4,26 @@ import { Event } from "./type";
 
 
 export const MockImage = [
-    {
-        id: 1,
-        imageUrl : '/event1.jpg',
-        title: "G-DRAGON 2025 World Tour",
-    },
-    {
-        id: 2,
-        imageUrl : '/event2.jpg',
-        title: "G-DRAGON 2024 World Tour"
-    },
-    {
-        id: 3,
-        imageUrl : '/event3.jpg',
-        title: "G-DRAGON 2023 World Tour"
-    },
-    {
-        id: 4,
-        imageUrl : '/event4.jpg',
-        title: "G-DRAGON 2022 World Tour"
-    }
+  {
+    id: 1,
+    imageUrl: '/event1.jpg',
+    title: "G-DRAGON 2025 World Tour",
+  },
+  {
+    id: 2,
+    imageUrl: '/event2.jpg',
+    title: "G-DRAGON 2024 World Tour"
+  },
+  {
+    id: 3,
+    imageUrl: '/event3.jpg',
+    title: "G-DRAGON 2023 World Tour"
+  },
+  {
+    id: 4,
+    imageUrl: '/event4.jpg',
+    title: "G-DRAGON 2022 World Tour"
+  }
 ]
 
 
@@ -41,23 +41,23 @@ export const CATEGORIES: Category[] = [
 ];
 
 export const EVENTS: Event[] = [
-  // {
-  //   id: '1',
-  //   title: 'Neon Nights Music Festival',
-  //   description: 'Experience the most vibrant electronic music festival of the year with top DJs from around the world.',
-  //   date: '2024-08-15T20:00:00',
-  //   location: 'Cyber City Arena',
-  //   status: 'pending',
-  //   lat: 10.874772,
-  //   lng: 106.800659,
-  //   image: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=2070&auto=format&fit=crop',
-  //   price: '$50',
-  //   category: 'Music',
-  //   organizer: {
-  //     name: 'Electric Dreams',
-  //     avatar: 'https://i.pravatar.cc/150?u=1',
-  //   },
-  // },
+  {
+    id: '1',
+    title: 'Neon Nights Music Festival',
+    description: 'Experience the most vibrant electronic music festival of the year with top DJs from around the world.',
+    date: '2024-08-15T20:00:00',
+    location: 'Cyber City Arena',
+    status: 'pending',
+    lat: 10.874772,
+    lng: 106.800659,
+    image: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=2070&auto=format&fit=crop',
+    price: '$50',
+    category: 'Music',
+    organizer: {
+      name: 'Electric Dreams',
+      avatar: 'https://i.pravatar.cc/150?u=1',
+    },
+  },
   {
     id: '2',
     title: 'Abstract Art Exhibition',

@@ -4,6 +4,8 @@
 
 import { useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Toaster } from "sonner";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 export default function QueryClientProviderWrapper({
   children,
@@ -15,8 +17,8 @@ export default function QueryClientProviderWrapper({
       new QueryClient({
         defaultOptions: {
           queries: {
-      
-            staleTime: 5 * 60 * 1000, 
+
+            staleTime: 5 * 60 * 1000,
             retry: false,
             refetchOnWindowFocus: false,
           },
@@ -25,9 +27,11 @@ export default function QueryClientProviderWrapper({
   );
 
   return (
-  
+
     <QueryClientProvider client={queryClient}>
       {children}
+      <ReactQueryDevtools initialIsOpen={false} />
+      <Toaster richColors duration={2000} />
     </QueryClientProvider>
   );
 }
