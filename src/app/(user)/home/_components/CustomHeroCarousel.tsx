@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Calendar, MapPin } from 'lucide-react';
 import { MockImage } from '@/utils/mock';
 
 export default function CustomHeroCarousel() {
@@ -14,19 +14,21 @@ export default function CustomHeroCarousel() {
     const slideVariants = {
         enter: (direction: number) => ({
             x: direction > 0 ? '100%' : '-100%',
+            scale: 1.1,
             opacity: 0,
-
+            zIndex: 0,
         }),
         center: {
             zIndex: 1,
             x: 0,
+            scale: 1,
             opacity: 1,
         },
         exit: (direction: number) => ({
             zIndex: 0,
             x: direction < 0 ? '100%' : '-100%',
+            scale: 1.1,
             opacity: 0,
-
         }),
     };
 
@@ -43,16 +45,16 @@ export default function CustomHeroCarousel() {
     useEffect(() => {
         const timer = setInterval(() => {
             paginate(1);
-        }, 5000);
+        }, 6000);
         return () => clearInterval(timer);
     }, [currentIndex]);
 
-    const imageIndex = currentIndex;
-    const item = MockImage[imageIndex];
+    const item = MockImage[currentIndex];
 
     return (
-        <div className="relative w-full h-full overflow-hidden rounded-[2.5rem] shadow-2xl border-4 border-white/20 bg-background group">
-            <AnimatePresence initial={false} custom={direction}>
+        <div className="relative w-full h-full overflow-hidden rounded-[2rem] shadow-2xl bg-black group isolate">
+            {/* Main Carousel Track */}
+            <AnimatePresence initial={false} custom={direction} mode="popLayout">
                 <motion.div
                     key={currentIndex}
                     custom={direction}
@@ -61,9 +63,9 @@ export default function CustomHeroCarousel() {
                     animate="center"
                     exit="exit"
                     transition={{
-                        x: { type: "spring", stiffness: 100, damping: 20, duration: 2 }, // Softer spring
-                        opacity: { duration: 1.5, ease: "easeInOut" },
-                        scale: { duration: 1.5, ease: "easeInOut" }
+                        x: { type: "spring", stiffness: 200, damping: 30 },
+                        opacity: { duration: 0.4 },
+                        scale: { duration: 0.6 }
                     }}
                     drag="x"
                     dragConstraints={{ left: 0, right: 0 }}
@@ -77,68 +79,85 @@ export default function CustomHeroCarousel() {
                             paginate(-1);
                         }
                     }}
-                    className="absolute inset-0 w-full h-full"
+                    className="absolute inset-0 w-full h-full will-change-transform"
                 >
                     <Image
                         src={item.imageUrl}
                         alt={item.title}
                         fill
-                        className="object-cover"
                         priority
+                        className="object-cover transition-transform duration-[2000ms] ease-out"
                     />
-                    <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent" />
+
+                    {/* Gradient Overlays */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-80" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-black/40 mix-blend-multiply opacity-60" />
                 </motion.div>
             </AnimatePresence>
 
-            {/* Content Overlay */}
-            <div className="absolute bottom-0 left-0 right-0 p-8 md:p-12 z-20">
+            {/* Floating Content Card - Premium Look */}
+            <div className="absolute bottom-6 left-6 right-6 z-20">
                 <motion.div
                     key={`content-${currentIndex}`}
                     initial={{ y: 20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.2 }}
-                    className="glass-card p-6 rounded-2xl max-w-xl backdrop-blur-md bg-black/40 border-white/10"
+                    transition={{ delay: 0.3, duration: 0.5 }}
+                    className="bg-white/10 backdrop-blur-xl border border-white/10 p-5 rounded-2xl shadow-xl overflow-hidden relative"
                 >
-                    <div className="flex items-center gap-5">
-                        <div className="w-14 h-14 rounded-full bg-white/10 flex items-center justify-center text-3xl shrink-0 backdrop-blur-sm shadow-inner overflow-hidden">
-                            {/* Placeholder icons based on index logic or data if available */}
-                            {currentIndex % 4 === 0 ? '🎵' : currentIndex % 4 === 1 ? '🎨' : currentIndex % 4 === 2 ? '💻' : '🍔'}
+                    {/* Glass Shimmer Effect */}
+                    <div className="absolute inset-0 bg-gradient-to-tr from-white/10 via-transparent to-transparent pointer-events-none" />
+
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
+                        <div className="space-y-1">
+                            <div className="flex items-center gap-2 text-primary-foreground/80 text-xs font-semibold uppercase tracking-wider mb-2">
+                                <span className="bg-primary/20 px-2 py-0.5 rounded text-primary-foreground border border-primary/20">Featured</span>
+                                <span>•</span>
+                                <span>Upcoming Event</span>
+                            </div>
+                            <h2 className="text-xl md:text-2xl font-bold text-white leading-tight line-clamp-1">{item.title}</h2>
+                            <div className="flex items-center gap-4 text-white/70 text-sm pt-1">
+                                <div className="flex items-center gap-1.5">
+                                    <Calendar className="w-3.5 h-3.5" />
+                                    <span>Dec 12, 2025</span>
+                                </div>
+                                <div className="flex items-center gap-1.5">
+                                    <MapPin className="w-3.5 h-3.5" />
+                                    <span>Central City</span>
+                                </div>
+                            </div>
                         </div>
-                        <div className="flex-1 min-w-0">
-                            <h3 className="font-bold text-2xl text-white truncate drop-shadow-md">{item.title}</h3>
-                            <p className="text-white/80 text-sm mt-1 font-medium">Coming soon / Live Event</p>
-                        </div>
-                        <Button size="sm" className="hidden sm:inline-flex rounded-full bg-white text-black hover:bg-white/90 font-semibold px-6 shadow-lg shadow-white/10">
-                            Join
+
+                        <Button className="shrink-0 rounded-xl font-semibold shadow-lg shadow-primary/20 bg-white text-black hover:bg-white/90 transition-all hover:scale-105 active:scale-95">
+                            Book Ticket
                         </Button>
                     </div>
                 </motion.div>
             </div>
 
-            {/* Custom Navigation */}
-            <div className="absolute top-1/2 left-4 -translate-y-1/2 z-20 opacity-0 group-hover:opacity-100 transition-opacity">
+            {/* Navigation Buttons - Hidden by default, show on hover */}
+            <div className="absolute top-1/2 left-4 -translate-y-1/2 z-30 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                 <Button
                     size="icon"
-                    variant="outline"
-                    className="rounded-full bg-black/20 border-white/20 text-white hover:bg-black/40 hover:text-white backdrop-blur-sm h-12 w-12"
-                    onClick={() => paginate(-1)}
+                    variant="ghost"
+                    className="rounded-full bg-black/20 hover:bg-black/40 text-white backdrop-blur-md border border-white/10 h-10 w-10 hover:scale-110 transition-all"
+                    onClick={(e) => { e.stopPropagation(); paginate(-1); }}
                 >
-                    <ChevronLeft className="h-6 w-6" />
+                    <ChevronLeft className="h-5 w-5" />
                 </Button>
             </div>
-            <div className="absolute top-1/2 right-4 -translate-y-1/2 z-20 opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="absolute top-1/2 right-4 -translate-y-1/2 z-30 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                 <Button
                     size="icon"
-                    variant="outline"
-                    className="rounded-full bg-black/20 border-white/20 text-white hover:bg-black/40 hover:text-white backdrop-blur-sm h-12 w-12"
-                    onClick={() => paginate(1)}
+                    variant="ghost"
+                    className="rounded-full bg-black/20 hover:bg-black/40 text-white backdrop-blur-md border border-white/10 h-10 w-10 hover:scale-110 transition-all"
+                    onClick={(e) => { e.stopPropagation(); paginate(1); }}
                 >
-                    <ChevronRight className="h-6 w-6" />
+                    <ChevronRight className="h-5 w-5" />
                 </Button>
             </div>
 
-            {/* Dots Indicator */}
-            <div className="absolute bottom-4 right-8 z-20 flex gap-2">
+            {/* Progress/Pagination Indicators */}
+            <div className="absolute top-6 right-6 z-20 flex gap-1.5 p-1.5 rounded-full bg-black/20 backdrop-blur-md border border-white/5">
                 {MockImage.map((_, idx) => (
                     <button
                         key={idx}
@@ -146,12 +165,11 @@ export default function CustomHeroCarousel() {
                             setDirection(idx > currentIndex ? 1 : -1);
                             setCurrentIndex(idx);
                         }}
-                        className={`w-2 h-2 rounded-full transition-all duration-300 ${idx === currentIndex ? 'w-8 bg-white' : 'bg-white/40 hover:bg-white/60'
+                        className={`h-1.5 rounded-full transition-all duration-500 ${idx === currentIndex ? 'w-6 bg-white' : 'w-1.5 bg-white/30 hover:bg-white/50'
                             }`}
                     />
                 ))}
             </div>
-
         </div>
     );
 }

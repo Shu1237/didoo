@@ -15,10 +15,8 @@ export type JWTUserType = {
   exp?: number;
 };
 export interface Category {
-  id: string;
+  id: number;
   name: string;
-  icon: string;
-  color: string;
 }
 
 export interface Event {

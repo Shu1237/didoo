@@ -28,31 +28,38 @@ const List = ({
 }: ListProps) => {
 
   return (
-    <div className="h-full overflow-y-auto bg-background/80 backdrop-blur-xl rounded-2xl shadow-lg border border-border/50 p-4 space-y-4 no-scrollbar flex flex-col">
-      <div className="flex-1 space-y-4">
+    <div className="flex flex-col h-full min-h-0 items-center w-full">
+      {/* Scrollable List Area - 90% Width */}
+      <div className="flex-1 w-[90%] overflow-y-auto space-y-3 no-scrollbar scroll-smooth pr-1 pb-2">
         {isLoading ? (
-          <div className="space-y-4">
+          <div className="space-y-3">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="bg-card/50 rounded-xl p-4 shadow-sm border border-border/50 space-y-3">
-                <Skeleton className="h-40 w-full rounded-lg" />
-                <div className="space-y-2">
-                  <Skeleton className="h-4 w-3/4" />
-                  <Skeleton className="h-3 w-1/2" />
+              <div key={i} className="bg-card/30 rounded-2xl p-3 shadow-none border border-border/30 space-y-3 animate-pulse">
+                <div className="flex gap-4">
+                  <Skeleton className="h-24 w-24 rounded-xl shrink-0" />
+                  <div className="flex-1 space-y-2 py-1">
+                    <Skeleton className="h-4 w-3/4" />
+                    <Skeleton className="h-3 w-1/2" />
+                    <Skeleton className="h-8 w-1/3 mt-auto" />
+                  </div>
                 </div>
               </div>
             ))}
           </div>
         ) : eventsData.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-40 text-muted-foreground text-center">
-            <p className="font-medium">Không tìm thấy sự kiện</p>
-            <p className="text-sm">Thử thay đổi bộ lọc hoặc tìm kiếm khác</p>
+          <div className="flex flex-col items-center justify-center py-12 text-muted-foreground text-center">
+            <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
+              <Search className="w-6 h-6 opacity-50" />
+            </div>
+            <p className="font-semibold text-foreground">Không tìm thấy sự kiện</p>
+            <p className="text-sm mt-1 max-w-[200px]">Hãy thử tìm kiếm với từ khóa hoặc bộ lọc khác</p>
           </div>
         ) : (
           eventsData.map((event, index) => (
             <motion.div
               key={event.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
               transition={{ delay: index * 0.05, duration: 0.3 }}
               className="group"
             >
@@ -62,9 +69,9 @@ const List = ({
         )}
       </div>
 
-      {/* Pagination */}
+      {/* Pagination Container - Bottom Fixed - 90% Width */}
       {!isLoading && totalPages > 1 && (
-        <div className="pt-2 border-t border-border/50">
+        <div className="w-[90%] pt-2 mt-auto border-t border-border/40 shrink-0">
           <BasePagination
             currentPage={currentPage}
             totalPages={totalPages}
@@ -77,5 +84,8 @@ const List = ({
     </div>
   );
 };
+
+// Import necessary icons
+import { Search } from 'lucide-react';
 
 export default List;

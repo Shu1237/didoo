@@ -1,4 +1,5 @@
 
+import { MapIcon, ShieldCheck, Users, Zap } from "lucide-react";
 import { Category } from "./type";
 import { Event } from "./type";
 
@@ -32,12 +33,10 @@ export const MockImage = [
 
 
 export const CATEGORIES: Category[] = [
-  { id: '1', name: 'Music', icon: '🎵', color: 'bg-purple-100 text-purple-600' },
-  { id: '2', name: 'Art', icon: '🎨', color: 'bg-pink-100 text-pink-600' },
-  { id: '3', name: 'Sports', icon: '⚽', color: 'bg-blue-100 text-blue-600' },
-  { id: '4', name: 'Food', icon: '🍔', color: 'bg-orange-100 text-orange-600' },
-  { id: '5', name: 'Tech', icon: '💻', color: 'bg-cyan-100 text-cyan-600' },
-  { id: '6', name: 'Education', icon: '📚', color: 'bg-green-100 text-green-600' },
+  { id: 1, name: 'Art' },
+  { id: 2, name: 'Tech' },
+  { id: 3, name: 'Health' },
+  { id: 4, name: 'Music' },
 ];
 
 export const EVENTS: Event[] = [
@@ -65,7 +64,7 @@ export const EVENTS: Event[] = [
     date: '2024-08-20T10:00:00',
     location: 'Modern Gallery',
     status: 'pending',
-    lat: 10.878200, // ~400m Bắc
+    lat: 10.878200,
     lng: 106.800500,
     image: 'https://images.unsplash.com/photo-1545989253-02cc26577f88?q=80&w=2070&auto=format&fit=crop',
     price: 'Free',
@@ -82,8 +81,8 @@ export const EVENTS: Event[] = [
     date: '2024-09-05T09:00:00',
     location: 'Innovation Hub',
     status: 'draft',
-    lat: 10.871900, // ~300m Nam
-    lng: 106.803300, // ~300m Đông
+    lat: 10.871900,
+    lng: 106.803300,
     image: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=2070&auto=format&fit=crop',
     price: '$120',
     category: 'Tech',
@@ -99,8 +98,8 @@ export const EVENTS: Event[] = [
     status: 'completed',
     date: '2024-07-30T16:00:00',
     location: 'Central Park',
-    lat: 10.879100, // ~500m Bắc
-    lng: 106.798300, // ~250m Tây
+    lat: 10.879100,
+    lng: 106.798300,
     image: '/event1.jpg',
     price: '$10',
     category: 'Food',
@@ -116,8 +115,8 @@ export const EVENTS: Event[] = [
     status: 'completed',
     date: '2024-10-12T06:00:00',
     location: 'City Stadium',
-    lat: 10.872300, // ~250m Nam
-    lng: 106.797800, // ~300m Tây
+    lat: 10.872300,
+    lng: 106.797800,
     image: '/event2.jpg',
     price: '$25',
     category: 'Sports',
@@ -126,6 +125,125 @@ export const EVENTS: Event[] = [
       avatar: 'https://i.pravatar.cc/150?u=5',
     },
   },
+  {
+    id: '6',
+    title: 'AI & Future Workshop',
+    description: 'Learn about the future of AI in this interactive workshop.',
+    date: '2024-11-15T14:00:00',
+    location: 'Tech Hub',
+    status: 'pending',
+    lat: 10.875000,
+    lng: 106.801000,
+    image: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2070&auto=format&fit=crop',
+    price: '$80',
+    category: 'Tech',
+    organizer: {
+      name: 'AI Labs',
+      avatar: 'https://i.pravatar.cc/150?u=6',
+    },
+  },
+  {
+    id: '7',
+    title: 'Jazz Night Live',
+    description: 'Smooth jazz evening with saxophonist Kenny G tribute.',
+    date: '2024-08-18T19:00:00',
+    location: 'Blue Note Club',
+    status: 'pending',
+    lat: 10.876000,
+    lng: 106.802000,
+    image: 'https://images.unsplash.com/photo-1415201364774-f6f0bb35f28f?q=80&w=2070&auto=format&fit=crop',
+    price: '$45',
+    category: 'Music',
+    organizer: {
+      name: 'Jazz Lovers',
+      avatar: 'https://i.pravatar.cc/150?u=7',
+    },
+  },
+  {
+    id: '8',
+    title: 'Yoga in the Park',
+    description: 'Morning yoga session for mindfulness and flexibility.',
+    date: '2024-08-24T06:30:00',
+    location: 'Green Park',
+    status: 'pending',
+    lat: 10.879500,
+    lng: 106.799000,
+    image: 'https://images.unsplash.com/photo-1603988363607-e1e4a66962c6?q=80&w=2070&auto=format&fit=crop',
+    price: '$15',
+    category: 'Health',
+    organizer: {
+      name: 'Yoga Peace',
+      avatar: 'https://i.pravatar.cc/150?u=8',
+    },
+  },
+  {
+    id: '9',
+    title: 'Digital Marketing Mastery',
+    description: 'Master the art of digital marketing in 2024.',
+    date: '2024-09-10T09:00:00',
+    location: 'Business Center',
+    status: 'pending',
+    lat: 10.873000,
+    lng: 106.804000,
+    image: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?q=80&w=2070&auto=format&fit=crop',
+    price: '$200',
+    category: 'Education',
+    organizer: {
+      name: 'Growth Hackers',
+      avatar: 'https://i.pravatar.cc/150?u=9',
+    },
+  },
+  {
+    id: '10',
+    title: 'Street Food Festival',
+    description: 'Biggest street food gathering in the city.',
+    date: '2024-08-25T17:00:00',
+    location: 'Downtown Square',
+    status: 'pending',
+    lat: 10.877000,
+    lng: 106.796000,
+    image: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?q=80&w=2070&auto=format&fit=crop',
+    price: 'Free entry',
+    category: 'Food',
+    organizer: {
+      name: 'City Events',
+      avatar: 'https://i.pravatar.cc/150?u=10',
+    },
+  },
+  {
+    id: '11',
+    title: 'Coding Bootcamp Open Day',
+    description: 'Free introduction to coding and career advice.',
+    date: '2024-08-31T10:00:00',
+    location: 'Code Academy',
+    status: 'pending',
+    lat: 10.874000,
+    lng: 106.800000,
+    image: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=2070&auto=format&fit=crop',
+    price: 'Free',
+    category: 'Tech',
+    organizer: {
+      name: 'Code Academy',
+      avatar: 'https://i.pravatar.cc/150?u=11',
+    },
+  },
+  {
+    id: '12',
+    title: 'Photography Walk',
+    description: 'Join us for a guided photography walk through the historic district.',
+    date: '2024-09-01T15:00:00',
+    location: 'Old Quarter',
+    status: 'pending',
+    lat: 10.875500,
+    lng: 106.802500,
+    image: 'https://images.unsplash.com/photo-1452587925148-ce544e77e70d?q=80&w=2070&auto=format&fit=crop',
+    price: '$20',
+    category: 'Art',
+    organizer: {
+      name: 'Photo Club',
+      avatar: 'https://i.pravatar.cc/150?u=12',
+    },
+  }
 ];
 
 export const USERS = [
@@ -141,3 +259,38 @@ export const USERS = [
   },
 ];
 
+export const features = [
+  {
+    icon: MapIcon,
+    title: "Smart Discovery",
+    description: "Real-time interactive map to find events near you instantly.",
+    color: "text-blue-500",
+    bg: "bg-blue-500/10",
+    colSpan: "col-span-1 lg:col-span-1",
+  },
+  {
+    icon: Zap,
+    title: "Instant Booking",
+    description: "Book tickets in seconds with our seamless checkout process.",
+    color: "text-yellow-500",
+    bg: "bg-yellow-500/10",
+    colSpan: "col-span-1 lg:col-span-1",
+  },
+  {
+    icon: Users,
+    title: "Community Driven",
+    description: "Join thousands of explorers. Share, review, and connect.",
+    color: "text-pink-500",
+    bg: "bg-pink-500/10",
+    colSpan: "col-span-1 lg:col-span-2",
+    className: "flex-row items-center gap-6",
+  },
+  {
+    icon: ShieldCheck,
+    title: "Verified & Secure",
+    description: "100% verified events and secure payment gateways.",
+    color: "text-green-500",
+    bg: "bg-green-500/10",
+    colSpan: "col-span-1 lg:col-span-2",
+  }
+];

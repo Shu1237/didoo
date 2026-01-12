@@ -1,16 +1,18 @@
 import Header from "@/components/layout/Header";
 
-
-
 export default function MapLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <div className="fixed inset-0 h-screen w-screen overflow-hidden">
+    <div className="h-screen w-screen overflow-hidden">
       <Header />
-      {children}
+
+      {/* Content offset xuống dưới header */}
+      <div className="pt-[74px] h-full">
+        {children}
+      </div>
     </div>
   );
 }

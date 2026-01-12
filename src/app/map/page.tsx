@@ -47,6 +47,9 @@ const Page = () => {
       prevStyle === mapStyle.normalStyle ? mapStyle.satelliteStyle : mapStyle.normalStyle
     );
   }
+  // Pagination constants
+  const ITEMS_PER_PAGE = 5; // Adjusted to fill taller space
+
   // Filter and sort events
   useEffect(() => {
     let filtered = EVENTS;
@@ -79,52 +82,64 @@ const Page = () => {
       return 0;
     });
 
-    setFilteredEvents(filtered);
-  }, [category, searchQuery, sortBy, coordinates]);
+    // Calculate pagination
+    setTotalItems(filtered.length);
+    setTotalPages(Math.ceil(filtered.length / ITEMS_PER_PAGE));
+
+    // Slice for current page
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const paginatedEvents = filtered.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
+    setFilteredEvents(paginatedEvents);
+  }, [category, searchQuery, sortBy, coordinates, currentPage]);
+
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [category, searchQuery, sortBy]);
 
   return (
-    <div className="relative w-full h-screen overflow-hidden bg-background">
+    <div className="relative w-full h-screen overflow-hidden bg-muted/20">
       {/* Map - Full Screen */}
       <div className="absolute inset-0 z-0">
         <Map coordinates={coordinates} events={filteredEvents} isLoading={isLoading} selectedEvent={selectedEvent} mapStyle={mapStyleType} />
       </div>
 
-      {/* Map Style Toggle Button */}
-      {/* <div className="absolute bottom-6 right-6 z-20 pointer-events-auto">
-        <Button
-          variant="secondary"
-          size="icon"
-          onClick={toggleMapStyle}
-          className="rounded-full shadow-2xl bg-white dark:bg-card hover:scale-110 transition-transform border-2 border-white/20"
-        >
-          {mapStyleType === mapStyle.satelliteStyle ? <MapPin className="w-5 h-5 text-primary" /> : <Satellite className="w-5 h-5 text-primary" />}
-        </Button>
-      </div> */}
-
-      {/* Sidebar Panel - Unified */}
+      {/* Sidebar Panel - Premium Floating Glass */}
       <motion.div
-        initial={{ x: -300, opacity: 0 }}
+        initial={{ x: -100, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
-        transition={{ type: "spring", stiffness: 300, damping: 30 }}
-        className="absolute top-[calc(var(--spacing)*20)] left-4 bottom-4 w-full lg:w-[30%] min-w-[320px] flex flex-col gap-2 z-10 pointer-events-none"
+        transition={{ type: "spring", stiffness: 300, damping: 25 }}
+        className="absolute top-4 left-4 w-full md:w-[440px] max-h-[calc(100vh-6rem)] z-10 flex flex-col gap-4 pointer-events-none"
       >
-        {/* Header Section - Pointer events enabled for interaction */}
-        <div className="pointer-events-auto">
-          <Header
-            category={category}
-            setCategory={setCategory}
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-            sortBy={sortBy}
-            setSortBy={setSortBy}
-          />
-        </div>
+        {/* Main Floating Container */}
+        <div className="flex flex-col h-auto max-h-full bg-background/60 dark:bg-background/40 backdrop-blur-xl border border-white/20 dark:border-white/10 shadow-2xl rounded-[2rem] p-4 pointer-events-auto">
 
-        {/* List Section - Pointer events enabled for interaction */}
-        <div className="flex-1 min-h-0 pointer-events-auto">
-          <List eventsData={filteredEvents} isLoading={isLoading} setSelectedEvent={setSelectedEvent} currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} totalItems={totalItems} />
-        </div>
+          {/* Top: Header Filter */}
+          <div className="shrink-0 mb-4">
+            <div className="flex items-center gap-2 mb-4 px-1">
+              <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center shadow-lg shadow-primary/30">
+                <MapPin className="w-4 h-4 text-white" />
+              </div>
+              <h1 className="font-bold text-lg tracking-tight">Khám phá hoạt động</h1>
+            </div>
 
+            <Header
+              category={category}
+              setCategory={setCategory}
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+              sortBy={sortBy}
+              setSortBy={setSortBy}
+            />
+          </div>
+
+          {/* Middle: List */}
+          <div className="flex-1 relative">
+            <List eventsData={filteredEvents} isLoading={isLoading} setSelectedEvent={setSelectedEvent} currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} totalItems={totalItems} />
+          </div>
+
+        </div>
       </motion.div>
     </div>
   );
