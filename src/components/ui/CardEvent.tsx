@@ -1,4 +1,4 @@
-// src/components/ui/CardEvent.tsx
+
 'use client';
 
 import Image from 'next/image';
@@ -28,33 +28,26 @@ const EventCard = ({
         transition={{ type: "spring", stiffness: 300 }}
         className="h-full"
       >
-        <Card className="h-full overflow-hidden rounded-2xl border-none shadow-lg hover:shadow-2xl transition-shadow duration-300 bg-card dark:bg-card/50 backdrop-blur-sm">
-          <CardContent className="p-0 h-full flex flex-col">
-            {/* Image Section */}
-            <div className="relative w-full h-48 overflow-hidden">
-              <Image
-                src={image}
-                alt={title}
-                fill
-                className="object-cover transition-transform duration-700 group-hover:scale-110"
-              />
-              <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent opacity-60" />
+        <div className='w-[303px] h-[265px] rounded-[10px] shadow-lg hover:shadow-xl transition-shadow bg-card'>
+          <div className='h-[156px] relative '>
+          <div className='w-[95%] mx-auto absolute top-2.5 left-0 right-0 h-[146px] overflow-hidden rounded-xl border border-white/10'>
+              <Image src={image} alt={title} fill className="rounded-xl object-cover" />
+          </div>
 
-              {/* Category Badge */}
-              {category && (
-                <div className="absolute top-3 right-3 bg-white/90 dark:bg-black/80 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold text-primary shadow-sm">
-                  {category}
-                </div>
-              )}
-
-              {/* Price Badge */}
-              <div className="absolute bottom-3 left-3 bg-primary/90 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold text-white shadow-sm flex items-center gap-1">
-                <Ticket className="w-3 h-3" />
-                {price}
+            {/* Category Badge */}
+            {category && (
+              <div className="absolute top-4 right-4 bg-white/90 dark:bg-black/80 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold text-primary shadow-sm">
+                {category}
               </div>
-            </div>
+            )}
 
-            {/* Content Section */}
+            {/* Price Badge */}
+            <div className="absolute bottom-[7px] left-3.5 bg-primary/90 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold text-white shadow-sm flex items-center gap-1">
+              <Ticket className="w-3 h-3" />
+              {price}
+            </div>
+          </div>
+
             <div className="p-4 flex flex-col flex-1 gap-3">
               <h3 className="text-lg font-bold leading-tight line-clamp-2 group-hover:text-primary transition-colors">
                 {title}
@@ -72,10 +65,9 @@ const EventCard = ({
                 </div>
               </div>
             </div>
-          </CardContent>
-        </Card>
+        </div>
       </motion.div>
-    </Link>
+    </Link >
   );
 };
 
