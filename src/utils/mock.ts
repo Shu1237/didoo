@@ -100,7 +100,7 @@ export const EVENTS: Event[] = [
     location: 'Central Park',
     lat: 10.879100,
     lng: 106.798300,
-    image: '/event1.jpg',
+    image: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=2070&auto=format&fit=crop',
     price: '$10',
     category: 'Food',
     organizer: {
@@ -117,7 +117,7 @@ export const EVENTS: Event[] = [
     location: 'City Stadium',
     lat: 10.872300,
     lng: 106.797800,
-    image: '/event2.jpg',
+    image: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=2070&auto=format&fit=crop',
     price: '$25',
     category: 'Sports',
     organizer: {
@@ -202,7 +202,7 @@ export const EVENTS: Event[] = [
     status: 'pending',
     lat: 10.877000,
     lng: 106.796000,
-    image: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?q=80&w=2070&auto=format&fit=crop',
+    image: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=2070&auto=format&fit=crop',
     price: 'Free entry',
     category: 'Food',
     organizer: {
@@ -236,7 +236,7 @@ export const EVENTS: Event[] = [
     status: 'pending',
     lat: 10.875500,
     lng: 106.802500,
-    image: 'https://images.unsplash.com/photo-1452587925148-ce544e77e70d?q=80&w=2070&auto=format&fit=crop',
+    image: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=2070&auto=format&fit=crop',
     price: '$20',
     category: 'Art',
     organizer: {
