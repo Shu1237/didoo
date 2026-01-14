@@ -4,10 +4,14 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight, Calendar, MapPin } from 'lucide-react';
-import { MockImage } from '@/utils/mock';
+import { ChevronLeft, ChevronRight, Calendar, MapPin, Ticket } from 'lucide-react';
+import { Event } from '@/utils/type';
 
-export default function CustomHeroCarousel() {
+interface CustomHeroCarouselProps {
+    events: Event[];
+}
+
+export default function CustomHeroCarousel({ events }: CustomHeroCarouselProps) {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [direction, setDirection] = useState(0);
 
@@ -39,17 +43,19 @@ export default function CustomHeroCarousel() {
 
     const paginate = (newDirection: number) => {
         setDirection(newDirection);
-        setCurrentIndex((prevIndex) => (prevIndex + newDirection + MockImage.length) % MockImage.length);
+        setCurrentIndex((prevIndex) => (prevIndex + newDirection + events.length) % events.length);
     };
 
     useEffect(() => {
         const timer = setInterval(() => {
             paginate(1);
-        }, 6000);
+        }, 4000);
         return () => clearInterval(timer);
-    }, [currentIndex]);
+    }, [currentIndex, events.length]);
 
-    const item = MockImage[currentIndex];
+    if (!events || events.length === 0) return null;
+
+    const item = events[currentIndex];
 
     return (
         <div className="relative w-full h-full overflow-hidden rounded-[2rem] shadow-2xl bg-black group isolate">
@@ -82,11 +88,11 @@ export default function CustomHeroCarousel() {
                     className="absolute inset-0 w-full h-full will-change-transform"
                 >
                     <Image
-                        src={item.imageUrl}
+                        src={item.image}
                         alt={item.title}
                         fill
                         priority
-                        className="object-cover transition-transform duration-[2000ms] ease-out"
+                        className="object-cover transition-transform duration-[2000ms] ease-out brightness-75"
                     />
 
                     {/* Gradient Overlays */}
@@ -102,63 +108,73 @@ export default function CustomHeroCarousel() {
                     initial={{ y: 20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ delay: 0.3, duration: 0.5 }}
-                    className="bg-white/10 backdrop-blur-xl border border-white/10 p-5 rounded-2xl shadow-xl overflow-hidden relative"
+                    className="bg-white/10 backdrop-blur-xl border border-white/10 p-5 md:p-8 rounded-3xl shadow-2xl overflow-hidden relative max-w-3xl mx-auto"
                 >
                     {/* Glass Shimmer Effect */}
                     <div className="absolute inset-0 bg-gradient-to-tr from-white/10 via-transparent to-transparent pointer-events-none" />
 
-                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
-                        <div className="space-y-1">
-                            <div className="flex items-center gap-2 text-primary-foreground/80 text-xs font-semibold uppercase tracking-wider mb-2">
-                                <span className="bg-primary/20 px-2 py-0.5 rounded text-primary-foreground border border-primary/20">Featured</span>
-                                <span>•</span>
-                                <span>Upcoming Event</span>
+                    <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 relative z-10">
+                        <div className="space-y-3 flex-1">
+                            <div className="flex items-center gap-3 mb-2">
+                                <span className="bg-primary/90 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg shadow-primary/20 backdrop-blur-sm">
+                                    {item.category || "Featured"}
+                                </span>
+                                {item.price && (
+                                    <span className="flex items-center gap-1.5 bg-white/20 text-white px-3 py-1 rounded-full text-xs font-bold border border-white/10 backdrop-blur-sm">
+                                        <Ticket className="w-3 h-3" />
+                                        {item.price}
+                                    </span>
+                                )}
                             </div>
-                            <h2 className="text-xl md:text-2xl font-bold text-white leading-tight line-clamp-1">{item.title}</h2>
-                            <div className="flex items-center gap-4 text-white/70 text-sm pt-1">
-                                <div className="flex items-center gap-1.5">
-                                    <Calendar className="w-3.5 h-3.5" />
-                                    <span>Dec 12, 2025</span>
+
+                            <h2 className="text-2xl md:text-4xl font-black text-white leading-tight tracking-tight line-clamp-2 drop-shadow-lg">
+                                {item.title}
+                            </h2>
+
+                            <div className="flex flex-wrap items-center gap-4 text-white/90 text-sm font-medium pt-1">
+                                <div className="flex items-center gap-2 bg-black/20 px-3 py-1.5 rounded-lg border border-white/5">
+                                    <Calendar className="w-4 h-4 text-primary" />
+                                    <span>{new Date(item.date).toLocaleDateString('vi-VN', { weekday: 'long', day: 'numeric', month: 'long' })}</span>
                                 </div>
-                                <div className="flex items-center gap-1.5">
-                                    <MapPin className="w-3.5 h-3.5" />
-                                    <span>Central City</span>
+                                <div className="flex items-center gap-2 bg-black/20 px-3 py-1.5 rounded-lg border border-white/5">
+                                    <MapPin className="w-4 h-4 text-pink-500" />
+                                    <span className="truncate max-w-[200px]">{item.location}</span>
                                 </div>
                             </div>
                         </div>
 
-                        <Button className="shrink-0 rounded-xl font-semibold shadow-lg shadow-primary/20 bg-white text-black hover:bg-white/90 transition-all hover:scale-105 active:scale-95">
-                            Book Ticket
+                        <Button className="shrink-0 h-12 px-8 rounded-2xl font-bold shadow-lg shadow-primary/30 bg-primary hover:bg-primary/90 text-white transition-all hover:scale-105 active:scale-95 text-base w-full md:w-auto">
+                            Đặt Vé Ngay
                         </Button>
                     </div>
                 </motion.div>
             </div>
 
             {/* Navigation Buttons - Hidden by default, show on hover */}
-            <div className="absolute top-1/2 left-4 -translate-y-1/2 z-30 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <div className="absolute top-1/2 left-4 -translate-y-1/2 z-30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 hidden md:block">
                 <Button
                     size="icon"
                     variant="ghost"
-                    className="rounded-full bg-black/20 hover:bg-black/40 text-white backdrop-blur-md border border-white/10 h-10 w-10 hover:scale-110 transition-all"
+                    className="rounded-full bg-black/20 hover:bg-black/40 text-white backdrop-blur-md border border-white/10 h-12 w-12 hover:scale-110 transition-all"
                     onClick={(e) => { e.stopPropagation(); paginate(-1); }}
                 >
-                    <ChevronLeft className="h-5 w-5" />
+                    <ChevronLeft className="h-6 w-6" />
                 </Button>
             </div>
-            <div className="absolute top-1/2 right-4 -translate-y-1/2 z-30 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <div className="absolute top-1/2 right-4 -translate-y-1/2 z-30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 hidden md:block">
                 <Button
                     size="icon"
                     variant="ghost"
-                    className="rounded-full bg-black/20 hover:bg-black/40 text-white backdrop-blur-md border border-white/10 h-10 w-10 hover:scale-110 transition-all"
+                    className="rounded-full bg-black/20 hover:bg-black/40 text-white backdrop-blur-md border border-white/10 h-12 w-12 hover:scale-110 transition-all"
                     onClick={(e) => { e.stopPropagation(); paginate(1); }}
                 >
-                    <ChevronRight className="h-5 w-5" />
+                    <ChevronRight className="h-6 w-6" />
                 </Button>
             </div>
 
             {/* Progress/Pagination Indicators */}
             <div className="absolute top-6 right-6 z-20 flex gap-1.5 p-1.5 rounded-full bg-black/20 backdrop-blur-md border border-white/5">
-                {MockImage.map((_, idx) => (
+                {events.map((_, idx) => (
                     <button
                         key={idx}
                         onClick={() => {

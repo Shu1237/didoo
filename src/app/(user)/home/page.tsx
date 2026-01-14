@@ -20,7 +20,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-background pb-20">
-      <HeroSection />
+      <HeroSection events={upcomingEvents.slice(0, 5)} />
 
       <SearchFilter />
 

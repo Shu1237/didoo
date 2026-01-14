@@ -17,15 +17,11 @@ const mapStyle = {
 const Page = () => {
   const [category, setCategory] = useState<string | null>(null);
   const [coordinates, setCoordinates] = useState<{ lat: number; lng: number } | null>(null);
-  const [filteredEvents, setFilteredEvents] = useState(EVENTS);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<'date' | 'distance' | 'price'>('date');
   const [mapStyleType, setMapStyleType] = useState<string>(mapStyle.normalStyle);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [totalItems, setTotalItems] = useState(0);
   // Get user location on mount
   useEffect(() => {
     if (navigator.geolocation) {
@@ -81,28 +77,26 @@ const Page = () => {
       }
       return 0;
     });
+  }, [category, searchQuery, sortBy, coordinates]);
 
-    // Calculate pagination
-    setTotalItems(filtered.length);
-    setTotalPages(Math.ceil(filtered.length / ITEMS_PER_PAGE));
 
-    // Slice for current page
-    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-    const paginatedEvents = filtered.slice(startIndex, startIndex + ITEMS_PER_PAGE);
-
-    setFilteredEvents(paginatedEvents);
-  }, [category, searchQuery, sortBy, coordinates, currentPage]);
-
-  // Reset page when filters change
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [category, searchQuery, sortBy]);
 
   return (
-    <div className="relative w-full h-screen overflow-hidden bg-muted/20">
+    <div className="relative w-full h-full overflow-hidden bg-muted/20">
       {/* Map - Full Screen */}
       <div className="absolute inset-0 z-0">
-        <Map coordinates={coordinates} events={filteredEvents} isLoading={isLoading} selectedEvent={selectedEvent} mapStyle={mapStyleType} />
+        <Map coordinates={coordinates} events={EVENTS} isLoading={isLoading} selectedEvent={selectedEvent} mapStyle={mapStyleType} />
+      </div>
+
+      <div className="absolute bottom-6 right-6 z-20 pointer-events-auto">
+        <Button
+          variant="secondary"
+          size="icon"
+          onClick={toggleMapStyle}
+          className="rounded-full shadow-2xl bg-white dark:bg-card hover:scale-110 transition-transform border-2 border-white/20"
+        >
+          {mapStyleType === mapStyle.satelliteStyle ? <MapPin className="w-5 h-5 text-primary" /> : <Satellite className="w-5 h-5 text-primary" />}
+        </Button>
       </div>
 
       {/* Sidebar Panel - Premium Floating Glass */}
@@ -110,10 +104,10 @@ const Page = () => {
         initial={{ x: -100, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         transition={{ type: "spring", stiffness: 300, damping: 25 }}
-        className="absolute top-4 left-4 w-full md:w-[440px] max-h-[calc(100vh-6rem)] z-10 flex flex-col gap-4 pointer-events-none"
+        className="absolute top-4 left-4 w-full md:w-[440px] bottom-[5px] z-10 flex flex-col gap-4 pointer-events-none"
       >
         {/* Main Floating Container */}
-        <div className="flex flex-col h-auto max-h-full bg-background/60 dark:bg-background/40 backdrop-blur-xl border border-white/20 dark:border-white/10 shadow-2xl rounded-[2rem] p-4 pointer-events-auto">
+        <div className="flex flex-col h-full bg-background/60 dark:bg-background/40 backdrop-blur-xl border border-white/20 dark:border-white/10 shadow-2xl rounded-[2rem] p-4 pointer-events-auto">
 
           {/* Top: Header Filter */}
           <div className="shrink-0 mb-4">
@@ -136,7 +130,7 @@ const Page = () => {
 
           {/* Middle: List */}
           <div className="flex-1 relative">
-            <List eventsData={filteredEvents} isLoading={isLoading} setSelectedEvent={setSelectedEvent} currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} totalItems={totalItems} />
+            <List eventsData={EVENTS} isLoading={isLoading} setSelectedEvent={setSelectedEvent} />
           </div>
 
         </div>

@@ -85,7 +85,7 @@ export const EVENTS: Event[] = [
     lng: 106.803300,
     image: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=2070&auto=format&fit=crop',
     price: '$120',
-    category: 'Tech',
+    category: 'Art',
     organizer: {
       name: 'Tech Ventures',
       avatar: 'https://i.pravatar.cc/150?u=3',
@@ -102,7 +102,7 @@ export const EVENTS: Event[] = [
     lng: 106.798300,
     image: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=2070&auto=format&fit=crop',
     price: '$10',
-    category: 'Food',
+    category: 'Art',
     organizer: {
       name: 'Foodie Group',
       avatar: 'https://i.pravatar.cc/150?u=4',
@@ -119,7 +119,7 @@ export const EVENTS: Event[] = [
     lng: 106.797800,
     image: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=2070&auto=format&fit=crop',
     price: '$25',
-    category: 'Sports',
+    category: 'Art',
     organizer: {
       name: 'Runners Club',
       avatar: 'https://i.pravatar.cc/150?u=5',

@@ -26,7 +26,6 @@ import {
     LogOut,
     LayoutDashboard,
     HelpCircle,
-    BookOpen
 } from "lucide-react";
 import {
     DropdownMenu,
@@ -211,7 +210,7 @@ const Header = () => {
 
                     {/* Right: Auth / Profile */}
                     <div className="flex items-center gap-4">
-                        <ModeToggle />
+                        {/* <ModeToggle /> */}
                         {user && isOrganizerOrAdmin(user.role) && (
                             <Link href="/organizer/events/create">
                                 <Button variant="ghost" className="text-gray-300 hover:text-white hover:bg-white/10 hidden lg:flex">

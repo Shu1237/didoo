@@ -28,7 +28,7 @@ const EventCard = ({
         transition={{ type: "spring", stiffness: 300 }}
         className="h-full"
       >
-        <div className='w-[303px] h-[265px] rounded-[10px] shadow-lg hover:shadow-xl transition-shadow bg-card'>
+        <div className='w-full h-full rounded-xl shadow-lg hover:shadow-xl transition-shadow bg-card flex flex-col'>
           <div className='h-[156px] relative '>
             <div className='w-[95%] mx-auto absolute top-2.5 left-0 right-0 h-[146px] overflow-hidden rounded-xl border border-white/10'>
               <Image src={image} alt={title} fill className="rounded-xl object-cover" />
