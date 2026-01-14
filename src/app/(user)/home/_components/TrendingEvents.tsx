@@ -35,7 +35,7 @@ export const TrendingEvents = ({ events }: TrendingEventsProps) => {
                 }}
                 className="w-full"
             >
-                <CarouselContent className="-ml-4 pb-8">
+                <CarouselContent className="ml-4 pb-8">
                     {trending.map((event, idx) => (
                         <CarouselItem key={event.id} className="pl-4 basis-[85%] md:basis-1/2 lg:basis-1/3 xl:basis-1/4">
                             <div className="relative h-full pt-8 pl-6">

@@ -47,7 +47,7 @@ export const WeekendEvents = ({ events }: WeekendEventsProps) => {
                                     alt={event.title}
                                     width={200}
                                     height={150}
-                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                    className="w-full h-full object-cover"
                                 />
                             </div>
 
