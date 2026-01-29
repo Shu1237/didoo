@@ -22,7 +22,7 @@ const DetailPlace = ({ eventData, setSelectedEvent }: DetailPlaceProps) => {
   return (
     <div
       onClick={() => setSelectedEvent(eventData)}
-      className="group relative flex gap-4 p-4 rounded-[1.5rem] bg-card/50 dark:bg-card/40 border border-white/40 dark:border-white/10 hover:border-primary/50 hover:bg-card/80 transition-all duration-300 cursor-pointer overflow-hidden backdrop-blur-md shadow-sm hover:shadow-xl hover:-translate-y-1 w-full max-w-full"
+      className="group relative flex gap-4 p-4 rounded-[1.5rem] bg-card/30 dark:bg-card/20 border border-white/40 dark:border-white/15 hover:border-primary/60 hover:bg-card/50 transition-all duration-300 cursor-pointer overflow-hidden backdrop-blur-lg shadow-sm hover:shadow-xl hover:-translate-y-1 w-full max-w-full"
     >
       {/* Left: Image & Action */}
       <div className="flex flex-col gap-3 shrink-0 w-28">
