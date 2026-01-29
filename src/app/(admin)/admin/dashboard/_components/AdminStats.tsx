@@ -1,8 +1,5 @@
 import { Card } from "@/components/ui/card";
-
-
-import { Wallet, Users, Calendar, Ticket } from "lucide-react";
-
+import { Wallet, Users, Calendar, Ticket, TrendingUp, TrendingDown } from "lucide-react";
 
 interface AdminStatsProps {
   adminStats: {
@@ -13,8 +10,8 @@ interface AdminStatsProps {
     icon: string;
     description: string;
   }[]
-
 }
+
 export default function AdminStats({ adminStats }: AdminStatsProps) {
   const iconMap: any = {
     Wallet,
@@ -24,23 +21,33 @@ export default function AdminStats({ adminStats }: AdminStatsProps) {
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       {adminStats.map((stat, index) => {
         const Icon = iconMap[stat.icon];
+        const isTrendUp = stat.trend === 'up';
+
         return (
-          <Card key={index} className="p-6 bg-background/60 backdrop-blur-md border-border/50 hover:shadow-lg transition-all duration-300 group">
-            <div className="flex items-center justify-between mb-4">
-              <div className="p-2 rounded-lg bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-colors">
-                {Icon && <Icon className="w-6 h-6" />}
+          <Card key={index} className="p-5 rounded-xl border border-border/50 bg-card shadow-sm hover:shadow-md transition-all duration-200">
+            <div className="flex justify-between items-start mb-2">
+              <div className="p-2 rounded-lg bg-secondary text-foreground">
+                {Icon && <Icon className="w-5 h-5" />}
               </div>
-              <span className={`text-xs font-bold px-2 py-1 rounded-full ${stat.trend === 'up' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
-                {stat.change}
-              </span>
+              {isTrendUp ? (
+                <div className="flex items-center gap-1 text-xs font-medium text-emerald-600 bg-emerald-50 dark:bg-emerald-950/30 px-2 py-1 rounded-md">
+                  <TrendingUp className="w-3 h-3" />
+                  {stat.change}
+                </div>
+              ) : (
+                <div className="flex items-center gap-1 text-xs font-medium text-rose-600 bg-rose-50 dark:bg-rose-950/30 px-2 py-1 rounded-md">
+                  <TrendingDown className="w-3 h-3" />
+                  {stat.change}
+                </div>
+              )}
             </div>
-            <div>
-              <p className="text-sm text-muted-foreground font-medium">{stat.title}</p>
-              <h3 className="text-2xl font-bold mt-1 text-foreground">{stat.value}</h3>
-              <p className="text-xs text-muted-foreground mt-2">{stat.description}</p>
+
+            <div className="mt-4">
+              <h3 className="text-2xl font-bold tracking-tight text-foreground">{stat.value}</h3>
+              <p className="text-sm font-medium text-muted-foreground">{stat.title}</p>
             </div>
           </Card>
         );

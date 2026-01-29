@@ -173,7 +173,7 @@ export default function CustomHeroCarousel({ events }: CustomHeroCarouselProps) 
             </div>
 
             {/* Progress/Pagination Indicators */}
-            <div className="absolute top-6 right-6 z-20 flex gap-1.5 p-1.5 rounded-full bg-black/20 backdrop-blur-md border border-white/5">
+            <div className="absolute bottom-6 right-6 z-20 flex gap-1.5 p-1.5 rounded-full bg-black/20 backdrop-blur-md border border-white/5">
                 {events.map((_, idx) => (
                     <button
                         key={idx}

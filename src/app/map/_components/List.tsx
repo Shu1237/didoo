@@ -11,9 +11,9 @@ interface ListProps {
   eventsData: Event[];
   isLoading: boolean;
   setSelectedEvent: React.Dispatch<React.SetStateAction<Event | null>>;
-  currentPage: number;
-  totalPages: number;
-  onPageChange: (page: number) => void;
+  currentPage?: number;
+  totalPages?: number;
+  onPageChange?: (page: number) => void;
   totalItems?: number;
 }
 
@@ -30,7 +30,7 @@ const List = ({
   return (
     <div className="flex flex-col h-full min-h-0 items-center w-full">
       {/* Scrollable List Area - 90% Width */}
-      <div className="flex-1 w-[90%] overflow-y-auto space-y-3 no-scrollbar scroll-smooth pr-1 pb-2">
+      <div className="flex-1 w-[90%] overflow-y-auto overflow-x-hidden space-y-3 scroll-smooth pb-2 min-h-0 no-scrollbar">
         {isLoading ? (
           <div className="space-y-3">
             {[1, 2, 3].map((i) => (
@@ -70,14 +70,14 @@ const List = ({
       </div>
 
       {/* Pagination Container - Bottom Fixed - 90% Width */}
-      {!isLoading && totalPages > 1 && (
-        <div className="w-[90%] pt-2 mt-auto border-t border-border/40 shrink-0">
+      {!isLoading && totalPages && totalPages > 1 && currentPage && onPageChange && (
+        <div className="w-[90%] pt-3 pb-1 mt-auto border-t border-border/40 shrink-0">
           <BasePagination
             currentPage={currentPage}
             totalPages={totalPages}
             onPageChange={onPageChange}
             totalItems={totalItems}
-            itemsPerPage={10}
+            itemsPerPage={5}
           />
         </div>
       )}

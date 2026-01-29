@@ -10,6 +10,7 @@ import { MonthOverview } from "./_components/MonthOverview";
 import { SpecialEvents } from "./_components/SpecialEvents";
 import { TrendingEvents } from "./_components/TrendingEvents";
 import { WeekendEvents } from "./_components/WeekendEvents";
+import MapEvent from "./_components/MapEvent";
 
 
 export default function Home() {
@@ -25,6 +26,7 @@ export default function Home() {
       <SearchFilter />
 
       <AboutSection />
+      <MapEvent eventData={upcomingEvents} />
 
       <div className="container mx-auto px-4 space-y-12">
         <SpecialEvents events={upcomingEvents} />

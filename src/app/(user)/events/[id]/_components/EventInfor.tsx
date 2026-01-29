@@ -2,88 +2,160 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { Info, ShieldCheck, AlertCircle, Ticket, Clock } from "lucide-react";
+import { Info, ShieldCheck, AlertCircle, Ticket, Clock, User, Calendar, Star } from "lucide-react";
+import { Event } from "@/utils/type";
+import Image from "next/image";
 
-export default function EventInfor() {
+interface EventInforProps {
+    event: Event;
+}
+
+export default function EventInfor({ event }: EventInforProps) {
+    // Generate some mock rich content if description is short (for design demo)
+    const longDescription = event.description.length < 100
+        ? `${event.description} Đây là sự kiện được mong chờ nhất năm với sự góp mặt của nhiều nghệ sĩ nổi tiếng. Chương trình hứa hẹn mang đến những màn trình diễn bùng nổ, âm thanh ánh sáng đẳng cấp quốc tế. Không chỉ là âm nhạc, đây còn là nơi kết nối những tâm hồn đồng điệu, tạo nên những kỷ niệm khó quên. Hãy chuẩn bị sẵn sàng cho một đêm không ngủ cùng chúng tôi!`
+        : event.description;
+
     return (
-        <section className="container mx-auto px-4 max-w-6xl -mt-8 relative z-20 pb-20">
-            <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-                className="bg-background/60 dark:bg-card/30 backdrop-blur-xl border border-white/20 dark:border-white/5 rounded-3xl p-8 md:p-12 shadow-xl"
-            >
-                {/* Header */}
-                <div className="flex items-center gap-4 mb-10 border-b border-border/40 pb-6">
-                    <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
-                        <Info className="w-6 h-6" />
-                    </div>
-                    <h2 className="text-3xl font-bold tracking-tight text-foreground">Thông tin quan trọng</h2>
-                </div>
+        <section className="container mx-auto px-4 max-w-7xl pb-20">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
 
-                {/* Content Box */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-12 text-muted-foreground leading-relaxed">
-
-                    {/* Column 1 */}
-                    <div className="space-y-8">
-                        {/* Section 1 */}
-                        <div className="group">
-                            <h3 className="font-bold text-lg text-foreground mb-3 flex items-center gap-2 group-hover:text-primary transition-colors">
-                                <ShieldCheck className="w-5 h-5 text-primary" />
-                                1. Quy định chung
-                            </h3>
-                            <ul className="space-y-2 list-disc pl-5 marker:text-primary/50 text-sm md:text-base">
-                                <li>Khán giả có trách nhiệm bảo quản tài sản cá nhân.</li>
-                                <li>Mỗi tài khoản được phép mua tối đa 10 vé mỗi lần.</li>
-                                <li>Vé bị lộ thông tin sẽ không được hỗ trợ giải quyết.</li>
-                            </ul>
+                {/* LEFT CONTENT - About & Organizer */}
+                <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.5 }}
+                    viewport={{ once: true }}
+                    className="lg:col-span-2 space-y-10"
+                >
+                    {/* About Section */}
+                    <div className="bg-white/60 dark:bg-card/30 backdrop-blur-2xl border border-white/40 dark:border-white/10 rounded-[2.5rem] p-8 md:p-10 shadow-sm">
+                        <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
+                            <Star className="w-6 h-6 text-yellow-500 fill-yellow-500" />
+                            Giới thiệu sự kiện
+                        </h2>
+                        <div className="prose dark:prose-invert max-w-none text-muted-foreground leading-relaxed">
+                            <p className="mb-4 text-lg">{longDescription}</p>
+                            <p>
+                                Sự kiện được tổ chức chuyên nghiệp với quy mô lớn, đảm bảo an ninh và trải nghiệm tốt nhất cho khán giả.
+                                Các khu vực tiện ích bao gồm: Quầy F&B đa dạng, Khu vực check-in sống ảo, Khu vực Y tế & Hỗ trợ.
+                            </p>
                         </div>
 
-                        {/* Section 2 */}
-                        <div className="group">
-                            <h3 className="font-bold text-lg text-foreground mb-3 flex items-center gap-2 group-hover:text-primary transition-colors">
-                                <AlertCircle className="w-5 h-5 text-primary" />
-                                2. Quy định về độ tuổi
-                            </h3>
-                            <ul className="space-y-2 list-disc pl-5 marker:text-primary/50 text-sm md:text-base">
-                                <li>Sự kiện không phù hợp cho trẻ em dưới 5 tuổi.</li>
-                                <li>Người giám hộ đi cùng phải chịu trách nhiệm hoàn toàn.</li>
-                                <li>Ban Tổ Chức không chịu trách nhiệm nếu không tuân thủ.</li>
-                            </ul>
+                        {/* Tags */}
+                        <div className="flex flex-wrap gap-2 mt-8">
+                            <span className="px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium border border-primary/20">
+                                #{event.category}
+                            </span>
+                            <span className="px-4 py-1.5 rounded-full bg-secondary/10 text-secondary text-sm font-medium border border-secondary/20">
+                                #LiveEvent
+                            </span>
+                            <span className="px-4 py-1.5 rounded-full bg-accent/10 text-accent text-sm font-medium border border-accent/20">
+                                #2024
+                            </span>
                         </div>
                     </div>
 
-                    {/* Column 2 */}
-                    <div className="space-y-8">
-                        {/* Section 3 */}
-                        <div className="group">
-                            <h3 className="font-bold text-lg text-foreground mb-3 flex items-center gap-2 group-hover:text-primary transition-colors">
-                                <Ticket className="w-5 h-5 text-primary" />
-                                3. Quy định về sử dụng vé
-                            </h3>
-                            <ul className="space-y-2 list-disc pl-5 marker:text-primary/50 text-sm md:text-base">
-                                <li>Vé đã mua không hoàn tiền dưới mọi hình thức chiều lòng.</li>
-                                <li>Người mua không được phép chỉnh sửa thông tin vé.</li>
-                                <li>Khán giả cần giữ vé nguyên vẹn mã vạch để check-in.</li>
-                            </ul>
+                    {/* Organizer Section */}
+                    <div className="bg-white/60 dark:bg-card/30 backdrop-blur-2xl border border-white/40 dark:border-white/10 rounded-[2.5rem] p-8 md:p-10 shadow-sm flex flex-col md:flex-row items-center gap-8">
+                        <div className="relative w-28 h-28 shrink-0">
+                            <div className="absolute inset-0 bg-primary/20 rounded-full animate-pulse" />
+                            <Image
+                                src={event.organizer?.avatar || "https://i.pravatar.cc/150?u=org"}
+                                alt={event.organizer?.name || "Organizer"}
+                                fill
+                                className="object-cover rounded-full border-4 border-background relative z-10"
+                            />
+                            <div className="absolute bottom-0 right-0 z-20 bg-blue-500 text-white p-1 rounded-full border-2 border-background">
+                                <ShieldCheck className="w-3 h-3" />
+                            </div>
                         </div>
-
-                        {/* Section 4 */}
-                        <div className="group">
-                            <h3 className="font-bold text-lg text-foreground mb-3 flex items-center gap-2 group-hover:text-primary transition-colors">
-                                <Clock className="w-5 h-5 text-primary" />
-                                4. Thời gian check-in
-                            </h3>
-                            <ul className="space-y-2 list-disc pl-5 marker:text-primary/50 text-sm md:text-base">
-                                <li>Cổng check-in mở trước giờ diễn ra 2 tiếng.</li>
-                                <li>Vui lòng đến sớm để hoàn tất thủ tục an ninh.</li>
-                                <li>BTC có quyền từ chối vào cửa nếu đến quá trễ.</li>
-                            </ul>
+                        <div className="text-center md:text-left">
+                            <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-1">Ban tổ chức</h3>
+                            <h4 className="text-2xl font-bold text-foreground mb-2">{event.organizer?.name || "Organizer Name"}</h4>
+                            <p className="text-muted-foreground max-w-md">
+                                Đơn vị tổ chức sự kiện chuyên nghiệp với hơn 10 năm kinh nghiệm trong ngành giải trí và sự kiện.
+                            </p>
                         </div>
+                        <button className="md:ml-auto px-6 py-2.5 rounded-xl bg-muted hover:bg-muted/80 text-foreground font-medium transition-colors">
+                            Xem hồ sơ
+                        </button>
                     </div>
 
-                </div>
-            </motion.div>
+                </motion.div>
+
+                {/* RIGHT SIDEBAR - Important Info */}
+                <motion.div
+                    initial={{ opacity: 0, x: 20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.5, delay: 0.1 }}
+                    viewport={{ once: true }}
+                    className="lg:col-span-1"
+                >
+                    <div className="bg-white/60 dark:bg-card/30 backdrop-blur-2xl border border-white/40 dark:border-white/10 rounded-[2.5rem] p-8 sticky top-24 shadow-sm">
+                        <div className="flex items-center gap-3 mb-8 pb-4 border-b border-white/10">
+                            <div className="w-10 h-10 rounded-xl bg-red-500/10 flex items-center justify-center text-red-500">
+                                <Info className="w-6 h-6" />
+                            </div>
+                            <h3 className="text-xl font-bold">Lưu ý quan trọng</h3>
+                        </div>
+
+                        <div className="space-y-6">
+                            {/* Item 1 */}
+                            <div className="group flex gap-4">
+                                <div className="mt-1 w-8 h-8 rounded-full bg-background flex shrink-0 items-center justify-center shadow-sm text-primary group-hover:scale-110 transition-transform">
+                                    <Clock className="w-4 h-4" />
+                                </div>
+                                <div>
+                                    <h4 className="font-semibold text-foreground mb-1">Thời gian Check-in</h4>
+                                    <p className="text-sm text-muted-foreground">Vui lòng có mặt trước <span className="text-primary font-bold">2 tiếng</span> để hoàn tất thủ tục an ninh.</p>
+                                </div>
+                            </div>
+
+                            {/* Item 2 */}
+                            <div className="group flex gap-4">
+                                <div className="mt-1 w-8 h-8 rounded-full bg-background flex shrink-0 items-center justify-center shadow-sm text-primary group-hover:scale-110 transition-transform">
+                                    <Ticket className="w-4 h-4" />
+                                </div>
+                                <div>
+                                    <h4 className="font-semibold text-foreground mb-1">Vé sự kiện</h4>
+                                    <p className="text-sm text-muted-foreground">Không hoàn tiền. Giữ mã QR cẩn thận để quét tại cổng.</p>
+                                </div>
+                            </div>
+
+                            {/* Item 3 */}
+                            <div className="group flex gap-4">
+                                <div className="mt-1 w-8 h-8 rounded-full bg-background flex shrink-0 items-center justify-center shadow-sm text-primary group-hover:scale-110 transition-transform">
+                                    <AlertCircle className="w-4 h-4" />
+                                </div>
+                                <div>
+                                    <h4 className="font-semibold text-foreground mb-1">Độ tuổi</h4>
+                                    <p className="text-sm text-muted-foreground">Sự kiện dành cho khán giả trên <span className="text-primary font-bold">16 tuổi</span>. Mang theo CCCD.</p>
+                                </div>
+                            </div>
+
+                            {/* Item 4 */}
+                            <div className="group flex gap-4">
+                                <div className="mt-1 w-8 h-8 rounded-full bg-background flex shrink-0 items-center justify-center shadow-sm text-primary group-hover:scale-110 transition-transform">
+                                    <ShieldCheck className="w-4 h-4" />
+                                </div>
+                                <div>
+                                    <h4 className="font-semibold text-foreground mb-1">An ninh</h4>
+                                    <p className="text-sm text-muted-foreground">Không mang vũ khí, chất cháy nổ. Tuân thủ hướng dẫn của BTC.</p>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div className="mt-8 pt-6 border-t border-white/10 text-center">
+                            <p className="text-xs text-muted-foreground">
+                                Cần hỗ trợ? <a href="#" className="text-primary underline">Liên hệ BTC</a>
+                            </p>
+                        </div>
+                    </div>
+                </motion.div>
+
+            </div>
         </section>
     );
 }
