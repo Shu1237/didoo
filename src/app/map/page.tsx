@@ -43,10 +43,9 @@ const Page = () => {
       prevStyle === mapStyle.normalStyle ? mapStyle.satelliteStyle : mapStyle.normalStyle
     );
   }
-  // Pagination constants
-  const ITEMS_PER_PAGE = 5; // Adjusted to fill taller space
-
   // Filter and sort events
+  const [filteredEvents, setFilteredEvents] = useState<Event[]>(EVENTS);
+
   useEffect(() => {
     let filtered = EVENTS;
 
@@ -77,6 +76,8 @@ const Page = () => {
       }
       return 0;
     });
+
+    setFilteredEvents(filtered);
   }, [category, searchQuery, sortBy, coordinates]);
 
 
@@ -129,8 +130,12 @@ const Page = () => {
           </div>
 
           {/* Middle: List */}
-          <div className="flex-1 relative">
-            <List eventsData={EVENTS} isLoading={isLoading} setSelectedEvent={setSelectedEvent} />
+          <div className="flex-1 min-h-0 relative">
+            <List 
+              eventsData={filteredEvents} 
+              isLoading={isLoading} 
+              setSelectedEvent={setSelectedEvent}
+            />
           </div>
 
         </div>
