@@ -12,7 +12,7 @@ interface Props {
 export default function CustomHeroCarousel({ events, onSelect }: Props) {
     return (
         <div className="w-full">
-            <p className="text-white/40 text-[10px] font-bold uppercase tracking-[0.4em] mb-4 ml-1">
+            <p className="text-white/90 text-xs font-bold uppercase tracking-[0.4em] mb-4 ml-1 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
                 More Events
             </p>
 

@@ -59,8 +59,8 @@ export default function HeroSection({ events: initialEvents }: { events: Event[]
                             />
                         </motion.div>
 
-                        {/* Overlay làm tối nền */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-90" />
+                        {/* Overlay làm tối nền - giảm opacity để dễ nhìn hơn */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-black/20" />
                     </motion.div>
                 </AnimatePresence>
             </div>
@@ -79,14 +79,14 @@ export default function HeroSection({ events: initialEvents }: { events: Event[]
                                 exit={{ opacity: 0, y: -30 }}
                                 transition={{ duration: 0.5 }}
                             >
-                                <h1 className="text-6xl lg:text-8xl font-black text-white uppercase leading-[0.9] tracking-tighter mb-8 drop-shadow-2xl">
+                                <h1 className="text-6xl lg:text-8xl font-black text-white uppercase leading-[0.9] tracking-tighter mb-8 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
                                     {activeEvent.title}
                                 </h1>
                                 <div className="flex gap-4">
                                     <Button className="h-14 px-10 rounded-full bg-white text-black font-bold uppercase hover:bg-gray-200 transition-colors">
                                         Get Tickets
                                     </Button>
-                                    <Button variant="outline" className="h-14 px-8 rounded-full text-white border-white/30 backdrop-blur-md uppercase font-bold hover:bg-white/10 transition-colors">
+                                    <Button variant="outline" className="h-14 px-8 rounded-full !bg-white/20 !text-white !border-2 !border-white/70 backdrop-blur-md uppercase font-bold hover:!bg-white/30 hover:!border-white transition-colors">
                                         More Info
                                     </Button>
                                 </div>

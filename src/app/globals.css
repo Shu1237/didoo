@@ -247,38 +247,79 @@
     @apply bg-clip-text text-transparent bg-gradient-to-r from-primary via-purple-500 to-accent;
   }
 
-  .no-scrollbar::-webkit-scrollbar {
+  .no-scrollbar::-webkit-scrollbar,
+  .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
 
-  .no-scrollbar {
+  .no-scrollbar,
+  .scrollbar-hide {
     -ms-overflow-style: none;
     /* IE and Edge */
     scrollbar-width: none;
     /* Firefox */
   }
 
+  /* Global scrollbar - phù hợp giao diện Deep Twilight (Lilac) */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #CD9FCC80 transparent;
+  }
+
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #CD9FCC80;
+    border-radius: 10px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #CD9FCC;
+  }
+
+  ::-webkit-scrollbar-thumb:active {
+    background: #B88AB7;
+  }
+
+  .dark ::-webkit-scrollbar-thumb {
+    background: #CD9FCC70;
+  }
+
+  .dark ::-webkit-scrollbar-thumb:hover {
+    background: #CD9FCC;
+  }
+
   /* Custom thin scrollbar for list components */
   .scrollbar-thin::-webkit-scrollbar {
     width: 6px;
+    height: 6px;
   }
 
   .scrollbar-thin::-webkit-scrollbar-track {
     background: transparent;
-  }
-
-  .scrollbar-thin::-webkit-scrollbar-thumb {
-    background: rgba(var(--primary), 0.2);
     border-radius: 3px;
   }
 
-  .scrollbar-thin:hover::-webkit-scrollbar-thumb {
-    background: rgba(var(--primary), 0.4);
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: #CD9FCC80;
+    border-radius: 10px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: #CD9FCC;
   }
 
   .scrollbar-thin {
     scrollbar-width: thin;
-    scrollbar-color: hsl(var(--primary) / 0.2) transparent;
+    scrollbar-color: #CD9FCC80 transparent;
   }
 
   /* Theme toggle animation */
