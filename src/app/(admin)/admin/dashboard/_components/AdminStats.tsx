@@ -1,28 +1,28 @@
 import { Card } from "@/components/ui/card";
-import { Wallet, Ticket, Calendar, Users, TrendingUp, TrendingDown } from "lucide-react";
+import { Wallet, Users, Calendar, Ticket, TrendingUp, TrendingDown } from "lucide-react";
 
-interface DashboardStatsProps {
-  reportData: {
+interface AdminStatsProps {
+  adminStats: {
     title: string;
     value: string;
     change: string;
-    trend: string
+    trend: string;
     icon: string;
     description: string;
   }[]
 }
 
-export default function DashboardStats({ reportData }: DashboardStatsProps) {
+export default function AdminStats({ adminStats }: AdminStatsProps) {
   const iconMap: any = {
     Wallet,
-    Ticket,
+    Users,
     Calendar,
-    Users
+    Ticket
   };
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      {reportData.map((stat, index) => {
+      {adminStats.map((stat, index) => {
         const Icon = iconMap[stat.icon];
         const isTrendUp = stat.trend === 'up';
 
@@ -44,6 +44,7 @@ export default function DashboardStats({ reportData }: DashboardStatsProps) {
                 </div>
               )}
             </div>
+
             <div className="mt-4">
               <h3 className="text-2xl font-bold tracking-tight text-foreground">{stat.value}</h3>
               <p className="text-sm font-medium text-muted-foreground">{stat.title}</p>

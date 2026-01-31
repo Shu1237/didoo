@@ -1,6 +1,7 @@
 // import { DetailEventMock, nowShowingEvents } from "@/utils/mock";
 import HeroSection from "./_components/HeroSection";
 import EventInfor from "./_components/EventInfor";
+import EventLocation from "./_components/EventLocation";
 import ListEvent from "@/app/(user)/events/[id]/_components/ListEvent";
 import { EVENTS } from "@/utils/mock";
 
@@ -19,7 +20,9 @@ export default async function DetailEventPage({ params }: { params: { id: string
     <>
       <HeroSection event={detailEvent} />
 
-      <EventInfor />
+      <EventLocation event={detailEvent} />
+
+      <EventInfor event={detailEvent} />
 
       <ListEvent title="Có thể bạn sẽ thích" eventData={eventRelated} relatedEvent={true} />
     </>

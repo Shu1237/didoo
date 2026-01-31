@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { Calendar, MapPin, DollarSign, Share2, Heart } from 'lucide-react';
+import { Calendar, MapPin, Share2, Heart, Ticket, Clock, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Event } from '@/utils/type';
 import { motion } from 'framer-motion';
@@ -17,95 +17,158 @@ export default function HeroSection({ event }: DetailEventProps) {
   const isValidDate = !isNaN(eventDate.getTime());
 
   return (
-    <section className="relative w-full py-20 lg:py-32 overflow-hidden">
-      {/* Background Ambience - Blurs the event image */}
-      <div className="absolute inset-0 z-0">
-        <Image
-          src={event.image}
-          alt="Background"
-          fill
-          className="object-cover opacity-20 dark:opacity-10 blur-3xl scale-110"
-          priority
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-background via-background/80 to-background/40" />
+    <section className="relative w-full py-12 md:py-20 overflow-hidden">
+
+      {/* 1. Dynamic Background Ambience */}
+      <div className="absolute inset-0 z-0 select-none pointer-events-none">
+        {/* Blurry Image Background */}
+        <div className="absolute inset-0">
+          <Image
+            src={event.image}
+            alt="Background Ambience"
+            fill
+            className="object-cover opacity-[0.15] dark:opacity-[0.2] blur-[80px] scale-110"
+            priority
+          />
+        </div>
+        {/* Gradient Overlay for better text readability and fading */}
+        <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/60 to-background" />
       </div>
 
-      <div className="container relative z-10 px-4 mx-auto">
+      <div className="container relative z-10 px-4 mx-auto max-w-7xl">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="bg-white/50 dark:bg-black/40 backdrop-blur-2xl border border-white/20 dark:border-white/10 rounded-[2.5rem] p-6 md:p-10 shadow-2xl overflow-hidden"
+          initial={{ opacity: 0, scale: 0.98 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+          className="group relative bg-white/60 dark:bg-card/30 backdrop-blur-2xl border border-white/40 dark:border-white/10 rounded-[2.5rem] p-6 md:p-10 lg:p-12 shadow-2xl overflow-hidden"
         >
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+          {/* Grid Layout */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
 
-            {/* LEFT — Banner Image */}
-            <div className="lg:col-span-5 relative group">
-              <div className="relative aspect-[4/5] md:aspect-square lg:aspect-[4/5] rounded-2xl overflow-hidden shadow-2xl border border-white/10">
+            {/* LEFT: Event Image Card */}
+            <div className="lg:col-span-5 relative">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="relative aspect-[4/5] md:aspect-[3/3.5] lg:aspect-[3.5/4.5] rounded-3xl overflow-hidden shadow-2xl ring-1 ring-black/5"
+              >
                 <Image
                   src={event.image}
                   alt={event.title}
                   fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                  className="object-cover hover:scale-105 transition-transform duration-700 ease-in-out"
                   priority
                 />
-                {/* Category Badge */}
-                <div className="absolute top-4 left-4">
-                  <span className="px-4 py-1.5 rounded-full bg-black/60 backdrop-blur-md text-white text-sm font-semibold border border-white/20 shadow-lg">
+
+                {/* Status/Category Overlay Badges */}
+                <div className="absolute top-4 left-4 flex flex-col gap-2">
+                  <span className="px-4 py-1.5 rounded-full bg-black/50 backdrop-blur-md text-white text-xs font-bold uppercase tracking-wider border border-white/20 shadow-lg">
                     {event.category}
                   </span>
                 </div>
-              </div>
+                {/* Price Tag Overlay (Mobile/Visual) */}
+                <div className="absolute bottom-4 right-4 lg:hidden">
+                  <div className="bg-primary text-primary-foreground px-4 py-2 rounded-xl font-bold text-lg shadow-lg">
+                    {event.price === '0' || event.price === 'Free' ? 'Miễn phí' : event.price}
+                  </div>
+                </div>
+              </motion.div>
             </div>
 
-            {/* RIGHT — Event Info */}
+            {/* RIGHT: Event Details */}
             <div className="lg:col-span-7 flex flex-col justify-center space-y-8">
-              <div className="space-y-4">
+
+              {/* Header Info */}
+              <div className="space-y-6">
                 <motion.h1
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.2 }}
-                  className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight text-foreground leading-[1.1]"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-foreground leading-[1.1] text-balance"
                 >
                   {event.title}
                 </motion.h1>
 
-                <div className="flex flex-wrap items-center gap-4 md:gap-8 text-muted-foreground pt-2">
-                  <div className="flex items-center gap-2.5 px-4 py-2 rounded-xl bg-primary/5 border border-primary/10">
-                    <Calendar className="w-5 h-5 text-primary" />
-                    <span className="font-medium text-foreground">
-                      {isValidDate ? format(eventDate, "EEEE, dd 'tháng' MM, yyyy", { locale: vi }) : event.date}
-                    </span>
+                {/* Metadata Rows */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.4 }}
+                  className="flex flex-wrap gap-4 text-base"
+                >
+                  <div className="flex items-center gap-3 px-5 py-3 rounded-2xl bg-primary/5 text-primary border border-primary/10">
+                    <Calendar className="w-5 h-5" />
+                    <div className="flex flex-col">
+                      <span className="text-xs text-primary/70 uppercase font-bold tracking-wider">Ngày tổ chức</span>
+                      <span className="font-semibold">
+                        {isValidDate ? format(eventDate, "EEEE, dd/MM/yyyy", { locale: vi }) : event.date}
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2.5 px-4 py-2 rounded-xl bg-secondary/5 border border-secondary/10">
-                    <MapPin className="w-5 h-5 text-secondary" />
-                    <span className="font-medium text-foreground">{event.location}</span>
+
+                  <div className="flex items-center gap-3 px-5 py-3 rounded-2xl bg-secondary/5 text-secondary border border-secondary/10">
+                    <MapPin className="w-5 h-5" />
+                    <div className="flex flex-col">
+                      <span className="text-xs text-secondary/70 uppercase font-bold tracking-wider">Địa điểm</span>
+                      <span className="font-semibold">{event.location}</span>
+                    </div>
                   </div>
+                </motion.div>
+              </div>
+
+              {/* Price & Description */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.5 }}
+                className="space-y-4"
+              >
+                <div className="hidden lg:flex items-baseline gap-2">
+                  <span className="text-lg text-muted-foreground font-medium">Giá vé từ:</span>
+                  <span className="text-3xl font-bold text-primary">
+                    {event.price === '0' || event.price === 'Free' ? 'Miễn phí' : event.price}
+                  </span>
                 </div>
-              </div>
-
-              <div className="flex flex-col gap-2">
-                <p className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                  {event.price === '0' || event.price === 'Free' ? 'Miễn phí' : event.price}
+                <p className="text-lg text-muted-foreground leading-relaxed max-w-2xl line-clamp-3">
+                  {event.description}
                 </p>
-                <p className="text-muted-foreground leading-relaxed text-lg">
-                  {/* Placeholder for description if not in Event type, or generic text */}
-                  Hãy tham gia cùng chúng tôi trong sự kiện đặc biệt này. Một trải nghiệm không thể bỏ lỡ với những khoảnh khắc đáng nhớ và kết nối tuyệt vời.
-                </p>
-              </div>
+              </motion.div>
 
-              <div className="flex flex-col sm:flex-row gap-4 pt-4 border-t border-border/40">
-                <Button size="lg" className="h-14 px-8 text-lg font-bold rounded-2xl bg-primary hover:bg-primary/90 shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all flex-1 sm:flex-none">
-                  Mua vé ngay
+              {/* Action Buttons */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.6 }}
+                className="flex flex-col sm:flex-row gap-4 pt-4 border-t border-black/5 dark:border-white/5"
+              >
+                <Button
+                  size="lg"
+                  className="h-14 px-8 text-lg font-bold rounded-2xl bg-primary hover:bg-primary/90 shadow-xl shadow-primary/20 hover:shadow-primary/30 transition-all flex items-center justify-center gap-2 flex-1 sm:flex-none"
+                >
+                  <Ticket className="w-5 h-5" />
+                  <span>Mua vé ngay</span>
                 </Button>
-                <Button size="lg" variant="outline" className="h-14 px-6 rounded-2xl border-border/60 hover:bg-muted text-foreground flex gap-2">
-                  <Heart className="w-5 h-5" />
-                  <span>Quan tâm</span>
-                </Button>
-                <Button size="lg" variant="ghost" className="h-14 w-14 rounded-2xl hover:bg-muted text-muted-foreground p-0">
-                  <Share2 className="w-6 h-6" />
-                </Button>
-              </div>
+
+                <div className="flex gap-3">
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="h-14 px-6 rounded-2xl border-2 hover:bg-accent/5 hover:text-accent hover:border-accent/30 transition-all flex items-center gap-2 text-base font-semibold"
+                  >
+                    <Heart className="w-5 h-5" />
+                    <span className="hidden sm:inline">Quan tâm</span>
+                  </Button>
+
+                  <Button
+                    size="lg"
+                    variant="ghost"
+                    className="h-14 w-14 rounded-2xl border-2 border-transparent hover:border-border hover:bg-background transition-all"
+                  >
+                    <Share2 className="w-5 h-5" />
+                  </Button>
+                </div>
+              </motion.div>
 
             </div>
           </div>
