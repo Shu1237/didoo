@@ -1,33 +1,21 @@
 import type { Metadata } from "next";
-import localFont from 'next/font/local'
+import { Inter, Plus_Jakarta_Sans } from 'next/font/google'
 import "./globals.css";
 import { ThemeProvider } from "next-themes";
 import QueryClientProviderWrapper from "@/components/QueryClientProviderWrapper";
 
 
-const myFont = localFont({
-  src: [
-    {
-      path: '../fonts/Poppins-Regular.ttf',
-      weight: '400',
-      style: 'normal',
-
-    },
-    {
-      path: '../fonts/Poppins-SemiBold.ttf',
-      weight: '600',
-      style: 'normal',
-
-    },
-    {
-      path: '../fonts/Poppins-Bold.ttf',
-      weight: '700',
-      style: 'normal',
-
-    }
-  ],
+const inter = Inter({
+  subsets: ['latin'],
   display: 'swap',
-  variable: '--font-custom',
+  variable: '--font-inter',
+})
+
+// Using Plus Jakarta Sans as an alternative to Satoshi/General Sans for Headings
+const plusJakarta = Plus_Jakarta_Sans({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-heading',
 })
 
 
@@ -44,12 +32,12 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={myFont.className}
+        className={`${inter.variable} ${plusJakarta.variable} font-sans antialiased`}
       >
         <QueryClientProviderWrapper>
           <ThemeProvider
             attribute="class"
-            defaultTheme="dark"
+            defaultTheme="light"
             enableSystem
             disableTransitionOnChange
           >

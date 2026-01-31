@@ -1,31 +1,29 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { useSessionStore } from "@/stores/sesionStore";
 import { authRequest } from "@/apiRequest/auth";
 import { Button } from "@/components/ui/button";
-import { isOrganizerOrAdmin } from "@/utils/permissions";
 import {
-    Map as MapIcon,
     ChevronDown,
-    Music,
-    Trophy,
-    Cpu,
-    Briefcase,
-    GraduationCap,
-    Hammer,
     MapPin,
     Wifi,
     Gift,
     List,
     Ticket,
-    User,
     LogOut,
     LayoutDashboard,
-    HelpCircle,
+    Palette,
+    Brush,
+    Rocket,
+    Zap,
+    Briefcase,
+    Cpu,
+    Search,
+    ArrowUpRight
 } from "lucide-react";
 import {
     DropdownMenu,
@@ -35,23 +33,12 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ModeToggle } from "./buttonMode";
 
 const Header = () => {
     const user = useSessionStore((state) => state.user);
     const router = useRouter();
     const pathname = usePathname();
     const [hoveredNav, setHoveredNav] = useState<string | null>(null);
-    const [scrolled, setScrolled] = useState(false);
-
-    // Handle scroll effect
-    useEffect(() => {
-        const handleScroll = () => {
-            setScrolled(window.scrollY > 20);
-        };
-        window.addEventListener("scroll", handleScroll);
-        return () => window.removeEventListener("scroll", handleScroll);
-    }, []);
 
     const handleLogout = async () => {
         try {
@@ -69,237 +56,167 @@ const Header = () => {
         return "/user/profile";
     };
 
-    // Interaction: Active link check
     const isActive = (path: string) => pathname === path || pathname?.startsWith(path + "/");
 
     return (
         <>
-            {/* Blur Overlay when Mega Menu is open */}
+            {/* Overlay làm mờ nền khi hover Mega Menu */}
             <div
-                className={`fixed inset-0 bg-background/20 backdrop-blur-sm z-40 transition-opacity duration-500 ${hoveredNav === 'categories' ? 'opacity-100 visible' : 'opacity-0 invisible pointer-events-none'
-                    }`}
+                className={`fixed inset-0 bg-black/10 backdrop-blur-sm z-40 transition-opacity duration-300 ${hoveredNav === 'categories' ? 'opacity-100 visible' : 'opacity-0 invisible pointer-events-none'}`}
             />
 
-            <header
-                className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b border-transparent ${scrolled || hoveredNav ? 'bg-[#0F0F1A]/90 backdrop-blur-md border-white/10 shadow-lg py-3' : 'bg-[#0F0F1A] py-4'
-                    }`}
-                onMouseLeave={() => setHoveredNav(null)}
-            >
-                <div className="mx-auto max-w-7xl px-6 flex items-center justify-between">
+            {/* Container Header dạng viên thuốc */}
+            <div className="fixed top-4 left-0 right-0 z-50 flex justify-center px-4">
+                <header
+                    className="w-full max-w-6xl transition-all duration-300 bg-white/70 backdrop-blur-md border border-white/20 shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] rounded-full py-2 px-6"
+                    onMouseLeave={() => setHoveredNav(null)}
+                >
+                    <div className="flex items-center justify-between h-12">
 
-                    {/* Left: Logo & Navigation */}
-                    <div className="flex items-center gap-12">
-                        {/* Logo */}
-                        <Link href="/home" className="flex items-center gap-3 group">
-                            <div className="relative overflow-hidden rounded-lg">
+                        {/* LEFT: Logo */}
+                        <Link href="/home" className="flex items-center gap-2 group shrink-0">
+                            <div className="relative h-8 w-8 overflow-hidden rounded-full shadow-sm">
                                 <Image
                                     src="/DiDoo.png"
-                                    alt="DiDoo logo"
-                                    width={40}
-                                    height={40}
-                                    className="h-10 w-10 object-cover transition-transform duration-300 group-hover:scale-110"
-                                    priority
+                                    alt="Logo"
+                                    width={32}
+                                    height={32}
+                                    className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-110"
                                 />
                             </div>
-                            <span className="font-sans font-bold text-2xl tracking-tighter text-white">
+                            <span className="font-bold text-xl tracking-tighter text-slate-900">
                                 DiDoo
                             </span>
                         </Link>
 
-                        {/* Primary Navigation */}
-                        <nav className="hidden md:flex items-center gap-1">
-                            {/* Home */}
+                        {/* CENTER: Navigation */}
+                        <nav className="hidden md:flex items-center gap-1 bg-slate-100/50 p-1 rounded-full border border-slate-200/50">
                             <NavItem href="/home" active={isActive('/home')} label="Home" />
 
                             {/* Events Dropdown */}
-                            <div
-                                className="relative group h-full"
-                                onMouseEnter={() => setHoveredNav('events')}
-                                onMouseLeave={() => setHoveredNav(null)}
-                            >
-                                <button className={`flex items-center gap-1 px-4 py-2 text-sm font-medium transition-colors ${isActive('/events') ? 'text-white' : 'text-gray-300 hover:text-white'
-                                    }`}>
-                                    Events
-                                    <ChevronDown className="w-4 h-4 transition-transform duration-300 group-hover:rotate-180" />
-                                    {/* Underline Animation */}
-                                    <span className={`absolute bottom-0 left-4 h-[2px] bg-[#6C5CE7] transition-all duration-300 ease-out ${isActive('/events') ? 'w-[calc(100%-2rem)]' : 'w-0 group-hover:w-[calc(100%-2rem)]'
-                                        }`} />
+                            <div className="relative group" onMouseEnter={() => setHoveredNav('events')}>
+                                <button className="flex items-center gap-1 px-4 py-1.5 text-[14px] font-medium transition-colors rounded-full text-slate-600 hover:text-slate-900 hover:bg-white shadow-sm hover:shadow-none">
+                                    Events <ChevronDown className="w-3.5 h-3.5 opacity-70" />
                                 </button>
-
-                                {/* Simple Dropdown Content */}
-                                <div className="absolute top-full left-0 mt-2 w-56 bg-[#1A1A2E] border border-white/10 rounded-xl shadow-xl overflow-hidden opacity-0 invisible translate-y-2 transition-all duration-300 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0">
-                                    <div className="p-2 space-y-1">
+                                <div className="absolute top-full left-0 pt-4 w-52 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                                    <div className="bg-white/90 backdrop-blur-lg border border-slate-200/50 rounded-2xl shadow-xl p-2 space-y-1">
                                         <DropdownItem href="/events" icon={<List className="w-4 h-4" />} title="All Events" />
-                                        <DropdownItem href="/events?filter=near-me" icon={<MapPin className="w-4 h-4 text-[#00CEC9]" />} title="Near Me" />
-                                        <DropdownItem href="/events?filter=online" icon={<Wifi className="w-4 h-4 text-[#6C5CE7]" />} title="Online Events" />
-                                        <DropdownItem href="/events?filter=free" icon={<Gift className="w-4 h-4 text-[#FD79A8]" />} title="Free Events" />
+                                        <DropdownItem href="/events?filter=near-me" icon={<MapPin className="w-4 h-4 text-cyan-500" />} title="Near Me" />
+                                        <DropdownItem href="/events?filter=online" icon={<Wifi className="w-4 h-4 text-indigo-500" />} title="Online" />
+                                        <DropdownItem href="/events?filter=free" icon={<Gift className="w-4 h-4 text-pink-500" />} title="Free" />
                                     </div>
                                 </div>
                             </div>
 
                             {/* Categories Mega Menu */}
-                            <div
-                                className="relative group h-full"
-                                onMouseEnter={() => setHoveredNav('categories')}
-                                onMouseLeave={() => setHoveredNav(null)}
-                            >
-                                <button className={`flex items-center gap-1 px-4 py-2 text-sm font-medium transition-colors ${isActive('/categories') ? 'text-white' : 'text-gray-300 hover:text-white'
-                                    }`}>
-                                    Categories
-                                    <ChevronDown className="w-4 h-4 transition-transform duration-300 group-hover:rotate-180" />
-                                    <span className={`absolute bottom-0 left-4 h-[2px] bg-[#6C5CE7] transition-all duration-300 ease-out ${isActive('/categories') ? 'w-[calc(100%-2rem)]' : 'w-0 group-hover:w-[calc(100%-2rem)]'
-                                        }`} />
+                            <div className="relative group" onMouseEnter={() => setHoveredNav('categories')}>
+                                <button className="flex items-center gap-1 px-4 py-1.5 text-[14px] font-medium transition-colors rounded-full text-slate-600 hover:text-slate-900 hover:bg-white">
+                                    Categories <ChevronDown className="w-3.5 h-3.5 opacity-70" />
                                 </button>
-
-                                {/* Mega Menu Content */}
-                                <div className="absolute top-full left-0 mt-2 w-[800px] bg-[#1A1A2E] border border-white/10 rounded-xl shadow-2xl overflow-hidden opacity-0 invisible translate-y-4 transition-all duration-300 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 p-6 grid grid-cols-3 gap-6 z-50">
-
-                                    {/* Column 1: Entertainment */}
-                                    <div className="space-y-4">
-                                        <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest pl-2">Entertainment</h3>
-                                        <div className="space-y-1">
-                                            <MegaMenuItem href="/events/music" icon={<Music className="w-5 h-5 text-[#FD79A8]" />} title="Music" desc="Concerts, Festivals & Live" />
-                                            <MegaMenuItem href="/events/sport" icon={<Trophy className="w-5 h-5 text-[#FDCB6E]" />} title="Sports" desc="Matches, Marathons & eSports" />
-                                        </div>
-                                    </div>
-
-                                    {/* Column 2: Development */}
-                                    <div className="space-y-4">
-                                        <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest pl-2">Development</h3>
-                                        <div className="space-y-1">
-                                            <MegaMenuItem href="/events/tech" icon={<Cpu className="w-5 h-5 text-[#00CEC9]" />} title="Technology" desc="Coding, AI & Robotics" />
-                                            <MegaMenuItem href="/events/workshop" icon={<Hammer className="w-5 h-5 text-[#6C5CE7]" />} title="Workshops" desc="Hands-on Learning" />
-                                            <MegaMenuItem href="/events/business" icon={<Briefcase className="w-5 h-5 text-[#0984E3]" />} title="Business" desc="Networking & Startups" />
-                                        </div>
-                                    </div>
-
-                                    {/* Column 3: Knowledge */}
-                                    <div className="space-y-4">
-                                        <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest pl-2">Knowledge</h3>
-                                        <div className="space-y-1">
-                                            <MegaMenuItem href="/events/education" icon={<GraduationCap className="w-5 h-5 text-white" />} title="Education" desc="Seminars & Universities" />
-                                        </div>
+                                <div className="absolute top-full left-1/2 -translate-x-1/2 pt-4 w-[700px] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
+                                    <div className="bg-white/90 backdrop-blur-xl border border-slate-200/50 rounded-3xl shadow-2xl p-6 grid grid-cols-3 gap-6">
+                                        <CategorySection title="Creative" items={[
+                                            { href: "/events/design", icon: <Palette className="w-5 h-5 text-pink-500" />, title: "UI/UX Design", desc: "Interfaces" },
+                                            { href: "/events/art", icon: <Brush className="w-5 h-5 text-cyan-500" />, title: "Art Direction", desc: "Aesthetics" }
+                                        ]} />
+                                        <CategorySection title="Tech" items={[
+                                            { href: "/events/tech", icon: <Cpu className="w-5 h-5 text-blue-500" />, title: "Technology", desc: "Software" },
+                                            { href: "/events/innovation", icon: <Zap className="w-5 h-5 text-orange-500" />, title: "Innovation", desc: "Trends" }
+                                        ]} />
+                                        <CategorySection title="Business" items={[
+                                            { href: "/events/leadership", icon: <Briefcase className="w-5 h-5 text-slate-700" />, title: "Leadership", desc: "Skills" },
+                                            { href: "/events/startup", icon: <Rocket className="w-5 h-5 text-emerald-500" />, title: "Startups", desc: "Growth" }
+                                        ]} />
                                     </div>
                                 </div>
                             </div>
 
-                            {/* Map */}
-                            <NavItem href="/map" active={isActive('/map')} label="Map" icon={<MapIcon className="w-4 h-4 mr-1.5" />} />
-
-                            {/* About Dropdown */}
-                            <div
-                                className="relative group h-full"
-                                onMouseEnter={() => setHoveredNav('about')}
-                                onMouseLeave={() => setHoveredNav(null)}
-                            >
-                                <button className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-gray-300 hover:text-white transition-colors">
-                                    About
-                                    <ChevronDown className="w-4 h-4 transition-transform duration-300 group-hover:rotate-180" />
-                                    <span className="absolute bottom-0 left-4 h-[2px] bg-[#6C5CE7] transition-all duration-300 ease-out w-0 group-hover:w-[calc(100%-2rem)]" />
-                                </button>
-                                <div className="absolute top-full left-0 mt-2 w-48 bg-[#1A1A2E] border border-white/10 rounded-xl shadow-xl overflow-hidden opacity-0 invisible translate-y-2 transition-all duration-300 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0">
-                                    <div className="p-2 space-y-1">
-                                        <DropdownItem href="/help/tickets" icon={<Ticket className="w-4 h-4" />} title="How to buy tickets" />
-                                        <DropdownItem href="/help/faqs" icon={<HelpCircle className="w-4 h-4" />} title="FAQs" />
-                                    </div>
-                                </div>
-                            </div>
-
+                            <NavItem href="/map" active={isActive('/map')} label="Map" />
                         </nav>
-                    </div>
 
-                    {/* Right: Auth / Profile */}
-                    <div className="flex items-center gap-4">
-                        {/* <ModeToggle /> */}
-                        {user && isOrganizerOrAdmin(user.role) && (
-                            <Link href="/organizer/events/create">
-                                <Button variant="ghost" className="text-gray-300 hover:text-white hover:bg-white/10 hidden lg:flex">
-                                    Create Event
-                                </Button>
-                            </Link>
-                        )}
+                        {/* RIGHT: Auth / Actions */}
+                        <div className="flex items-center gap-2">
+                            <button className="p-2 rounded-full transition-all text-slate-500 hover:text-slate-900 hover:bg-slate-100/50">
+                                <Search className="w-5 h-5" />
+                            </button>
 
-                        {user ? (
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button className="bg-[#6C5CE7] hover:bg-[#5a4ad1] text-white rounded-full px-6 font-medium shadow-[0_0_15px_rgba(108,92,231,0.5)] transition-shadow duration-300">
-                                        My Account
-                                    </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end" className="w-56 bg-[#1A1A2E] border-white/10 text-gray-200">
-                                    <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                                    <DropdownMenuSeparator className="bg-white/10" />
-                                    <DropdownMenuItem className="focus:bg-white/10 focus:text-white cursor-pointer" asChild>
-                                        <Link href="/user/tickets">
-                                            <Ticket className="w-4 h-4 mr-2" /> My Tickets
-                                        </Link>
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem className="focus:bg-white/10 focus:text-white cursor-pointer" asChild>
-                                        <Link href="/user/profile">
-                                            <User className="w-4 h-4 mr-2" /> Profile
-                                        </Link>
-                                    </DropdownMenuItem>
-                                    {getDashboardLink() && (
-                                        <DropdownMenuItem className="focus:bg-white/10 focus:text-white cursor-pointer" asChild>
-                                            <Link href={getDashboardLink()!}>
-                                                <LayoutDashboard className="w-4 h-4 mr-2" /> Dashboard
-                                            </Link>
+                            {user ? (
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button className="bg-orange-500 hover:bg-orange-600 text-white rounded-full px-5 h-9 text-sm font-medium shadow-lg shadow-orange-500/20 transition-all">
+                                            Account
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end" className="w-56 bg-white/90 backdrop-blur-md rounded-xl border-slate-100 shadow-xl p-2 mt-4">
+                                        <DropdownMenuLabel className="text-[10px] uppercase text-slate-400 font-bold px-2 py-1.5">Settings</DropdownMenuLabel>
+                                        <DropdownMenuItem className="rounded-lg cursor-pointer" asChild>
+                                            <Link href="/user/tickets" className="flex items-center gap-2.5 px-2 py-2"><Ticket className="w-4 h-4" /> <span>My Tickets</span></Link>
                                         </DropdownMenuItem>
-                                    )}
-                                    <DropdownMenuSeparator className="bg-white/10" />
-                                    <DropdownMenuItem onClick={handleLogout} className="text-red-400 focus:bg-red-500/10 focus:text-red-400 cursor-pointer">
-                                        <LogOut className="w-4 h-4 mr-2" /> Logout
-                                    </DropdownMenuItem>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
-                        ) : (
-                            <div className="flex items-center gap-3">
-                                <Link href="/login" className="text-sm font-medium text-gray-300 hover:text-white transition-colors">
-                                    Log In
-                                </Link>
-                                <Link href="/register">
-                                    <Button className="bg-[#6C5CE7] hover:bg-[#5a4ad1] text-white rounded-full px-5 shadow-[0_4px_14px_0_rgba(108,92,231,0.39)] hover:shadow-[0_6px_20px_rgba(108,92,231,0.23)] hover:-translate-y-[1px] transition-all">
-                                        Sign Up
+                                        {getDashboardLink() && (
+                                            <DropdownMenuItem className="rounded-lg cursor-pointer" asChild>
+                                                <Link href={getDashboardLink()!} className="flex items-center gap-2.5 px-2 py-2"><LayoutDashboard className="w-4 h-4" /> <span>Dashboard</span></Link>
+                                            </DropdownMenuItem>
+                                        )}
+                                        <DropdownMenuSeparator />
+                                        <DropdownMenuItem onClick={handleLogout} className="text-red-500 rounded-lg cursor-pointer flex items-center gap-2.5 px-2 py-2">
+                                            <LogOut className="w-4 h-4" /> <span className="font-medium">Logout</span>
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            ) : (
+                                <Link href="/login">
+                                    <Button className="rounded-full px-5 h-9 text-sm font-semibold flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white shadow-lg">
+                                        Ticket <ArrowUpRight className="w-4 h-4" />
                                     </Button>
                                 </Link>
-                            </div>
-                        )}
+                            )}
+                        </div>
                     </div>
-                </div>
-            </header>
+                </header>
+            </div>
         </>
     );
 };
 
-// Helper Components
-const NavItem = ({ href, active, label, icon }: { href: string; active: boolean; label: string; icon?: React.ReactNode }) => (
-    <Link
-        href={href}
-        className={`relative px-4 py-2 text-sm font-medium transition-colors flex items-center group ${active ? 'text-white' : 'text-gray-300 hover:text-white'
-            }`}
-    >
-        {icon}
-        {label}
-        <span className={`absolute bottom-0 left-4 h-[2px] bg-[#6C5CE7] transition-all duration-300 ease-out ${active ? 'w-[calc(100%-2rem)]' : 'w-0 group-hover:w-[calc(100%-2rem)]'
-            }`} />
+// --- Sub-components tối ưu cho giao diện mới ---
+
+const NavItem = ({ href, active, label }: { href: string; active: boolean; label: string }) => (
+    <Link href={href}>
+        <div className={`px-4 py-1.5 text-[14px] font-medium transition-all rounded-full ${active
+            ? "bg-white text-orange-600 shadow-sm"
+            : "text-slate-600 hover:text-slate-900 hover:bg-white/50"
+            }`}>
+            {label}
+        </div>
     </Link>
 );
 
 const DropdownItem = ({ href, icon, title }: { href: string; icon: React.ReactNode; title: string }) => (
-    <Link href={href} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/10 transition-colors group">
-        <div className="text-gray-400 group-hover:text-white transition-colors">{icon}</div>
-        <span className="text-sm text-gray-300 group-hover:text-white font-medium">{title}</span>
+    <Link href={href} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-slate-50 transition-colors group">
+        <div className="text-slate-400 group-hover:text-slate-900">{icon}</div>
+        <span className="text-sm text-slate-600 group-hover:text-slate-900 font-medium">{title}</span>
     </Link>
 );
 
+const CategorySection = ({ title, items }: { title: string; items: any[] }) => (
+    <div className="space-y-4">
+        <h3 className="text-[11px] font-bold text-slate-400 uppercase tracking-widest px-3">{title}</h3>
+        <div className="space-y-1">
+            {items.map((item, idx) => (
+                <MegaMenuItem key={idx} {...item} />
+            ))}
+        </div>
+    </div>
+);
+
 const MegaMenuItem = ({ href, icon, title, desc }: { href: string; icon: React.ReactNode; title: string; desc: string }) => (
-    <Link href={href} className="flex items-start gap-3 p-3 rounded-lg hover:bg-white/10 transition-all group">
-        <div className="mt-1 p-2 rounded-md bg-white/5 group-hover:bg-white/10 transition-colors">
+    <Link href={href} className="flex items-start gap-3 p-3 rounded-2xl hover:bg-slate-50 transition-all group">
+        <div className="p-2 rounded-xl bg-slate-100 group-hover:bg-white group-hover:shadow-sm text-slate-600 group-hover:text-slate-900 transition-all">
             {icon}
         </div>
         <div>
-            <div className="font-semibold text-gray-200 group-hover:text-white transition-colors">{title}</div>
-            <div className="text-xs text-gray-500 group-hover:text-gray-400 transition-colors mt-0.5">{desc}</div>
+            <div className="font-bold text-slate-700 group-hover:text-slate-900 text-[13px]">{title}</div>
+            <div className="text-[11px] text-slate-400 mt-0.5">{desc}</div>
         </div>
     </Link>
 );

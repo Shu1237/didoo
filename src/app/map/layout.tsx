@@ -6,11 +6,11 @@ export default function MapLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="h-screen w-screen overflow-hidden">
+    <div className="h-screen w-full overflow-hidden bg-background">
       <Header />
 
       {/* Content offset xuống dưới header */}
-      <div className="pt-[74px] h-full">
+      <div className="h-full">
         {children}
       </div>
     </div>

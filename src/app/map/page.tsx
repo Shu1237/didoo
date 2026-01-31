@@ -68,20 +68,20 @@ const Page = () => {
   // Filter and sort events using useMemo
   const filteredEvents = useMemo(() => {
     let filtered = EVENTS;
-    
+
     // Filter by category
     if (category) {
       filtered = filtered.filter(e => e.category.toLowerCase().includes(category.toLowerCase()));
     }
-    
+
     // Filter by search query
     if (searchQuery) {
-      filtered = filtered.filter(e => 
-        e.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+      filtered = filtered.filter(e =>
+        e.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         e.location.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
-    
+
     // Sort
     filtered = [...filtered].sort((a, b) => {
       if (sortBy === 'date') {
@@ -94,15 +94,15 @@ const Page = () => {
       }
       return 0;
     });
-    
+
     return filtered;
   }, [category, searchQuery, sortBy, coordinates?.lat, coordinates?.lng]);
 
   return (
-    <div className="relative w-full h-full overflow-hidden bg-muted/20 font-sans">
+    <div className="relative w-full h-full overflow-hidden font-sans">
       {/* Map Background */}
       <div className="absolute inset-0 z-0">
-        <Map coordinates={coordinates} events={EVENTS} isLoading={isLoading} selectedEvent={selectedEvent} mapStyle={mapStyleType} />
+        <Map coordinates={coordinates} events={EVENTS} isLoading={isLoading} selectedEvent={selectedEvent} setSelectedEvent={setSelectedEvent} mapStyle={mapStyleType} />
       </div>
 
       {/* Sidebar Panel */}
@@ -110,7 +110,7 @@ const Page = () => {
         initial={{ x: -460 }}
         animate={{ x: isSidebarOpen ? 0 : -460 }}
         transition={{ type: "spring", stiffness: 200, damping: 25 }}
-        className="absolute top-4 left-4 w-[90%] md:w-[420px] bottom-4 z-10 pointer-events-none"
+        className="absolute top-24 left-4 w-[90%] md:w-[420px] bottom-4 z-10 pointer-events-none"
       >
         <div className="relative flex flex-col h-full bg-background/60 backdrop-blur-xl border border-white/20 shadow-2xl rounded-[2rem] p-5 pointer-events-auto">
           <div className="flex items-center gap-2 mb-6 px-1">
@@ -131,7 +131,7 @@ const Page = () => {
           </div>
 
           {/* Nút Đóng: Mũi tên chỉ sang trái, đặt sát cạnh phải của sidebar */}
-          <div 
+          <div
             className="absolute top-1/2 -translate-y-1/2 -right-3 cursor-pointer p-2 hover:scale-125 transition-transform"
             onClick={() => setIsSidebarOpen(false)}
           >
@@ -149,7 +149,7 @@ const Page = () => {
             exit={{ x: -50, opacity: 0 }}
             className="absolute top-1/2 -translate-y-1/2 left-0 z-20 pointer-events-auto flex items-center"
           >
-            <div 
+            <div
               className="bg-background/80 backdrop-blur-md p-3 pr-4 rounded-r-2xl border border-l-0 border-white/20 cursor-pointer shadow-lg group"
               onClick={() => setIsSidebarOpen(true)}
             >

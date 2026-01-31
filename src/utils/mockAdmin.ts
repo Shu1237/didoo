@@ -107,6 +107,39 @@ export const mockTransactions = [
     },
 ];
 
+export const mockOrganizers = [
+    {
+        id: 'org_001',
+        name: 'Electric Dreams',
+        email: 'contact@electricdreams.com',
+        company: 'Electric Dreams Entertainment',
+        phone: '0901234567',
+        status: 'pending',
+        createdAt: '2024-08-01',
+        avatar: 'https://i.pravatar.cc/150?u=org1',
+    },
+    {
+        id: 'org_002',
+        name: 'Art Collective',
+        email: 'hello@artcollective.vn',
+        company: 'Art Collective Co.',
+        phone: '0912345678',
+        status: 'approved',
+        createdAt: '2024-07-15',
+        avatar: 'https://i.pravatar.cc/150?u=org2',
+    },
+    {
+        id: 'org_003',
+        name: 'Tech Events Vietnam',
+        email: 'info@techevents.vn',
+        company: 'Tech Events Vietnam JSC',
+        phone: '0923456789',
+        status: 'pending',
+        createdAt: '2024-08-10',
+        avatar: 'https://i.pravatar.cc/150?u=org3',
+    },
+];
+
 export const mockUsers = [
     {
         id: 'user_001',

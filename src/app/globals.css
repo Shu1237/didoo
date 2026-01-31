@@ -86,113 +86,122 @@
 :root {
   --radius: 1rem;
 
-  /* Premium Light Theme */
+  /* Deep Twilight Design System (Light Mode) */
   --background: #FFFFFF;
-  --foreground: #09090B;
-  /* Deep Zinc for sharp text */
+  /* White Background */
+  --foreground: #0A014F;
+  /* Deep Twilight Text */
 
-  --card: #FFFFFF;
-  --card-foreground: #09090B;
+  --card: #FAE8EB;
+  /* Lavender Blush Cards */
+  --card-foreground: #0A014F;
 
-  --popover: #FFFFFF;
-  --popover-foreground: #09090B;
+  --popover: #FAE8EB;
+  --popover-foreground: #0A014F;
 
-  /* Refined Primary - Deep Violet Blue */
-  --primary: #5B46E8;
+  /* Primary - Deep Twilight/Lilac */
+  --primary: #0A014F;
+  /* Deep Twilight */
   --primary-foreground: #FFFFFF;
 
-  /* Refined Secondary - Clean Teal */
-  --secondary: #0EA5E9;
-  /* Sky Blue/Cyan tone for fresh look */
-  --secondary-foreground: #FFFFFF;
+  /* Secondary - Lilac */
+  --secondary: #CD9FCC;
+  --secondary-foreground: #0A014F;
 
-  /* Refined Muted - Subtle Grays */
-  --muted: #F1F5F9;
-  /* Slate 100 */
+  /* Muted - Lavender Blush */
+  --muted: #FAE8EB;
   --muted-foreground: #64748B;
-  /* Slate 500 */
 
-  /* Refined Accent - Hot Pink/Rose */
-  --accent: #E11D48;
-  /* Rose 600 */
-  --accent-foreground: #FFFFFF;
+  /* Accent - Cotton Rose (Warm Warning/Accent) */
+  --accent: #F6CACA;
+  --accent-foreground: #0A014F;
+
+  --destructive: #EF4444;
+  /* Pending/Error Red */
+  --destructive-foreground: #FFFFFF;
+
+  --success: #10B981;
+  /* Success Emerald */
+
+  --border: #CD9FCC;
+  /* Lilac border for subtle separation */
+  --input: #CD9FCC;
+  --ring: #0A014F;
+
+  /* Charts */
+  --chart-1: #0A014F;
+  /* Deep Twilight */
+  --chart-2: #CD9FCC;
+  /* Lilac */
+  --chart-3: #F6CACA;
+  /* Cotton Rose */
+  --chart-4: #10B981;
+  /* Success */
+  --chart-5: #EF4444;
+
+  --sidebar: #FFFFFF;
+  --sidebar-foreground: #0A014F;
+  --sidebar-primary: #0A014F;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #FAE8EB;
+  --sidebar-accent-foreground: #0A014F;
+  --sidebar-border: #FAE8EB;
+  --sidebar-ring: #0A014F;
+}
+
+.dark {
+  /* Deep Twilight Design System (Dark Mode) */
+  --background: #0A014F;
+  /* Deep Twilight BG */
+  --foreground: #FAE8EB;
+  /* Lavender Blush Text */
+
+  --card: #13135C;
+  /* Slightly lighter Deep Twilight */
+  --card-foreground: #FAE8EB;
+
+  --popover: #13135C;
+  --popover-foreground: #FAE8EB;
+
+  /* Primary - Lilac for contrast on dark */
+  --primary: #CD9FCC;
+  --primary-foreground: #0A014F;
+
+  /* Secondary - Cotton Rose */
+  --secondary: #F6CACA;
+  --secondary-foreground: #0A014F;
+
+  --muted: #13135C;
+  --muted-foreground: #CD9FCC;
+
+  /* Accent - Cotton Rose */
+  --accent: #F6CACA;
+  --accent-foreground: #0A014F;
 
   --destructive: #EF4444;
   --destructive-foreground: #FFFFFF;
 
-  --border: #E2E8F0;
-  /* Slate 200 */
-  --input: #E2E8F0;
-  --ring: #5B46E8;
+  --success: #10B981;
 
-  /* Charts - Vibrant & Distinguishable */
-  --chart-1: #5B46E8;
-  --chart-2: #0EA5E9;
-  --chart-3: #E11D48;
-  --chart-4: #F59E0B;
-  --chart-5: #10B981;
+  --border: #2E2E80;
+  /* Darker border */
+  --input: #2E2E80;
+  --ring: #CD9FCC;
 
-  --sidebar: #F8FAFC;
-  --sidebar-foreground: #0F172A;
-  --sidebar-primary: #5B46E8;
-  --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: #E2E8F0;
-  --sidebar-accent-foreground: #0F172A;
-  --sidebar-border: #E2E8F0;
-  --sidebar-ring: #5B46E8;
-}
+  --chart-1: #CD9FCC;
+  --chart-2: #F6CACA;
+  --chart-3: #FAE8EB;
+  --chart-4: #10B981;
+  --chart-5: #EF4444;
 
-.dark {
-  /* Stable Premium Dark Theme */
-  --background: #020817;
-  /* Deepest Navy/Black */
-  --foreground: #F8FAFC;
-
-  --card: #0F172A;
-  /* Slate 950 */
-  --card-foreground: #F8FAFC;
-
-  --popover: #0F172A;
-  --popover-foreground: #F8FAFC;
-
-  --primary: #818CF8;
-  /* Indigo 400 - Glowing effect */
-  --primary-foreground: #FFFFFF;
-
-  --secondary: #2DD4BF;
-  /* Teal 400 */
-  --secondary-foreground: #020817;
-
-  --muted: #1E293B;
-  /* Slate 800 */
-  --muted-foreground: #94A3B8;
-  /* Slate 400 */
-
-  --accent: #FB7185;
-  /* Rose 400 */
-  --accent-foreground: #FFFFFF;
-
-  --destructive: #F87171;
-  --destructive-foreground: #FFFFFF;
-
-  --border: #1E293B;
-  --input: #1E293B;
-  --ring: #818CF8;
-
-  --chart-1: #818CF8;
-  --chart-2: #2DD4BF;
-  --chart-3: #FB7185;
-  --chart-4: #FBBF24;
-  --chart-5: #34D399;
-
-  --sidebar: #020817;
-  --sidebar-foreground: #F8FAFC;
-  --sidebar-primary: #818CF8;
-  --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: #1E293B;
-  --sidebar-accent-foreground: #F8FAFC;
-  --sidebar-border: #1E293B;
-  --sidebar-ring: #818CF8;
+  --sidebar: #0A014F;
+  --sidebar-foreground: #FAE8EB;
+  --sidebar-primary: #CD9FCC;
+  --sidebar-primary-foreground: #0A014F;
+  --sidebar-accent: #13135C;
+  --sidebar-accent-foreground: #FAE8EB;
+  --sidebar-border: #2E2E80;
+  --sidebar-ring: #CD9FCC;
 }
 
 @layer base {
@@ -201,7 +210,22 @@
   }
 
   body {
-    @apply bg-background text-foreground antialiased transition-colors duration-300;
+    @apply bg-background text-foreground antialiased transition-colors duration-300 font-sans font-medium text-[15px];
+  }
+
+  /* Typography Rules */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-heading), ui-sans-serif, system-ui, sans-serif;
+    @apply font-bold tracking-tighter;
+  }
+
+  .caption {
+    @apply font-semibold text-[12px];
   }
 }
 

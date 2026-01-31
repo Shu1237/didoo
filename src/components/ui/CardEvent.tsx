@@ -28,7 +28,7 @@ const EventCard = ({
         transition={{ type: "spring", stiffness: 300 }}
         className="h-full"
       >
-        <div className='w-full h-full rounded-xl shadow-lg hover:shadow-xl transition-shadow bg-card flex flex-col'>
+        <div className='w-full h-full rounded-xl shadow-lg hover:shadow-xl transition-shadow bg-white/5 border border-white/10 flex flex-col backdrop-blur-sm'>
           <div className='h-[156px] relative '>
             <div className='w-[95%] mx-auto absolute top-2.5 left-0 right-0 h-[146px] overflow-hidden rounded-xl border border-white/10'>
               <Image src={image} alt={title} fill className="rounded-xl object-cover" />
@@ -49,11 +49,11 @@ const EventCard = ({
           </div>
 
           <div className="p-4 flex flex-col flex-1 gap-3">
-            <h3 className="text-lg font-bold leading-tight line-clamp-2 group-hover:text-primary transition-colors">
+            <h3 className="text-lg font-bold leading-tight line-clamp-2 text-white group-hover:text-primary transition-colors">
               {title}
             </h3>
 
-            <div className="mt-auto space-y-2 text-muted-foreground">
+            <div className="mt-auto space-y-2 text-gray-400">
               <div className="flex items-center gap-2 text-sm">
                 <Calendar className="w-4 h-4 text-secondary shrink-0" />
                 <span className="truncate">{new Date(date).toLocaleDateString('vi-VN', { weekday: 'short', day: 'numeric', month: 'long' })}</span>

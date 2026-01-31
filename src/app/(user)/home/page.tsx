@@ -1,38 +1,30 @@
 'use client';
 
-
 import HeroSection from "./_components/HeroSection";
-import { CATEGORIES, EVENTS } from "@/utils/mock";
-import { SearchFilter } from "./_components/SearchFilter";
-import { AboutSection } from "./_components/AboutSection";
-import { ForYouEvents } from "./_components/ForYouEvents";
-import { MonthOverview } from "./_components/MonthOverview";
+import { EVENTS } from "@/utils/mock";
 import { SpecialEvents } from "./_components/SpecialEvents";
+import { AboutSection } from "./_components/AboutSection";
 import { TrendingEvents } from "./_components/TrendingEvents";
-import { WeekendEvents } from "./_components/WeekendEvents";
-
+import { MonthOverview } from "./_components/MonthOverview";
 
 export default function Home() {
-
   const upcomingEvents = EVENTS;
-  const popularEvents = [...EVENTS].reverse();
-  const categories = CATEGORIES;
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div className="min-h-screen bg-slate-50 text-slate-900 selection:bg-[#DA4167] selection:text-white">
       <HeroSection events={upcomingEvents.slice(0, 5)} />
 
-      <SearchFilter />
+      {/* 1. Grid Section: DAYS TO UP LEVEL... */}
+      <SpecialEvents events={upcomingEvents} />
 
+      {/* 2. Split Feature: THE EVENT FOR EXPERIENCED... */}
       <AboutSection />
 
-      <div className="container mx-auto px-4 space-y-12">
-        <SpecialEvents events={upcomingEvents} />
-        <TrendingEvents events={popularEvents} />
-        <ForYouEvents events={upcomingEvents} categories={categories} />
-        <WeekendEvents events={upcomingEvents} />
-        <MonthOverview />
-      </div>
+      {/* 3. Keynotes: FEATURING KEYNOTES... */}
+      <TrendingEvents events={upcomingEvents} />
+
+      {/* 4. Venue: WHERE CREATIVITY MEETS... */}
+      <MonthOverview />
     </div>
   );
 }

@@ -1,6 +1,7 @@
 
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import { PageContainer } from "./_components/PageContainer";
 
 
 export default function UserLayout({
@@ -11,9 +12,9 @@ export default function UserLayout({
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-      <main className="flex-1 pt-17">
+      <PageContainer>
         {children}
-      </main>
+      </PageContainer>
       <Footer />
     </div>
   );
