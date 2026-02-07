@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
@@ -39,6 +39,16 @@ const Header = () => {
     const router = useRouter();
     const pathname = usePathname();
     const [hoveredNav, setHoveredNav] = useState<string | null>(null);
+    const [isScrolled, setIsScrolled] = useState(false);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            setIsScrolled(window.scrollY > 10);
+        };
+
+        window.addEventListener("scroll", handleScroll);
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, []);
 
     const handleLogout = async () => {
         try {
@@ -66,7 +76,7 @@ const Header = () => {
             />
 
             {/* Container Header dạng viên thuốc */}
-            <div className="fixed top-4 left-0 right-0 z-50 flex justify-center px-4">
+            <div className={`fixed left-0 right-0 z-50 flex justify-center px-4 transition-all duration-300 ${isScrolled ? 'top-0' : 'top-4'}`}>
                 <header
                     className="w-full max-w-6xl transition-all duration-300 bg-white/70 backdrop-blur-md border border-white/20 shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] rounded-full py-2 px-6"
                     onMouseLeave={() => setHoveredNav(null)}

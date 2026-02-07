@@ -1,35 +1,41 @@
 import http from "@/lib/http";
-import { LoginInput } from "@/schemas/authSchema";
+import { EmailInput, LoginInput, ResetPasswordInput } from "@/schemas/auth";
+
+import { ENDPOINT_CLIENT, ENDPOINT_SERVER } from "@/utils/endpoint";
+
 
 
 export const authRequest = {
-  login: (data: LoginInput) =>
-    http.post<{ access_token: string; refresh_token: string }>(
-      "/auth/login",
-      data
+  loginClient: (data: LoginInput) =>
+    http.post<{ accessToken: string; refreshToken: string }>(
+      ENDPOINT_CLIENT.LOGIN,
+      data,
     ),
   // call sever to set up token
-  auth: (body: { access_token: string; refresh_token: string }) =>
-    http.post("/api/auth", body, {
+  loginServer: (body: { accessToken: string; refreshToken: string }) =>
+    http.post(ENDPOINT_SERVER.LOGIN, body, {
       baseURL: "",
     }),
-  logoutClient: () => http.post("/auth/logout", {}),
+  logoutClient: () => http.post(ENDPOINT_CLIENT.LOGOUT, {}),
   logoutServer: () =>
-    http.post("/api/auth/logout", undefined, {
+    http.post(ENDPOINT_SERVER.LOGOUT, undefined, {
       baseURL: "",
     }),
 
-    // call client to refresh token
-  refreshTokenClient: (body: { refresh_token: string }) =>
-    http.post<{access_token:string}>("/auth/refresh_token", body),
+  // call client to refresh token
+  refreshTokenClient: (body: { refreshToken: string }) =>
+    http.post<{ accessToken: string, refreshToken: string }>(ENDPOINT_CLIENT.REFRESH, body, {
+      skipAuth: true
+    }),
 
-  // call sever to refresh token 
-  refreshTokenServer: (body: {access_token: string }) =>
-    http.post<{access_token:string}>("/api/auth/refresh_token", body,
-      {
-        baseURL: ""
+  // call sever to refresh token
+  refreshTokenServer: (body: { accessToken: string, refreshToken: string }) =>
+    http.post<{ accessToken: string, refreshToken: string }>(ENDPOINT_SERVER.REFRESH, body, {
+      baseURL: "",
+    }),
+  forgotPassword: (data: EmailInput) =>
+    http.post<{ message: string }>(ENDPOINT_CLIENT.FORGOT_PASSWORD, data),
+  resetPassword: (data: ResetPasswordInput) =>
+    http.post<{ message: string }>(ENDPOINT_CLIENT.RESET_PASSWORD, data),
 
-      }
-    ),
-      
 };
