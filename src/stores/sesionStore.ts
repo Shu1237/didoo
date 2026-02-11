@@ -1,61 +1,56 @@
-import { create } from "zustand"
-import { decodeJWT } from "@/lib/utils"
-import { JWTUserType } from "@/utils/type"
+import { decodeJWT } from "@/lib/utils";
+import { JWTUserType } from "@/utils/type";
+import { create } from "zustand";
+
+
 
 interface SessionState {
-  access_token: string | null
-  user: JWTUserType | null
-  refresh_token: string | null
+    accessToken: string | null;
+    refreshToken: string | null;
+    user: JWTUserType | null;
 
-  setSession: (access_token: string, refresh_token: string) => void
-  setAccessToken: (access_token: string) => void
-  clearSession: () => void
+    setSession: (params: {
+        accessToken: string;
+        refreshToken: string;
+    }) => void;
+
+
+
+    clearSession: () => void;
 }
 
 export const useSessionStore = create<SessionState>((set) => ({
-  access_token: null,
-  user: null,
-  refresh_token: null,
+    accessToken: null,
+    refreshToken: null,
+    user: null,
 
-  setSession: (access_token: string, refresh_token: string) => {
-    try {
-      const decodedUser = decodeJWT<JWTUserType>(access_token)
-      set({
-        access_token,
-        refresh_token,
-        user: decodedUser,
-      })
-    } catch (error) {
-      console.error("Invalid access token", error)
-      set({
-        access_token: null,
-        refresh_token: null,
-        user: null,
-      })
-    }
-  },
+    /* ===== INIT / LOGIN ===== */
+    setSession: ({ accessToken, refreshToken }) => {
+        try {
+            const user = decodeJWT<JWTUserType>(accessToken);
+            set({
+                accessToken,
+                refreshToken,
+                user,
+            });
+        } catch (error) {
+            console.error("Invalid access token", error);
+            set({
+                accessToken: null,
+                refreshToken: null,
+                user: null,
+            });
+        }
+    },
 
-  setAccessToken: (access_token: string) => {
-    try {
-      const decodedUser = decodeJWT<JWTUserType>(access_token)
-      set({
-        access_token,
-        user: decodedUser,
-      })
-    } catch (error) {
-      console.error("Invalid access token", error)
-      set({
-        access_token: null,
-        user: null,
-      })
-    }
-  },
 
-  clearSession: () => {
-    set({
-      access_token: null,
-      refresh_token: null,
-      user: null,
-    })
-  },
-}))
+
+    /* ===== LOGOUT / EXPIRED ===== */
+    clearSession: () => {
+        set({
+            accessToken: null,
+            refreshToken: null,
+            user: null,
+        });
+    },
+}));

@@ -3,6 +3,9 @@ import { Inter, Plus_Jakarta_Sans } from 'next/font/google'
 import "./globals.css";
 import { ThemeProvider } from "next-themes";
 import QueryClientProviderWrapper from "@/components/QueryClientProviderWrapper";
+import { cookies } from "next/headers";
+import { AuthProvider } from "@/contexts/authContext";
+import { Toaster } from "sonner";
 
 
 const inter = Inter({
@@ -24,29 +27,33 @@ export const metadata: Metadata = {
   description: "DiDoo website",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const cookieStore = await cookies();
+  const accessToken = cookieStore.get("accessToken");
+  const refreshToken = cookieStore.get("refreshToken");
+
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en">
       <body
-        className={`${inter.variable} ${plusJakarta.variable} font-sans antialiased`}
+        className={`${inter.variable} ${plusJakarta.variable} antialiased`}
       >
-        <QueryClientProviderWrapper>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="light"
-            enableSystem
-            disableTransitionOnChange
-          >
-            {children}
-          </ThemeProvider>
-
-        </QueryClientProviderWrapper>
-
-
+        <AuthProvider initialAccessToken={accessToken?.value || null} initialRefreshToken={refreshToken?.value || null}>
+          <QueryClientProviderWrapper>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+            >
+              {children}
+              <Toaster richColors />
+            </ThemeProvider>
+          </QueryClientProviderWrapper>
+        </AuthProvider>
       </body>
     </html>
   );

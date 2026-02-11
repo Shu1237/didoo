@@ -1,8 +1,25 @@
+
+
 export type ResponseData<T> = {
-  data: T;
-  isSuccess: boolean;
-  message: string;
+    message: string;
+    data: T;
+    isSuccess: boolean;
 };
+
+export type ResponseError = {
+    data:null;
+    isSuccess: false;
+    message: string;
+    errors: ValidationErrorItem[];
+
+};
+
+
+export type ValidationErrorItem = {
+    field: string;
+    detail: string;
+}
+
 
 export type UserRole = "user" | "organizer" | "admin" | "staff";
 
