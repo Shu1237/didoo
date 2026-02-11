@@ -4,16 +4,25 @@ export const mockOrganizerEvents = [
         id: 'event_001',
         title: 'Neon Nights Music Festival',
         date: '15/08/2024',
+        sold: 280,
+        total: 300,
+        status: "Đang bán vé",
     },
     {
         id: 'event_002',
         title: 'Tech Startup Summit',
         date: '05/09/2024',
+        sold: 120,
+        total: 200,
+        status: "Sắp diễn ra",
     },
     {
         id: 'event_003',
         title: 'Summer Food Carnival',
         date: '30/07/2024',
+        sold: 450,
+        total: 500,
+        status: "Sắp kết thúc",
     },
 ];
 
