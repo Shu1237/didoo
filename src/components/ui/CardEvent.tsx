@@ -3,14 +3,9 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { Calendar, MapPin, Ticket } from 'lucide-react';
+import { Calendar, MapPin, Ticket, ArrowUpRight } from 'lucide-react';
 import { motion } from 'framer-motion';
-import {
-  Card,
-  CardContent,
-} from '@/components/ui/card';
 import { Event } from '@/utils/type';
-
 
 const EventCard = ({
   id,
@@ -22,47 +17,81 @@ const EventCard = ({
   category,
 }: Event) => {
   return (
-    <Link href={`/events/${id}`} className="block group h-full">
+    <Link href={`/events/${id}`} className="block group">
       <motion.div
-        whileHover={{ y: -8 }}
-        transition={{ type: "spring", stiffness: 300 }}
-        className="h-full"
+        whileHover={{ y: -10 }}
+        transition={{ type: "spring", stiffness: 400, damping: 25 }}
+        className="relative h-full"
       >
-        <div className='w-full h-full rounded-xl shadow-lg hover:shadow-xl transition-shadow bg-white/5 border border-white/10 flex flex-col backdrop-blur-sm'>
-          <div className='h-[156px] relative '>
-            <div className='w-[95%] mx-auto absolute top-2.5 left-0 right-0 h-[146px] overflow-hidden rounded-xl border border-white/10'>
-              <Image src={image} alt={title} fill className="rounded-xl object-cover" />
+        <div className='relative h-full overflow-hidden rounded-3xl bg-gradient-to-br from-white/[0.08] to-transparent border border-white/10 backdrop-blur-xl transition-all duration-500 group-hover:border-primary/50 group-hover:shadow-[0_0_40px_-10px_rgba(var(--primary),0.3)]'>
+
+          {/* Image Container */}
+          <div className='relative h-[220px] overflow-hidden'>
+            <Image
+              src={image}
+              alt={title}
+              fill
+              className="object-cover transition-transform duration-700 ease-out group-hover:scale-110"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+
+            {/* Badges on Image */}
+            <div className="absolute top-4 left-4 right-4 flex justify-between items-start">
+              {category && (
+                <div className="bg-primary/20 backdrop-blur-md border border-primary/30 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider text-primary">
+                  {category}
+                </div>
+              )}
+              <motion.div
+                whileHover={{ rotate: 45 }}
+                className="w-10 h-10 rounded-full bg-white text-black flex items-center justify-center opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300"
+              >
+                <ArrowUpRight className="w-5 h-5" />
+              </motion.div>
             </div>
 
-            {/* Category Badge */}
-            {category && (
-              <div className="absolute top-4 right-4 bg-white/90 dark:bg-black/80 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold text-primary shadow-sm">
-                {category}
+            <div className="absolute bottom-4 left-4 flex items-center gap-2">
+              <div className="bg-white/10 backdrop-blur-md border border-white/20 px-3 py-1.5 rounded-2xl flex items-center gap-1.5 shadow-xl">
+                <Ticket className="w-3.5 h-3.5 text-primary" />
+                <span className="text-xs font-bold text-white uppercase">{price}</span>
               </div>
-            )}
-
-            {/* Price Badge */}
-            <div className="absolute bottom-[7px] left-3.5 bg-primary/90 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold text-white shadow-sm flex items-center gap-1">
-              <Ticket className="w-3 h-3" />
-              {price}
             </div>
           </div>
 
-          <div className="p-4 flex flex-col flex-1 gap-3">
-            <h3 className="text-lg font-bold leading-tight line-clamp-2 text-white group-hover:text-primary transition-colors">
+          {/* Content */}
+          <div className="p-6 flex flex-col gap-4">
+            <h3 className="text-xl font-bold leading-tight line-clamp-2 text-white group-hover:text-primary transition-colors duration-300">
               {title}
             </h3>
 
-            <div className="mt-auto space-y-2 text-gray-400">
-              <div className="flex items-center gap-2 text-sm">
-                <Calendar className="w-4 h-4 text-secondary shrink-0" />
-                <span className="truncate">{new Date(date).toLocaleDateString('vi-VN', { weekday: 'short', day: 'numeric', month: 'long' })}</span>
+            <div className="space-y-3">
+              <div className="flex items-center gap-2.5 text-sm text-gray-400 font-medium translate-y-0 group-hover:-translate-y-1 transition-transform duration-300 delay-75">
+                <div className="w-8 h-8 rounded-xl bg-white/5 flex items-center justify-center border border-white/5">
+                  <Calendar className="w-4 h-4 text-primary" />
+                </div>
+                <span>{new Date(date).toLocaleDateString('vi-VN', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
               </div>
 
-              <div className="flex items-center gap-2 text-sm">
-                <MapPin className="w-4 h-4 text-accent shrink-0" />
+              <div className="flex items-center gap-2.5 text-sm text-gray-400 font-medium translate-y-0 group-hover:-translate-y-1 transition-transform duration-300 delay-150">
+                <div className="w-8 h-8 rounded-xl bg-white/5 flex items-center justify-center border border-white/5">
+                  <MapPin className="w-4 h-4 text-primary" />
+                </div>
                 <span className="truncate">{location}</span>
               </div>
+            </div>
+
+            <div className="pt-2 mt-2 border-t border-white/5 flex items-center justify-between">
+              <div className="flex -space-x-2">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="w-6 h-6 rounded-full border-2 border-[#1A1A1A] bg-secondary flex items-center justify-center overflow-hidden">
+                    <img src={`https://i.pravatar.cc/100?img=${i + 20}`} alt="attendee" className="w-full h-full object-cover" />
+                  </div>
+                ))}
+                <div className="w-6 h-6 rounded-full border-2 border-[#1A1A1A] bg-white/5 flex items-center justify-center text-[8px] font-bold text-gray-400">
+                  +12
+                </div>
+              </div>
+              <span className="text-[10px] font-bold uppercase tracking-widest text-primary group-hover:underline underline-offset-4">Chi tiết</span>
             </div>
           </div>
         </div>

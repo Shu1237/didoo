@@ -1,9 +1,8 @@
 "use client";
 
-import Link from "next/link";
-import Image from "next/image";
 import { useSessionStore } from "@/stores/sesionStore";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,68 +13,93 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { authRequest } from "@/apiRequest/auth";
 import { useRouter } from "next/navigation";
+import { Search, Bell, Mail, Command, LogOut, Settings, User } from "lucide-react";
+import Link from "next/link";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function OrganizerHeader() {
   const user = useSessionStore((state) => state.user);
   const router = useRouter();
 
   const handleLogout = async () => {
-    // try {
-    //   await authRequest.logoutClient();
-    //   router.push("/login");
-    // } catch (error) {
-    //   console.error("Logout error:", error);
-    // }
+    try {
+      await authRequest.logoutClient();
+      router.push("/login");
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
   };
 
   return (
-    <header className="bg-background/80 backdrop-blur-md border-b border-border/50 sticky top-0 z-50">
-      <div className="container mx-auto px-6 py-4 flex items-center justify-between">
-        <Link href="/organizer/dashboard" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-          <div className="relative w-10 h-10 overflow-hidden rounded-xl shadow-md">
-            <Image
-              src="/DiDoo.png"
-              alt="DiDoo logo"
-              fill
-              className="object-cover"
-            />
+    <header className="px-8 py-4 flex items-center justify-between bg-white border-b border-zinc-100">
+      {/* Left: Search Bar */}
+      <div className="flex-1 max-w-xl">
+        <div className="relative group">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 group-focus-within:text-primary transition-colors" />
+          <Input
+            placeholder="Tìm kiếm sự kiện, doanh thu..."
+            className="pl-12 pr-12 h-11 rounded-2xl bg-zinc-100 border-transparent hover:bg-zinc-100/80 focus:bg-white focus:border-zinc-200 focus:shadow-sm transition-all placeholder:text-zinc-400 text-zinc-700 font-semibold"
+          />
+          <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-1 opacity-30 select-none">
+            <Command className="w-3 h-3" />
+            <span className="text-[10px] font-black tracking-tighter uppercase">F</span>
           </div>
-          <span className="font-bold text-xl bg-linear-to-r from-primary to-accent bg-clip-text text-transparent">DiDoo Organizer</span>
-        </Link>
-
-        <div className="flex items-center gap-4">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="flex items-center gap-3 pl-2 pr-4 py-6 rounded-full hover:bg-secondary/50 border border-transparent hover:border-border/50 transition-all">
-                <div className="w-10 h-10 rounded-full bg-linear-to-br from-primary to-accent p-0.5">
-                  <div className="w-full h-full rounded-full bg-background flex items-center justify-center overflow-hidden">
-                    <span className="font-bold text-primary text-lg">
-                      {user?.name?.[0] || user?.email?.[0] || "O"}
-                    </span>
-                  </div>
-                </div>
-                <div className="hidden md:flex flex-col items-start text-sm">
-                  <span className="font-semibold">{user?.name || "Organizer"}</span>
-                  <span className="text-xs text-muted-foreground">{user?.email || "organizer@didoo.com"}</span>
-                </div>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56 p-2 rounded-xl border-border/50 shadow-xl bg-background/95 backdrop-blur-xl">
-              <DropdownMenuLabel className="px-2 py-1.5">Tài khoản</DropdownMenuLabel>
-              <DropdownMenuSeparator className="bg-border/50" />
-              <DropdownMenuItem asChild className="rounded-lg cursor-pointer focus:bg-primary/10 focus:text-primary">
-                <Link href="/organizer/profile">Hồ sơ</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild className="rounded-lg cursor-pointer focus:bg-primary/10 focus:text-primary">
-                <Link href="/home">Về trang chủ</Link>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator className="bg-border/50" />
-              <DropdownMenuItem onClick={handleLogout} className="rounded-lg cursor-pointer text-destructive focus:bg-destructive/10 focus:text-destructive">
-                Đăng xuất
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
         </div>
+      </div>
+
+      {/* Right: Actions */}
+      <div className="flex items-center gap-4">
+        {/* Notifications */}
+        <Button variant="ghost" size="icon" className="w-11 h-11 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-600 border border-zinc-200/50 relative transition-all">
+          <Bell className="w-5 h-5" />
+          <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-primary rounded-full border-2 border-white shadow-sm" />
+        </Button>
+
+        {/* Messages */}
+        <Button variant="ghost" size="icon" className="w-11 h-11 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-600 border border-zinc-200/50 transition-all">
+          <Mail className="w-5 h-5" />
+        </Button>
+
+        {/* Profile */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="w-11 h-11 rounded-full bg-zinc-900 hover:bg-zinc-800 p-0 overflow-hidden shadow-md border border-zinc-200">
+              <Avatar className="h-full w-full">
+                <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.name || "Organizer"}`} />
+                <AvatarFallback className="bg-zinc-900 text-white font-black italic">
+                  {user?.name?.[0] || "O"}
+                </AvatarFallback>
+              </Avatar>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-56 mt-2 rounded-xl border-zinc-100 shadow-xl bg-white p-2">
+            <DropdownMenuLabel className="px-2 py-1.5">
+              <p className="text-sm font-bold text-zinc-900">{user?.name || "Organizer"}</p>
+              <p className="text-xs text-zinc-500 font-medium">{user?.email || "organizer@example.com"}</p>
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator className="bg-zinc-100 my-1" />
+            <DropdownMenuItem asChild className="rounded-lg cursor-pointer focus:bg-zinc-50">
+              <Link href="/organizer/profile" className="flex items-center gap-2">
+                <User className="w-4 h-4 text-zinc-500" />
+                <span>Profile</span>
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild className="rounded-lg cursor-pointer focus:bg-zinc-50">
+              <Link href="/home" className="flex items-center gap-2">
+                <Settings className="w-4 h-4 text-zinc-500" />
+                <span>Về trang chủ</span>
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator className="bg-zinc-100 my-1" />
+            <DropdownMenuItem
+              onClick={handleLogout}
+              className="rounded-lg cursor-pointer text-rose-600 focus:text-rose-700 focus:bg-rose-50 flex items-center gap-2"
+            >
+              <LogOut className="w-4 h-4" />
+              <span>Log out</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </header>
   );
