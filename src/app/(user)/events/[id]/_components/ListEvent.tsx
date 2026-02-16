@@ -8,7 +8,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from '@/components/ui/carousel';
-import { Event } from "@/utils/type";
+import { Event } from "../../../../../types/base";
 import { motion } from 'framer-motion';
 import { ShieldCheck, ArrowRight } from 'lucide-react';
 

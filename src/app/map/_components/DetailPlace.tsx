@@ -4,7 +4,7 @@ import React from 'react';
 import Image from 'next/image';
 import { Calendar, MapPin } from 'lucide-react';
 import Link from 'next/link';
-import { Event } from "@/utils/type";
+import { Event } from "../../../types/base";
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import { Button } from '@/components/ui/button';

@@ -1,7 +1,7 @@
 'use client';
 
 import TicketCard from "@/components/ui/TicketCard";
-import { Event } from "@/utils/type";
+import { Event } from "../../../../types/base";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, ShieldCheck } from "lucide-react";
 import { motion, Variants } from "framer-motion";

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Calendar, MapPin } from "lucide-react";
 import Image from "next/image";
 
-import { Event } from "@/utils/type";
+import { Event } from "../../../../types/base";
 import { SectionHeader } from "./SectionHeader";
 
 interface WeekendEventsProps {

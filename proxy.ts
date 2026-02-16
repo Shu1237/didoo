@@ -1,117 +1,93 @@
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
-import { jwtDecode } from "jwt-decode";
-import { JWTUserType, UserRole } from "@/utils/type";
-import { getAllowedRoles } from "@/utils/permissions";
 
-// Public routes that don't require authentication
-const publicRoutes = [
-  "/",
-  "/home",
-  "/events",
-  "/login",
-  "/register",
-  "/forgot-password",
-];
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 
-// Auth routes (should redirect if already logged in)
-const authRoutes = ["/login", "/register", "/forgot-password"];
+import { Roles } from '@/utils/enum';
+import { cookies } from 'next/headers'
+import { decodeJWT } from '@/lib/utils';
 
-// Role-based route mapping
-const roleRoutes: Record<UserRole, string[]> = {
-  admin: ["/admin"],
-  organizer: ["/organizer"],
-  user: ["/user"],
-  staff: ["/organizer"], // Staff can access organizer routes
+// Define public routes that don't require authentication
+const publicPaths = ['/login', '/register', '/forgot-password', '/api/login', '/api/logout', '/api/refresh_token'];
+
+// Define role-based route access
+// Map URL prefixes to allowed roles
+const rolePermissions: Record<string, Roles[]> = {
+  '/admin': [Roles.ADMIN],
+  '/organizer': [Roles.ORGANIZER],
+  '/user': [Roles.USER],
+
+
 };
 
-export function proxy(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const accessToken = request.cookies.get("access_token")?.value;
-  const refreshToken = request.cookies.get("refresh_token")?.value;
+  const cookieStore = await cookies()
+  const accessToken = cookieStore.get('accessToken')?.value;
+  const refreshToken = cookieStore.get('refreshToken')?.value;
 
-  // Check if route is public
-  const isPublicRoute = publicRoutes.some((route) => 
-    pathname === route || pathname.startsWith(`${route}/`)
-  );
+  const isPublic =
+    publicPaths.some(path => pathname.startsWith(path)) ||
+    pathname.startsWith('/_next') ||
+    pathname.startsWith('/favicon.ico') ||
+    pathname.startsWith('/public') ||
+    pathname === '/';
 
-  // Check if route is auth route
-  const isAuthRoute = authRoutes.some((route) => 
-    pathname === route || pathname.startsWith(`${route}/`)
-  );
-
-  // If no token and trying to access protected route
-  if (!refreshToken && !isPublicRoute) {
-    const loginUrl = new URL("/login", request.url);
-    loginUrl.searchParams.set("redirect", pathname);
-    return NextResponse.redirect(loginUrl);
+  // Case 1: Public route
+  if (isPublic) {
+    return NextResponse.next();
+  }
+  // Case 2: No refresh_token -> Middleware blocks immediately (As per AuthContext logic)
+  if (!refreshToken) {
+    const url = new URL('/login', request.url);
+    url.searchParams.set('redirect', pathname);
+    return NextResponse.redirect(url);
   }
 
-  // If has token and trying to access auth routes, redirect to home
-  if (refreshToken && isAuthRoute) {
-      // Decode token to get user role
-      try {
-        const user = jwtDecode<JWTUserType>(accessToken || "");
-        const redirectPath = getDefaultRouteForRole(user.role);
-        return NextResponse.redirect(new URL(redirectPath, request.url));
-      } catch {
-        // Invalid token, allow access to auth routes
-        return NextResponse.next();
-      }
-  }
+  // 3. Validate Access Token if it exists
+  if (accessToken) {
+    try {
+      const user = decodeJWT<{ role: string; exp: number }>(accessToken);
 
-  // Role-based access control
-  if (accessToken && refreshToken) {
-      try {
-        const user = jwtDecode<JWTUserType>(accessToken);
-        const allowedRoles = getAllowedRoles(pathname);
-
-      // If route has role restrictions
-      if (allowedRoles.length > 0 && !allowedRoles.includes(user.role)) {
-        // Redirect to default route for user's role
-        const redirectPath = getDefaultRouteForRole(user.role);
-        return NextResponse.redirect(new URL(redirectPath, request.url));
+      // Check Token Expiration
+      const currentTime = Math.floor(Date.now() / 1000);
+      if (user.exp < currentTime) {
+        // Token Expired but Refresh Token exists (checked above).
+        // Action: Redirect to same URL but delete access_token cookie.
+        // This forces the browser to retry effectively as "Missing Access Token".
+        // Result: AuthContext will see [No Access, Valid Refresh] -> Trigger Case 3 (Refresh Logic).
+        const response = NextResponse.redirect(request.url);
+        response.cookies.delete('accessToken');
+        return response;
       }
 
-      // Check if user is accessing route outside their role group
-      if (pathname.startsWith("/admin") && user.role !== "admin") {
-        return NextResponse.redirect(new URL("/home", request.url));
-      }
+      // Valid Token -> Check Role-based Access (RBAC)
+      const matchedPath = Object.keys(rolePermissions).find(path => pathname.startsWith(path));
+      if (matchedPath) {
+        const allowedRoles = rolePermissions[matchedPath];
+        const userRole = user.role as Roles;
 
-      if (pathname.startsWith("/organizer") && !["organizer", "admin", "staff"].includes(user.role)) {
-        return NextResponse.redirect(new URL("/home", request.url));
-      }
-
-      if (pathname.startsWith("/user") && user.role === "admin") {
-        // Admin can access user routes, but redirect to admin dashboard by default
-        if (pathname === "/user" || pathname === "/user/") {
-          return NextResponse.redirect(new URL("/admin/dashboard", request.url));
+        if (!allowedRoles.includes(userRole)) {
+          // Unauthorized Access
+          // You might want to redirect to            // Invalid token -> redirect to login
+          return NextResponse.redirect(new URL('/login', request.url)); // Ensure /unauthorized exists or use a generic error page
         }
       }
+
     } catch (error) {
-      // Invalid token, clear cookies and redirect to login
-      const response = NextResponse.redirect(new URL("/login", request.url));
-      response.cookies.delete("access_token");
-      response.cookies.delete("refresh_token");
+      console.error("Token decoding failed:", error);
+      // Invalid token structure -> Treat as expired/missing.
+      // Force refresh flow by stripping the bad cookie.
+      const response = NextResponse.redirect(request.url);
+      response.cookies.delete('accessToken');
       return response;
     }
   }
 
+  // Case 3: No Access Token (or stripped above), but has Refresh Token.
+  // Allow request to proceed. 
+  // Layout will receive [null, refreshToken].
+  // AuthContext will trigger Case 3 logic to fetch new access token.
   return NextResponse.next();
-}
-
-function getDefaultRouteForRole(role: UserRole): string {
-  switch (role) {
-    case "admin":
-      return "/admin/dashboard";
-    case "organizer":
-      return "/organizer/dashboard";
-    case "staff":
-      return "/organizer/dashboard";
-    case "user":
-    default:
-      return "/home";
-  }
 }
 
 export const config = {
@@ -121,9 +97,8 @@ export const config = {
      * - api (API routes)
      * - _next/static (static files)
      * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public folder
+     * - favicon.ico, sitemap.xml, robots.txt (metadata files)
      */
-    "/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    '/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)',
   ],
 };

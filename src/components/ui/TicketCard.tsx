@@ -4,7 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Calendar, MapPin, ArrowUpRight, ShieldCheck } from 'lucide-react';
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
-import { Event } from '@/utils/type';
+import { Event } from '../../types/base';
 import { format } from 'date-fns';
 
 const TicketCard = ({

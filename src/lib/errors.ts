@@ -1,6 +1,7 @@
 import { toast } from "sonner";
 import { UseFormSetError } from "react-hook-form";
-import { ResponseError } from "@/utils/type";
+import { ResponseError } from "@/types/base";
+
 
 
 /* ================= ERROR CLASSES ================= */
@@ -42,7 +43,7 @@ export const handleErrorApi = ({
         }
 
         // map errors với setError
-        const errors = error.payload.errors;
+        const errors = error.payload.listErrors;
         if (errors && errors.length > 0) {
             errors.forEach((err) => {
                 setError(err.field, {

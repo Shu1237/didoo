@@ -1,6 +1,6 @@
 'use client';
 
-import { Category, Event } from '@/utils/type';
+import { Category, Event } from '../../../../types/base';
 import EventCard from '@/components/ui/CardEvent';
 import { Trophy } from 'lucide-react';
 import { SectionHeader } from './SectionHeader';

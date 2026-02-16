@@ -4,12 +4,12 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Event } from "@/utils/type";
+import { Event } from "../../../../../types/base";
 interface EventsListProps {
-  events:Event[]
+  events: Event[]
 }
 
-export default function EventsList({events}:EventsListProps) {
+export default function EventsList({ events }: EventsListProps) {
 
 
 
@@ -31,13 +31,12 @@ export default function EventsList({events}:EventsListProps) {
               <div className="flex items-center gap-2 mb-2">
                 <p className="font-medium text-zinc-900">{event.title}</p>
                 <Badge
-                  className={`text-white hover:text-white ${
-                    event.status === "pending"
-                      ? "bg-amber-500 hover:bg-amber-600"
-                      : event.status === "completed"
-                        ? "bg-emerald-500 hover:bg-emerald-600"
-                        : "bg-zinc-500 hover:bg-zinc-600"
-                  }`}
+                  className={`text-white hover:text-white ${event.status === "pending"
+                    ? "bg-amber-500 hover:bg-amber-600"
+                    : event.status === "completed"
+                      ? "bg-emerald-500 hover:bg-emerald-600"
+                      : "bg-zinc-500 hover:bg-zinc-600"
+                    }`}
                 >
                   {event.status}
                 </Badge>

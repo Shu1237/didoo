@@ -70,7 +70,7 @@ export default function RegisterForm() {
             <h2 className="text-[52px] font-bold text-white leading-[1.1]">What our explorers said</h2>
             <div className="text-4xl text-white/20 font-serif italic">&quot;</div>
             <p className="text-xl text-white/60 italic font-light max-w-sm leading-relaxed">Search and find your favorite events is now easier than ever. Just browse events and book tickets when you need to.</p>
-            
+
           </div>
 
           <div className="absolute bottom-10 right-10 opacity-20 pointer-events-none">
@@ -112,7 +112,6 @@ function SocialIcon({ icon }: { icon: string }) {
   return (
     <button type="button" className="w-14 h-14 rounded-full bg-white flex items-center justify-center hover:scale-110 active:scale-95 transition-all shadow-xl shadow-black/10">
       {icon === 'google' && <Image src="https://www.svgrepo.com/show/475656/google-color.svg" width={28} height={28} alt="G" />}
-      {icon === 'facebook' && <Facebook className="w-7 h-7 text-[#1877F2] fill-current" />}
     </button>
   );
 }

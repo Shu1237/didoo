@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Calendar, MapPin, Ticket, ArrowUpRight } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { Event } from '@/utils/type';
+import { Event } from '../../types/base';
 
 const EventCard = ({
   id,

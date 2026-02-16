@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Calendar } from "lucide-react";
 import { mockOrganizerEvents } from "@/utils/mockOrganizer";
-import { Event } from "@/utils/type";
+import { Event } from "../../../../../types/base";
 
 interface EventsListProps {
   events: any[];

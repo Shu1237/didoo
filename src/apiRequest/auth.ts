@@ -1,9 +1,19 @@
 import http from "@/lib/http";
-import { EmailInput, LoginInput, ResetPasswordInput } from "@/schemas/auth";
+import {
+  LoginInput,
+  LoginGoogleInput,
+  RegisterInput,
+  VerifyRegisterInput,
+  ForgotPasswordInput,
+  VerifyForgotPasswordInput,
+  ChangeEmailInput,
+  VerifyChangeEmailInput,
+  ChangePasswordInput,
+  LogoutInput,
+  RefreshInput
+} from "@/schemas/auth";
 
 import { ENDPOINT_CLIENT, ENDPOINT_SERVER } from "@/utils/endpoint";
-
-
 
 export const authRequest = {
   loginClient: (data: LoginInput) =>
@@ -11,31 +21,40 @@ export const authRequest = {
       ENDPOINT_CLIENT.LOGIN,
       data,
     ),
-  // call sever to set up token
   loginServer: (body: { accessToken: string; refreshToken: string }) =>
     http.post(ENDPOINT_SERVER.LOGIN, body, {
       baseURL: "",
     }),
-  logoutClient: () => http.post(ENDPOINT_CLIENT.LOGOUT, {}),
+  loginGoogle: (data: LoginGoogleInput) =>
+    http.post<{ accessToken: string; refreshToken: string }>(
+      ENDPOINT_CLIENT.LOGIN_GOOGLE,
+      data
+    ),
+  register: (data: RegisterInput) =>
+    http.post(ENDPOINT_CLIENT.REGISTER, data),
+  verifyRegister: (data: VerifyRegisterInput) =>
+    http.post(ENDPOINT_CLIENT.VERIFY_REGISTER, data),
+  logoutClient: (data: LogoutInput) =>
+    http.post(ENDPOINT_CLIENT.LOGOUT, data),
   logoutServer: () =>
     http.post(ENDPOINT_SERVER.LOGOUT, undefined, {
       baseURL: "",
     }),
-
-  // call client to refresh token
-  refreshTokenClient: (body: { refreshToken: string }) =>
+  refreshTokenClient: (body: RefreshInput) =>
     http.post<{ accessToken: string, refreshToken: string }>(ENDPOINT_CLIENT.REFRESH, body, {
-      skipAuth: true
     }),
-
-  // call sever to refresh token
   refreshTokenServer: (body: { accessToken: string, refreshToken: string }) =>
     http.post<{ accessToken: string, refreshToken: string }>(ENDPOINT_SERVER.REFRESH, body, {
       baseURL: "",
     }),
-  forgotPassword: (data: EmailInput) =>
-    http.post<{ message: string }>(ENDPOINT_CLIENT.FORGOT_PASSWORD, data),
-  resetPassword: (data: ResetPasswordInput) =>
-    http.post<{ message: string }>(ENDPOINT_CLIENT.RESET_PASSWORD, data),
-
+  forgotPassword: (data: ForgotPasswordInput) =>
+    http.post(ENDPOINT_CLIENT.FORGOT_PASSWORD, data),
+  verifyForgotPassword: (data: VerifyForgotPasswordInput) =>
+    http.post(ENDPOINT_CLIENT.VERIFY_FORGOT_PASSWORD, data),
+  changeEmail: (data: ChangeEmailInput) =>
+    http.post(ENDPOINT_CLIENT.CHANGE_EMAIL, data),
+  verifyChangeEmail: (data: VerifyChangeEmailInput) =>
+    http.post(ENDPOINT_CLIENT.VERIFY_CHANGE_EMAIL, data),
+  changePassword: (data: ChangePasswordInput) =>
+    http.post(ENDPOINT_CLIENT.CHANGE_PASSWORD, data),
 };

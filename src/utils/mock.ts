@@ -1,7 +1,7 @@
 
 import { MapIcon, ShieldCheck, Users, Zap } from "lucide-react";
-import { Category } from "./type";
-import { Event } from "./type";
+import { Category } from "../types/category";
+import { Event } from "../types/event";
 
 
 export const MockImage = [
