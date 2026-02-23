@@ -33,6 +33,8 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Roles } from "@/utils/enum";
+import { useAuth } from "@/hooks/useAuth";
 
 const Header = () => {
     const user = useSessionStore((state) => state.user);
@@ -40,7 +42,7 @@ const Header = () => {
     const pathname = usePathname();
     const [hoveredNav, setHoveredNav] = useState<string | null>(null);
     const [isScrolled, setIsScrolled] = useState(false);
-
+    const { logout } = useAuth();
     useEffect(() => {
         const handleScroll = () => {
             setIsScrolled(window.scrollY > 10);
@@ -51,18 +53,14 @@ const Header = () => {
     }, []);
 
     const handleLogout = async () => {
-        try {
-            await authRequest.logoutClient();
-            router.push("/login");
-        } catch (error) {
-            console.error("Logout error:", error);
-        }
+        if (!user || !user.UserId) return;
+        await logout.mutateAsync({ userId: user.UserId });
     };
 
     const getDashboardLink = () => {
         if (!user) return null;
-        if (user.role === "admin") return "/admin/dashboard";
-        if (user.role === "organizer") return "/organizer/dashboard";
+        if (user.RoleId === Roles.ADMIN) return "/admin/dashboard";
+        if (user.RoleId === Roles.ORGANIZER) return "/organizer/dashboard";
         return "/user/profile";
     };
 

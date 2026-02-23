@@ -1,54 +1,59 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { eventRequest } from "@/apiRequest/event";
 import { EventCreateBody, EventUpdateBody } from "@/schemas/event";
-import { QUERY_KEY } from "@/utils/constant";
+import { KEY, QUERY_KEY } from "@/utils/constant";
 import { EventGetListQuery } from "@/types/event";
+import { toast } from "sonner";
+import { handleErrorApi } from "@/lib/errors";
 
 export const useGetEvents = (params?: EventGetListQuery) => {
     return useQuery({
-        queryKey: QUERY_KEY.eventList(params),
+        queryKey: QUERY_KEY.events.list(params),
         queryFn: () => eventRequest.getList(params || {}),
     });
 };
 
 export const useGetEvent = (id: string) => {
     return useQuery({
-        queryKey: QUERY_KEY.eventDetail(id),
+        queryKey: QUERY_KEY.events.detail(id),
         queryFn: () => eventRequest.getById(id),
         enabled: !!id,
     });
 };
 
-import { handleErrorApi } from "@/lib/errors";
-
 export const useEvent = () => {
     const queryClient = useQueryClient();
 
     const create = useMutation({
-        mutationFn: (body: EventCreateBody) => eventRequest.create(body),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: QUERY_KEY.eventList() });
+        mutationFn: async (body: EventCreateBody) => {
+            const res = await eventRequest.create(body);
+            return res.data;
         },
-        onError: (error) => {
-            handleErrorApi({ error });
-        }
+        onSuccess: () => {
+            toast.success('Event created successfully');
+            queryClient.invalidateQueries({ queryKey: KEY.events });
+        },
     });
 
     const update = useMutation({
-        mutationFn: ({ id, body }: { id: string; body: EventUpdateBody }) => eventRequest.update(id, body),
-        onSuccess: (data, variables) => {
-            queryClient.invalidateQueries({ queryKey: QUERY_KEY.eventList() });
-            queryClient.invalidateQueries({ queryKey: QUERY_KEY.eventDetail(variables.id) });
+        mutationFn: async ({ id, body }: { id: string; body: EventUpdateBody }) => {
+            const res = await eventRequest.update(id, body);
+            return res.data;
         },
-        onError: (error) => {
-            handleErrorApi({ error });
-        }
+        onSuccess: () => {
+            toast.success('Event updated successfully');
+            queryClient.invalidateQueries({ queryKey: KEY.events });
+        },
     });
 
     const deleteEvent = useMutation({
-        mutationFn: (id: string) => eventRequest.delete(id),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: QUERY_KEY.eventList() });
+        mutationFn: async (id: string) => {
+            const res = await eventRequest.delete(id);
+            return res.message;
+        },
+        onSuccess: (data) => {
+            toast.success(data);
+            queryClient.invalidateQueries({ queryKey: KEY.events });
         },
         onError: (error) => {
             handleErrorApi({ error });
@@ -56,9 +61,13 @@ export const useEvent = () => {
     });
 
     const restore = useMutation({
-        mutationFn: (id: string) => eventRequest.restore(id),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: QUERY_KEY.eventList() });
+        mutationFn: async (id: string) => {
+            const res = await eventRequest.restore(id);
+            return res.message;
+        },
+        onSuccess: (data) => {
+            toast.success(data);
+            queryClient.invalidateQueries({ queryKey: KEY.events });
         },
         onError: (error) => {
             handleErrorApi({ error });

@@ -14,7 +14,7 @@ const publicPaths = ['/login', '/register', '/forgot-password', '/api/login', '/
 const rolePermissions: Record<string, Roles[]> = {
   '/admin': [Roles.ADMIN],
   '/organizer': [Roles.ORGANIZER],
-  '/user': [Roles.USER],
+  '/home': [Roles.USER, Roles.GUEST],
 
 
 };

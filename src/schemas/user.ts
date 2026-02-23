@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { Role } from "@/utils/enum";
+import { Roles } from "@/utils/enum";
 
 // Shared schemas
 export const locationSchema = z.object({
@@ -20,7 +20,7 @@ export const userCreateSchema = z.object({
     dateOfBirth: z.date(),
     address: z.string().optional(),
     status: z.string().default("Active"), // Enum?
-    roleName: z.string().default(Role.USER),
+    roleName: z.string().default(Roles.USER),
     organizerId: z.uuid().nullable().optional(),
 });
 

@@ -5,7 +5,7 @@ export const categoryCreateSchema = z.object({
     name: z.string().min(1),
     slug: z.string().min(1),
     description: z.string().optional(),
-    iconUrl: z.string().url().optional(),
+    iconUrl: z.url().optional(),
     status: z.enum(CategoryStatus).default(CategoryStatus.ACTIVE),
     parentCategoryId: z.uuid().nullable().optional(),
 });
@@ -14,7 +14,7 @@ export const categoryUpdateSchema = z.object({
     name: z.string().min(1).optional(),
     slug: z.string().optional(),
     description: z.string().optional(),
-    iconUrl: z.string().url().optional(),
+    iconUrl: z.url().optional(),
     status: z.enum(CategoryStatus).optional(),
     parentCategoryId: z.uuid().nullable().optional(),
 });

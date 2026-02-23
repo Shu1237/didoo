@@ -1,53 +1,59 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { userRequest } from "@/apiRequest/user";
 import { UserCreateBody, UserUpdateBody } from "@/schemas/user";
-import { QUERY_KEY } from "@/utils/constant";
+import { KEY, QUERY_KEY } from "@/utils/constant";
 import { UserGetListQuery } from "@/types/user";
+import { toast } from "sonner";
+import { handleErrorApi } from "@/lib/errors";
 
 export const useGetUsers = (params?: UserGetListQuery) => {
     return useQuery({
-        queryKey: QUERY_KEY.userList(params),
+        queryKey: QUERY_KEY.users.list(params),
         queryFn: () => userRequest.getList(params || {}),
     });
 };
 
 export const useGetUser = (id: string) => {
     return useQuery({
-        queryKey: QUERY_KEY.userDetail(id),
+        queryKey: QUERY_KEY.users.detail(id),
         queryFn: () => userRequest.getById(id),
         enabled: !!id,
     });
 };
 
-import { handleErrorApi } from "@/lib/errors";
-
 export const useUser = () => {
     const queryClient = useQueryClient();
 
     const create = useMutation({
-        mutationFn: (body: UserCreateBody) => userRequest.create(body),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: QUERY_KEY.userList() });
+        mutationFn: async (body: UserCreateBody) => {
+            const res = await userRequest.create(body);
+            return res.data;
         },
-        onError: (error) => {
-            handleErrorApi({ error });
-        }
+        onSuccess: () => {
+            toast.success('User created successfully');
+            queryClient.invalidateQueries({ queryKey: KEY.users });
+        },
     });
 
     const update = useMutation({
-        mutationFn: ({ id, body }: { id: string; body: UserUpdateBody }) => userRequest.update(id, body),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: QUERY_KEY.userList() });
+        mutationFn: async ({ id, body }: { id: string; body: UserUpdateBody }) => {
+            const res = await userRequest.update(id, body);
+            return res.data;
         },
-        onError: (error) => {
-            handleErrorApi({ error });
-        }
+        onSuccess: () => {
+            toast.success('User updated successfully');
+            queryClient.invalidateQueries({ queryKey: KEY.users });
+        },
     });
 
     const deleteUser = useMutation({
-        mutationFn: (id: string) => userRequest.delete(id),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: QUERY_KEY.userList() });
+        mutationFn: async (id: string) => {
+            const res = await userRequest.delete(id);
+            return res.message;
+        },
+        onSuccess: (data) => {
+            toast.success(data);
+            queryClient.invalidateQueries({ queryKey: KEY.users });
         },
         onError: (error) => {
             handleErrorApi({ error });
@@ -55,9 +61,13 @@ export const useUser = () => {
     });
 
     const restore = useMutation({
-        mutationFn: (id: string) => userRequest.restore(id),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: QUERY_KEY.userList() });
+        mutationFn: async (id: string) => {
+            const res = await userRequest.restore(id);
+            return res.message;
+        },
+        onSuccess: (data) => {
+            toast.success(data);
+            queryClient.invalidateQueries({ queryKey: KEY.users });
         },
         onError: (error) => {
             handleErrorApi({ error });

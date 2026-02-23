@@ -9,9 +9,10 @@ export enum HttpErrorCode {
 }
 
 export enum Roles {
-    ADMIN = 'Admin',
-    ORGANIZER = 'Organizer',
-    USER = 'User',
+    ADMIN = '346637b8-09e2-42a1-aae7-71340c19e8f5',
+    ORGANIZER = '4aa3c956-70b7-4ac1-a7ca-28f5de93755d',
+    USER = 'a9d8183a-c7c3-4e08-b31a-9a2f603bef0e',
+    GUEST = 'c2a05f94-054a-4127-b1a4-15403bcebc97',
 }
 
 export enum Gender {

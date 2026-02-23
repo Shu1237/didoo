@@ -3,18 +3,17 @@ import { z } from "zod";
 export const locationSchema = z.object({
     latitude: z.number(),
     longitude: z.number(),
-    address: z.string(),
 });
 
 export const loginSchema = z.object({
     email: z.email("Email không hợp lệ"),
     password: z.string().min(1, "Mật khẩu là bắt buộc"),
-    location: locationSchema.optional(),
+    location: locationSchema,
 });
 
 export const loginGoogleSchema = z.object({
     googleToken: z.string(),
-    location: locationSchema.optional(),
+    location: locationSchema,
 });
 
 export const registerSchema = z.object({
@@ -22,10 +21,16 @@ export const registerSchema = z.object({
     email: z.email("Email không hợp lệ"),
     phone: z.string().optional(),
     password: z.string().min(6, "Password tối thiểu 6 ký tự"),
-    avatarUrl: z.string().url().optional(),
+    confirmPassword: z.string().min(6, "Password tối thiểu 6 ký tự"),
+    avatarUrl: z.url().optional(),
     gender: z.number().int().min(0).max(2).default(0),
-    dateOfBirth: z.string().datetime(),
+    dateOfBirth: z.coerce.date({
+        message: "Vui lòng chọn ngày sinh",
+    }),
     address: z.string().optional(),
+}).refine((data) => data.password === data.confirmPassword, {
+    message: "Mật khẩu không khớp",
+    path: ["confirmPassword"],
 });
 
 export const verifyRegisterSchema = z.object({
@@ -35,36 +40,44 @@ export const verifyRegisterSchema = z.object({
 
 export const forgotPasswordSchema = z.object({
     email: z.email("Email không hợp lệ"),
+    clientUri: z.string().optional(),
 });
 
 export const verifyForgotPasswordSchema = z.object({
-    email: z.email("Email không hợp lệ"),
-    otp: z.string().length(6, "OTP phải có 6 ký tự"),
+    key: z.string(),
     newPassword: z.string().min(6, "Password tối thiểu 6 ký tự"),
+    confirmPassword: z.string().min(6, "Password tối thiểu 6 ký tự"),
+}).refine((data) => data.newPassword === data.confirmPassword, {
+    message: "Mật khẩu không khớp",
+    path: ["confirmPassword"],
 });
 
 export const changeEmailSchema = z.object({
-    userId: z.string().uuid(),
+    userId: z.uuid(),
     newEmail: z.email("Email không hợp lệ"),
 });
 
 export const verifyChangeEmailSchema = z.object({
-    userId: z.string().uuid(),
+    userId: z.uuid(),
     otp: z.string().length(6, "OTP phải có 6 ký tự"),
 });
 
 export const changePasswordSchema = z.object({
-    userId: z.string().uuid(),
+    userId: z.uuid(),
     oldPassword: z.string().min(1, "Mật khẩu cũ là bắt buộc"),
     newPassword: z.string().min(6, "Password mới tối thiểu 6 ký tự"),
+    confirmPassword: z.string().min(6, "Password mới tối thiểu 6 ký tự"),
+}).refine((data) => data.newPassword === data.confirmPassword, {
+    message: "Mật khẩu không khớp",
+    path: ["confirmPassword"],
 });
 
 export const logoutSchema = z.object({
-    userId: z.string().uuid(),
+    userId: z.uuid(),
 });
 
 export const refreshSchema = z.object({
-    id: z.string().uuid(),
+    id: z.uuid(),
     accessToken: z.string(),
     refreshToken: z.string(),
 });

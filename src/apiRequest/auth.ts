@@ -30,7 +30,7 @@ export const authRequest = {
       ENDPOINT_CLIENT.LOGIN_GOOGLE,
       data
     ),
-  register: (data: RegisterInput) =>
+  register: (data: Omit<RegisterInput, 'confirmPassword'>) =>
     http.post(ENDPOINT_CLIENT.REGISTER, data),
   verifyRegister: (data: VerifyRegisterInput) =>
     http.post(ENDPOINT_CLIENT.VERIFY_REGISTER, data),
@@ -49,7 +49,7 @@ export const authRequest = {
     }),
   forgotPassword: (data: ForgotPasswordInput) =>
     http.post(ENDPOINT_CLIENT.FORGOT_PASSWORD, data),
-  verifyForgotPassword: (data: VerifyForgotPasswordInput) =>
+  verifyForgotPassword: (data: Omit<VerifyForgotPasswordInput, 'confirmPassword'>) =>
     http.post(ENDPOINT_CLIENT.VERIFY_FORGOT_PASSWORD, data),
   changeEmail: (data: ChangeEmailInput) =>
     http.post(ENDPOINT_CLIENT.CHANGE_EMAIL, data),

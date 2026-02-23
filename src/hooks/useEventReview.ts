@@ -1,54 +1,59 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { eventReviewRequest } from "@/apiRequest/eventReview";
 import { EventReviewCreateBody, EventReviewUpdateBody } from "@/schemas/eventReview";
-import { QUERY_KEY } from "@/utils/constant";
+import { KEY, QUERY_KEY } from "@/utils/constant";
 import { EventReviewGetListQuery } from "@/types/eventReview";
+import { toast } from "sonner";
+import { handleErrorApi } from "@/lib/errors";
 
 export const useGetEventReviews = (params?: EventReviewGetListQuery) => {
     return useQuery({
-        queryKey: QUERY_KEY.eventReviewList(params),
+        queryKey: QUERY_KEY.eventReviews.list(params),
         queryFn: () => eventReviewRequest.getList(params || {}),
     });
 };
 
 export const useGetEventReview = (id: string) => {
     return useQuery({
-        queryKey: QUERY_KEY.eventReviewDetail(id),
+        queryKey: QUERY_KEY.eventReviews.detail(id),
         queryFn: () => eventReviewRequest.getById(id),
         enabled: !!id,
     });
 };
 
-import { handleErrorApi } from "@/lib/errors";
-
 export const useEventReview = () => {
     const queryClient = useQueryClient();
 
     const create = useMutation({
-        mutationFn: (body: EventReviewCreateBody) => eventReviewRequest.create(body),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: QUERY_KEY.eventReviewList() });
+        mutationFn: async (body: EventReviewCreateBody) => {
+            const res = await eventReviewRequest.create(body);
+            return res.data;
         },
-        onError: (error) => {
-            handleErrorApi({ error });
-        }
+        onSuccess: () => {
+            toast.success('Event review created successfully');
+            queryClient.invalidateQueries({ queryKey: KEY.eventReviews });
+        },
     });
 
     const update = useMutation({
-        mutationFn: ({ id, body }: { id: string; body: EventReviewUpdateBody }) => eventReviewRequest.update(id, body),
-        onSuccess: (data, variables) => {
-            queryClient.invalidateQueries({ queryKey: QUERY_KEY.eventReviewList() });
-            queryClient.invalidateQueries({ queryKey: QUERY_KEY.eventReviewDetail(variables.id) });
+        mutationFn: async ({ id, body }: { id: string; body: EventReviewUpdateBody }) => {
+            const res = await eventReviewRequest.update(id, body);
+            return res.data;
         },
-        onError: (error) => {
-            handleErrorApi({ error });
-        }
+        onSuccess: () => {
+            toast.success('Event review updated successfully');
+            queryClient.invalidateQueries({ queryKey: KEY.eventReviews });
+        },
     });
 
     const deleteReview = useMutation({
-        mutationFn: (id: string) => eventReviewRequest.delete(id),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: QUERY_KEY.eventReviewList() });
+        mutationFn: async (id: string) => {
+            const res = await eventReviewRequest.delete(id);
+            return res.message;
+        },
+        onSuccess: (data) => {
+            toast.success(data);
+            queryClient.invalidateQueries({ queryKey: KEY.eventReviews });
         },
         onError: (error) => {
             handleErrorApi({ error });
@@ -56,9 +61,13 @@ export const useEventReview = () => {
     });
 
     const restore = useMutation({
-        mutationFn: (id: string) => eventReviewRequest.restore(id),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: QUERY_KEY.eventReviewList() });
+        mutationFn: async (id: string) => {
+            const res = await eventReviewRequest.restore(id);
+            return res.message;
+        },
+        onSuccess: (data) => {
+            toast.success(data);
+            queryClient.invalidateQueries({ queryKey: KEY.eventReviews });
         },
         onError: (error) => {
             handleErrorApi({ error });

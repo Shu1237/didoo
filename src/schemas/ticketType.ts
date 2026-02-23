@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const ticketTypeCreateSchema = z.object({
-    eventId: z.string().uuid(),
+    eventId: z.uuid(),
     name: z.string().min(1),
     price: z.number().min(0),
     totalQuantity: z.number().int().min(0),

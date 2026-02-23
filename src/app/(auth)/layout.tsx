@@ -13,17 +13,18 @@ export default function AuthLayout({
 }) {
   const router = useRouter();
   const user = useSessionStore((state) => state.user);
-
+  console.log(user);
   const roleRedirects: Record<Roles, string> = {
     [Roles.ADMIN]: "/admin",
     [Roles.USER]: "/home",
     [Roles.ORGANIZER]: "/organizer",
+    [Roles.GUEST]: "/home",
 
 
   };
   useEffect(() => {
     if (user) {
-      router.push(roleRedirects[user.role]);
+      router.push(roleRedirects[user.RoleId as Roles]);
     }
   }, [user]);
   return (

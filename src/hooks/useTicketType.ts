@@ -1,54 +1,59 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { ticketTypeRequest } from "@/apiRequest/ticketType";
 import { TicketTypeCreateBody, TicketTypeUpdateBody } from "@/schemas/ticketType";
-import { QUERY_KEY } from "@/utils/constant";
+import { KEY, QUERY_KEY } from "@/utils/constant";
 import { TicketTypeGetListQuery } from "@/types/ticketType";
+import { toast } from "sonner";
+import { handleErrorApi } from "@/lib/errors";
 
 export const useGetTicketTypes = (params?: TicketTypeGetListQuery) => {
     return useQuery({
-        queryKey: QUERY_KEY.ticketTypeList(params),
+        queryKey: QUERY_KEY.ticketTypes.list(params),
         queryFn: () => ticketTypeRequest.getList(params || {}),
     });
 };
 
 export const useGetTicketType = (id: string) => {
     return useQuery({
-        queryKey: QUERY_KEY.ticketTypeDetail(id),
+        queryKey: QUERY_KEY.ticketTypes.detail(id),
         queryFn: () => ticketTypeRequest.getById(id),
         enabled: !!id,
     });
 };
 
-import { handleErrorApi } from "@/lib/errors";
-
 export const useTicketType = () => {
     const queryClient = useQueryClient();
 
     const create = useMutation({
-        mutationFn: (body: TicketTypeCreateBody) => ticketTypeRequest.create(body),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: QUERY_KEY.ticketTypeList() });
+        mutationFn: async (body: TicketTypeCreateBody) => {
+            const res = await ticketTypeRequest.create(body);
+            return res.data;
         },
-        onError: (error) => {
-            handleErrorApi({ error });
-        }
+        onSuccess: () => {
+            toast.success('Ticket type created successfully');
+            queryClient.invalidateQueries({ queryKey: KEY.ticketTypes });
+        },
     });
 
     const update = useMutation({
-        mutationFn: ({ id, body }: { id: string; body: TicketTypeUpdateBody }) => ticketTypeRequest.update(id, body),
-        onSuccess: (data, variables) => {
-            queryClient.invalidateQueries({ queryKey: QUERY_KEY.ticketTypeList() });
-            queryClient.invalidateQueries({ queryKey: QUERY_KEY.ticketTypeDetail(variables.id) });
+        mutationFn: async ({ id, body }: { id: string; body: TicketTypeUpdateBody }) => {
+            const res = await ticketTypeRequest.update(id, body);
+            return res.data;
         },
-        onError: (error) => {
-            handleErrorApi({ error });
-        }
+        onSuccess: () => {
+            toast.success('Ticket type updated successfully');
+            queryClient.invalidateQueries({ queryKey: KEY.ticketTypes });
+        },
     });
 
     const deleteTicketType = useMutation({
-        mutationFn: (id: string) => ticketTypeRequest.delete(id),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: QUERY_KEY.ticketTypeList() });
+        mutationFn: async (id: string) => {
+            const res = await ticketTypeRequest.delete(id);
+            return res.message;
+        },
+        onSuccess: (data) => {
+            toast.success(data);
+            queryClient.invalidateQueries({ queryKey: KEY.ticketTypes });
         },
         onError: (error) => {
             handleErrorApi({ error });
@@ -56,9 +61,13 @@ export const useTicketType = () => {
     });
 
     const restore = useMutation({
-        mutationFn: (id: string) => ticketTypeRequest.restore(id),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: QUERY_KEY.ticketTypeList() });
+        mutationFn: async (id: string) => {
+            const res = await ticketTypeRequest.restore(id);
+            return res.message;
+        },
+        onSuccess: (data) => {
+            toast.success(data);
+            queryClient.invalidateQueries({ queryKey: KEY.ticketTypes });
         },
         onError: (error) => {
             handleErrorApi({ error });

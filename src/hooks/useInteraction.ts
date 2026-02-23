@@ -1,43 +1,48 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { interactionRequest } from "@/apiRequest/interaction";
 import { InteractionCreateBody } from "@/schemas/interaction";
-import { QUERY_KEY } from "@/utils/constant";
+import { KEY, QUERY_KEY } from "@/utils/constant";
 import { InteractionGetListQuery } from "@/types/interaction";
+import { toast } from "sonner";
+import { handleErrorApi } from "@/lib/errors";
 
 export const useGetInteractions = (params?: InteractionGetListQuery) => {
     return useQuery({
-        queryKey: QUERY_KEY.interactionList(params),
+        queryKey: QUERY_KEY.interactions.list(params),
         queryFn: () => interactionRequest.getList(params || {}),
     });
 };
 
 export const useGetInteraction = (id: string) => {
     return useQuery({
-        queryKey: QUERY_KEY.interactionDetail(id),
+        queryKey: QUERY_KEY.interactions.detail(id),
         queryFn: () => interactionRequest.getById(id),
         enabled: !!id,
     });
 };
 
-import { handleErrorApi } from "@/lib/errors";
-
 export const useInteraction = () => {
     const queryClient = useQueryClient();
 
     const create = useMutation({
-        mutationFn: (body: InteractionCreateBody) => interactionRequest.create(body),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: QUERY_KEY.interactionList() });
+        mutationFn: async (body: InteractionCreateBody) => {
+            const res = await interactionRequest.create(body);
+            return res.data;
         },
-        onError: (error) => {
-            handleErrorApi({ error });
-        }
+        onSuccess: () => {
+            toast.success('Interaction created successfully');
+            queryClient.invalidateQueries({ queryKey: KEY.interactions });
+        },
     });
 
     const remove = useMutation({
-        mutationFn: ({ userId, eventId, type }: { userId: string; eventId: string; type: number }) => interactionRequest.delete(userId, eventId, type),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: QUERY_KEY.interactionList() });
+        mutationFn: async ({ userId, eventId, type }: { userId: string; eventId: string; type: number }) => {
+            const res = await interactionRequest.delete(userId, eventId, type);
+            return res.message;
+        },
+        onSuccess: (data) => {
+            toast.success(data);
+            queryClient.invalidateQueries({ queryKey: KEY.interactions });
         },
         onError: (error) => {
             handleErrorApi({ error });
@@ -45,9 +50,13 @@ export const useInteraction = () => {
     });
 
     const softRemove = useMutation({
-        mutationFn: ({ userId, eventId, type }: { userId: string; eventId: string; type: number }) => interactionRequest.softDelete(userId, eventId, type),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: QUERY_KEY.interactionList() });
+        mutationFn: async ({ userId, eventId, type }: { userId: string; eventId: string; type: number }) => {
+            const res = await interactionRequest.softDelete(userId, eventId, type);
+            return res.message;
+        },
+        onSuccess: (data) => {
+            toast.success(data);
+            queryClient.invalidateQueries({ queryKey: KEY.interactions });
         },
         onError: (error) => {
             handleErrorApi({ error });
@@ -55,9 +64,13 @@ export const useInteraction = () => {
     });
 
     const restore = useMutation({
-        mutationFn: ({ userId, eventId, type }: { userId: string; eventId: string; type: number }) => interactionRequest.restore(userId, eventId, type),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: QUERY_KEY.interactionList() });
+        mutationFn: async ({ userId, eventId, type }: { userId: string; eventId: string; type: number }) => {
+            const res = await interactionRequest.restore(userId, eventId, type);
+            return res.message;
+        },
+        onSuccess: (data) => {
+            toast.success(data);
+            queryClient.invalidateQueries({ queryKey: KEY.interactions });
         },
         onError: (error) => {
             handleErrorApi({ error });

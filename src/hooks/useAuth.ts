@@ -13,21 +13,24 @@ import {
     ChangePasswordInput,
     LogoutInput
 } from "@/schemas/auth";
+import { useSessionStore } from "@/stores/sesionStore";
 import { useMutation } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 
 export const useAuth = () => {
+    const { user, clearSession } = useSessionStore((state) => state);
+    const router = useRouter();
     const login = useMutation({
         mutationFn: async (data: LoginInput) => {
             const res = await authRequest.loginClient(data)
             return res.data
         },
         onSuccess: async (data) => {
-            await authRequest.loginServer(data)
+            await authRequest.loginServer(data);
+            toast.success("Login successfully");
         },
-        onError: (error) => {
-            handleErrorApi({ error })
-        }
 
     })
 
@@ -38,30 +41,29 @@ export const useAuth = () => {
         },
         onSuccess: async (data) => {
             await authRequest.loginServer(data)
+            toast.success("Login successfully");
         },
-        onError: (error) => {
-            handleErrorApi({ error })
-        }
     })
 
     const register = useMutation({
         mutationFn: async (data: RegisterInput) => {
             const res = await authRequest.register(data)
-            return res.data
+            return res.message
         },
-        onError: (error) => {
-            handleErrorApi({ error })
-        }
+        onSuccess: async (data) => {
+            toast.success(data);
+        },
     })
 
     const verifyRegister = useMutation({
         mutationFn: async (data: VerifyRegisterInput) => {
             const res = await authRequest.verifyRegister(data)
-            return res.data
+            return res.message
         },
-        onError: (error) => {
-            handleErrorApi({ error })
-        }
+        onSuccess: async (data) => {
+            toast.success(data);
+            router.replace("/login");
+        },
     })
 
     const logout = useMutation({
@@ -70,6 +72,9 @@ export const useAuth = () => {
         },
         onSuccess: async () => {
             await authRequest.logoutServer()
+            clearSession();
+            toast.success("Logout successfully");
+            router.replace("/login");
         },
         onError: (error) => {
             handleErrorApi({ error })
@@ -81,49 +86,63 @@ export const useAuth = () => {
             const res = await authRequest.forgotPassword(data)
             return res.data
         },
-        onError: (error) => {
-            handleErrorApi({ error })
-        }
     })
 
     const verifyForgotPassword = useMutation({
         mutationFn: async (data: VerifyForgotPasswordInput) => {
-            const res = await authRequest.verifyForgotPassword(data)
-            return res.data
+            const { confirmPassword, ...payload } = data;
+            const res = await authRequest.verifyForgotPassword(payload)
+            return res.message
         },
-        onError: (error) => {
-            handleErrorApi({ error })
-        }
+        onSuccess: async (data) => {
+            toast.success(data);
+        },
     })
 
     const changeEmail = useMutation({
         mutationFn: async (data: ChangeEmailInput) => {
             const res = await authRequest.changeEmail(data)
-            return res.data
+            return res.message
         },
-        onError: (error) => {
-            handleErrorApi({ error })
-        }
+        onSuccess: async (data) => {
+            toast.success(data);
+        },
     })
 
     const verifyChangeEmail = useMutation({
         mutationFn: async (data: VerifyChangeEmailInput) => {
             const res = await authRequest.verifyChangeEmail(data)
-            return res.data
+            return res.message
         },
-        onError: (error) => {
-            handleErrorApi({ error })
+        onSuccess: async (data) => {
+            if (user?.UserId) {
+                try {
+                    await authRequest.logoutClient({ userId: user.UserId });
+                } catch (e) { }
+            }
+            await authRequest.logoutServer();
+            clearSession();
+            toast.success(data);
+            router.replace("/login");
         }
     })
 
     const changePassword = useMutation({
         mutationFn: async (data: ChangePasswordInput) => {
             const res = await authRequest.changePassword(data)
-            return res.data
+            return res.message
         },
-        onError: (error) => {
-            handleErrorApi({ error })
-        }
+        onSuccess: async (data) => {
+            if (user?.UserId) {
+                try {
+                    await authRequest.logoutClient({ userId: user.UserId });
+                } catch (e) { }
+            }
+            await authRequest.logoutServer();
+            clearSession();
+            toast.success(data);
+            router.replace("/login");
+        },
     })
 
     return {

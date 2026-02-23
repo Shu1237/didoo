@@ -5,8 +5,6 @@ import { ResponseData, ResponseError } from "../types/base";
 import { toast } from "sonner";
 import { EntityError, HttpError } from "@/lib/errors";
 import { HttpErrorCode } from "@/utils/enum";
-import { decodeJWT } from "@/lib/utils";
-import { JWTUserType } from "@/types/user";
 
 interface CustomOptions extends RequestInit {
     baseURL?: string | undefined;
@@ -72,13 +70,13 @@ class TokenRefreshInterceptor {
         if (!refreshToken) {
             throw new Error("NO_REFRESH_TOKEN");
         }
-        if (!user || !user.id) {
+        if (!user || !user.UserId) {
             throw new Error("NO_USER_ID");
         }
         try {
             // Gọi API refresh token
             const result = await authRequest.refreshTokenClient({
-                id: user.id,
+                id: user.UserId,
                 accessToken: accessToken || "",
                 refreshToken: refreshToken
             });

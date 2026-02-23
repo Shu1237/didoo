@@ -1,54 +1,59 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { organizerRequest } from "@/apiRequest/organizer";
 import { OrganizerCreateBody, OrganizerUpdateBody } from "@/schemas/organizer";
-import { QUERY_KEY } from "@/utils/constant";
+import { KEY, QUERY_KEY } from "@/utils/constant";
 import { OrganizerGetListQuery } from "@/types/organizer";
+import { toast } from "sonner";
+import { handleErrorApi } from "@/lib/errors";
 
 export const useGetOrganizers = (params?: OrganizerGetListQuery) => {
     return useQuery({
-        queryKey: QUERY_KEY.organizerList(params),
+        queryKey: QUERY_KEY.organizers.list(params),
         queryFn: () => organizerRequest.getList(params || {}),
     });
 };
 
 export const useGetOrganizer = (id: string) => {
     return useQuery({
-        queryKey: QUERY_KEY.organizerDetail(id),
+        queryKey: QUERY_KEY.organizers.detail(id),
         queryFn: () => organizerRequest.getById(id),
         enabled: !!id,
     });
 };
 
-import { handleErrorApi } from "@/lib/errors";
-
 export const useOrganizer = () => {
     const queryClient = useQueryClient();
 
     const create = useMutation({
-        mutationFn: (body: OrganizerCreateBody) => organizerRequest.create(body),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: QUERY_KEY.organizerList() });
+        mutationFn: async (body: OrganizerCreateBody) => {
+            const res = await organizerRequest.create(body);
+            return res.data;
         },
-        onError: (error) => {
-            handleErrorApi({ error });
-        }
+        onSuccess: () => {
+            toast.success('Organizer created successfully');
+            queryClient.invalidateQueries({ queryKey: KEY.organizers });
+        },
     });
 
     const update = useMutation({
-        mutationFn: ({ id, body }: { id: string; body: OrganizerUpdateBody }) => organizerRequest.update(id, body),
-        onSuccess: (data, variables) => {
-            queryClient.invalidateQueries({ queryKey: QUERY_KEY.organizerList() });
-            queryClient.invalidateQueries({ queryKey: QUERY_KEY.organizerDetail(variables.id) });
+        mutationFn: async ({ id, body }: { id: string; body: OrganizerUpdateBody }) => {
+            const res = await organizerRequest.update(id, body);
+            return res.data;
         },
-        onError: (error) => {
-            handleErrorApi({ error });
-        }
+        onSuccess: () => {
+            toast.success('Organizer updated successfully');
+            queryClient.invalidateQueries({ queryKey: KEY.organizers });
+        },
     });
 
     const deleteOrganizer = useMutation({
-        mutationFn: (id: string) => organizerRequest.delete(id),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: QUERY_KEY.organizerList() });
+        mutationFn: async (id: string) => {
+            const res = await organizerRequest.delete(id);
+            return res.message;
+        },
+        onSuccess: (data) => {
+            toast.success(data);
+            queryClient.invalidateQueries({ queryKey: KEY.organizers });
         },
         onError: (error) => {
             handleErrorApi({ error });
@@ -56,9 +61,13 @@ export const useOrganizer = () => {
     });
 
     const restore = useMutation({
-        mutationFn: (id: string) => organizerRequest.restore(id),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: QUERY_KEY.organizerList() });
+        mutationFn: async (id: string) => {
+            const res = await organizerRequest.restore(id);
+            return res.message;
+        },
+        onSuccess: (data) => {
+            toast.success(data);
+            queryClient.invalidateQueries({ queryKey: KEY.organizers });
         },
         onError: (error) => {
             handleErrorApi({ error });
