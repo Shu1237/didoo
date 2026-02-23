@@ -14,6 +14,7 @@ import {
 } from "@/schemas/auth";
 
 import { ENDPOINT_CLIENT, ENDPOINT_SERVER } from "@/utils/endpoint";
+import { CredentialResponse } from "@react-oauth/google";
 
 export const authRequest = {
   loginClient: (data: LoginInput) =>

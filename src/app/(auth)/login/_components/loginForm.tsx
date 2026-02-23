@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
@@ -12,6 +11,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { loginSchema, LoginInput } from '@/schemas/auth';
 import { useAuth } from '@/hooks/useAuth';
 import { useAuthContext } from '@/contexts/authContext';
+import { GoogleLogin } from '@react-oauth/google';
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { handleErrorApi } from '@/lib/errors';
@@ -24,7 +24,7 @@ export default function LoginForm() {
     WebkitMaskImage: 'radial-gradient(circle at top right, transparent 100px, black 101px)',
   };
 
-  const { login } = useAuth();
+  const { login, loginGoogle } = useAuth();
   const { setTokenFromContext } = useAuthContext();
   const searchParams = useSearchParams();
   const resetSuccess = searchParams.get('reset') === 'success';
@@ -34,6 +34,7 @@ export default function LoginForm() {
     register,
     handleSubmit,
     setValue,
+    getValues,
     setError: setErrorForm,
     formState: { errors },
   } = useForm<LoginInput>({
@@ -169,8 +170,43 @@ export default function LoginForm() {
         </form>
 
         <div className="mt-8 flex flex-col items-center gap-3">
-          <div className="flex justify-center gap-5">
-            <SocialIcon icon="google" />
+          <div className="flex justify-center items-center gap-5">
+            <div className="bg-white rounded-full overflow-hidden w-14 h-14 flex items-center justify-center hover:scale-110 transition-all shadow-xl shadow-black/10">
+              <GoogleLogin
+                onSuccess={async (credentialResponse) => {
+                  if (loginGoogle.isPending) return;
+
+                  // 1. Nhận data từ Google (CredentialResponse)
+                  const googleToken = credentialResponse.credential;
+                  console.log(googleToken);
+                  if (!googleToken) {
+                    toast.error("Không nhận được token từ Google");
+                    return;
+                  }
+
+                  // 2. Sử dụng data để gọi API xuống Backend
+                  try {
+                    const result = await loginGoogle.mutateAsync({
+                      googleToken: googleToken,
+                      location: getValues('location')
+                    });
+
+                    if (result?.accessToken && result?.refreshToken) {
+                      setTokenFromContext(result.accessToken, result.refreshToken);
+                    }
+                  } catch (err: any) {
+                    // Lỗi đã được xử lý trong useAuth hoặc toast ở đây
+                    console.error("Login BE error:", err);
+                  }
+                }}
+                onError={() => {
+                  toast.error("Đăng nhập Google thất bại");
+                }}
+                type="icon"
+                shape="circle"
+                theme="outline"
+              />
+            </div>
             <SocialIcon icon="facebook" />
           </div>
         </div>
@@ -230,11 +266,32 @@ export default function LoginForm() {
   );
 }
 
-function SocialIcon({ icon }: { icon: string }) {
+function SocialIcon({
+  icon,
+  onClick,
+  disabled,
+  loading
+}: {
+  icon: string;
+  onClick?: () => void;
+  disabled?: boolean;
+  loading?: boolean;
+}) {
   return (
-    <button type="button" className="w-14 h-14 rounded-full bg-white flex items-center justify-center hover:scale-110 active:scale-95 transition-all shadow-xl shadow-black/10">
-      {icon === 'google' && <Image src="https://www.svgrepo.com/show/475656/google-color.svg" width={28} height={28} alt="G" />}
-      {icon === 'facebook' && <Facebook className="w-7 h-7 text-[#1877F2] fill-current" />}
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      className="w-14 h-14 rounded-full bg-white flex items-center justify-center hover:scale-110 active:scale-95 transition-all shadow-xl shadow-black/10 disabled:opacity-50 disabled:cursor-not-allowed"
+    >
+      {loading ? (
+        <div className="w-6 h-6 border-2 border-gray-300 border-t-[#FF9B8A] rounded-full animate-spin"></div>
+      ) : (
+        <>
+          {icon === 'google' && <Image src="https://www.svgrepo.com/show/475656/google-color.svg" width={28} height={28} alt="G" />}
+          {icon === 'facebook' && <Facebook className="w-7 h-7 text-[#1877F2] fill-current" />}
+        </>
+      )}
     </button>
   );
 }
