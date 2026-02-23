@@ -6,6 +6,7 @@ import QueryClientProviderWrapper from "@/components/QueryClientProviderWrapper"
 import { cookies } from "next/headers";
 import { AuthProvider } from "@/contexts/authContext";
 import { Toaster } from "sonner";
+import GoogleAuthProvider from "@/components/GoogleAuthProvider";
 
 
 const inter = Inter({
@@ -37,23 +38,25 @@ export default async function RootLayout({
   const refreshToken = cookieStore.get("refreshToken");
 
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${inter.variable} ${plusJakarta.variable} antialiased`}
       >
-        <AuthProvider initialAccessToken={accessToken?.value || null} initialRefreshToken={refreshToken?.value || null}>
-          <QueryClientProviderWrapper>
-            <ThemeProvider
-              attribute="class"
-              defaultTheme="system"
-              enableSystem
-              disableTransitionOnChange
-            >
-              {children}
-              <Toaster richColors position="top-center" />
-            </ThemeProvider>
-          </QueryClientProviderWrapper>
-        </AuthProvider>
+        <GoogleAuthProvider>
+          <AuthProvider initialAccessToken={accessToken?.value || null} initialRefreshToken={refreshToken?.value || null}>
+            <QueryClientProviderWrapper>
+              <ThemeProvider
+                attribute="class"
+                defaultTheme="system"
+                enableSystem
+                disableTransitionOnChange
+              >
+                {children}
+                <Toaster richColors position="top-center" />
+              </ThemeProvider>
+            </QueryClientProviderWrapper>
+          </AuthProvider>
+        </GoogleAuthProvider>
       </body>
     </html>
   );

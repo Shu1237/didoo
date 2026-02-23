@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Facebook, Eye, EyeOff, Mail, CheckCircle2 } from 'lucide-react';
+import { Eye, EyeOff, Mail, CheckCircle2 } from 'lucide-react';
 import {
   InputOTP,
   InputOTPGroup,
@@ -18,6 +18,8 @@ import * as z from 'zod';
 import { RegisterInput, registerSchema } from '@/schemas/auth';
 import { useState } from 'react';
 import { handleErrorApi } from '@/lib/errors';
+import { toast } from 'sonner';
+import { GoogleLogin } from '@react-oauth/google';
 
 type FormValues = RegisterInput & { otp?: string };
 
@@ -29,7 +31,7 @@ export default function RegisterForm() {
     WebkitMaskImage: 'radial-gradient(circle at top right, transparent 100px, black 101px)',
   };
 
-  const { register, verifyRegister } = useAuth();
+  const { register, verifyRegister, loginGoogle } = useAuth();
   const [error, setError] = useState<string | null>(null);
   const [step, setStep] = useState(1);
 
@@ -45,6 +47,8 @@ export default function RegisterForm() {
     defaultValues: {
       fullName: '',
       email: '',
+      phone: '',
+      gender: 0,
       password: '',
       confirmPassword: '',
       otp: '',
@@ -56,17 +60,19 @@ export default function RegisterForm() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const currentOtp = watch("otp");
   const currentEmail = watch("email");
+  const currentPassword = watch("password");
+
+  const isPasswordSecure =
+    currentPassword.length >= 8 &&
+    /[A-Z]/.test(currentPassword) &&
+    /[!@#$%^&*(),?":{}|<>]/.test(currentPassword);
 
   const onSubmit = async (data: FormValues) => {
     if (step === 1) {
       if (register.isPending) return;
       setError(null);
       try {
-        const { confirmPassword, otp, ...rest } = data;
-        await register.mutateAsync({
-          ...rest,
-          gender: 0,
-        });
+        await register.mutateAsync(data);
         setStep(2);
       } catch (err: any) {
         console.log(err);
@@ -101,6 +107,20 @@ export default function RegisterForm() {
     }
   };
 
+  const onGoogleSuccess = async (credentialResponse: any) => {
+    if (loginGoogle.isPending) return;
+    setError(null);
+    try {
+      await loginGoogle.mutateAsync({
+        googleToken: credentialResponse.credential,
+        location: { latitude: 0, longitude: 0 } // Default for register
+      });
+    } catch (err: any) {
+      handleErrorApi({ error: err });
+      setError(err?.message || "Đăng nhập Google thất bại.");
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
@@ -108,27 +128,21 @@ export default function RegisterForm() {
       className="grid grid-cols-1 lg:grid-cols-2 bg-[#2D2D2D]/60 backdrop-blur-[40px] rounded-[50px] border border-white/10 shadow-[0_50px_100px_rgba(0,0,0,0.4)] overflow-visible relative"
     >
       {/* FORM BÊN TRÁI */}
-      <div className="p-8 lg:p-16 text-white max-h-[90vh] overflow-y-auto no-scrollbar">
-        <Link href="/home" className="inline-block mb-6 hover:scale-105 transition-transform">
-          <Image src="/DiDoo.png" alt="DiDoo logo" width={60} height={60} className="rounded-xl shadow-lg" priority />
+      <div className="p-6 lg:p-10 text-white max-h-[90vh] overflow-y-auto no-scrollbar">
+        <Link href="/home" className="inline-block mb-4 hover:scale-105 transition-transform">
+          <Image src="/DiDoo.png" alt="DiDoo logo" width={50} height={50} className="rounded-xl shadow-lg" priority />
         </Link>
-        <div className="flex justify-center mb-4">
-          <div className="h-12 w-12 bg-[#FF9B8A]/10 rounded-xl flex items-center justify-center text-[#FF9B8A]">
-            {step === 1 && <Mail className="w-6 h-6" />}
-            {step === 2 && <CheckCircle2 className="w-6 h-6" />}
-          </div>
-        </div>
-        <h1 className="text-[44px] font-bold mb-2">
+        <h1 className="text-3xl font-bold mb-1">
           {step === 1 && 'Create Account'}
           {step === 2 && 'Verify Account'}
         </h1>
-        <p className="text-white/40 text-lg mb-6">
+        <p className="text-white/40 text-base mb-4">
           {step === 1 && 'Join us and start exploring events'}
           {step === 2 && `An OTP has been sent to ${watch('email')}`}
         </p>
 
         {error && (
-          <div className="mb-4 p-3 bg-red-500/20 border border-red-500/50 text-red-200 text-sm rounded-xl text-center">
+          <div className="mb-4 p-2 bg-red-500/20 border border-red-500/50 text-red-200 text-xs rounded-xl text-center">
             {error}
           </div>
         )}
@@ -140,97 +154,134 @@ export default function RegisterForm() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
             transition={{ duration: 0.3 }}
-            className="space-y-4"
+            className="space-y-3"
             onSubmit={handleSubmit(onSubmit)}
           >
             {step === 1 && (
               <>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-white/60 ml-2">Full Name</label>
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-white/60 ml-2">Full Name</label>
                   <input
                     type="text"
                     placeholder="John Doe"
                     {...registerField("fullName")}
-                    className={`w-full bg-black/50 border border-transparent rounded-full px-6 py-4 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#FF9B8A]/20 transition-all placeholder:text-gray-400 text-white ${errors.fullName ? '!border-red-500 bg-red-500/10' : ''}`}
+                    className={`w-full bg-black/50 border border-transparent rounded-full px-5 py-3 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#FF9B8A]/20 transition-all placeholder:text-gray-400 text-white ${errors.fullName ? '!border-red-500 bg-red-500/10' : ''}`}
                   />
                   {errors.fullName && (
-                    <p className="text-xs text-red-500 ml-2 mt-1 whitespace-pre-line leading-relaxed">{errors.fullName.message}</p>
+                    <p className="text-[10px] text-red-500 ml-2 mt-0.5 whitespace-pre-line leading-relaxed">{errors.fullName.message}</p>
                   )}
                 </div>
 
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-white/60 ml-2">Email</label>
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-white/60 ml-2">Email</label>
                   <input
                     type="email"
                     placeholder="Johndoe@gmail.com"
                     {...registerField("email")}
-                    className={`w-full bg-black/50 border border-transparent rounded-full px-6 py-4 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#FF9B8A]/20 transition-all placeholder:text-gray-400 text-white ${errors.email ? '!border-red-500 bg-red-500/10' : ''}`}
+                    className={`w-full bg-black/50 border border-transparent rounded-full px-5 py-3 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#FF9B8A]/20 transition-all placeholder:text-gray-400 text-white ${errors.email ? '!border-red-500 bg-red-500/10' : ''}`}
                   />
                   {errors.email && (
-                    <p className="text-xs text-red-500 ml-2 mt-1 whitespace-pre-line leading-relaxed">{errors.email.message}</p>
+                    <p className="text-[10px] text-red-500 ml-2 mt-0.5 whitespace-pre-line leading-relaxed">{errors.email.message}</p>
                   )}
                 </div>
 
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-white/60 ml-2">Date of Birth</label>
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-white/60 ml-2">Phone Number</label>
                   <input
-                    type="date"
-                    {...registerField("dateOfBirth")}
-                    className={`w-full bg-black/50 border border-transparent rounded-full px-6 py-4 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#FF9B8A]/20 transition-all placeholder:text-gray-400 text-white [color-scheme:dark] ${errors.dateOfBirth ? '!border-red-500 bg-red-500/10' : ''}`}
+                    type="tel"
+                    placeholder="0123456789"
+                    {...registerField("phone")}
+                    className={`w-full bg-black/50 border border-transparent rounded-full px-5 py-3 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#FF9B8A]/20 transition-all placeholder:text-gray-400 text-white ${errors.phone ? '!border-red-500 bg-red-500/10' : ''}`}
                   />
-                  {errors.dateOfBirth && (
-                    <p className="text-xs text-red-500 ml-2 mt-1 whitespace-pre-line leading-relaxed">{errors.dateOfBirth.message}</p>
+                  {errors.phone && (
+                    <p className="text-[10px] text-red-500 ml-2 mt-0.5 whitespace-pre-line leading-relaxed">{errors.phone.message}</p>
                   )}
                 </div>
 
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-white/60 ml-2">Password</label>
+                <div className="grid grid-cols-2 gap-3 pb-1">
+                  <div className="space-y-1">
+                    <label className="text-xs font-medium text-white/60 ml-2">Gender</label>
+                    <select
+                      {...registerField("gender", { valueAsNumber: true })}
+                      className="w-full bg-black/50 border border-transparent rounded-full px-4 py-3 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#FF9B8A]/20 transition-all text-white appearance-none cursor-pointer"
+                      style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='white'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='Length19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center', backgroundSize: '1rem' }}
+                    >
+                      <option value={0} className="bg-[#1A1A1A]">Male</option>
+                      <option value={1} className="bg-[#1A1A1A]">Female</option>
+                      <option value={2} className="bg-[#1A1A1A]">Other</option>
+                    </select>
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-xs font-medium text-white/60 ml-2">Birth Date</label>
+                    <input
+                      type="date"
+                      {...registerField("dateOfBirth")}
+                      className={`w-full bg-black/50 border border-transparent rounded-full px-4 py-3 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#FF9B8A]/20 transition-all placeholder:text-gray-400 text-white [color-scheme:dark] ${errors.dateOfBirth ? '!border-red-500 bg-red-500/10' : ''}`}
+                    />
+                    {errors.dateOfBirth && (
+                      <p className="text-[10px] text-red-500 ml-2 mt-0.5 whitespace-pre-line leading-relaxed">{errors.dateOfBirth.message}</p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-white/60 ml-2">Password</label>
                   <div className="relative">
                     <input
                       type={showPassword ? "text" : "password"}
                       placeholder="••••••••"
                       {...registerField("password")}
-                      className={`w-full bg-black/50 border border-transparent rounded-full px-6 py-4 pr-12 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#FF9B8A]/20 transition-all placeholder:text-gray-400 text-white ${errors.password ? '!border-red-500 bg-red-500/10' : ''}`}
+                      className={`w-full bg-black/50 border border-transparent rounded-full px-5 py-3 pr-12 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#FF9B8A]/20 transition-all placeholder:text-gray-400 text-white ${errors.password ? '!border-red-500 bg-red-500/10' : ''}`}
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
                       className="absolute right-5 top-1/2 -translate-y-1/2 text-white/40 hover:text-white transition-colors"
                     >
-                      {showPassword ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
+                      {showPassword ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
                     </button>
                   </div>
                   {errors.password && (
-                    <p className="text-xs text-red-500 ml-2 mt-1 whitespace-pre-line leading-relaxed">{errors.password.message}</p>
+                    <p className="text-[10px] text-red-500 ml-2 mt-0.5 whitespace-pre-line leading-relaxed">{errors.password.message}</p>
                   )}
                 </div>
 
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-white/60 ml-2">Confirm Password</label>
-                  <div className="relative">
-                    <input
-                      type={showConfirmPassword ? "text" : "password"}
-                      placeholder="••••••••"
-                      {...registerField("confirmPassword")}
-                      className={`w-full bg-black/50 border border-transparent rounded-full px-6 py-4 pr-12 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#FF9B8A]/20 transition-all placeholder:text-gray-400 text-white ${errors.confirmPassword ? '!border-red-500 bg-red-500/10' : ''}`}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      className="absolute right-5 top-1/2 -translate-y-1/2 text-white/40 hover:text-white transition-colors"
+                <AnimatePresence>
+                  {isPasswordSecure && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="space-y-1 overflow-hidden"
                     >
-                      {showConfirmPassword ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
-                    </button>
-                  </div>
-                  {errors.confirmPassword && (
-                    <p className="text-xs text-red-500 ml-2 mt-1 whitespace-pre-line leading-relaxed">{errors.confirmPassword.message}</p>
+                      <label className="text-xs font-medium text-white/60 ml-2">Confirm Password</label>
+                      <div className="relative">
+                        <input
+                          type={showConfirmPassword ? "text" : "password"}
+                          placeholder="••••••••"
+                          {...registerField("confirmPassword")}
+                          className={`w-full bg-black/50 border border-transparent rounded-full px-5 py-3 pr-12 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#FF9B8A]/20 transition-all placeholder:text-gray-400 text-white ${errors.confirmPassword ? '!border-red-500 bg-red-500/10' : ''}`}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                          className="absolute right-5 top-1/2 -translate-y-1/2 text-white/40 hover:text-white transition-colors"
+                        >
+                          {showConfirmPassword ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                        </button>
+                      </div>
+                      {errors.confirmPassword && (
+                        <p className="text-[10px] text-red-500 ml-2 mt-0.5 whitespace-pre-line leading-relaxed">{errors.confirmPassword.message}</p>
+                      )}
+                    </motion.div>
                   )}
-                </div>
+                </AnimatePresence>
 
                 <button
                   type="submit"
                   disabled={register.isPending || (step === 1 && !isValid)}
-                  className="w-full h-14 mt-4 bg-[#FF9B8A] text-white font-bold rounded-full py-4 shadow-lg shadow-[#FF9B8A]/20 hover:bg-[#FF8A75] transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  className="w-full h-12 mt-2 bg-[#FF9B8A] text-white font-bold rounded-full py-2 shadow-lg shadow-[#FF9B8A]/20 hover:bg-[#FF8A75] transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   {register.isPending ? (
                     <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
@@ -242,36 +293,36 @@ export default function RegisterForm() {
             )}
 
             {step === 2 && (
-              <div className="space-y-6">
+              <div className="space-y-4">
                 <div className="space-y-2 flex flex-col items-center">
-                  <div className="flex justify-center py-4">
+                  <div className="flex justify-center py-2">
                     <InputOTP
                       maxLength={6}
                       value={currentOtp || ''}
                       onChange={(value) => setValue("otp", value, { shouldValidate: true })}
                     >
                       <InputOTPGroup>
-                        <InputOTPSlot index={0} className="w-12 h-12 text-lg" />
-                        <InputOTPSlot index={1} className="w-12 h-12 text-lg" />
-                        <InputOTPSlot index={2} className="w-12 h-12 text-lg" />
+                        <InputOTPSlot index={0} className="w-10 h-10 text-base" />
+                        <InputOTPSlot index={1} className="w-10 h-10 text-base" />
+                        <InputOTPSlot index={2} className="w-10 h-10 text-base" />
                       </InputOTPGroup>
                       <InputOTPSeparator />
                       <InputOTPGroup>
-                        <InputOTPSlot index={3} className="w-12 h-12 text-lg" />
-                        <InputOTPSlot index={4} className="w-12 h-12 text-lg" />
-                        <InputOTPSlot index={5} className="w-12 h-12 text-lg" />
+                        <InputOTPSlot index={3} className="w-10 h-10 text-base" />
+                        <InputOTPSlot index={4} className="w-10 h-10 text-base" />
+                        <InputOTPSlot index={5} className="w-10 h-10 text-base" />
                       </InputOTPGroup>
                     </InputOTP>
                   </div>
                   {errors.otp && (
-                    <p className="text-center text-xs text-red-500 whitespace-pre-line leading-relaxed">{errors.otp.message}</p>
+                    <p className="text-center text-[10px] text-red-500 whitespace-pre-line leading-relaxed">{errors.otp.message}</p>
                   )}
                 </div>
 
                 <button
                   type="submit"
                   disabled={verifyRegister.isPending || (currentOtp?.length || 0) !== 6}
-                  className="w-full h-14 bg-[#FF9B8A] text-white font-bold rounded-full py-4 shadow-lg shadow-[#FF9B8A]/20 hover:bg-[#FF8A75] transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  className="w-full h-12 bg-[#FF9B8A] text-white font-bold rounded-full py-2 shadow-lg shadow-[#FF9B8A]/20 hover:bg-[#FF8A75] transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   {verifyRegister.isPending ? (
                     <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
@@ -280,7 +331,7 @@ export default function RegisterForm() {
                   )}
                 </button>
 
-                <p className="text-center text-sm text-white/40">
+                <p className="text-center text-xs text-white/40">
                   Didn&apos;t receive code?{' '}
                   <button
                     type="button"
@@ -299,14 +350,22 @@ export default function RegisterForm() {
           </motion.form>
         </AnimatePresence>
 
-        <div className="mt-8 flex flex-col items-center gap-3">
-          <div className="flex justify-center gap-5">
-            <SocialIcon icon="google" />
-            <SocialIcon icon="facebook" />
+        <div className="mt-6 flex flex-col items-center gap-2">
+          <div className="flex justify-center">
+            <GoogleLogin
+              onSuccess={onGoogleSuccess}
+              onError={() => {
+                setError("Đăng nhập Google thất bại.");
+                toast.error("Google Login failed");
+              }}
+              type="icon"
+              shape="circle"
+              theme="outline"
+            />
           </div>
         </div>
 
-        <p className="text-center text-sm text-white/40 mt-6">
+        <p className="text-center text-xs text-white/40 mt-4">
           Already have an account?{' '}
           <Link href="/login" className="text-[#FF9B8A] font-bold hover:underline">
             Sign in
@@ -362,10 +421,14 @@ export default function RegisterForm() {
   );
 }
 
-function SocialIcon({ icon }: { icon: string }) {
+function SocialIcon({ icon, onClick }: { icon: string, onClick?: () => void }) {
   return (
-    <button type="button" className="w-14 h-14 rounded-full bg-white flex items-center justify-center hover:scale-110 active:scale-95 transition-all shadow-xl shadow-black/10">
-      {icon === 'google' && <Image src="https://www.svgrepo.com/show/475656/google-color.svg" width={28} height={28} alt="G" />}
+    <button
+      type="button"
+      onClick={onClick}
+      className="w-10 h-10 rounded-full bg-white flex items-center justify-center hover:scale-110 active:scale-95 transition-all shadow-xl shadow-black/10"
+    >
+      {icon === 'google' && <Image src="https://www.svgrepo.com/show/475656/google-color.svg" width={22} height={22} alt="G" />}
     </button>
   );
 }

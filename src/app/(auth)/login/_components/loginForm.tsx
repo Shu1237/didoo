@@ -5,17 +5,17 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { Facebook, Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { loginSchema, LoginInput } from '@/schemas/auth';
 import { useAuth } from '@/hooks/useAuth';
-import { useAuthContext } from '@/contexts/authContext';
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { handleErrorApi } from '@/lib/errors';
 import { toast } from 'sonner';
+import { GoogleLogin } from '@react-oauth/google';
 
 
 export default function LoginForm() {
@@ -24,8 +24,7 @@ export default function LoginForm() {
     WebkitMaskImage: 'radial-gradient(circle at top right, transparent 100px, black 101px)',
   };
 
-  const { login } = useAuth();
-  const { setTokenFromContext } = useAuthContext();
+  const { login, loginGoogle } = useAuth();
   const searchParams = useSearchParams();
   const resetSuccess = searchParams.get('reset') === 'success';
   const [error, setError] = useState<string | null>(null);
@@ -34,6 +33,7 @@ export default function LoginForm() {
     register,
     handleSubmit,
     setValue,
+    watch,
     setError: setErrorForm,
     formState: { errors },
   } = useForm<LoginInput>({
@@ -71,16 +71,27 @@ export default function LoginForm() {
     if (login.isPending) return;
     setError(null);
     try {
-      const result = await login.mutateAsync(data);
-      if (result?.accessToken && result?.refreshToken) {
-        setTokenFromContext(result.accessToken, result.refreshToken);
-      }
+      await login.mutateAsync(data);
     } catch (err: any) {
       handleErrorApi({
         error: err,
         setError: setErrorForm
       });
       setError(err?.message || "Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.");
+    }
+  };
+
+  const onGoogleSuccess = async (credentialResponse: any) => {
+    if (loginGoogle.isPending) return;
+    setError(null);
+    try {
+      await loginGoogle.mutateAsync({
+        googleToken: credentialResponse.credential,
+        location: watch("location")
+      });
+    } catch (err: any) {
+      handleErrorApi({ error: err });
+      setError(err?.message || "Đăng nhập Google thất bại.");
     }
   };
 
@@ -91,12 +102,12 @@ export default function LoginForm() {
       className="grid grid-cols-1 lg:grid-cols-2 bg-[#2D2D2D]/60 backdrop-blur-[40px] rounded-[50px] border border-white/10 shadow-[0_50px_100px_rgba(0,0,0,0.4)] overflow-visible relative"
     >
       {/* FORM BÊN TRÁI */}
-      <div className="p-8 lg:p-16 text-white">
-        <Link href="/home" className="inline-block mb-6 hover:scale-105 transition-transform">
-          <Image src="/DiDoo.png" alt="DiDoo logo" width={60} height={60} className="rounded-xl shadow-lg" priority />
+      <div className="p-6 lg:p-10 text-white">
+        <Link href="/home" className="inline-block mb-4 hover:scale-105 transition-transform">
+          <Image src="/DiDoo.png" alt="DiDoo logo" width={50} height={50} className="rounded-xl shadow-lg" priority />
         </Link>
-        <h1 className="text-[44px] font-bold mb-2">Welcome back</h1>
-        <p className="text-white/40 text-lg mb-6">Please Enter your Account details</p>
+        <h1 className="text-3xl font-bold mb-1">Welcome back</h1>
+        <p className="text-white/40 text-base mb-4">Please Enter your Account details</p>
 
         {error && (
           <div className="mb-4 p-3 bg-red-500/20 border border-red-500/50 text-red-200 text-sm rounded-xl text-center">
@@ -110,40 +121,40 @@ export default function LoginForm() {
           </div>
         )}
 
-        <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
+        <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-white/60 ml-2">Email</label>
+          <div className="space-y-1">
+            <label className="text-xs font-medium text-white/60 ml-2">Email</label>
             <input
               type="email"
               placeholder="Johndoe@gmail.com"
               {...register("email")}
-              className={`w-full bg-black/50 border border-transparent rounded-full px-6 py-4 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#FF9B8A]/20 transition-all placeholder:text-gray-400 text-white ${errors.email ? '!border-red-500 bg-red-500/10' : ''}`}
+              className={`w-full bg-black/50 border border-transparent rounded-full px-5 py-3 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#FF9B8A]/20 transition-all placeholder:text-gray-400 text-white ${errors.email ? '!border-red-500 bg-red-500/10' : ''}`}
             />
             {errors.email && (
-              <p className="text-xs text-red-500 ml-2 mt-1 whitespace-pre-line leading-relaxed">{errors.email.message}</p>
+              <p className="text-[10px] text-red-500 ml-2 mt-0.5 whitespace-pre-line leading-relaxed">{errors.email.message}</p>
             )}
           </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-white/60 ml-2">Password</label>
+          <div className="space-y-1">
+            <label className="text-xs font-medium text-white/60 ml-2">Password</label>
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
                 placeholder="••••••••"
                 {...register("password")}
-                className={`w-full bg-black/50 border border-transparent rounded-full px-6 py-4 pr-12 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#FF9B8A]/20 transition-all placeholder:text-gray-400 text-white ${errors.password ? '!border-red-500 bg-red-500/10' : ''}`}
+                className={`w-full bg-black/50 border border-transparent rounded-full px-5 py-3 pr-12 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#FF9B8A]/20 transition-all placeholder:text-gray-400 text-white ${errors.password ? '!border-red-500 bg-red-500/10' : ''}`}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-5 top-1/2 -translate-y-1/2 text-white/40 hover:text-white transition-colors"
               >
-                {showPassword ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
+                {showPassword ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
               </button>
             </div>
             {errors.password && (
-              <p className="text-xs text-red-500 ml-2 mt-1 whitespace-pre-line leading-relaxed">{errors.password.message}</p>
+              <p className="text-[10px] text-red-500 ml-2 mt-0.5 whitespace-pre-line leading-relaxed">{errors.password.message}</p>
             )}
           </div>
 
@@ -158,7 +169,7 @@ export default function LoginForm() {
           <button
             type="submit"
             disabled={login.isPending}
-            className="w-full h-14 bg-[#FF9B8A] text-white font-bold rounded-full py-4 shadow-lg shadow-[#FF9B8A]/20 hover:bg-[#FF8A75] transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="w-full h-12 bg-[#FF9B8A] text-white font-bold rounded-full py-2 shadow-lg shadow-[#FF9B8A]/20 hover:bg-[#FF8A75] transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {login.isPending ? (
               <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
@@ -168,13 +179,21 @@ export default function LoginForm() {
           </button>
         </form>
 
-        <div className="mt-8 flex flex-col items-center gap-3">
-          <div className="flex justify-center gap-5">
-            <SocialIcon icon="google" />
-            <SocialIcon icon="facebook" />
+        <div className="mt-6 flex flex-col items-center gap-2">
+          <div className="flex justify-center">
+            <GoogleLogin
+              onSuccess={onGoogleSuccess}
+              onError={() => {
+                setError("Đăng nhập Google thất bại.");
+                toast.error("Google Login failed");
+              }}
+              type="icon"
+              shape="circle"
+              theme="outline"
+            />
           </div>
         </div>
-        <p className="text-center text-sm text-white/40 mt-10">
+        <p className="text-center text-xs text-white/40 mt-4">
           Don&apos;t have an account?{' '}
           <Link href="/register" className="text-[#FF9B8A] font-bold hover:underline">
             Sign up
@@ -230,11 +249,14 @@ export default function LoginForm() {
   );
 }
 
-function SocialIcon({ icon }: { icon: string }) {
+function SocialIcon({ icon, onClick }: { icon: string, onClick?: () => void }) {
   return (
-    <button type="button" className="w-14 h-14 rounded-full bg-white flex items-center justify-center hover:scale-110 active:scale-95 transition-all shadow-xl shadow-black/10">
-      {icon === 'google' && <Image src="https://www.svgrepo.com/show/475656/google-color.svg" width={28} height={28} alt="G" />}
-      {icon === 'facebook' && <Facebook className="w-7 h-7 text-[#1877F2] fill-current" />}
+    <button
+      type="button"
+      onClick={onClick}
+      className="w-10 h-10 rounded-full bg-white flex items-center justify-center hover:scale-110 active:scale-95 transition-all shadow-xl shadow-black/10"
+    >
+      {icon === 'google' && <Image src="https://www.svgrepo.com/show/475656/google-color.svg" width={22} height={22} alt="G" />}
     </button>
   );
 }

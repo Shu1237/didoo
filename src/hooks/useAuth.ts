@@ -20,7 +20,7 @@ import { toast } from "sonner";
 
 
 export const useAuth = () => {
-    const { user, clearSession } = useSessionStore((state) => state);
+    const { user, setSession, clearSession } = useSessionStore((state) => state);
     const router = useRouter();
     const login = useMutation({
         mutationFn: async (data: LoginInput) => {
@@ -28,8 +28,10 @@ export const useAuth = () => {
             return res.data
         },
         onSuccess: async (data) => {
+            setSession(data);
             await authRequest.loginServer(data);
             toast.success("Login successfully");
+            router.replace("/");
         },
 
     })
@@ -40,14 +42,17 @@ export const useAuth = () => {
             return res.data
         },
         onSuccess: async (data) => {
+            setSession(data);
             await authRequest.loginServer(data)
             toast.success("Login successfully");
+            router.replace("/");
         },
     })
 
     const register = useMutation({
         mutationFn: async (data: RegisterInput) => {
-            const res = await authRequest.register(data)
+            const { confirmPassword, ...payload } = data;
+            const res = await authRequest.register(payload)
             return res.message
         },
         onSuccess: async (data) => {
@@ -90,8 +95,10 @@ export const useAuth = () => {
 
     const verifyForgotPassword = useMutation({
         mutationFn: async (data: VerifyForgotPasswordInput) => {
-            const { confirmPassword, ...payload } = data;
-            const res = await authRequest.verifyForgotPassword(payload)
+            const res = await authRequest.verifyForgotPassword({
+                key: data.key,
+                newPassword: data.password
+            })
             return res.message
         },
         onSuccess: async (data) => {
@@ -129,7 +136,11 @@ export const useAuth = () => {
 
     const changePassword = useMutation({
         mutationFn: async (data: ChangePasswordInput) => {
-            const res = await authRequest.changePassword(data)
+            const res = await authRequest.changePassword({
+                userId: data.userId,
+                password: data.oldPassword,
+                newPassword: data.password
+            })
             return res.message
         },
         onSuccess: async (data) => {

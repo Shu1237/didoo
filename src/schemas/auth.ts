@@ -20,8 +20,11 @@ export const registerSchema = z.object({
     fullName: z.string().min(1, "Họ tên là bắt buộc"),
     email: z.email("Email không hợp lệ"),
     phone: z.string().optional(),
-    password: z.string().min(6, "Password tối thiểu 6 ký tự"),
-    confirmPassword: z.string().min(6, "Password tối thiểu 6 ký tự"),
+    password: z.string()
+        .min(8, "Mật khẩu tối thiểu 8 ký tự")
+        .regex(/[A-Z]/, "Mật khẩu phải chứa ít nhất 1 chữ hoa")
+        .regex(/[!@#$%^&*(),.?":{}|<>]/, "Mật khẩu phải chứa ít nhất 1 ký tự đặc biệt"),
+    confirmPassword: z.string().min(1, "Vui lòng xác nhận mật khẩu"),
     avatarUrl: z.url().optional(),
     gender: z.number().int().min(0).max(2).default(0),
     dateOfBirth: z.coerce.date({
@@ -45,35 +48,41 @@ export const forgotPasswordSchema = z.object({
 
 export const verifyForgotPasswordSchema = z.object({
     key: z.string(),
-    newPassword: z.string().min(6, "Password tối thiểu 6 ký tự"),
-    confirmPassword: z.string().min(6, "Password tối thiểu 6 ký tự"),
-}).refine((data) => data.newPassword === data.confirmPassword, {
+    password: z.string()
+        .min(8, "Mật khẩu tối thiểu 8 ký tự")
+        .regex(/[A-Z]/, "Mật khẩu phải chứa ít nhất 1 chữ hoa")
+        .regex(/[!@#$%^&*(),.?":{}|<>]/, "Mật khẩu phải chứa ít nhất 1 ký tự đặc biệt"),
+    confirmPassword: z.string().min(1, "Vui lòng xác nhận mật khẩu"),
+}).refine((data) => data.password === data.confirmPassword, {
     message: "Mật khẩu không khớp",
     path: ["confirmPassword"],
 });
 
 export const changeEmailSchema = z.object({
-    userId: z.uuid(),
+    userId: z.string(),
     newEmail: z.email("Email không hợp lệ"),
 });
 
 export const verifyChangeEmailSchema = z.object({
-    userId: z.uuid(),
+    userId: z.string(),
     otp: z.string().length(6, "OTP phải có 6 ký tự"),
 });
 
 export const changePasswordSchema = z.object({
-    userId: z.uuid(),
+    userId: z.string(),
     oldPassword: z.string().min(1, "Mật khẩu cũ là bắt buộc"),
-    newPassword: z.string().min(6, "Password mới tối thiểu 6 ký tự"),
-    confirmPassword: z.string().min(6, "Password mới tối thiểu 6 ký tự"),
-}).refine((data) => data.newPassword === data.confirmPassword, {
+    password: z.string()
+        .min(8, "Mật khẩu tối thiểu 8 ký tự")
+        .regex(/[A-Z]/, "Mật khẩu phải chứa ít nhất 1 chữ hoa")
+        .regex(/[!@#$%^&*(),.?":{}|<>]/, "Mật khẩu phải chứa ít nhất 1 ký tự đặc biệt"),
+    confirmPassword: z.string().min(1, "Vui lòng xác nhận mật khẩu"),
+}).refine((data) => data.password === data.confirmPassword, {
     message: "Mật khẩu không khớp",
     path: ["confirmPassword"],
 });
 
 export const logoutSchema = z.object({
-    userId: z.uuid(),
+    userId: z.string(),
 });
 
 export const refreshSchema = z.object({

@@ -49,12 +49,12 @@ export const authRequest = {
     }),
   forgotPassword: (data: ForgotPasswordInput) =>
     http.post(ENDPOINT_CLIENT.FORGOT_PASSWORD, data),
-  verifyForgotPassword: (data: Omit<VerifyForgotPasswordInput, 'confirmPassword'>) =>
+  verifyForgotPassword: (data: { key: string; newPassword: string }) =>
     http.post(ENDPOINT_CLIENT.VERIFY_FORGOT_PASSWORD, data),
   changeEmail: (data: ChangeEmailInput) =>
     http.post(ENDPOINT_CLIENT.CHANGE_EMAIL, data),
   verifyChangeEmail: (data: VerifyChangeEmailInput) =>
     http.post(ENDPOINT_CLIENT.VERIFY_CHANGE_EMAIL, data),
-  changePassword: (data: ChangePasswordInput) =>
+  changePassword: (data: { userId: string; password: string; newPassword: string }) =>
     http.post(ENDPOINT_CLIENT.CHANGE_PASSWORD, data),
 };
