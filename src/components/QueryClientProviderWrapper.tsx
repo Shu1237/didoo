@@ -30,8 +30,7 @@ export default function QueryClientProviderWrapper({
 
     <QueryClientProvider client={queryClient}>
       {children}
-      {/* <ReactQueryDevtools initialIsOpen={false} /> */}
-      <Toaster richColors duration={2000} />
+      <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   );
 }

@@ -5,12 +5,14 @@
 
 
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
-
 import { useSessionStore } from "@/stores/sesionStore";
-
 import { authRequest } from "@/apiRequest/auth";
 import { handleErrorApi } from "@/lib/errors";
-import { AuthContextType } from "@/utils/type";
+import { AuthContextType } from "@/types/base";
+import { decodeJWT } from "@/lib/utils";
+import { JWTUserType } from "@/types/user";
+
+
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -46,7 +48,6 @@ export const AuthProvider = ({
                 setIsHydrated(true);
                 return;
             }
-
             // Case 3: Có refresh_token nhưng KHÔNG có access_token
             // → Call API để lấy access_token mới
             if (!initialAccessToken && initialRefreshToken) {
@@ -54,26 +55,31 @@ export const AuthProvider = ({
                 setIsRefreshing(true);
 
                 try {
+                    const decodedToken = decodeJWT<JWTUserType>(initialRefreshToken);
+                    if (!decodedToken?.id) {
+                        throw new Error("Invalid refresh token payload");
+                    }
+
                     // Gọi API backend để refresh access_token
                     const result = await authRequest.refreshTokenClient({
+                        id: decodedToken.id,
+                        accessToken: initialAccessToken || "",
                         refreshToken: initialRefreshToken
                     });
 
-                    if (!result.data?.accessToken) {
+                    if (!result.data?.accessToken || !result.data?.refreshToken) {
                         throw new Error("Invalid refresh token response");
                     }
 
-                    const newAccessToken = result.data.accessToken;
-
-
+                    const { accessToken: newAccessToken, refreshToken: newRefreshToken } = result.data;
 
                     // Step 1: Set vào Zustand store
-                    setSession({ accessToken: newAccessToken, refreshToken: initialRefreshToken });
+                    setSession({ accessToken: newAccessToken, refreshToken: newRefreshToken });
 
                     // Step 2: Đồng bộ access_token mới vào cookies thông qua API route
                     await authRequest.refreshTokenServer({
                         accessToken: newAccessToken,
-                        refreshToken: initialRefreshToken
+                        refreshToken: newRefreshToken
                     });
 
 

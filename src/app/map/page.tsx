@@ -7,7 +7,7 @@ import Map from './_components/Map';
 import { MapPin, Satellite } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { EVENTS } from '@/utils/mock';
-import { Event } from '@/utils/type';
+import { Event } from '../../types/base';
 import { Button } from '@/components/ui/button';
 
 // 1. Component Mũi tên thuần (Đã sửa hướng và xóa khung)

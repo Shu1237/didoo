@@ -1,17 +1,14 @@
 import { authRequest } from "@/apiRequest/auth";
 import { useSessionStore } from "@/stores/sesionStore";
-
-
+import envconfig from "../../config";
+import { ResponseData, ResponseError } from "../types/base";
 import { toast } from "sonner";
 import { EntityError, HttpError } from "@/lib/errors";
-import { ResponseData,ResponseError } from "@/utils/type";
-import envconfig from "../../config";
 import { HttpErrorCode } from "@/utils/enum";
-
 
 interface CustomOptions extends RequestInit {
     baseURL?: string | undefined;
-    params?: Record<string, string | number | boolean | undefined>;
+    query?: Record<string, string | number | boolean | undefined>;
     skipAuth?: boolean;
 }
 
@@ -67,18 +64,24 @@ class TokenRefreshInterceptor {
 
     private async performRefresh(): Promise<string> {
         const refreshToken = useSessionStore.getState().refreshToken;
+        const accessToken = useSessionStore.getState().accessToken;
+        const user = useSessionStore.getState().user;
 
         if (!refreshToken) {
             throw new Error("NO_REFRESH_TOKEN");
         }
-
+        if (!user || !user.UserId) {
+            throw new Error("NO_USER_ID");
+        }
         try {
             // Gọi API refresh token
             const result = await authRequest.refreshTokenClient({
+                id: user.UserId,
+                accessToken: accessToken || "",
                 refreshToken: refreshToken
             });
 
-            if (!result.data?.accessToken) {
+            if (!result.data?.accessToken || !result.data?.refreshToken) {
                 throw new Error("INVALID_REFRESH_RESPONSE");
             }
 
@@ -86,7 +89,7 @@ class TokenRefreshInterceptor {
             const newRefreshToken = result.data.refreshToken;
 
             // Update Zustand store với token mới
-            useSessionStore.getState().setSession({
+            useSessionStore.getState().updateSession({
                 accessToken: newAccessToken,
                 refreshToken: newRefreshToken
             })
@@ -119,8 +122,8 @@ class TokenRefreshInterceptor {
             // Client: clear store + toast + redirect
             useSessionStore.getState().clearSession();
             toast.error("Phiên đăng nhập đã hết hạn");
-            if (typeof window !== "undefined") {
-                window.location.href = `/auth/login`;
+            if (!isServerRuntime()) {
+                window.location.href = `/login`;
             }
         }
     }
@@ -173,9 +176,9 @@ async function httpRequest<T>(
         : `${baseUrl}/${url}`;
 
     // Add query params if exists
-    const urlWithParams = options?.params
+    const urlWithParams = options?.query
         ? `${fullUrl}?${new URLSearchParams(
-            Object.entries(options.params)
+            Object.entries(options.query)
                 .filter(([_, v]) => v !== undefined)
                 .map(([k, v]) => [k, String(v)])
         ).toString()}`

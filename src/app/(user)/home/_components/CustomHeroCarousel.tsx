@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { Event } from '@/utils/type';
+import { Event } from '../../../../types/base';
 import Image from 'next/image';
 
 interface Props {

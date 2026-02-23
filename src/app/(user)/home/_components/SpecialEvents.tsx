@@ -1,6 +1,6 @@
 'use client';
 
-import { Event } from "@/utils/type";
+import { Event } from "../../../../types/base";
 import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";

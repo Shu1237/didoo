@@ -4,7 +4,7 @@ import { useRef, useEffect, useState } from 'react';
 import MapComponent, { Marker, NavigationControl, useMap, Source, Layer } from 'react-map-gl/mapbox';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import Image from 'next/image';
-import { Event } from '@/utils/type';
+import { Event } from '../../../types/base';
 import { Spinner } from '@/components/ui/spinner';
 import { envconfig } from '../../../../config';
 

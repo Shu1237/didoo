@@ -15,8 +15,14 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'api.dicebear.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
+        pathname: '/dzmx76ojp/**',
+      },
     ],
   },
 };
 
 export default nextConfig;
+

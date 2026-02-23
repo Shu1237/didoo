@@ -3,7 +3,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { ShieldCheck, Ticket, Clock, Zap, Globe, Cpu, Music, Wind } from "lucide-react";
-import { Event } from "@/utils/type";
+import { Event } from "../../../../../types/base";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 

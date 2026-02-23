@@ -1,6 +1,7 @@
 import { decodeJWT } from "@/lib/utils";
-import { JWTUserType } from "@/utils/type";
+import { JWTUserType } from "@/types/user";
 import { create } from "zustand";
+
 
 
 
@@ -14,6 +15,10 @@ interface SessionState {
         refreshToken: string;
     }) => void;
 
+    updateSession: (params: {
+        accessToken: string;
+        refreshToken: string;
+    }) => void;
 
 
     clearSession: () => void;
@@ -42,9 +47,21 @@ export const useSessionStore = create<SessionState>((set) => ({
             });
         }
     },
-
-
-
+    updateSession: ({ accessToken, refreshToken }) => {
+        try {
+            set({
+                accessToken,
+                refreshToken
+            })
+        } catch (error) {
+            console.error("Invalid access token", error);
+            set({
+                accessToken: null,
+                refreshToken: null,
+                user: null,
+            });
+        }
+    },
     /* ===== LOGOUT / EXPIRED ===== */
     clearSession: () => {
         set({

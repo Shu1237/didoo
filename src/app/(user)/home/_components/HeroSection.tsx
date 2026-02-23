@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import { Event } from '@/utils/type';
+import { Event } from '../../../../types/base';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import CustomHeroCarousel from './CustomHeroCarousel';

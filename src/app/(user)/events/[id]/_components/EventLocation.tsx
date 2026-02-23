@@ -4,7 +4,7 @@ import React, { useEffect, useState, useMemo } from 'react';
 import MapComponent, { Marker, NavigationControl } from 'react-map-gl/mapbox';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { MapPin, Navigation, ArrowRight } from 'lucide-react';
-import { Event } from "@/utils/type";
+import { Event } from "../../../../../types/base";
 import { getDistanceKm } from '@/utils/helper';
 import envconfig from '../../../../../../config';
 import { Button } from "@/components/ui/button";

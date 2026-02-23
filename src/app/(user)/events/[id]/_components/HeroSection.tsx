@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import { Calendar, MapPin, Share2, Heart, ArrowUpRight, ShieldCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Event } from '@/utils/type';
+import { Event } from '../../../../../types/base';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';

@@ -8,7 +8,7 @@ import { useEffect, useRef, useState, useMemo } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Spinner } from "@/components/ui/spinner";
 import { getDistanceKm } from "@/utils/helper";
-import { Event } from "@/utils/type";
+import { Event } from "../../../../types/base";
 import envconfig from "../../../../../config";
 
 interface MapEventProps {
