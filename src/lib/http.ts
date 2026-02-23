@@ -190,6 +190,7 @@ async function httpRequest<T>(
         headers: {
             ...baseHeaders,
             ...options?.headers,
+            "ngrok-skip-browser-warning": "true"
         } as HeadersInit,
         body,
         method,
