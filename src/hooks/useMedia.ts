@@ -1,4 +1,5 @@
 import { mediaRequest } from "@/apiRequest/media";
+import { handleErrorApi } from "@/lib/errors";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -12,9 +13,8 @@ export const useMedia = () => {
         onSuccess: () => {
             toast.success("Upload ảnh thành công!");
         },
-        onError: (error: any) => {
-            const message = error.response?.data?.error?.message || error.message || "Upload ảnh thất bại";
-            toast.error(message);
+        onError: (error) => {
+            handleErrorApi({ error })
         }
     });
 
