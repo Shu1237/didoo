@@ -4,7 +4,7 @@ import React, { useEffect, useState, useMemo } from 'react';
 import MapComponent, { Marker, NavigationControl } from 'react-map-gl/mapbox';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { MapPin, Navigation, ArrowRight } from 'lucide-react';
-import { Event } from "../../../../../types/base";
+import { Event } from "@/types/event";
 import { getDistanceKm } from '@/utils/helper';
 import envconfig from '../../../../../../config';
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,10 @@ interface EventLocationProps {
 export default function EventLocation({ event }: EventLocationProps) {
     const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+
+    const eventLocation = event.locations?.[0];
+    const eventLat = eventLocation?.latitude || 0;
+    const eventLng = eventLocation?.longitude || 0;
 
     useEffect(() => {
         if (!navigator.geolocation) {
@@ -40,9 +44,9 @@ export default function EventLocation({ event }: EventLocationProps) {
     }, []);
 
     const distance = useMemo(() => {
-        if (!userLocation) return null;
-        return getDistanceKm(userLocation.lat, userLocation.lng, event.lat, event.lng);
-    }, [userLocation, event]);
+        if (!userLocation || !eventLat || !eventLng) return null;
+        return getDistanceKm(userLocation.lat, userLocation.lng, eventLat, eventLng);
+    }, [userLocation, eventLat, eventLng]);
 
     return (
         <section className="relative py-24 bg-[#0a0a0a]">
@@ -63,8 +67,8 @@ export default function EventLocation({ event }: EventLocationProps) {
                         <MapComponent
                             mapboxAccessToken={envconfig.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}
                             initialViewState={{
-                                longitude: event.lng,
-                                latitude: event.lat,
+                                longitude: eventLng,
+                                latitude: eventLat,
                                 zoom: 14,
                             }}
                             style={{ width: '100%', height: '100%' }}
@@ -73,7 +77,7 @@ export default function EventLocation({ event }: EventLocationProps) {
                             <NavigationControl position="top-right" />
 
                             {/* Minimal Event Marker */}
-                            <Marker longitude={event.lng} latitude={event.lat} anchor="bottom">
+                            <Marker longitude={eventLng} latitude={eventLat} anchor="bottom">
                                 <div className="relative group flex items-center justify-center">
                                     <div className="w-6 h-6 bg-primary rounded-full shadow-[0_0_20px_rgba(var(--primary),1)] border-2 border-white" />
                                     <div className="absolute -top-12 bg-white text-black px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest shadow-xl opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
@@ -109,12 +113,14 @@ export default function EventLocation({ event }: EventLocationProps) {
                         </h2>
                         <div className="space-y-4">
                             <p className="text-white/40 text-xl font-medium leading-relaxed">
-                                {event.location}
+                                {eventLocation?.name || "Online / TBA"}<br />
+                                <span className="text-sm">{eventLocation?.address}</span>
                             </p>
                             <Button
                                 variant="link"
                                 className="p-0 h-auto text-primary text-xs font-black uppercase tracking-widest hover:text-white transition-colors"
-                                onClick={() => window.open(`https://www.google.com/maps/dir/?api=1&destination=${event.lat},${event.lng}`, '_blank')}
+                                onClick={() => window.open(`https://www.google.com/maps/dir/?api=1&destination=${eventLat},${eventLng}`, '_blank')}
+                                disabled={!eventLat || !eventLng}
                             >
                                 Get Directions <ArrowRight className="ml-2 w-4 h-4" />
                             </Button>

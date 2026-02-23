@@ -1,15 +1,16 @@
 "use client";
 
-import { useSessionStore } from "@/stores/sesionStore";
+import { useGetMe } from "@/hooks/useUser";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
 import { Mail, Shield, User as UserIcon, Settings } from "lucide-react";
 
 export default function ProfileSidebar() {
-  const user = useSessionStore((state) => state.user);
+  const { data: userData } = useGetMe();
+  const user = userData?.data;
 
-  const initials = user?.FullName
-    ? user.FullName.substring(0, 2).toUpperCase()
+  const initials = user?.fullName
+    ? user.fullName.substring(0, 2).toUpperCase()
     : "U";
 
   return (
@@ -23,7 +24,7 @@ export default function ProfileSidebar() {
           {/* Avatar */}
           <div className="relative mb-4">
             <Avatar className="w-24 h-24 border-[4px] border-white shadow-xl ring-1 ring-slate-200">
-              <AvatarImage src="" alt={user?.FullName || "User"} className="object-cover" />
+              <AvatarImage src="" alt={user?.fullName || "User"} className="object-cover" />
               <AvatarFallback className="text-3xl font-bold bg-slate-100 text-slate-800">{initials}</AvatarFallback>
             </Avatar>
             <div className="absolute bottom-2 right-2 w-4 h-4 bg-green-500 border-2 border-white rounded-full shadow-lg" />
@@ -31,10 +32,10 @@ export default function ProfileSidebar() {
 
           {/* User Info */}
           <div className="space-y-1">
-            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">{user?.FullName || "Người dùng"}</h1>
+            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">{user?.fullName || "Người dùng"}</h1>
             <p className="text-slate-500 text-sm font-semibold flex items-center justify-center gap-1.5 leading-none">
               <Mail className="w-3.5 h-3.5" />
-              {user?.Email || "Chưa đăng nhập"}
+              {user?.email || "Chưa đăng nhập"}
             </p>
           </div>
 

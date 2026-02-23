@@ -5,6 +5,7 @@ import { KEY, QUERY_KEY } from "@/utils/constant";
 import { UserGetListQuery } from "@/types/user";
 import { toast } from "sonner";
 import { handleErrorApi } from "@/lib/errors";
+import { useSessionStore } from "@/stores/sesionStore";
 
 export const useGetUsers = (params?: UserGetListQuery) => {
     return useQuery({
@@ -18,6 +19,17 @@ export const useGetUser = (id: string) => {
         queryKey: QUERY_KEY.users.detail(id),
         queryFn: () => userRequest.getById(id),
         enabled: !!id,
+    });
+};
+
+export const useGetMe = () => {
+    const user = useSessionStore((state) => state.user);
+    const userId = user?.UserId;
+
+    return useQuery({
+        queryKey: QUERY_KEY.users.detail(userId || ""),
+        queryFn: () => userRequest.getById(userId || ""),
+        enabled: !!userId,
     });
 };
 

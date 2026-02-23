@@ -2,18 +2,18 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { Calendar, MapPin, ArrowUpRight, ShieldCheck } from 'lucide-react';
+import { Calendar, MapPin, ArrowUpRight } from 'lucide-react';
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
-import { Event } from '../../types/base';
-import { format } from 'date-fns';
+import { Event } from '@/types/event';
+import { format, isValid } from 'date-fns';
 
 const TicketCard = ({
     id,
-    title,
-    date,
-    location,
-    price,
-    image,
+    name,
+    startTime,
+    locations,
+    thumbnailUrl,
+    bannerUrl,
     category,
 }: Event) => {
     // Subtle Magnetic effect
@@ -43,6 +43,10 @@ const TicketCard = ({
         y.set(0);
     };
 
+    const displayDate = startTime && isValid(new Date(startTime))
+        ? format(new Date(startTime), "dd MMM, yyyy")
+        : "TBA";
+
     return (
         <Link href={`/events/${id}`} className="block group">
             <motion.div
@@ -60,8 +64,8 @@ const TicketCard = ({
                     {/* Media Container */}
                     <div className="relative aspect-[4/5] w-full overflow-hidden">
                         <Image
-                            src={image}
-                            alt={title}
+                            src={thumbnailUrl || bannerUrl || 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=2070&auto=format&fit=crop'}
+                            alt={name}
                             fill
                             className="object-cover transition-transform duration-1000 group-hover:scale-110"
                         />
@@ -70,7 +74,7 @@ const TicketCard = ({
                         {/* Elegant Category Tag */}
                         <div className="absolute top-6 left-6 flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-white/10">
                             <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-                            <span className="text-[9px] font-bold text-white/90 uppercase tracking-[0.2em]">{category}</span>
+                            <span className="text-[9px] font-bold text-white/90 uppercase tracking-[0.2em]">{category?.name || "Event"}</span>
                         </div>
                     </div>
 
@@ -78,7 +82,7 @@ const TicketCard = ({
                     <div className="absolute inset-x-0 bottom-0 p-8 flex flex-col justify-end">
                         <div className="space-y-4">
                             <h3 className="text-3xl font-black text-white leading-[0.9] tracking-tighter group-hover:text-primary transition-colors">
-                                {title.split(' ').map((word, i) => (
+                                {name.split(' ').map((word, i) => (
                                     <span key={i} className={i === 1 ? "text-primary block" : "block"}>
                                         {word}
                                     </span>
@@ -89,19 +93,19 @@ const TicketCard = ({
                                 <div className="flex items-center gap-3 text-white/40">
                                     <Calendar className="w-3.5 h-3.5 text-primary/60" />
                                     <span className="text-[10px] font-bold uppercase tracking-widest leading-none">
-                                        {format(new Date(date), "dd MMM, yyyy")}
+                                        {displayDate}
                                     </span>
                                 </div>
                                 <div className="flex items-center gap-3 text-white/40">
                                     <MapPin className="w-3.5 h-3.5 text-primary/60" />
-                                    <span className="text-[10px] font-bold uppercase tracking-widest truncate leading-none">{location}</span>
+                                    <span className="text-[10px] font-bold uppercase tracking-widest truncate leading-none">{locations?.[0]?.name || "Online/TBA"}</span>
                                 </div>
                             </div>
 
                             <div className="flex items-center justify-between pt-4">
                                 <div>
                                     <p className="text-[8px] uppercase tracking-widest text-white/30 font-bold mb-1">Pass Value</p>
-                                    <p className="text-xl font-black text-white tracking-widest">{price}</p>
+                                    <p className="text-xl font-black text-white tracking-widest">Free</p>
                                 </div>
 
                                 <div className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center bg-white/5 group-hover:bg-primary group-hover:text-black transition-all duration-500">

@@ -1,18 +1,28 @@
+'use client';
 
+import { useGetEvent, useGetEvents } from "@/hooks/useEvent";
 import HeroSection from "./_components/HeroSection";
 import EventInfor from "./_components/EventInfor";
 import EventLocation from "./_components/EventLocation";
 import ListEvent from "@/app/(user)/events/[id]/_components/ListEvent";
-import { EVENTS } from "@/utils/mock";
 import ImmersiveBackground from "./_components/ImmersiveBackground";
+import Loading from "@/components/loading";
+import { use } from "react";
 
-export default async function DetailEventPage({ params }: { params: { id: string } }) {
-  const { id } = await params;
-  const detailEvent = EVENTS.find((event) => event.id.toString() === id);
+export default function DetailEventPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
 
-  const eventRelated = EVENTS.filter((event) =>
-    event.id.toString() !== id && event.category === detailEvent?.category
-  );
+  const { data: detailEventResponse, isLoading: isLoadingDetail } = useGetEvent(id);
+  const detailEvent = detailEventResponse?.data;
+
+  const { data: relatedEventsResponse, isLoading: isLoadingRelated } = useGetEvents({
+    categoryId: detailEvent?.category?.id,
+    pageSize: 4,
+  });
+
+  const eventRelated = (relatedEventsResponse?.data.items || []).filter(e => e.id !== id);
+
+  if (isLoadingDetail) return <Loading />;
 
   if (!detailEvent) {
     return (

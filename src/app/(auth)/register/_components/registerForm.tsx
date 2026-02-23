@@ -19,7 +19,7 @@ import { RegisterInput, registerSchema } from '@/schemas/auth';
 import { useState } from 'react';
 import { handleErrorApi } from '@/lib/errors';
 import { toast } from 'sonner';
-import { GoogleLogin } from '@react-oauth/google';
+import { useGoogleLogin } from '@react-oauth/google';
 
 type FormValues = RegisterInput & { otp?: string };
 
@@ -107,19 +107,25 @@ export default function RegisterForm() {
     }
   };
 
-  const onGoogleSuccess = async (credentialResponse: any) => {
-    if (loginGoogle.isPending) return;
-    setError(null);
-    try {
-      await loginGoogle.mutateAsync({
-        googleToken: credentialResponse.credential,
-        location: { latitude: 0, longitude: 0 } // Default for register
-      });
-    } catch (err: any) {
-      handleErrorApi({ error: err });
-      setError(err?.message || "Đăng nhập Google thất bại.");
+  const loginGoogleCus = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      if (loginGoogle.isPending) return;
+      setError(null);
+      try {
+        await loginGoogle.mutateAsync({
+          googleToken: tokenResponse.access_token,
+          location: { latitude: 0, longitude: 0 } // Default for register
+        });
+      } catch (err: any) {
+        handleErrorApi({ error: err });
+        setError(err?.message || "Đăng nhập Google thất bại.");
+      }
+    },
+    onError: () => {
+      setError("Đăng nhập Google thất bại.");
+      toast.error("Google Login failed");
     }
-  };
+  });
 
   return (
     <motion.div
@@ -352,16 +358,7 @@ export default function RegisterForm() {
 
         <div className="mt-6 flex flex-col items-center gap-2">
           <div className="flex justify-center">
-            <GoogleLogin
-              onSuccess={onGoogleSuccess}
-              onError={() => {
-                setError("Đăng nhập Google thất bại.");
-                toast.error("Google Login failed");
-              }}
-              type="icon"
-              shape="circle"
-              theme="outline"
-            />
+            <SocialIcon icon="google" onClick={() => loginGoogleCus()} />
           </div>
         </div>
 

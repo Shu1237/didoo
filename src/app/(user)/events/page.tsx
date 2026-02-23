@@ -1,6 +1,6 @@
 'use client';
 
-import { EVENTS } from "@/utils/mock";
+import { useGetEvents } from "@/hooks/useEvent";
 import SearchFilter from "../home/_components/SearchFilter";
 import EventsHero from "./_components/EventsHero";
 import EventsGrid from "./_components/EventsGrid";
@@ -9,13 +9,23 @@ import { TrendingUp, Music, CalendarDays, Zap, LayoutGrid, Sparkles, MapPin, Cal
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
+import Loading from "@/components/loading";
 
 export default function EventsPage() {
+    const { data: eventsResponse, isLoading } = useGetEvents({
+        pageSize: 20,
+        isDescending: true,
+    });
+
+    if (isLoading) return <Loading />;
+
+    const events = eventsResponse?.data.items || [];
+
     // categorizing events for display
-    const featuredEvent = EVENTS[0]; // The main highlight
-    const trendingEvents = EVENTS.slice(1, 9);
-    const upcomingEvents = EVENTS.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()).slice(0, 4);
-    const musicEvents = EVENTS.filter(e => e.category === 'Music').slice(0, 4);
+    const featuredEvent = events[0]; // The main highlight
+    const trendingEvents = events.slice(1, 9);
+    const upcomingEvents = [...events].sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime()).slice(0, 4);
+    const musicEvents = events.filter(e => e.category?.name === 'Music' || e.category?.name === 'Âm nhạc').slice(0, 4);
 
     const categories = [
         { name: "Tất cả", icon: <LayoutGrid className="w-4 h-4" /> },
@@ -101,68 +111,70 @@ export default function EventsPage() {
                 </motion.div>
 
                 {/* Featured Highlight Section */}
-                <div className="max-w-[1920px] mx-auto px-6 md:px-12 mb-40 relative z-10">
-                    <div className="flex items-center gap-4 mb-12">
-                        <span className="text-primary font-black italic tracking-widest uppercase text-sm">/ Spotlight /</span>
-                        <div className="flex-1 h-px bg-gradient-to-r from-primary/50 to-transparent" />
+                {featuredEvent && (
+                    <div className="max-w-[1920px] mx-auto px-6 md:px-12 mb-40 relative z-10">
+                        <div className="flex items-center gap-4 mb-12">
+                            <span className="text-primary font-black italic tracking-widest uppercase text-sm">/ Spotlight /</span>
+                            <div className="flex-1 h-px bg-gradient-to-r from-primary/50 to-transparent" />
+                        </div>
+
+                        <Link href={`/events/${featuredEvent.id}`} className="group block relative perspective-2000">
+                            <motion.div
+                                whileHover={{ rotateX: 2, rotateY: -2, scale: 1.01 }}
+                                transition={{ type: "spring", stiffness: 100 }}
+                                className="relative h-[500px] md:h-[800px] rounded-[60px] overflow-hidden border border-white/10 shadow-[0_0_100px_-20px_rgba(var(--primary),0.2)]"
+                            >
+                                <Image
+                                    src={featuredEvent.thumbnailUrl || featuredEvent.bannerUrl || 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=2070&auto=format&fit=crop'}
+                                    alt={featuredEvent.name}
+                                    fill
+                                    className="object-cover transition-transform duration-1000 group-hover:scale-105"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-[#050505]/40 to-transparent" />
+
+                                {/* Interactive Overlay */}
+                                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-primary/10 mix-blend-overlay" />
+
+                                <div className="absolute bottom-0 left-0 right-0 p-10 md:p-20 space-y-8">
+                                    <div className="flex flex-wrap items-center gap-4">
+                                        <motion.div
+                                            initial={{ opacity: 0, scale: 0.8 }}
+                                            whileInView={{ opacity: 1, scale: 1 }}
+                                            className="px-6 py-2 rounded-full bg-primary text-black font-black text-[10px] uppercase tracking-[0.3em] shadow-2xl"
+                                        >
+                                            Featured Event
+                                        </motion.div>
+                                        <div className="px-6 py-2 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 text-white font-black text-[10px] uppercase tracking-[0.3em]">
+                                            Live Show
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-6 max-w-5xl">
+                                        <h3 className="text-5xl md:text-9xl font-black leading-[0.85] uppercase italic tracking-tighter group-hover:text-primary transition-colors duration-500">
+                                            {featuredEvent.name}
+                                        </h3>
+
+                                        <div className="flex flex-wrap items-center gap-10 text-gray-400 font-black uppercase tracking-widest text-xs md:text-sm">
+                                            <div className="flex items-center gap-3">
+                                                <Calendar className="w-5 h-5 text-primary" />
+                                                <span className="text-white">{featuredEvent.startTime ? new Date(featuredEvent.startTime).toLocaleDateString('vi-VN', { day: 'numeric', month: 'long', year: 'numeric' }) : "TBA"}</span>
+                                            </div>
+                                            <div className="flex items-center gap-3">
+                                                <MapPin className="w-5 h-5 text-primary" />
+                                                <span className="text-white">{featuredEvent.locations?.[0]?.name || "Online/TBA"}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <Button className="h-20 px-12 rounded-[30px] bg-white text-black hover:bg-primary hover:text-white transition-all duration-500 font-black text-xl uppercase italic group/btn shadow-2xl">
+                                        Secure Your Ticket
+                                        <ArrowRight className="ml-4 w-6 h-6 group-hover/btn:translate-x-2 transition-transform" />
+                                    </Button>
+                                </div>
+                            </motion.div>
+                        </Link>
                     </div>
-
-                    <Link href={`/events/${featuredEvent.id}`} className="group block relative perspective-2000">
-                        <motion.div
-                            whileHover={{ rotateX: 2, rotateY: -2, scale: 1.01 }}
-                            transition={{ type: "spring", stiffness: 100 }}
-                            className="relative h-[500px] md:h-[800px] rounded-[60px] overflow-hidden border border-white/10 shadow-[0_0_100px_-20px_rgba(var(--primary),0.2)]"
-                        >
-                            <Image
-                                src={featuredEvent.image}
-                                alt={featuredEvent.title}
-                                fill
-                                className="object-cover transition-transform duration-1000 group-hover:scale-105"
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-[#050505]/40 to-transparent" />
-
-                            {/* Interactive Overlay */}
-                            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-primary/10 mix-blend-overlay" />
-
-                            <div className="absolute bottom-0 left-0 right-0 p-10 md:p-20 space-y-8">
-                                <div className="flex flex-wrap items-center gap-4">
-                                    <motion.div
-                                        initial={{ opacity: 0, scale: 0.8 }}
-                                        whileInView={{ opacity: 1, scale: 1 }}
-                                        className="px-6 py-2 rounded-full bg-primary text-black font-black text-[10px] uppercase tracking-[0.3em] shadow-2xl"
-                                    >
-                                        Featured Event
-                                    </motion.div>
-                                    <div className="px-6 py-2 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 text-white font-black text-[10px] uppercase tracking-[0.3em]">
-                                        Live Show
-                                    </div>
-                                </div>
-
-                                <div className="space-y-6 max-w-5xl">
-                                    <h3 className="text-5xl md:text-9xl font-black leading-[0.85] uppercase italic tracking-tighter group-hover:text-primary transition-colors duration-500">
-                                        {featuredEvent.title}
-                                    </h3>
-
-                                    <div className="flex flex-wrap items-center gap-10 text-gray-400 font-black uppercase tracking-widest text-xs md:text-sm">
-                                        <div className="flex items-center gap-3">
-                                            <Calendar className="w-5 h-5 text-primary" />
-                                            <span className="text-white">{new Date(featuredEvent.date).toLocaleDateString('vi-VN', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
-                                        </div>
-                                        <div className="flex items-center gap-3">
-                                            <MapPin className="w-5 h-5 text-primary" />
-                                            <span className="text-white">{featuredEvent.location}</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <Button className="h-20 px-12 rounded-[30px] bg-white text-black hover:bg-primary hover:text-white transition-all duration-500 font-black text-xl uppercase italic group/btn shadow-2xl">
-                                    Secure Your Ticket
-                                    <ArrowRight className="ml-4 w-6 h-6 group-hover/btn:translate-x-2 transition-transform" />
-                                </Button>
-                            </div>
-                        </motion.div>
-                    </Link>
-                </div>
+                )}
 
                 {/* Premium Floating Category Navigation */}
                 <div className="sticky top-8 z-50 flex justify-center mb-32 px-4 pointer-events-none">

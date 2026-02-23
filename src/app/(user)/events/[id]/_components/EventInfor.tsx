@@ -3,7 +3,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { ShieldCheck, Ticket, Clock, Zap, Globe, Cpu, Music, Wind } from "lucide-react";
-import { Event } from "../../../../../types/base";
+import { Event } from "@/types/event";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 
@@ -12,9 +12,10 @@ interface EventInforProps {
 }
 
 export default function EventInfor({ event }: EventInforProps) {
-    const longDescription = event.description.length < 100
-        ? `${event.description} Đây là sự kiện công nghệ được mong đợi nhất mùa giải. Tham gia cùng chúng tôi để có trải nghiệm tuyệt vời nơi nghệ thuật và đổi mới giao thoa.`
-        : event.description;
+    const description = event.description || "";
+    const longDescription = description.length < 100
+        ? `${description} Đây là sự kiện công nghệ được mong đợi nhất mùa giải. Tham gia cùng chúng tôi để có trải nghiệm tuyệt vời nơi nghệ thuật và đổi mới giao thoa.`
+        : description;
 
     return (
         <section className="relative py-24 bg-[#050505] overflow-hidden">
@@ -52,7 +53,7 @@ export default function EventInfor({ event }: EventInforProps) {
 
                                 <div className="grid md:grid-cols-5 gap-8 items-start">
                                     <div className="md:col-span-3">
-                                        <p className="text-2xl font-light text-white/90 leading-tight">
+                                        <p className="text-2xl font-light text-white/90 leading-tight whitespace-pre-line">
                                             {longDescription}
                                         </p>
                                     </div>
@@ -65,7 +66,7 @@ export default function EventInfor({ event }: EventInforProps) {
                             </motion.div>
                         </div>
 
-                        {/* Tech Specs - Kiểu dáng thanh lịch hơn */}
+                        {/* Tech Specs */}
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-px bg-white/10 border border-white/10 rounded-3xl overflow-hidden">
                             {[
                                 { label: "Resolution", value: "Native 8K", icon: Cpu },
@@ -83,7 +84,7 @@ export default function EventInfor({ event }: EventInforProps) {
                             ))}
                         </div>
 
-                        {/* Operational Intel - Layout gom cụm lại */}
+                        {/* Operational Intel */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {[
                                 { icon: Clock, label: "Check-in Protocol", val: "Strictly 30m prior", desc: "Không cho phép vào cửa muộn để đảm bảo đồng bộ hóa thị giác." },
@@ -107,7 +108,7 @@ export default function EventInfor({ event }: EventInforProps) {
                         </div>
                     </div>
 
-                    {/* RIGHT: SIDEBAR (4 columns) - Làm gọn và chắc chắn hơn */}
+                    {/* RIGHT: SIDEBAR */}
                     <aside className="lg:col-span-4">
                         <div className="sticky top-24 space-y-6">
                             <div className="bg-[#0a0a0a] border border-white/10 rounded-[40px] p-8 space-y-8 shadow-2xl">
@@ -116,7 +117,7 @@ export default function EventInfor({ event }: EventInforProps) {
                                         <div className="absolute inset-0 bg-primary/20 rounded-full blur-2xl" />
                                         <div className="relative w-full h-full rounded-3xl overflow-hidden border border-white/10 grayscale hover:grayscale-0 transition-all duration-500">
                                             <Image
-                                                src={event.organizer?.avatar || "https://i.pravatar.cc/150?u=org"}
+                                                src={event.organizer?.logoUrl || "https://i.pravatar.cc/150?u=org"}
                                                 alt="Organizer"
                                                 fill
                                                 className="object-cover"
@@ -127,7 +128,7 @@ export default function EventInfor({ event }: EventInforProps) {
                                     <div>
                                         <p className="text-[10px] font-bold text-primary uppercase tracking-[0.3em] mb-2">Architected By</p>
                                         <h3 className="text-3xl font-bold text-white tracking-tighter italic">
-                                            {event.organizer?.name || "Foodie Group"}
+                                            {event.organizer?.name || "Organizer"}
                                         </h3>
                                     </div>
 
@@ -146,7 +147,7 @@ export default function EventInfor({ event }: EventInforProps) {
                                 </div>
                             </div>
 
-                            {/* Trust Badge - Kiểu dáng tối giản */}
+                            {/* Trust Badge */}
                             <div className="px-8 py-5 rounded-2xl border border-white/5 bg-white/[0.02] flex items-center gap-4">
                                 <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
                                 <span className="text-[10px] font-bold text-white/50 uppercase tracking-widest">

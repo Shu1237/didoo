@@ -3,9 +3,9 @@
 import Image from 'next/image';
 import { Calendar, MapPin, Share2, Heart, ArrowUpRight, ShieldCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Event } from '../../../../../types/base';
+import { Event } from '@/types/event';
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { format } from 'date-fns';
+import { format, isValid } from 'date-fns';
 import { vi } from 'date-fns/locale';
 
 interface DetailEventProps {
@@ -13,8 +13,8 @@ interface DetailEventProps {
 }
 
 export default function HeroSection({ event }: DetailEventProps) {
-  const eventDate = new Date(event.date);
-  const isValidDate = !isNaN(eventDate.getTime());
+  const eventDate = new Date(event.startTime);
+  const isValidDate = event.startTime && isValid(eventDate);
   const { scrollY } = useScroll();
   const y1 = useTransform(scrollY, [0, 500], [0, 100]);
 
@@ -46,7 +46,7 @@ export default function HeroSection({ event }: DetailEventProps) {
               </div>
 
               <h1 className="text-6xl md:text-8xl font-black text-white leading-[0.9] tracking-tighter">
-                {event.title.split(' ').map((word, i) => (
+                {event.name.split(' ').map((word, i) => (
                   <span key={i} className={i === 1 ? "text-primary block" : "block"}>
                     {word}
                   </span>
@@ -54,7 +54,7 @@ export default function HeroSection({ event }: DetailEventProps) {
               </h1>
 
               <p className="text-xl text-white/50 max-w-xl leading-relaxed font-light">
-                {event.description || "An immersive journey into the future of digital art and high-tech innovation. Join an elite circle of creators and visionaries."}
+                {event.description || "An immersive journey into the future of digital art and high-tech innovation."}
               </p>
 
               {/* Data Strip */}
@@ -63,14 +63,14 @@ export default function HeroSection({ event }: DetailEventProps) {
                   <p className="text-[10px] uppercase tracking-widest text-white/40 font-bold">Timeline</p>
                   <p className="text-xl font-medium text-white flex items-center gap-2">
                     <Calendar className="w-4 h-4 text-primary" />
-                    {isValidDate ? format(eventDate, "dd MMMM, yyyy", { locale: vi }) : event.date}
+                    {isValidDate ? format(eventDate, "dd MMMM, yyyy", { locale: vi }) : "TBA"}
                   </p>
                 </div>
                 <div className="space-y-1">
                   <p className="text-[10px] uppercase tracking-widest text-white/40 font-bold">Venue</p>
                   <p className="text-xl font-medium text-white flex items-center gap-2">
                     <MapPin className="w-4 h-4 text-primary" />
-                    {event.location}
+                    {event.locations?.[0]?.name || "Online / TBA"}
                   </p>
                 </div>
               </div>
@@ -101,8 +101,8 @@ export default function HeroSection({ event }: DetailEventProps) {
           >
             <div className="relative aspect-[3/4] rounded-[40px] overflow-hidden group">
               <Image
-                src={event.image}
-                alt={event.title}
+                src={event.thumbnailUrl || event.bannerUrl || 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=2070&auto=format&fit=crop'}
+                alt={event.name}
                 fill
                 className="object-cover transition-transform duration-1000 group-hover:scale-110"
                 priority
@@ -114,7 +114,7 @@ export default function HeroSection({ event }: DetailEventProps) {
                 <div className="flex justify-between items-end">
                   <div>
                     <p className="text-[10px] uppercase tracking-widest text-white/60 mb-1">Entry Value</p>
-                    <p className="text-3xl font-bold text-white tracking-tighter">{event.price}</p>
+                    <p className="text-3xl font-bold text-white tracking-tighter">Free</p>
                   </div>
                   <div className="h-12 w-12 rounded-full bg-primary flex items-center justify-center">
                     <ArrowUpRight className="w-6 h-6 text-black" />

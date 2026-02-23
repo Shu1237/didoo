@@ -17,7 +17,7 @@ export const userCreateSchema = z.object({
     password: z.string().min(6),
     avatarUrl: z.url().optional(),
     gender: z.number().int().min(0).max(2).default(0),
-    dateOfBirth: z.date(),
+    dateOfBirth: z.coerce.date(),
     address: z.string().optional(),
     status: z.string().default("Active"), // Enum?
     roleName: z.string().default(Roles.USER),
@@ -29,7 +29,7 @@ export const userUpdateSchema = z.object({
     phone: z.string().optional(),
     avatarUrl: z.url().optional(),
     gender: z.number().int().min(0).max(2).optional(),
-    dateOfBirth: z.date().optional(),
+    dateOfBirth: z.coerce.date().optional(),
     address: z.string().optional(),
     status: z.string().optional(),
     roleName: z.string().optional(),

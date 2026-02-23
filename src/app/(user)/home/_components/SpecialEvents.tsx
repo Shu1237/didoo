@@ -1,6 +1,6 @@
 'use client';
 
-import { Event } from "../../../../types/base";
+import { Event } from "@/types/event";
 import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
@@ -42,8 +42,8 @@ export const SpecialEvents = ({ events }: SpecialEventsProps) => {
                             <div className="absolute inset-0 p-6 flex flex-col justify-between z-10">
                                 <div>
                                     <h3 className="text-2xl font-black text-white uppercase leading-none mb-2 drop-shadow-md">
-                                        {event.title.split(' ').slice(0, 3).join(' ')} <br />
-                                        <span className="text-white">{event.title.split(' ').slice(3).join(' ')}</span>
+                                        {event.name.split(' ').slice(0, 3).join(' ')} <br />
+                                        <span className="text-white">{event.name.split(' ').slice(3).join(' ')}</span>
                                     </h3>
                                     <p className="text-white/80 text-xs line-clamp-2 mt-2 font-medium drop-shadow">
                                         {event.description}
@@ -52,7 +52,7 @@ export const SpecialEvents = ({ events }: SpecialEventsProps) => {
 
                                 <div className="flex justify-between items-end border-t border-white/20 pt-4">
                                     <p className="text-xs font-bold text-white uppercase tracking-wider drop-shadow">
-                                        {new Date(event.date).toLocaleDateString('en-US', { day: '2-digit', month: 'short' })}
+                                        {new Date(event.startTime).toLocaleDateString('en-US', { day: '2-digit', month: 'short' })}
                                     </p>
                                     <ArrowUpRight className="w-5 h-5 text-white group-hover:rotate-45 transition-transform drop-shadow" />
                                 </div>
@@ -61,8 +61,8 @@ export const SpecialEvents = ({ events }: SpecialEventsProps) => {
                             {/* Background Image - Clean */}
                             <div className="absolute inset-0 transition-transform duration-700 group-hover:scale-105">
                                 <Image
-                                    src={event.image}
-                                    alt={event.title}
+                                    src={event.thumbnailUrl || event.bannerUrl || 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=2070&auto=format&fit=crop'}
+                                    alt={event.name}
                                     fill
                                     className="object-cover"
                                 />

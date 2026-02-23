@@ -1,6 +1,6 @@
 'use client';
 
-import { Event } from "../../../../types/base";
+import { Event } from "@/types/event";
 import Image from "next/image";
 import {
     Carousel,
@@ -56,7 +56,7 @@ export const TrendingEvents = ({ events }: TrendingEventsProps) => {
                                         {/* Image Container */}
                                         <div className="aspect-[3/4] relative overflow-hidden rounded-2xl bg-gray-200 mb-4 shadow-sm group-hover:shadow-md transition-all">
                                             <Image
-                                                src={event.organizer?.avatar || event.image} // Use organizer avatar if possible, else event image
+                                                src={event.organizer?.logoUrl || event.thumbnailUrl || event.bannerUrl || 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=2070&auto=format&fit=crop'} // Use organizer logo if possible, else event image
                                                 alt={event.organizer?.name || "Speaker"}
                                                 fill
                                                 className="object-cover transition-transform duration-700 group-hover:scale-105"
@@ -79,7 +79,7 @@ export const TrendingEvents = ({ events }: TrendingEventsProps) => {
                                                 {event.organizer?.name || "Speaker Name"}
                                             </h3>
                                             <p className="text-slate-500 text-sm font-bold uppercase truncate mb-3">
-                                                {event.category} Leader
+                                                {event.category?.name || "Event"} Leader
                                             </p>
 
                                             <Button variant="outline" className="h-10 px-6 rounded-full border-slate-200 text-slate-700 hover:bg-slate-900 hover:text-white uppercase text-xs font-bold tracking-widest transition-colors">

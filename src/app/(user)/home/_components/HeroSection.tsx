@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useCallback } from 'react';
-import { Event } from '../../../../types/base';
+import { useState, useCallback, useEffect } from 'react';
+import { Event } from '@/types/event';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import CustomHeroCarousel from './CustomHeroCarousel';
@@ -10,6 +10,14 @@ import Image from 'next/image';
 export default function HeroSection({ events: initialEvents }: { events: Event[] }) {
     // Quản lý danh sách sự kiện, phần tử đầu tiên (index 0) luôn là ảnh nền active
     const [eventList, setEventList] = useState(initialEvents);
+
+    // Update local state when prop changes
+    useEffect(() => {
+        setEventList(initialEvents);
+    }, [initialEvents]);
+
+    if (!eventList || eventList.length === 0) return null;
+
     const activeEvent = eventList[0];
 
     // Hàm xử lý khi click chọn ảnh: 
@@ -51,8 +59,8 @@ export default function HeroSection({ events: initialEvents }: { events: Event[]
                             transition={{ type: "spring", stiffness: 120, damping: 25 }}
                         >
                             <Image
-                                src={activeEvent.image}
-                                alt={activeEvent.title}
+                                src={activeEvent.thumbnailUrl || activeEvent.bannerUrl || 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=2070&auto=format&fit=crop'}
+                                alt={activeEvent.name}
                                 fill
                                 className="object-cover"
                                 priority
@@ -80,7 +88,7 @@ export default function HeroSection({ events: initialEvents }: { events: Event[]
                                 transition={{ duration: 0.5 }}
                             >
                                 <h1 className="text-6xl lg:text-8xl font-black text-white uppercase leading-[0.9] tracking-tighter mb-8 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
-                                    {activeEvent.title}
+                                    {activeEvent.name}
                                 </h1>
                                 <div className="flex gap-4">
                                     <Button className="h-14 px-10 rounded-full bg-white text-black font-bold uppercase hover:bg-gray-200 transition-colors">

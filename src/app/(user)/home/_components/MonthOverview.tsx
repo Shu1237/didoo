@@ -2,7 +2,7 @@
 
 import { ArrowUpRight, MapPin, Clock } from "lucide-react";
 import Image from "next/image";
-import { EVENTS } from "@/utils/mock";
+import { Event } from "@/types/event";
 import Link from "next/link";
 
 // Reusing avatars from api/dicebear or local images
@@ -12,10 +12,14 @@ const AVATARS = [
     "https://api.dicebear.com/7.x/avataaars/svg?seed=Mark"
 ];
 
-export const MonthOverview = () => {
+interface MonthOverviewProps {
+    events: Event[];
+}
+
+export const MonthOverview = ({ events }: MonthOverviewProps) => {
     // Select specific events for the grid (avoiding the first one if it's used in Hero)
     // We'll use index 1, 2, 3, 4 for the 4 small cards
-    const highlightEvents = EVENTS.slice(1, 5);
+    const highlightEvents = events.slice(1, 5);
 
     return (
         <section className="py-20 bg-slate-50">
@@ -63,33 +67,33 @@ export const MonthOverview = () => {
                         <Link href={`/events/${event.id}`} key={event.id} className="bg-white rounded-[2.5rem] p-4 flex flex-col hover:shadow-xl transition-all duration-300 border border-slate-100 group">
                             <div className="relative h-48 w-full rounded-[2rem] overflow-hidden mb-4">
                                 <Image
-                                    src={event.image}
-                                    alt={event.title}
+                                    src={event.thumbnailUrl || event.bannerUrl || 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=2070&auto=format&fit=crop'}
+                                    alt={event.name}
                                     fill
                                     className="object-cover group-hover:scale-105 transition-transform duration-500"
                                 />
                                 <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-[10px] font-bold uppercase text-slate-900 shadow-sm">
-                                    {event.category}
+                                    {event.category?.name || "Event"}
                                 </div>
                             </div>
                             <div className="px-2 flex-1 flex flex-col">
-                                <h4 className="font-bold text-lg text-slate-900 mb-1 line-clamp-1" title={event.title}>
-                                    {event.title}
+                                <h4 className="font-bold text-lg text-slate-900 mb-1 line-clamp-1" title={event.name}>
+                                    {event.name}
                                 </h4>
                                 <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-400 mb-4 line-clamp-1">
-                                    <MapPin className="w-3.5 h-3.5 shrink-0" /> {event.location}
+                                    <MapPin className="w-3.5 h-3.5 shrink-0" /> {event.locations?.[0]?.name || "Online/TBA"}
                                 </div>
                                 <div className="mt-auto flex items-center justify-between border-t border-slate-100 pt-4">
                                     <div className="text-xs font-semibold text-slate-500">
                                         <div className="flex items-center gap-1">
                                             <Clock className="w-3 h-3" />
-                                            {new Date(event.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                            {new Date(event.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                         </div>
                                         <div className="text-[10px] opacity-70">
-                                            {new Date(event.date).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}
+                                            {new Date(event.startTime).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}
                                         </div>
                                     </div>
-                                    <span className="text-2xl font-black text-slate-900">{event.price}</span>
+                                    <span className="text-2xl font-black text-slate-900">Free</span>
                                 </div>
                             </div>
                         </Link>
@@ -128,4 +132,4 @@ export const MonthOverview = () => {
             </div>
         </section>
     );
-}
+};
