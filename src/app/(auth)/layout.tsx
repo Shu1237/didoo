@@ -13,7 +13,6 @@ export default function AuthLayout({
 }) {
   const router = useRouter();
   const user = useSessionStore((state) => state.user);
-  console.log(user);
   const roleRedirects: Record<Roles, string> = {
     [Roles.ADMIN]: "/admin",
     [Roles.USER]: "/home",

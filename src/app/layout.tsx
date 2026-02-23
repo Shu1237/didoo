@@ -6,6 +6,8 @@ import QueryClientProviderWrapper from "@/components/QueryClientProviderWrapper"
 import { cookies } from "next/headers";
 import { AuthProvider } from "@/contexts/authContext";
 import { Toaster } from "sonner";
+import { GoogleOAuthProvider } from "@react-oauth/google";
+import envconfig from "../../config";
 
 
 const inter = Inter({
@@ -41,19 +43,21 @@ export default async function RootLayout({
       <body
         className={`${inter.variable} ${plusJakarta.variable} antialiased`}
       >
-        <AuthProvider initialAccessToken={accessToken?.value || null} initialRefreshToken={refreshToken?.value || null}>
-          <QueryClientProviderWrapper>
-            <ThemeProvider
-              attribute="class"
-              defaultTheme="system"
-              enableSystem
-              disableTransitionOnChange
-            >
-              {children}
-              <Toaster richColors position="top-center" />
-            </ThemeProvider>
-          </QueryClientProviderWrapper>
-        </AuthProvider>
+        <GoogleOAuthProvider clientId={envconfig.NEXT_PUBLIC_GOOGLE_API_KEY}>
+          <AuthProvider initialAccessToken={accessToken?.value || null} initialRefreshToken={refreshToken?.value || null}>
+            <QueryClientProviderWrapper>
+              <ThemeProvider
+                attribute="class"
+                defaultTheme="system"
+                enableSystem
+                disableTransitionOnChange
+              >
+                {children}
+                <Toaster richColors position="top-center" />
+              </ThemeProvider>
+            </QueryClientProviderWrapper>
+          </AuthProvider>
+        </GoogleOAuthProvider>
       </body>
     </html>
   );
