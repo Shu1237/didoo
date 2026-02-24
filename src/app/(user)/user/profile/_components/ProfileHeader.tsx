@@ -3,11 +3,16 @@
 import { useGetMe } from "@/hooks/useUser";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
-import { Mail, Shield, User as UserIcon, Settings } from "lucide-react";
+import { Mail, Shield, User as UserIcon, Settings, Rocket } from "lucide-react";
+import { useState } from "react";
+import { Dialog, DialogContent, DialogTrigger, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import BecomeOrganizerForm from "./BecomeOrganizerForm";
+import { Roles } from "@/utils/enum";
 
 export default function ProfileSidebar() {
   const { data: userData } = useGetMe();
   const user = userData?.data;
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const initials = user?.fullName
     ? user.fullName.substring(0, 2).toUpperCase()
@@ -64,6 +69,22 @@ export default function ProfileSidebar() {
           <Shield className="w-4 h-4 text-slate-300" />
           Quyền riêng tư
         </button>
+
+        {user?.role?.id === Roles.USER && (
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
+              <button className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[13px] font-bold text-orange-500 hover:bg-orange-50 transition-all border border-transparent hover:border-orange-100 mt-2">
+                <Rocket className="w-4 h-4" />
+                Trở thành Organizer
+              </button>
+            </DialogTrigger>
+            <DialogContent className="max-w-3xl p-0 bg-transparent border-none shadow-none overflow-hidden rounded-[32px]">
+              <DialogTitle className="sr-only">Đăng ký trở thành Organizer</DialogTitle>
+              <DialogDescription className="sr-only">Điền thông tin để đăng ký tài khoản tổ chức sự kiện.</DialogDescription>
+              <BecomeOrganizerForm onSuccess={() => setIsDialogOpen(false)} />
+            </DialogContent>
+          </Dialog>
+        )}
       </div>
     </div>
   );

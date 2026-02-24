@@ -19,9 +19,9 @@ import { RegisterInput, registerSchema } from '@/schemas/auth';
 import { useState } from 'react';
 import { handleErrorApi } from '@/lib/errors';
 import { toast } from 'sonner';
-import { useGoogleLogin } from '@react-oauth/google';
+import { GoogleLogin } from '@react-oauth/google';
 
-type FormValues = RegisterInput & { otp?: string };
+type FormValues = RegisterInput & { otp?: string; avatarUrl?: string };
 
 
 
@@ -52,6 +52,7 @@ export default function RegisterForm() {
       password: '',
       confirmPassword: '',
       otp: '',
+      avatarUrl: 'string',
     },
     mode: 'onChange'
   });
@@ -107,25 +108,6 @@ export default function RegisterForm() {
     }
   };
 
-  const loginGoogleCus = useGoogleLogin({
-    onSuccess: async (tokenResponse) => {
-      if (loginGoogle.isPending) return;
-      setError(null);
-      try {
-        await loginGoogle.mutateAsync({
-          googleToken: tokenResponse.access_token,
-          location: { latitude: 0, longitude: 0 } // Default for register
-        });
-      } catch (err: any) {
-        handleErrorApi({ error: err });
-        setError(err?.message || "Đăng nhập Google thất bại.");
-      }
-    },
-    onError: () => {
-      setError("Đăng nhập Google thất bại.");
-      toast.error("Google Login failed");
-    }
-  });
 
   return (
     <motion.div
@@ -251,10 +233,24 @@ export default function RegisterForm() {
                   {errors.password && (
                     <p className="text-[10px] text-red-500 ml-2 mt-0.5 whitespace-pre-line leading-relaxed">{errors.password.message}</p>
                   )}
+                  {/* Password Requirements */}
+                  {currentPassword && (
+                    <div className="mt-1 ml-2 space-y-0.5">
+                      <p className={`text-[10px] flex items-center gap-1 ${currentPassword.length >= 8 ? 'text-green-400' : 'text-white/40'}`}>
+                        <div className={`w-1 h-1 rounded-full ${currentPassword.length >= 8 ? 'bg-green-400' : 'bg-white/40'}`} /> Min 8 characters
+                      </p>
+                      <p className={`text-[10px] flex items-center gap-1 ${/[A-Z]/.test(currentPassword) ? 'text-green-400' : 'text-white/40'}`}>
+                        <div className={`w-1 h-1 rounded-full ${/[A-Z]/.test(currentPassword) ? 'bg-green-400' : 'bg-white/40'}`} /> One uppercase letter
+                      </p>
+                      <p className={`text-[10px] flex items-center gap-1 ${/[!@#$%^&*(),.?":{}|<>]/.test(currentPassword) ? 'text-green-400' : 'text-white/40'}`}>
+                        <div className={`w-1 h-1 rounded-full ${/[!@#$%^&*(),.?":{}|<>]/.test(currentPassword) ? 'bg-green-400' : 'bg-white/40'}`} /> One special character
+                      </p>
+                    </div>
+                  )}
                 </div>
 
                 <AnimatePresence>
-                  {isPasswordSecure && (
+                  {currentPassword.length > 0 && (
                     <motion.div
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: 'auto' }}
@@ -286,7 +282,7 @@ export default function RegisterForm() {
 
                 <button
                   type="submit"
-                  disabled={register.isPending || (step === 1 && !isValid)}
+                  disabled={register.isPending}
                   className="w-full h-12 mt-2 bg-[#FF9B8A] text-white font-bold rounded-full py-2 shadow-lg shadow-[#FF9B8A]/20 hover:bg-[#FF8A75] transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   {register.isPending ? (
@@ -358,7 +354,32 @@ export default function RegisterForm() {
 
         <div className="mt-6 flex flex-col items-center gap-2">
           <div className="flex justify-center">
-            <SocialIcon icon="google" onClick={() => loginGoogleCus()} />
+            <GoogleLogin
+              onSuccess={async (credentialResponse) => {
+                if (loginGoogle.isPending) return;
+                const googleToken = credentialResponse.credential;
+                if (!googleToken) {
+                  setError("Không nhận được token từ Google");
+                  return;
+                }
+                try {
+                  await loginGoogle.mutateAsync({
+                    GoogleToken: googleToken,
+                    Location: { latitude: 0, longitude: 0, address: '' }
+                  });
+                } catch (err: any) {
+                  handleErrorApi({ error: err });
+                  setError(err?.message || "Đăng nhập Google thất bại.");
+                }
+              }}
+              onError={() => {
+                setError("Đăng nhập Google thất bại.");
+                toast.error("Google Login failed");
+              }}
+              type="icon"
+              shape="circle"
+              theme="outline"
+            />
           </div>
         </div>
 
@@ -377,9 +398,8 @@ export default function RegisterForm() {
           style={maskStyle}
         >
           <div className="relative z-10 space-y-10">
-            <h2 className="text-[52px] font-bold text-white leading-[1.1]">What our explorers said</h2>
-            <div className="text-4xl text-white/20 font-serif italic">&quot;</div>
-            <p className="text-xl text-white/60 italic font-light max-w-sm leading-relaxed">Search and find your favorite events is now easier than ever. Just browse events and book tickets when you need to.</p>
+            <h2 className="text-[52px] font-bold text-white leading-[1.1]">Join our explorers</h2>
+            <p className="text-xl text-white/60 font-light max-w-sm leading-relaxed">Discover and book your favorite events with ease. Start your journey with DiDoo today.</p>
 
           </div>
 

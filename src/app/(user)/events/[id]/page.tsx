@@ -1,6 +1,7 @@
 'use client';
 
 import { useGetEvent, useGetEvents } from "@/hooks/useEvent";
+import { useGetTicketTypes } from "@/hooks/useTicketType";
 import HeroSection from "./_components/HeroSection";
 import EventInfor from "./_components/EventInfor";
 import EventLocation from "./_components/EventLocation";
@@ -15,12 +16,14 @@ export default function DetailEventPage({ params }: { params: Promise<{ id: stri
   const { data: detailEventResponse, isLoading: isLoadingDetail } = useGetEvent(id);
   const detailEvent = detailEventResponse?.data;
 
-  const { data: relatedEventsResponse, isLoading: isLoadingRelated } = useGetEvents({
+  const { data: relatedEventsResponse } = useGetEvents({
     categoryId: detailEvent?.category?.id,
     pageSize: 4,
   });
-
   const eventRelated = (relatedEventsResponse?.data.items || []).filter(e => e.id !== id);
+
+  const { data: ticketTypesResponse } = useGetTicketTypes({ eventId: id });
+  const ticketTypes = ticketTypesResponse?.data.items || [];
 
   if (isLoadingDetail) return <Loading />;
 
@@ -37,7 +40,7 @@ export default function DetailEventPage({ params }: { params: Promise<{ id: stri
       <ImmersiveBackground />
 
       <div className="relative z-10">
-        <HeroSection event={detailEvent} />
+        <HeroSection event={detailEvent} ticketTypes={ticketTypes} />
 
         <div className="max-w-[1920px] mx-auto px-6 md:px-12 space-y-32 pb-32">
           <EventInfor event={detailEvent} />

@@ -7,6 +7,8 @@ import { cn } from "@/lib/utils";
 import { LayoutDashboard, Menu, X, Users, Building2, Calendar, DollarSign } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
+import { useSessionStore } from "@/stores/sesionStore";
+import { authRequest } from "@/apiRequest/auth";
 
 const navItems = [
   {
@@ -39,6 +41,7 @@ const navItems = [
 export default function AdminSidebar() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(true);
+  const user = useSessionStore((state) => state.user);
 
   return (
     <aside
@@ -155,14 +158,21 @@ export default function AdminSidebar() {
             )}
           </AnimatePresence> */}
 
-          <div className={cn("flex items-center bg-zinc-900 rounded-[35px] border border-white/5 mx-2 transition-all overflow-hidden", isOpen ? "p-3 gap-3" : "p-2 justify-center w-12 h-12 mx-auto rounded-full")}>
+          <div className={cn(
+            "flex items-center bg-zinc-900 rounded-[35px] border border-white/5 mx-2 transition-all overflow-hidden w-[calc(100%-16px)]",
+            isOpen ? "p-3 gap-3" : "p-2 justify-center w-12 h-12 mx-auto rounded-full"
+          )}>
             <div className="w-9 h-9 rounded-full overflow-hidden shrink-0 border border-white/10">
-              <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Robert" alt="avatar" className="w-full h-full object-cover" />
+              <img
+                src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.FullName || "Admin"}`}
+                alt="avatar"
+                className="w-full h-full object-cover"
+              />
             </div>
             {isOpen && (
               <div className="flex-1 min-w-0 animate-in fade-in duration-500">
-                <p className="text-sm font-bold text-white truncate leading-none">Robert Doe</p>
-                <p className="text-[10px] text-zinc-500 truncate mt-1">rob.doe@brisk.com</p>
+                <p className="text-sm font-bold text-white truncate leading-none">{user?.FullName || "Admin"}</p>
+                <p className="text-[10px] text-zinc-500 truncate mt-1">{user?.Email || "admin@example.com"}</p>
               </div>
             )}
           </div>

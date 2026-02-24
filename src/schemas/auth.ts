@@ -3,6 +3,7 @@ import { z } from "zod";
 export const locationSchema = z.object({
     latitude: z.number(),
     longitude: z.number(),
+    address: z.string().optional().default(""),
 });
 
 export const loginSchema = z.object({
@@ -12,8 +13,8 @@ export const loginSchema = z.object({
 });
 
 export const loginGoogleSchema = z.object({
-    googleToken: z.string(),
-    location: locationSchema,
+    GoogleToken: z.string(),
+    Location: locationSchema,
 });
 
 export const registerSchema = z.object({

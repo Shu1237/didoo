@@ -1,6 +1,7 @@
 'use client';
 
 import { useGetEvents } from "@/hooks/useEvent";
+import { useGetCategories } from "@/hooks/useCategory";
 import SearchFilter from "../home/_components/SearchFilter";
 import EventsHero from "./_components/EventsHero";
 import EventsGrid from "./_components/EventsGrid";
@@ -12,14 +13,16 @@ import Link from "next/link";
 import Loading from "@/components/loading";
 
 export default function EventsPage() {
-    const { data: eventsResponse, isLoading } = useGetEvents({
-        pageSize: 20,
-        isDescending: true,
+    const { data: eventsResponse, isLoading: isEventsLoading } = useGetEvents({
+        PageSize: 20,
+        IsDescending: true,
     });
+    const { data: categoriesResponse, isLoading: isCategoriesLoading } = useGetCategories();
 
-    if (isLoading) return <Loading />;
+    if (isEventsLoading || isCategoriesLoading) return <Loading />;
 
     const events = eventsResponse?.data.items || [];
+    const allCategories = categoriesResponse?.data.items || [];
 
     // categorizing events for display
     const featuredEvent = events[0]; // The main highlight
@@ -27,7 +30,7 @@ export default function EventsPage() {
     const upcomingEvents = [...events].sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime()).slice(0, 4);
     const musicEvents = events.filter(e => e.category?.name === 'Music' || e.category?.name === 'Âm nhạc').slice(0, 4);
 
-    const categories = [
+    const staticCategories = [
         { name: "Tất cả", icon: <LayoutGrid className="w-4 h-4" /> },
         { name: "Âm nhạc", icon: <Music className="w-4 h-4" /> },
         { name: "Workshop", icon: <Zap className="w-4 h-4" /> },
@@ -106,7 +109,7 @@ export default function EventsPage() {
                     className="relative z-20 -mt-10 mb-20"
                 >
                     <div className="max-w-[1920px] mx-auto px-6 md:px-12">
-                        <SearchFilter />
+                        <SearchFilter categories={allCategories} />
                     </div>
                 </motion.div>
 
@@ -179,7 +182,7 @@ export default function EventsPage() {
                 {/* Premium Floating Category Navigation */}
                 <div className="sticky top-8 z-50 flex justify-center mb-32 px-4 pointer-events-none">
                     <div className="bg-black/40 backdrop-blur-[30px] border border-white/10 p-2 rounded-[40px] flex flex-wrap justify-center gap-2 shadow-[0_20px_50px_-10px_rgba(0,0,0,0.5)] pointer-events-auto">
-                        {categories.map((cat, idx) => (
+                        {staticCategories.map((cat, idx) => (
                             <Button
                                 key={idx}
                                 variant="ghost"

@@ -13,6 +13,8 @@ export const eventReviewRequest = {
         http.post<EventReview>(ENDPOINT_CLIENT.EVENT_REVIEWS, body),
     update: (id: string, body: EventReviewUpdateBody) =>
         http.put<Partial<EventReview>>(ENDPOINT_CLIENT.EVENT_REVIEW_DETAIL(id), body),
+    updatePartial: (id: string, body: EventReviewUpdateBody) =>
+        http.patch<Partial<EventReview>>(ENDPOINT_CLIENT.EVENT_REVIEW_DETAIL(id), body),
     delete: (id: string) =>
         http.delete<null>(ENDPOINT_CLIENT.EVENT_REVIEW_DETAIL(id)),
     restore: (id: string) =>

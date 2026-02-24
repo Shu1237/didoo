@@ -1,12 +1,8 @@
 import { z } from "zod";
 
 export const favoriteCreateSchema = z.object({
-    userId: z.uuid(),
-    eventId: z.uuid(),
+    UserId: z.string().uuid(),
+    EventId: z.string().uuid(),
 });
 
-
 export type FavoriteCreateBody = z.input<typeof favoriteCreateSchema>;
-
-
-

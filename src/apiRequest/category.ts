@@ -13,6 +13,8 @@ export const categoryRequest = {
         http.post<Category>(ENDPOINT_CLIENT.CATEGORIES, body),
     update: (id: string, body: CategoryUpdateBody) =>
         http.put<Partial<Category>>(ENDPOINT_CLIENT.CATEGORY_DETAIL(id), body),
+    updatePartial: (id: string, body: CategoryUpdateBody) =>
+        http.patch<Partial<Category>>(ENDPOINT_CLIENT.CATEGORY_DETAIL(id), body),
     delete: (id: string) =>
         http.delete<null>(ENDPOINT_CLIENT.CATEGORY_DETAIL(id)),
     restore: (id: string) =>

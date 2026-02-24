@@ -41,14 +41,14 @@ export const MonthOverview = ({ events }: MonthOverviewProps) => {
                         <div>
                             <div className="flex justify-between items-start mb-4">
                                 <h3 className="text-3xl font-bold text-slate-900 leading-tight max-w-[80%]">
-                                    Explore Events <br /> Around the World
+                                    Explore Events <br /> with Didoo
                                 </h3>
                                 <button className="w-12 h-12 bg-white rounded-full flex items-center justify-center shrink-0 hover:scale-110 transition-transform shadow-sm">
                                     <ArrowUpRight className="w-5 h-5 text-slate-900" />
                                 </button>
                             </div>
                             <p className="text-slate-700 font-medium max-w-xs leading-relaxed">
-                                Global adventure and explore a diverse array of events happening around the world.
+                                Discover a diverse array of events happening around you.
                             </p>
                         </div>
 
@@ -93,7 +93,7 @@ export const MonthOverview = ({ events }: MonthOverviewProps) => {
                                             {new Date(event.startTime).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}
                                         </div>
                                     </div>
-                                    <span className="text-2xl font-black text-slate-900">Free</span>
+                                    <span className="text-xs font-bold px-3 py-1 bg-zinc-100 rounded-full text-zinc-600 uppercase">Details</span>
                                 </div>
                             </div>
                         </Link>
@@ -107,7 +107,7 @@ export const MonthOverview = ({ events }: MonthOverviewProps) => {
                         <div>
                             <div className="flex justify-between items-start mb-4">
                                 <h3 className="text-3xl font-bold text-slate-900 leading-tight max-w-[80%]">
-                                    Local Events Taking <br /> Place Near You
+                                    Local Events <br /> Near You
                                 </h3>
                                 <button className="w-12 h-12 bg-white rounded-full flex items-center justify-center shrink-0 hover:scale-110 transition-transform shadow-sm">
                                     <ArrowUpRight className="w-5 h-5 text-slate-900" />

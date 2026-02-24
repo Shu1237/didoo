@@ -114,13 +114,13 @@ export default function OrganizerSidebar() {
         <div className="mt-auto pt-6">
           <div className={cn("flex items-center bg-zinc-900 rounded-[35px] border border-white/5 mx-2 transition-all overflow-hidden", isOpen ? "p-3 gap-3" : "p-2 justify-center w-12 h-12 mx-auto rounded-full")}>
             <div className="w-9 h-9 rounded-full overflow-hidden shrink-0 border border-white/10 flex items-center justify-center bg-zinc-800">
-              {/* <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.name || "Organizer"}`} alt="avatar" className="w-full h-full object-cover" /> */}
-              <span className="text-[10px] font-bold text-white">{user?.name?.[0] || "O"}</span>
+              {/* <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.FullName || "Organizer"}`} alt="avatar" className="w-full h-full object-cover" /> */}
+              <span className="text-[10px] font-bold text-white">{user?.FullName?.[0] || "O"}</span>
             </div>
             {isOpen && (
               <div className="flex-1 min-w-0 animate-in fade-in duration-500">
-                <p className="text-sm font-bold text-white truncate leading-none">{user?.name || "Organizer"}</p>
-                <p className="text-[10px] text-zinc-500 truncate mt-1">{user?.email || "organizer@didoo.com"}</p>
+                <p className="text-sm font-bold text-white truncate leading-none">{user?.FullName || "Organizer"}</p>
+                <p className="text-[10px] text-zinc-500 truncate mt-1">{user?.Email || "organizer@didoo.com"}</p>
               </div>
             )}
           </div>

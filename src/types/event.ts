@@ -1,3 +1,4 @@
+import { EventStatus } from "@/utils/enum";
 import { BasePaginationQuery } from "./base";
 import { Category } from "./category";
 import { Organizer } from "./organizer";
@@ -10,14 +11,14 @@ export interface EventGetListQuery extends BasePaginationQuery {
     tags?: string; // Comma separated or single tag
     startTime?: string;
     endTime?: string;
-    status?: string;
+    status?: EventStatus;
     categoryId?: string;
     organizerId?: string;
     ageRestriction?: number;
 }
 
 export interface EventTag {
-    name: string;
+    tagName: string;
 }
 
 export interface EventLocation {
@@ -39,11 +40,16 @@ export interface Event {
     endTime: string;
     openTime?: string;
     closedTime?: string;
-    status: string;
+    status: EventStatus;
     thumbnailUrl?: string;
     bannerUrl?: string;
     ageRestriction: number;
+    sold?: number;
+    total?: number;
     category?: Category;
     organizer?: Organizer;
     locations?: EventLocation[];
+    createdAt?: string;
+    updatedAt?: string;
+    isDeleted?: boolean;
 }

@@ -3,27 +3,46 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Check, X, Search, Filter, ChevronRight } from "lucide-react";
+import { Check, X, Search, Filter, ChevronRight, Loader2 } from "lucide-react";
 import Link from "next/link";
-
-// 1. Đảm bảo mảng dữ liệu này nằm TRƯỚC hàm Export
-const pendingOrganizers = [
-    { id: 1, name: "Starlight Events", date: "22/07/2024, 16:43", status: "Đã thu", amount: "+ 5.000.000 đ" },
-    { id: 2, name: "Mega Show Corp", date: "21/07/2024, 12:22", status: "Chờ xử lý", amount: "- 500.000 đ" },
-    { id: 3, name: "Indie Music VN", date: "21/07/2024, 11:38", status: "Thanh toán", amount: "- 600.000 đ" },
-    { id: 4, name: "Tech Startup", date: "21/07/2024, 10:22", status: "Đã thu", amount: "+ 10.000.000 đ" },
-    { id: 5, name: "Art Gallery", date: "20/07/2024, 16:43", status: "Đã thu", amount: "+ 2.500.000 đ" },
-    { id: 6, name: "Music Fest", date: "20/07/2024, 18:43", status: "Đã chi", amount: "- 1.500.000 đ" },
-];
+import { useGetOrganizers, useOrganizer } from "@/hooks/useOrganizer";
+import { OrganizerStatus } from "@/utils/enum";
+import { toast } from "sonner";
+import Loading from "@/components/loading";
 
 export default function PendingApprovalsWidget() {
+    const { data: organizersRes, isLoading } = useGetOrganizers({
+        Status: OrganizerStatus.PENDING,
+        PageSize: 10,
+    });
+    const { update } = useOrganizer();
+
+    const organizers = organizersRes?.data?.items || [];
+
+    const handleAction = async (org: any, status: OrganizerStatus) => {
+        const actionName = status === OrganizerStatus.ACTIVE ? "Phê duyệt" : "Từ chối";
+        let message = `Bạn có chắc chắn muốn ${actionName.toLowerCase()} organizer "${org.name}" không?`;
+
+        if (status === OrganizerStatus.ACTIVE && !org.isVerified) {
+            message += "\n\nCẢNH BÁO: Organizer này CHƯA được verify danh tính!";
+        }
+
+        if (!window.confirm(message)) return;
+
+        try {
+            await update.mutateAsync({ id: org.id, body: { Status: status } as any });
+            toast.success(status === OrganizerStatus.ACTIVE ? "Đã phê duyệt!" : "Đã từ chối!");
+        } catch (err) { }
+    };
+
+    if (isLoading) return <Loading />;
+
     return (
         <Card className="p-6 bg-white border-none shadow-sm rounded-[32px] flex flex-col h-full min-h-0 overflow-hidden">
-            {/* Header - shrink-0 giữ cố định */}
             <div className="flex items-center justify-between mb-6 shrink-0">
                 <div>
-                    <h3 className="font-bold text-xl text-zinc-900">Phê duyệt</h3>
-                    <p className="text-sm text-zinc-500 mt-0.5">Danh sách các yêu cầu đang chờ</p>
+                    <h3 className="font-bold text-xl text-zinc-900 tracking-tight">Phê duyệt</h3>
+                    <p className="text-sm text-zinc-500 mt-0.5 font-semibold">Danh sách các yêu cầu đang chờ</p>
                 </div>
                 <div className="flex gap-2">
                     <Button size="icon" variant="ghost" className="rounded-full h-9 w-9 hover:bg-zinc-100">
@@ -35,65 +54,65 @@ export default function PendingApprovalsWidget() {
                 </div>
             </div>
 
-            {/* Table Header - shrink-0 giữ cố định */}
-            <div className="grid grid-cols-12 gap-4 px-4 py-3 text-xs font-semibold text-zinc-400 border-b border-zinc-50 shrink-0">
-                <div className="col-span-4">Tên</div>
-                <div className="col-span-4 text-center lg:text-left">Thời gian</div>
-                <div className="col-span-2">Trạng thái</div>
-                <div className="col-span-2 text-right">Số tiền</div>
+            <div className="grid grid-cols-12 gap-4 px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-zinc-400 border-b border-zinc-50 shrink-0">
+                <div className="col-span-5">Tên tổ chức</div>
+                <div className="col-span-4">Thời gian đăng ký</div>
+                <div className="col-span-3 text-right">Thao tác</div>
             </div>
 
-            {/* Scrollable Area - flex-1 để chiếm diện tích còn lại và tự cuộn */}
-            <div className="flex-1 overflow-y-auto min-h-0 mt-2 pr-1 space-y-1 scrollbar-hide">
-                {pendingOrganizers.map((org) => (
-                    <div key={org.id} className="grid grid-cols-12 gap-4 items-center px-4 py-3 hover:bg-zinc-50 rounded-2xl transition-all group">
-                        <div className="col-span-4 flex items-center gap-3 min-w-0">
-                            <Avatar className="w-9 h-9 border border-zinc-100 shrink-0">
-                                <AvatarImage src={`https://api.dicebear.com/7.x/initials/svg?seed=${org.name}`} />
-                                <AvatarFallback>{org.name[0]}</AvatarFallback>
-                            </Avatar>
-                            <div className="min-w-0">
-                                <h4 className="font-bold text-sm text-zinc-900 truncate">{org.name}</h4>
-                                <p className="text-[10px] text-zinc-400 truncate">#{1000 + org.id}</p>
-                            </div>
-                        </div>
-
-                        <div className="col-span-4 text-[11px] font-medium text-zinc-500 truncate">
-                            {org.date}
-                        </div>
-
-                        <div className="col-span-2">
-                            <div className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${org.status === 'Đã thu' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' :
-                                org.status === 'Đã chi' ? 'bg-indigo-50 text-indigo-600 border-indigo-100' :
-                                    'bg-rose-50 text-rose-600 border-rose-100'
-                                }`}>
-                                <div className={`w-1.5 h-1.5 rounded-full ${org.status === 'Đã thu' ? 'bg-emerald-500' :
-                                    org.status === 'Đã chi' ? 'bg-indigo-500' : 'bg-rose-500'
-                                    }`} />
-                                <span className="hidden sm:inline">{org.status}</span>
-                            </div>
-                        </div>
-
-                        <div className="col-span-2 flex items-center justify-end gap-2 text-right">
-                            <span className="text-sm font-bold text-zinc-900 group-hover:hidden block transition-all">{org.amount}</span>
-                            <div className="hidden group-hover:flex gap-1 animate-in fade-in slide-in-from-right-2 duration-200">
-                                <Button size="icon" className="w-7 h-7 rounded-full bg-zinc-900 text-white hover:bg-black">
-                                    <Check className="w-3 h-3" />
-                                </Button>
-                                <Button size="icon" variant="outline" className="w-7 h-7 rounded-full border-zinc-200 text-zinc-400 hover:text-rose-600 hover:bg-rose-50">
-                                    <X className="w-3 h-3" />
-                                </Button>
-                            </div>
-                        </div>
+            <div className="flex-1 overflow-y-auto min-h-0 mt-2 pr-1 space-y-1 scrollbar-thin">
+                {organizers.length === 0 ? (
+                    <div className="h-full flex flex-col items-center justify-center p-8 text-zinc-400 font-bold italic text-sm">
+                        Không có yêu cầu nào đang chờ
                     </div>
-                ))}
+                ) : (
+                    organizers.map((org) => (
+                        <div key={org.id} className="grid grid-cols-12 gap-4 items-center px-4 py-3 hover:bg-zinc-50 rounded-2xl transition-all group">
+                            <div className="col-span-5 flex items-center gap-3 min-w-0">
+                                <Avatar className="w-10 h-10 border border-zinc-100 shrink-0">
+                                    <AvatarImage src={org.logoUrl || `https://api.dicebear.com/7.x/initials/svg?seed=${org.name}`} />
+                                    <AvatarFallback>{org.name[0]}</AvatarFallback>
+                                </Avatar>
+                                <div className="min-w-0">
+                                    <h4 className="font-bold text-sm text-zinc-900 truncate tracking-tight">{org.name}</h4>
+                                    <p className="text-[10px] text-zinc-400 truncate font-bold uppercase tracking-wider">{org.email}</p>
+                                </div>
+                            </div>
+
+                            <div className="col-span-4 text-[11px] font-bold text-zinc-500 truncate">
+                                {org.createdAt ? new Date(org.createdAt).toLocaleDateString("vi-VN", { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : "N/A"}
+                            </div>
+
+                            <div className="col-span-3 flex items-center justify-end gap-2 text-right">
+                                <div className="flex gap-2">
+                                    <Button
+                                        onClick={() => handleAction(org, OrganizerStatus.ACTIVE)}
+                                        disabled={update.isPending}
+                                        size="icon"
+                                        className="w-8 h-8 rounded-full bg-zinc-900 text-white hover:bg-primary shadow-lg shadow-zinc-200 transition-all active:scale-90"
+                                    >
+                                        {update.isPending ? <Loader2 className="w-3 h-3 animate-spin" /> : <Check className="w-4 h-4" />}
+                                    </Button>
+                                    <Button
+                                        onClick={() => handleAction(org, OrganizerStatus.REJECTED)}
+                                        disabled={update.isPending}
+                                        size="icon"
+                                        variant="outline"
+                                        className="w-8 h-8 rounded-full border-zinc-200 text-zinc-400 hover:text-rose-600 hover:bg-rose-50 transition-all active:scale-90"
+                                    >
+                                        <X className="w-4 h-4" />
+                                    </Button>
+                                </div>
+                            </div>
+                        </div>
+                    ))
+                )}
             </div>
 
-            {/* Footer: Nút xem thêm cố định dưới đáy */}
             <div className="pt-4 mt-2 border-t border-zinc-50 shrink-0">
                 <Button
                     variant="ghost"
-                    className="w-full justify-center gap-2 text-zinc-500 hover:text-zinc-900 hover:bg-zinc-50 rounded-xl font-semibold text-sm h-11 transition-all"
+                    className="w-full justify-center gap-2 text-zinc-500 hover:text-zinc-900 hover:bg-zinc-50 rounded-xl font-bold uppercase tracking-widest text-[10px] h-12 transition-all"
                     asChild
                 >
                     <Link href="/admin/organizers">

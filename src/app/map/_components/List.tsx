@@ -4,7 +4,7 @@ import React from 'react';
 import DetailPlace from './DetailPlace';
 import { motion } from 'framer-motion';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Event } from "../../../types/base";
+import { Event } from '@/types/event';
 import { BasePagination } from "@/components/layout/basePagination";
 
 interface ListProps {

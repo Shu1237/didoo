@@ -9,12 +9,13 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { loginSchema, LoginInput } from '@/schemas/auth';
 import { useAuth } from '@/hooks/useAuth';
+import { useAuthContext } from '@/contexts/authContext';
+import { GoogleLogin } from '@react-oauth/google';
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { handleErrorApi } from '@/lib/errors';
 import { toast } from 'sonner';
 // Sử dụng GoogleLogin để lấy ID Token (JWT) chuẩn xác
-import { GoogleLogin } from '@react-oauth/google';
 
 export default function LoginForm() {
   const maskStyle = {
@@ -23,24 +24,26 @@ export default function LoginForm() {
   };
 
   const { login, loginGoogle } = useAuth();
+  const { setTokenFromContext } = useAuthContext();
   const searchParams = useSearchParams();
   const resetSuccess = searchParams.get('reset') === 'success';
   const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
 
+
   const {
     register,
     handleSubmit,
     setValue,
-    watch,
+    getValues,
     setError: setErrorForm,
     formState: { errors },
   } = useForm<LoginInput>({
-    resolver: zodResolver(loginSchema),
+    resolver: zodResolver(loginSchema) as any,
     defaultValues: {
       email: '',
       password: '',
-      location: { latitude: 0, longitude: 0 }
+      location: { latitude: 0, longitude: 0, address: '' }
     },
   });
 
@@ -52,9 +55,10 @@ export default function LoginForm() {
           setValue("location", {
             latitude: position.coords.latitude,
             longitude: position.coords.longitude,
+            address: '',
           });
         },
-        () => setValue("location", { latitude: 0, longitude: 0 })
+        () => setValue("location", { latitude: 0, longitude: 0, address: '' })
       );
     }
   }, [setValue]);
@@ -71,21 +75,6 @@ export default function LoginForm() {
     }
   };
 
-  // Xử lý Login Google (Nhận JWT từ credential)
-  const handleGoogleSuccess = async (credentialResponse: any) => {
-    if (loginGoogle.isPending) return;
-    setError(null);
-    try {
-      // credentialResponse.credential là chuỗi JWT bắt đầu bằng "eyJ..."
-      await loginGoogle.mutateAsync({
-        googleToken: credentialResponse.credential,
-        location: watch("location")
-      });
-    } catch (err: any) {
-      handleErrorApi({ error: err });
-      setError(err?.message || "Đăng nhập Google thất bại.");
-    }
-  };
 
   return (
     <motion.div
@@ -146,18 +135,37 @@ export default function LoginForm() {
           </button>
         </form>
 
-        {/* NÚT ĐĂNG NHẬP GOOGLE */}
-        <div className="mt-6 flex flex-col items-center gap-4">
-          <div className="flex justify-center w-full">
-            <GoogleLogin
-              onSuccess={handleGoogleSuccess}
-              onError={() => toast.error("Google Login failed")}
-              useOneTap
-              theme="outline"
-              shape="circle"
-              size="large"
-              width="320"
-            />
+        <div className="mt-8 flex flex-col items-center gap-3">
+          <div className="flex justify-center items-center gap-5">
+            <div className="bg-white rounded-full overflow-hidden w-14 h-14 flex items-center justify-center hover:scale-110 transition-all shadow-xl shadow-black/10">
+              <GoogleLogin
+                onSuccess={async (credentialResponse) => {
+                  if (loginGoogle.isPending) return;
+                  const googleToken = credentialResponse.credential;
+                  if (!googleToken) {
+                    toast.error("Không nhận được token từ Google");
+                    return;
+                  }
+                  try {
+                    const result = await loginGoogle.mutateAsync({
+                      GoogleToken: googleToken,
+                      Location: getValues('location')
+                    });
+                    if (result?.accessToken && result?.refreshToken) {
+                      setTokenFromContext(result.accessToken, result.refreshToken);
+                    }
+                  } catch (err: any) {
+                    console.error("Login BE error:", err);
+                  }
+                }}
+                onError={() => {
+                  toast.error("Đăng nhập Google thất bại");
+                }}
+                type="icon"
+                shape="circle"
+                theme="outline"
+              />
+            </div>
           </div>
         </div>
 
@@ -176,13 +184,43 @@ export default function LoginForm() {
           style={maskStyle}
         >
           <div className="relative z-10 space-y-10">
-            <h2 className="text-[52px] font-bold text-white leading-[1.1]">What our explorers said</h2>
-            <p className="text-xl text-white/60 italic font-light max-w-sm leading-relaxed">
-              Search and find your favorite events is now easier than ever. Just browse events and book tickets when you need to.
+            <h2 className="text-[52px] font-bold text-white leading-[1.1]">Join our explorers</h2>
+            <p className="text-xl text-white/60 font-light max-w-sm leading-relaxed">
+              Discover and book your favorite events with ease. Start your journey with DiDoo today.
             </p>
           </div>
         </div>
       </div>
     </motion.div>
+  );
+}
+
+function SocialIcon({
+  icon,
+  onClick,
+  disabled,
+  loading
+}: {
+  icon: string;
+  onClick?: () => void;
+  disabled?: boolean;
+  loading?: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      className="w-14 h-14 rounded-full bg-white flex items-center justify-center hover:scale-110 active:scale-95 transition-all shadow-xl shadow-black/10 disabled:opacity-50 disabled:cursor-not-allowed"
+    >
+      {loading ? (
+        <div className="w-6 h-6 border-2 border-gray-300 border-t-[#FF9B8A] rounded-full animate-spin"></div>
+      ) : (
+        <>
+          {icon === 'google' && <Image src="https://www.svgrepo.com/show/475656/google-color.svg" width={28} height={28} alt="G" />}
+          {/* {icon === 'facebook' && <Facebook className="w-7 h-7 text-[#1877F2] fill-current" />} */}
+        </>
+      )}
+    </button>
   );
 }

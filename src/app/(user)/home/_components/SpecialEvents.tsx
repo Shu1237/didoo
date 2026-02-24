@@ -23,8 +23,8 @@ export const SpecialEvents = ({ events }: SpecialEventsProps) => {
                 className="mb-12"
             >
                 <h2 className="text-4xl md:text-5xl font-black text-slate-900 uppercase leading-tight mb-4">
-                    DAYS TO UP LEVEL & FALL BACK <br />
-                    IN LOVE WITH DESIGN
+                    Discover Special <br />
+                    Events for You
                 </h2>
             </motion.div>
 

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Calendar, MapPin } from "lucide-react";
 import Image from "next/image";
 
-import { Event } from "../../../../types/base";
+import { Event } from "@/types/event";
 import { SectionHeader } from "./SectionHeader";
 
 interface WeekendEventsProps {
@@ -33,18 +33,18 @@ export const WeekendEvents = ({ events }: WeekendEventsProps) => {
                                     {idx % 2 === 0 ? 'Thứ 7' : 'Chủ Nhật'}
                                 </span>
                                 <span className="text-2xl font-black text-foreground">
-                                    {new Date(event.date).getDate()}
+                                    {new Date(event.startTime).getDate()}
                                 </span>
                                 <span className="text-xs text-primary font-bold">
-                                    {new Date(event.date).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
+                                    {new Date(event.startTime).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
                                 </span>
                             </div>
 
                             {/* Image */}
                             <div className="w-full md:w-32 h-24 rounded-xl overflow-hidden shrink-0">
                                 <Image
-                                    src={event.image}
-                                    alt={event.title}
+                                    src={event.thumbnailUrl || "/placeholder.png"}
+                                    alt={event.name}
                                     width={200}
                                     height={150}
                                     className="w-full h-full object-cover"
@@ -53,10 +53,10 @@ export const WeekendEvents = ({ events }: WeekendEventsProps) => {
 
                             {/* Content */}
                             <div className="flex-1 min-w-0 text-center md:text-left space-y-2">
-                                <h4 className="text-xl font-bold truncate group-hover:text-primary transition-colors">{event.title}</h4>
+                                <h4 className="text-xl font-bold truncate group-hover:text-primary transition-colors">{event.name}</h4>
                                 <div className="flex items-center justify-center md:justify-start gap-4 text-sm text-muted-foreground">
-                                    <span className="flex items-center gap-1"><MapPin className="w-4 h-4" /> {event.location}</span>
-                                    <Badge variant="outline" className="border-primary/20 text-primary">{event.category}</Badge>
+                                    <span className="flex items-center gap-1"><MapPin className="w-4 h-4" /> {event.locations?.[0]?.address || "N/A"}</span>
+                                    <Badge variant="outline" className="border-primary/20 text-primary">{event.category?.name}</Badge>
                                 </div>
                             </div>
 

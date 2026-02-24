@@ -56,13 +56,13 @@ export const AuthProvider = ({
 
                 try {
                     const decodedToken = decodeJWT<JWTUserType>(initialRefreshToken);
-                    if (!decodedToken?.id) {
+                    if (!decodedToken?.UserId) {
                         throw new Error("Invalid refresh token payload");
                     }
 
                     // Gọi API backend để refresh access_token
                     const result = await authRequest.refreshTokenClient({
-                        id: decodedToken.id,
+                        id: decodedToken.UserId,
                         accessToken: initialAccessToken || "",
                         refreshToken: initialRefreshToken
                     });
@@ -99,7 +99,7 @@ export const AuthProvider = ({
                     }
 
                     // Redirect về login
-                    window.location.href = "/auth/login";
+                    window.location.href = "/login";
                     return;
                 } finally {
                     setIsRefreshing(false);

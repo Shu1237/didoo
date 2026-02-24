@@ -1,8 +1,9 @@
+import { CategoryStatus } from "@/utils/enum";
 import { BasePaginationQuery } from "./base";
 
 export interface CategoryGetListQuery extends BasePaginationQuery {
     name?: string;
-    status?: string;
+    status?: CategoryStatus;
 }
 
 export interface Category {
@@ -11,7 +12,11 @@ export interface Category {
     slug: string;
     description?: string;
     iconUrl?: string;
-    status: string;
+    status: CategoryStatus;
+    createdAt?: string;
+    updatedAt?: string;
+    isDeleted?: boolean;
     parentCategory?: Category | null;
+    parentCategoryId?: string | null;
     subCategories?: Category[];
 }

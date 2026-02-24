@@ -8,7 +8,6 @@ import { AuthProvider } from "@/contexts/authContext";
 import { Toaster } from "sonner";
 import GoogleAuthProvider from "@/components/GoogleAuthProvider";
 
-
 const inter = Inter({
   subsets: ['latin'],
   display: 'swap',
@@ -21,7 +20,6 @@ const plusJakarta = Plus_Jakarta_Sans({
   display: 'swap',
   variable: '--font-heading',
 })
-
 
 export const metadata: Metadata = {
   title: "DiDoo",
@@ -61,4 +59,3 @@ export default async function RootLayout({
     </html>
   );
 }
-

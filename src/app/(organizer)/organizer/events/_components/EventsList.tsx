@@ -4,9 +4,9 @@ import { Card } from "@/components/ui/card";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Calendar } from "lucide-react";
-import { mockOrganizerEvents } from "@/utils/mockOrganizer";
-import { Event } from "../../../../../types/base";
+import { Calendar, MapPin, Tag } from "lucide-react";
+import { Event } from "@/types/event";
+import { EventStatus } from "@/utils/enum";
 
 interface EventsListProps {
   events: any[];
@@ -32,7 +32,7 @@ export default function EventsList({ events, onViewDetail, onEdit }: EventsListP
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-8 pb-8">
-      {events.map((event: any) => (
+      {events.map((event: Event) => (
         <Card key={event.id} className="group relative overflow-hidden rounded-[40px] border border-zinc-100 bg-white hover:shadow-2xl hover:border-primary/20 transition-all duration-700 p-1 flex flex-col">
 
           <div className="p-7 flex-1 flex flex-col justify-between">
@@ -40,33 +40,35 @@ export default function EventsList({ events, onViewDetail, onEdit }: EventsListP
               <div className="flex justify-between items-start mb-6">
                 <div className="inline-flex items-center gap-2 bg-zinc-100 px-3 py-1.5 rounded-full border border-zinc-200 text-zinc-900 font-bold text-[10px] uppercase tracking-wider">
                   <Calendar className="w-3.5 h-3.5 mr-0.5 text-primary" />
-                  {event.date}
+                  {new Date(event.startTime).toLocaleDateString("vi-VN")}
                 </div>
-                <Badge className="bg-emerald-100 text-emerald-700 border-none font-black text-[9px] uppercase tracking-widest px-3 py-1 rounded-full">
-                  {event.status || "Sắp diễn ra"}
+                <Badge className={`border-none font-black text-[9px] uppercase tracking-widest px-3 py-1 rounded-full ${event.status === EventStatus.PUBLISHED ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"
+                  }`}>
+                  {event.status === EventStatus.PUBLISHED ? "Published" : "Draft"}
                 </Badge>
               </div>
 
-              <h3 className="text-2xl font-black tracking-tighter text-zinc-900 group-hover:text-primary transition-colors leading-tight mb-2">
-                {event.title}
+              <h3 className="text-2xl font-black tracking-tighter text-zinc-900 group-hover:text-primary transition-colors leading-tight mb-2 line-clamp-2">
+                {event.name}
               </h3>
-              <p className="text-zinc-600 text-sm font-medium line-clamp-2 mb-6 leading-relaxed">
-                Quản lý và theo dõi hiệu quả sự kiện của bạn với các công cụ tối ưu hóa bán vé.
-              </p>
+              <div className="flex items-center gap-2 text-zinc-500 text-xs font-bold mb-4">
+                <MapPin className="w-3 h-3" />
+                <span className="truncate">{event.locations?.[0]?.name || "Online"}</span>
+              </div>
             </div>
 
             <div className="grid grid-cols-2 gap-3 mb-8">
               <div className="bg-zinc-50 p-4 rounded-2xl border border-zinc-100">
-                <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500 mb-1">Vé đã bán</p>
-                <div className="flex items-baseline gap-1">
-                  <span className="text-lg font-black text-zinc-900">{event.sold || 0}</span>
-                  <span className="text-zinc-400 text-xs font-bold">/ {event.total || 0}</span>
+                <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500 mb-1">Thể loại</p>
+                <div className="flex items-center gap-1">
+                  <Tag className="w-3 h-3 text-zinc-400" />
+                  <span className="text-xs font-bold text-zinc-900">{event.category?.name || "N/A"}</span>
                 </div>
               </div>
               <div className="bg-zinc-50 p-4 rounded-2xl border border-zinc-100">
-                <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500 mb-1">Doanh thu</p>
+                <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500 mb-1">Giá vé từ</p>
                 <p className="text-lg font-black text-zinc-900">
-                  {((event.sold || 0) * 500000).toLocaleString()}
+                  {"0"}
                   <span className="text-zinc-400 text-xs font-black ml-1">Đ</span>
                 </p>
               </div>

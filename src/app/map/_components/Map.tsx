@@ -4,7 +4,7 @@ import { useRef, useEffect, useState } from 'react';
 import MapComponent, { Marker, NavigationControl, useMap, Source, Layer } from 'react-map-gl/mapbox';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import Image from 'next/image';
-import { Event } from '../../../types/base';
+import { Event } from '@/types/event';
 import { Spinner } from '@/components/ui/spinner';
 import { envconfig } from '../../../../config';
 
@@ -183,7 +183,9 @@ const Map = ({ coordinates, events, isLoading, selectedEvent, setSelectedEvent, 
     if (!map) return;
 
     // Fetch route
-    fetchRoute([coordinates.lng, coordinates.lat], [selectedEvent.lng, selectedEvent.lat]);
+    const eventLng = selectedEvent.locations?.[0]?.longitude || 0;
+    const eventLat = selectedEvent.locations?.[0]?.latitude || 0;
+    fetchRoute([coordinates.lng, coordinates.lat], [eventLng, eventLat]);
 
     // Smooth camera animation
     map.easeTo({
@@ -194,9 +196,11 @@ const Map = ({ coordinates, events, isLoading, selectedEvent, setSelectedEvent, 
 
     setTimeout(() => {
       // Calculate bounds to fit both points
+      const eventLng = selectedEvent.locations?.[0]?.longitude || 0;
+      const eventLat = selectedEvent.locations?.[0]?.latitude || 0;
       const bounds = [
-        [Math.min(coordinates.lng, selectedEvent.lng), Math.min(coordinates.lat, selectedEvent.lat)],
-        [Math.max(coordinates.lng, selectedEvent.lng), Math.max(coordinates.lat, selectedEvent.lat)]
+        [Math.min(coordinates.lng, eventLng), Math.min(coordinates.lat, eventLat)],
+        [Math.max(coordinates.lng, eventLng), Math.max(coordinates.lat, eventLat)]
       ];
 
       map.fitBounds(bounds as any, {
@@ -364,8 +368,8 @@ const Map = ({ coordinates, events, isLoading, selectedEvent, setSelectedEvent, 
           return (
             <Marker
               key={event.id}
-              longitude={event.lng}
-              latitude={event.lat}
+              longitude={event.locations?.[0]?.longitude || 0}
+              latitude={event.locations?.[0]?.latitude || 0}
               anchor={isSelected ? "center" : "bottom"}
             >
               <div
@@ -398,8 +402,8 @@ const Map = ({ coordinates, events, isLoading, selectedEvent, setSelectedEvent, 
                     </div>
                     <div className="relative z-10 w-12 h-12 rounded-full overflow-hidden border-2 border-primary ring-4 ring-primary/30 shadow-lg">
                       <Image
-                        src={event.image}
-                        alt={event.title}
+                        src={event.thumbnailUrl || "/placeholder.png"}
+                        alt={event.name}
                         fill
                         className="object-cover"
                         sizes="48px"
@@ -411,8 +415,8 @@ const Map = ({ coordinates, events, isLoading, selectedEvent, setSelectedEvent, 
                         <div className="flex justify-center pt-4">
                           <div className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-white shadow-lg">
                             <Image
-                              src={event.image}
-                              alt={event.title}
+                              src={event.thumbnailUrl || "/placeholder.png"}
+                              alt={event.name}
                               fill
                               className="object-cover"
                               sizes="64px"
@@ -420,9 +424,9 @@ const Map = ({ coordinates, events, isLoading, selectedEvent, setSelectedEvent, 
                           </div>
                         </div>
                         <div className="px-4 py-3 text-center">
-                          <p className="text-sm font-bold text-gray-900 dark:text-white line-clamp-2">{event.title}</p>
-                          {event.location && (
-                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 truncate">{event.location}</p>
+                          <p className="text-sm font-bold text-gray-900 dark:text-white line-clamp-2">{event.name}</p>
+                          {event.locations?.[0]?.address && (
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 truncate">{event.locations[0].address}</p>
                           )}
                         </div>
                         <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-3 h-3 bg-white dark:bg-gray-900 rotate-45 border-r border-b border-white/20" />
@@ -446,7 +450,7 @@ const Map = ({ coordinates, events, isLoading, selectedEvent, setSelectedEvent, 
               </svg>
             </div>
             <div>
-              <p className="text-sm text-gray-600 font-medium">Lộ trình đến {selectedEvent.title}</p>
+              <p className="text-sm text-gray-600 font-medium">Lộ trình đến {selectedEvent.name}</p>
               <div className="flex items-center gap-4 mt-1">
                 <div className="flex items-center gap-1">
                   <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
