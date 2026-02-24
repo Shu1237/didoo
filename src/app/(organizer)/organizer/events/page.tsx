@@ -86,6 +86,7 @@ export default function OrganizerEventsPage() {
         onClose={closeModal}
         mode={modalState.mode}
         event={modalState.event}
+        organizerId={organizerId || undefined}
       />
     </div>
   );

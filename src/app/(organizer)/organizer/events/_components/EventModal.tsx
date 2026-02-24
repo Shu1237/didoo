@@ -16,7 +16,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Calendar as CalendarIcon, MapPin, Ticket, Clock, Info, AlignLeft, Loader2, Plus, Image as ImageIcon } from "lucide-react";
-import { EventCreateBody, eventCreateSchema } from "@/schemas/event";
+import { EventCreateBody, eventCreateSchema, eventUpdateSchema } from "@/schemas/event";
 import { useEvent } from "@/hooks/useEvent";
 import { useMedia } from "@/hooks/useMedia";
 import { useGetCategories } from "@/hooks/useCategory";
@@ -24,6 +24,14 @@ import { Event } from "@/types/event";
 import { handleErrorApi } from "@/lib/errors";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
+import { useGetMe } from "@/hooks/useUser";
+
+const formatDateForInput = (date: string | Date | undefined) => {
+    if (!date) return "";
+    const d = new Date(date);
+    if (isNaN(d.getTime())) return "";
+    return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+};
 
 export type EventModalMode = "CREATE" | "EDIT" | "DETAIL";
 
@@ -32,59 +40,82 @@ interface EventModalProps {
     onClose: () => void;
     mode: EventModalMode;
     event?: Event;
+    organizerId?: string;
 }
 
-export default function EventModal({ isOpen, onClose, mode, event }: EventModalProps) {
+export default function EventModal({ isOpen, onClose, mode, event, organizerId }: EventModalProps) {
     const isDetail = mode === "DETAIL";
     const title = mode === "CREATE" ? "Tạo sự kiện mới" : mode === "EDIT" ? "Chỉnh sửa sự kiện" : "Chi tiết sự kiện";
 
     const { create, update } = useEvent();
     const { uploadImage } = useMedia();
     const { data: categoriesRes } = useGetCategories({ PageSize: 100 });
+    const { data: userData } = useGetMe();
+    const currentUser = userData?.data;
     const categories = categoriesRes?.data?.items || [];
 
     const thumbnailInputRef = useRef<HTMLInputElement>(null);
     const bannerInputRef = useRef<HTMLInputElement>(null);
 
     const form = useForm<EventCreateBody>({
-        resolver: zodResolver(eventCreateSchema),
+        resolver: zodResolver(mode === "EDIT" ? eventUpdateSchema : eventCreateSchema) as any,
         mode: "onTouched",
         defaultValues: {
             Name: "",
             Slug: "",
             Subtitle: "",
             Description: "",
-            StartTime: new Date() as any,
-            EndTime: new Date() as any,
+            StartTime: formatDateForInput(new Date()) as any,
+            EndTime: formatDateForInput(new Date()) as any,
             CategoryId: "",
-            OrganizerId: event?.organizer?.id || "", // Assuming organizerId is available
+            OrganizerId: organizerId || event?.organizer?.id || currentUser?.organizerId || "",
             Locations: [{ Name: "", Address: "" }],
             ThumbnailUrl: "",
             BannerUrl: "",
+            AgeRestriction: 0,
         },
     });
 
     useEffect(() => {
         if (isOpen) {
+            console.log("Modal Open - Mode:", mode, "Event:", event, "CurrentUser:", currentUser);
             if (mode === "EDIT" && event) {
-                form.reset({
+                const resetData = {
                     Name: event.name,
                     Slug: event.slug,
                     Subtitle: event.subtitle || "",
                     Description: event.description,
-                    StartTime: new Date(event.startTime) as any,
-                    EndTime: new Date(event.endTime) as any,
+                    StartTime: formatDateForInput(event.startTime) as any,
+                    EndTime: formatDateForInput(event.endTime) as any,
                     CategoryId: event.category?.id || "",
-                    OrganizerId: event.organizer?.id || "",
+                    OrganizerId: organizerId || event.organizer?.id || currentUser?.organizerId || "",
                     Locations: event.locations?.map(l => ({ Name: l.name, Address: l.address })) || [{ Name: "", Address: "" }],
                     ThumbnailUrl: event.thumbnailUrl || "",
                     BannerUrl: event.bannerUrl || "",
-                });
+                    AgeRestriction: event.ageRestriction || 0,
+                };
+                console.log("Resetting form (EDIT) with:", resetData);
+                form.reset(resetData);
             } else if (mode === "CREATE") {
-                form.reset();
+                const resetData = {
+                    Name: "",
+                    Slug: "",
+                    Subtitle: "",
+                    Description: "",
+                    StartTime: formatDateForInput(new Date()) as any,
+                    EndTime: formatDateForInput(new Date()) as any,
+                    CategoryId: "",
+                    OrganizerId: organizerId || currentUser?.organizerId || "",
+                    Locations: [{ Name: "", Address: "" }],
+                    ThumbnailUrl: "",
+                    BannerUrl: "",
+                    AgeRestriction: 0,
+                };
+                console.log("Resetting form (CREATE) with:", resetData);
+                form.reset(resetData);
             }
         }
-    }, [isOpen, mode, event, form]);
+    }, [isOpen, mode, event, form, currentUser, organizerId]);
 
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>, field: "ThumbnailUrl" | "BannerUrl") => {
         const file = e.target.files?.[0];
@@ -97,6 +128,7 @@ export default function EventModal({ isOpen, onClose, mode, event }: EventModalP
     };
 
     const onSubmit = async (values: EventCreateBody) => {
+        console.log("Submitting values:", values);
         try {
             if (mode === "CREATE") {
                 await create.mutateAsync(values);
@@ -107,8 +139,14 @@ export default function EventModal({ isOpen, onClose, mode, event }: EventModalP
             }
             onClose();
         } catch (error) {
+            console.error("Submission error:", error);
             handleErrorApi({ error, setError: form.setError });
         }
+    };
+
+    const onError = (errors: any) => {
+        console.error("Validation errors:", errors);
+        toast.error("Vui lòng kiểm tra lại các trường thông tin bắt buộc!");
     };
 
     const thumbnailUrl = form.watch("ThumbnailUrl");
@@ -208,7 +246,7 @@ export default function EventModal({ isOpen, onClose, mode, event }: EventModalP
                             </div>
                         </div>
                     ) : (
-                        <form id="event-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+                        <form id="event-form" onSubmit={form.handleSubmit(onSubmit, onError)} className="space-y-8">
                             <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
                                 {/* Media Pillar */}
                                 <div className="md:col-span-4 space-y-6">
@@ -253,6 +291,9 @@ export default function EventModal({ isOpen, onClose, mode, event }: EventModalP
 
                                 {/* Content Pillar */}
                                 <div className="md:col-span-8 space-y-6">
+                                    <input type="hidden" {...form.register("OrganizerId")} />
+                                    <input type="hidden" {...form.register("AgeRestriction")} />
+
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div className="space-y-2 col-span-2">
                                             <Input {...form.register("Name")} placeholder="Tên sự kiện *" className="h-12 rounded-2xl border-zinc-200 focus:ring-primary/10 transition-all font-bold" />

@@ -1,12 +1,42 @@
+"use client";
 
-import { organizerStats, upcomingEvents } from "@/utils/mockOrganizer";
 import DashboardStats from "./_components/DashboardStats";
 import RecentEvents from "./_components/RecentEvents";
 import SalesChart from "./_components/SalesChart";
+import { useGetMe } from "@/hooks/useUser";
+import { useOrganizerStats } from "@/hooks/useOrganizerStats";
+import Loading from "@/components/loading";
+import { EventStatus } from "@/utils/enum";
 
 export default function OrganizerDashboardPage() {
-  const events = upcomingEvents;
-  const reportData = organizerStats;
+  const { data: userData, isLoading: isUserLoading } = useGetMe();
+  const user = userData?.data;
+
+  const { stats, events, isLoading: isStatsLoading } = useOrganizerStats(user?.organizerId || undefined);
+
+  if (isUserLoading || isStatsLoading) return <Loading />;
+
+  // Map real events to the format expected by RecentEvents
+  const formattedEvents = events.map((event) => {
+    let statusText = "Đang bán vé";
+    if (event.status === EventStatus.DRAFT) statusText = "Nháp";
+    if (event.status === EventStatus.CANCELLED) statusText = "Đã hủy";
+    if (event.status === EventStatus.COMPLETED) statusText = "Đã kết thúc";
+    if (event.sold && event.total && event.sold >= event.total) statusText = "Hết vé";
+
+    return {
+      id: event.id as any,
+      title: event.name,
+      date: new Date(event.startTime).toLocaleDateString('vi-VN'),
+      time: `${new Date(event.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`,
+      location: event.locations?.[0]?.name || "N/A",
+      sold: event.sold || 0,
+      total: event.total || 0,
+      status: statusText,
+      revenue: ((event.sold || 0) * 50000).toLocaleString() + " VNĐ" // Mock revenue per event
+    };
+  });
+
   return (
     <div className="h-full flex flex-col space-y-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-zinc-100 pb-6 shrink-0">
@@ -28,7 +58,7 @@ export default function OrganizerDashboardPage() {
       </div>
 
       <div className="shrink-0">
-        <DashboardStats reportData={reportData} />
+        <DashboardStats reportData={stats || []} />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1 min-h-0">
@@ -36,7 +66,7 @@ export default function OrganizerDashboardPage() {
           <SalesChart />
         </div>
         <div className="lg:col-span-1 h-full min-h-0">
-          <RecentEvents upcomingEvents={events} />
+          <RecentEvents upcomingEvents={formattedEvents} />
         </div>
       </div>
     </div>

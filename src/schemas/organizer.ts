@@ -17,13 +17,18 @@ export const organizerCreateSchema = z.object({
 });
 
 export const organizerUpdateSchema = z.object({
+    id: z.string().optional(),
     Name: z.string().min(1).optional(),
     Slug: z.string().optional(),
     Description: z.string().optional(),
     LogoUrl: z.string().url().optional().or(z.literal("")),
+    BannerUrl: z.string().url().optional().or(z.literal("")),
     Email: z.string().email().optional(),
     Phone: z.string().optional().or(z.literal("")),
     WebsiteUrl: z.string().url().optional().or(z.literal("")),
+    FacebookUrl: z.string().url().optional().or(z.literal("")),
+    InstagramUrl: z.string().url().optional().or(z.literal("")),
+    TiktokUrl: z.string().url().optional().or(z.literal("")),
     Status: z.nativeEnum(OrganizerStatus).optional(),
     IsVerified: z.boolean().optional(),
 });
