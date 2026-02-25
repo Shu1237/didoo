@@ -14,7 +14,6 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Camera, Globe, Facebook, Instagram, Save, Loader2, Mail, Phone, Info } from "lucide-react";
 import { toast } from "sonner";
-import { handleErrorApi } from "@/lib/errors";
 
 export default function OrganizerProfilePage() {
     const { data: userData, isLoading: isUserLoading } = useGetMe();
@@ -44,13 +43,8 @@ export default function OrganizerProfilePage() {
     const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>, field: "LogoUrl" | "BannerUrl") => {
         const file = e.target.files?.[0];
         if (!file) return;
-        try {
-            const result = await uploadImage.mutateAsync(file);
-            form.setValue(field, result.secure_url);
-            toast.success("Tải ảnh lên thành công!");
-        } catch (err) {
-            handleErrorApi({ error: err });
-        }
+        const result = await uploadImage.mutateAsync(file);
+        form.setValue(field, result.secure_url);
     };
 
     const onSubmit = (values: OrganizerUpdateBody) => {

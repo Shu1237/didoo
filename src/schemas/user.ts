@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { Roles } from "@/utils/enum";
 
 // Shared schemas
 export const locationSchema = z.object({
@@ -9,7 +8,7 @@ export const locationSchema = z.object({
     longitude: z.number(),
 });
 
-// User schemas
+/** api.md: status 1=Active 2=Inactive, roleName 1=Admin 2=User 3=Manager 4=Guest */
 export const userCreateSchema = z.object({
     FullName: z.string().min(1, "Full name is required"),
     Email: z.string().email(),
@@ -19,8 +18,8 @@ export const userCreateSchema = z.object({
     Gender: z.number().int().min(0).max(2).default(0),
     DateOfBirth: z.coerce.date(),
     Address: z.string().optional(),
-    Status: z.string().default("Active"),
-    RoleName: z.string().default(Roles.USER),
+    Status: z.number().int().min(1).max(2).default(1),
+    RoleName: z.number().int().min(1).max(4).default(2),
     OrganizerId: z.string().uuid().nullable().optional(),
 });
 
@@ -31,8 +30,8 @@ export const userUpdateSchema = z.object({
     Gender: z.number().int().min(0).max(2).optional(),
     DateOfBirth: z.coerce.date().optional(),
     Address: z.string().optional(),
-    Status: z.string().optional(),
-    RoleName: z.string().optional(),
+    Status: z.number().int().min(1).max(2).optional(),
+    RoleName: z.number().int().min(1).max(4).optional(),
     OrganizerId: z.string().uuid().nullable().optional(),
     IsVerified: z.boolean().optional(),
     IsDeleted: z.boolean().optional(),

@@ -5,10 +5,17 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Shield, Lock, Unlock, ArrowRight } from "lucide-react";
+import { Shield, Lock, Unlock, ArrowRight, MoreVertical, Trash2, RotateCcw } from "lucide-react";
 import { User } from "@/types/user";
 import { useUser } from "@/hooks/useUser";
 import UserDetailModal from "./UserDetailModal";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { handleErrorApi } from "@/lib/errors";
 
 interface UsersListProps {
   users: User[];
@@ -16,16 +23,29 @@ interface UsersListProps {
 
 export default function UsersList({ users }: UsersListProps) {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  const { update } = useUser();
+  const { update, deleteUser, restore } = useUser();
 
   const handleToggleStatus = (user: User) => {
-    const isBlocked = user.status === "Blocked";
-    const newStatus = isBlocked ? "Active" : "Blocked";
+    const isBlocked = user.status === 2;
+    const newStatus = isBlocked ? 1 : 2;
+    update.mutate({ id: user.id, body: { Status: newStatus } });
+  };
 
-    update.mutate({
-      id: user.id,
-      body: { Status: newStatus }
-    });
+  const handleDelete = async (user: User) => {
+    if (!window.confirm(`Xóa người dùng "${user.fullName}"? Hành động này không thể hoàn tác.`)) return;
+    try {
+      await deleteUser.mutateAsync(user.id);
+    } catch (e) {
+      handleErrorApi({ error: e });
+    }
+  };
+
+  const handleRestore = async (user: User) => {
+    try {
+      await restore.mutateAsync(user.id);
+    } catch (e) {
+      handleErrorApi({ error: e });
+    }
   };
 
   if (!users || users.length === 0) {
@@ -39,7 +59,7 @@ export default function UsersList({ users }: UsersListProps) {
   return (
     <div className="grid grid-cols-1 gap-4">
       {users.map((user) => {
-        const isBlocked = user.status === "Blocked";
+        const isBlocked = user.status === 2;
         return (
           <Card key={user.id} className="p-4 bg-white border-zinc-100 shadow-sm hover:shadow-md transition-all duration-300 rounded-[24px] border group">
             <div className="flex items-center justify-between gap-4">
@@ -77,7 +97,7 @@ export default function UsersList({ users }: UsersListProps) {
                   className={`hidden md:flex rounded-full px-2.5 py-0.5 border-none pointer-events-none uppercase text-[8px] tracking-widest font-bold ${isBlocked ? "bg-rose-500 text-white" : "bg-emerald-500 text-white"
                     }`}
                 >
-                  {user.status || "Active"}
+                  {user.status === 1 ? "Active" : "Inactive"}
                 </Badge>
 
                 <div className="flex gap-2">
@@ -103,6 +123,28 @@ export default function UsersList({ users }: UsersListProps) {
                   >
                     {isBlocked ? <Unlock className="w-3.5 h-3.5" /> : <Lock className="w-3.5 h-3.5" />}
                   </Button>
+
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="outline" size="icon" className="rounded-full w-9 h-9 border-zinc-200">
+                        <MoreVertical className="w-4 h-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="rounded-xl">
+                      {user.isDeleted ? (
+                        <DropdownMenuItem onClick={() => handleRestore(user)} className="gap-2">
+                          <RotateCcw className="w-4 h-4" /> Khôi phục
+                        </DropdownMenuItem>
+                      ) : (
+                        <DropdownMenuItem
+                          onClick={() => handleDelete(user)}
+                          className="gap-2 text-red-600 focus:text-red-600"
+                        >
+                          <Trash2 className="w-4 h-4" /> Xóa
+                        </DropdownMenuItem>
+                      )}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               </div>
             </div>

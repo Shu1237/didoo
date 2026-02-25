@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { LayoutDashboard, Menu, X, Calendar, Wallet, UserCircle, ShoppingBag } from "lucide-react";
+import { LayoutDashboard, Menu, X, Calendar, Wallet, UserCircle, ShoppingBag, PlusCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { useSessionStore } from "@/stores/sesionStore";
@@ -19,6 +19,11 @@ const navItems = [
     title: "Sự kiện",
     href: "/organizer/events",
     icon: Calendar,
+  },
+  {
+    title: "Tạo sự kiện",
+    href: "/organizer/events/create",
+    icon: PlusCircle,
   },
   {
     title: "Ví & Doanh thu",

@@ -1,6 +1,7 @@
 import { BasePaginationQuery } from "./base";
 import { Event } from "./event";
 
+/** Match BE TicketTypeGetListQuery */
 export interface TicketTypeGetListQuery extends BasePaginationQuery {
     eventId?: string;
     name?: string;
@@ -9,15 +10,14 @@ export interface TicketTypeGetListQuery extends BasePaginationQuery {
     description?: string;
 }
 
+/** Match BE TicketTypeDTO - event nested */
 export interface TicketType {
     id: string;
-    eventId: string;
+    event?: Partial<Event>;
     name: string;
     price: number;
     totalQuantity: number;
     availableQuantity: number;
     description?: string;
-    event?: Partial<Event>;
     createdAt?: string;
-    updatedAt?: string;
 }

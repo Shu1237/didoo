@@ -10,9 +10,22 @@ export enum HttpErrorCode {
 
 export enum Roles {
     ADMIN = '4aa3c956-70b7-4ac1-a7ca-28f5de93755d',
-    ORGANIZER = '7810991d-db9a-4408-be98-a92b113880f5',
+    ORGANIZER = '346637b8-09e2-42a1-aae7-71340c19e8f5',
     USER = 'a9d8183a-c7c3-4e08-b31a-9a2f603bef0e',
     GUEST = 'c2a05f94-054a-4127-b1a4-15403bcebc97',
+}
+
+/** Redirect path theo role - dùng cho auth layout và useAuth */
+export const ROLE_REDIRECTS: Record<Roles, string> = {
+    [Roles.ADMIN]: "/admin/dashboard",
+    [Roles.ORGANIZER]: "/organizer/dashboard",
+    [Roles.USER]: "/home",
+    [Roles.GUEST]: "/home",
+};
+
+export function getRedirectPathForRole(roleId: string | undefined): string {
+    if (!roleId) return "/home";
+    return ROLE_REDIRECTS[roleId as Roles] ?? "/home";
 }
 
 export enum Gender {
@@ -21,35 +34,39 @@ export enum Gender {
     OTHER = 2,
 }
 
+/** api.md: 1=View, 2=Heart, 3=Save */
 export enum InteractionType {
-    VIEW = 0,
-    LIKE = 1,
-    SHARE = 2,
-    COMMENT = 3,
+    VIEW = 1,
+    HEART = 2,
+    SAVE = 3,
 }
 
+/** api.md: 1=Available, 2=Full, 3=Unavailable, 4=Locked */
 export enum TicketStatus {
-    READY = 0,
-    SOLD = 1,
-    EXPIRED = 2,
-    CANCELLED = 3,
+    AVAILABLE = 1,
+    FULL = 2,
+    UNAVAILABLE = 3,
+    LOCKED = 4,
 }
 
+/** api.md: 1=Draft, 2=Published, 3=Cancelled, 4=Opened, 5=Closed */
 export enum EventStatus {
-    DRAFT = 0,
-    PUBLISHED = 1,
-    CANCELLED = 2,
-    COMPLETED = 3,
+    DRAFT = 1,
+    PUBLISHED = 2,
+    CANCELLED = 3,
+    OPENED = 4,
+    CLOSED = 5,
 }
 
+/** api.md: 1=Pending, 2=Verified, 3=Banned */
 export enum OrganizerStatus {
-    PENDING = 0,
+    PENDING = 1,
+    VERIFIED = 2,
+    BANNED = 3,
+}
+
+/** api.md: 1=Active, 2=Inactive */
+export enum CategoryStatus {
     ACTIVE = 1,
     INACTIVE = 2,
-    REJECTED = 3,
-}
-
-export enum CategoryStatus {
-    ACTIVE = 'Active',
-    INACTIVE = 'Inactive',
 }

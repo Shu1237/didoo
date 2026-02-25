@@ -1,7 +1,8 @@
 'use client';
 
 import Image from 'next/image';
-import { Calendar, MapPin, Share2, Heart, ArrowUpRight } from 'lucide-react';
+import { Calendar, MapPin, ArrowUpRight } from 'lucide-react';
+import EventActions from './EventActions';
 import { Button } from '@/components/ui/button';
 import { Event } from '@/types/event';
 import { motion, useScroll, useTransform } from 'framer-motion';
@@ -93,14 +94,7 @@ export default function HeroSection({ event, ticketTypes }: DetailEventProps) {
                   <ArrowUpRight className="inline-block ml-2 w-5 h-5 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
                 </Button>
 
-                <div className="flex gap-3">
-                  <button className="h-16 w-16 flex items-center justify-center rounded-full border border-white/10 bg-white/5 text-white hover:bg-white hover:text-black transition-colors">
-                    <Heart className="w-5 h-5" />
-                  </button>
-                  <button className="h-16 w-16 flex items-center justify-center rounded-full border border-white/10 bg-white/5 text-white hover:bg-white hover:text-black transition-colors">
-                    <Share2 className="w-5 h-5" />
-                  </button>
-                </div>
+                <EventActions eventId={event.id} />
               </div>
             </motion.div>
           </div>

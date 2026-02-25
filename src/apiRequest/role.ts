@@ -1,15 +1,12 @@
 import http from "@/lib/http";
 import { ENDPOINT_CLIENT } from "@/utils/endpoint";
-import { RoleCreateBody, genericListQuerySchema } from "@/schemas/role";
-import { z } from "zod";
-import { PaginatedData } from "@/types/base";
+import { RoleCreateBody } from "@/schemas/role";
 import { Role } from "@/types/user";
 
-type RoleGetListQuery = z.infer<typeof genericListQuerySchema>;
-
+/** api.md: RoleGetAllResponse returns data as Role[] (not paginated) */
 export const roleRequest = {
-    getList: (params?: RoleGetListQuery) =>
-        http.get<PaginatedData<Role>>(ENDPOINT_CLIENT.ROLES, { query: params }),
+    getList: () =>
+        http.get<Role[]>(ENDPOINT_CLIENT.ROLES),
     create: (body: RoleCreateBody) =>
         http.post<Role>(ENDPOINT_CLIENT.ROLES, body),
     dumb: () =>

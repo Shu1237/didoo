@@ -353,7 +353,8 @@ export default function RegisterForm() {
         </AnimatePresence>
 
         <div className="mt-6 flex flex-col items-center gap-2">
-          <div className="flex justify-center">
+          <p className="text-xs text-white/50 font-medium">Hoặc đăng ký với</p>
+          <div className="w-[72px] h-[72px] rounded-full bg-white flex items-center justify-center shadow-xl shadow-black/25 border border-zinc-200 ring-[3px] ring-zinc-100 ring-offset-[3px] ring-offset-[#2D2D2D]/80 hover:scale-105 hover:shadow-2xl transition-all duration-300 overflow-hidden">
             <GoogleLogin
               onSuccess={async (credentialResponse) => {
                 if (loginGoogle.isPending) return;
@@ -379,6 +380,7 @@ export default function RegisterForm() {
               type="icon"
               shape="circle"
               theme="outline"
+              size="large"
             />
           </div>
         </div>

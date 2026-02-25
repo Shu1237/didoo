@@ -14,8 +14,8 @@ import Loading from "@/components/loading";
 
 export default function EventsPage() {
     const { data: eventsResponse, isLoading: isEventsLoading } = useGetEvents({
-        PageSize: 20,
-        IsDescending: true,
+        pageSize: 20,
+        isDescending: true,
     });
     const { data: categoriesResponse, isLoading: isCategoriesLoading } = useGetCategories();
 

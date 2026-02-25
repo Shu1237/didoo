@@ -27,10 +27,10 @@ export default function OrganizersList({ organizers }: OrganizersListProps) {
   };
 
   const handleAction = async (organizer: Organizer, status: OrganizerStatus) => {
-    const actionName = status === OrganizerStatus.ACTIVE ? "Phê duyệt & Xác minh" : "Từ chối";
+    const actionName = status === OrganizerStatus.VERIFIED ? "Phê duyệt & Xác minh" : "Từ chối";
     let message = `Bạn có chắc chắn muốn ${actionName.toLowerCase()} organizer "${organizer.name}" không?`;
 
-    if (status === OrganizerStatus.ACTIVE && !organizer.isVerified) {
+    if (status === OrganizerStatus.VERIFIED && !organizer.isVerified) {
       message += "\n\nLƯU Ý: Thao tác này sẽ đồng thời XÁC MINH danh tính cho Organizer này.";
     }
 
@@ -41,7 +41,7 @@ export default function OrganizersList({ organizers }: OrganizersListProps) {
         id: organizer.id,
         body: {
           Status: status,
-          IsVerified: status === OrganizerStatus.ACTIVE ? true : undefined
+          IsVerified: status === OrganizerStatus.VERIFIED ? true : undefined
         }
       });
     } catch (err) { }
@@ -82,14 +82,14 @@ export default function OrganizersList({ organizers }: OrganizersListProps) {
                   <Badge
                     className={`text-white hover:text-white shrink-0 rounded-full px-1.5 py-0 border-none pointer-events-none text-[8px] font-black uppercase tracking-[0.05em] ${organizer.status === OrganizerStatus.PENDING
                       ? "bg-amber-500"
-                      : organizer.status === OrganizerStatus.ACTIVE
+                      : organizer.status === OrganizerStatus.VERIFIED
                         ? "bg-emerald-500"
                         : "bg-rose-500"
                       }`}
                   >
                     {organizer.status === OrganizerStatus.PENDING
                       ? "Chờ phê duyệt"
-                      : organizer.status === OrganizerStatus.ACTIVE
+                      : organizer.status === OrganizerStatus.VERIFIED
                         ? "Đã phê duyệt"
                         : "Từ chối"}
                   </Badge>
@@ -114,7 +114,7 @@ export default function OrganizersList({ organizers }: OrganizersListProps) {
                     variant="default"
                     size="sm"
                     disabled={update.isPending}
-                    onClick={() => handleAction(organizer, OrganizerStatus.ACTIVE)}
+                    onClick={() => handleAction(organizer, OrganizerStatus.VERIFIED)}
                     className="bg-zinc-900 hover:bg-zinc-800 text-white rounded-xl px-2.5 h-7 text-[10px] font-bold uppercase tracking-wider"
                   >
                     {update.isPending ? <Loader2 className="w-3 h-3 animate-spin" /> : "Duyệt"}
@@ -123,7 +123,7 @@ export default function OrganizersList({ organizers }: OrganizersListProps) {
                     variant="destructive"
                     size="sm"
                     disabled={update.isPending}
-                    onClick={() => handleAction(organizer, OrganizerStatus.REJECTED)}
+                    onClick={() => handleAction(organizer, OrganizerStatus.BANNED)}
                     className="bg-rose-600 hover:bg-rose-700 text-white rounded-xl px-2.5 h-7 text-[10px] font-bold uppercase tracking-wider"
                   >
                     {update.isPending ? <Loader2 className="w-3 h-3 animate-spin" /> : "Từ chối"}
@@ -139,8 +139,8 @@ export default function OrganizersList({ organizers }: OrganizersListProps) {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         organizer={selectedOrganizer}
-        onApprove={(org) => handleAction(org, OrganizerStatus.ACTIVE)}
-        onReject={(org) => handleAction(org, OrganizerStatus.REJECTED)}
+        onApprove={(org) => handleAction(org, OrganizerStatus.VERIFIED)}
+        onReject={(org) => handleAction(org, OrganizerStatus.BANNED)}
         isUpdating={update.isPending}
       />
     </div>

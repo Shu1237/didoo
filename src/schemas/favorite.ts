@@ -1,8 +1,9 @@
 import { z } from "zod";
 
+/** Match BE FavoriteCreateCommand - camelCase */
 export const favoriteCreateSchema = z.object({
-    UserId: z.string().uuid(),
-    EventId: z.string().uuid(),
+    userId: z.string().uuid(),
+    eventId: z.string().uuid(),
 });
 
 export type FavoriteCreateBody = z.input<typeof favoriteCreateSchema>;

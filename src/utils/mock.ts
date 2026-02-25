@@ -59,7 +59,7 @@ export const EVENTS: Event[] = [
       email: 'contact@electricdreams.com',
       logoUrl: 'https://i.pravatar.cc/150?u=1',
       isVerified: true,
-      status: OrganizerStatus.ACTIVE,
+      status: OrganizerStatus.VERIFIED,
     },
   },
   {
@@ -81,7 +81,7 @@ export const EVENTS: Event[] = [
       email: 'info@artcollective.com',
       logoUrl: 'https://i.pravatar.cc/150?u=2',
       isVerified: true,
-      status: OrganizerStatus.ACTIVE,
+      status: OrganizerStatus.VERIFIED,
     },
   },
   {
@@ -103,7 +103,7 @@ export const EVENTS: Event[] = [
       email: 'hello@techventures.com',
       logoUrl: 'https://i.pravatar.cc/150?u=3',
       isVerified: true,
-      status: OrganizerStatus.ACTIVE,
+      status: OrganizerStatus.VERIFIED,
     },
   }
 ];

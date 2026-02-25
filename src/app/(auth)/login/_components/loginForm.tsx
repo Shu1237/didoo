@@ -125,7 +125,9 @@ export default function LoginForm() {
               </button>
             </div>
           </div>
-
+          <div className="text-right">
+            <Link href="/forgot-password" className="text-xs text-white/40 hover:text-white transition-colors">Forgot password?</Link>
+          </div>
           <button
             type="submit"
             disabled={login.isPending}

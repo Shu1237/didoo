@@ -6,6 +6,7 @@ export interface CategoryGetListQuery extends BasePaginationQuery {
     status?: CategoryStatus;
 }
 
+/** Match BE CategoryDTO */
 export interface Category {
     id: string;
     name: string;
@@ -13,10 +14,7 @@ export interface Category {
     description?: string;
     iconUrl?: string;
     status: CategoryStatus;
-    createdAt?: string;
-    updatedAt?: string;
-    isDeleted?: boolean;
     parentCategory?: Category | null;
-    parentCategoryId?: string | null;
     subCategories?: Category[];
+    isDeleted?: boolean;
 }

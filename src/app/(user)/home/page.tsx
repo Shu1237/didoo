@@ -14,14 +14,14 @@ import SearchFilter from "./_components/SearchFilter";
 
 export default function Home() {
   const { data: eventsResponse, isLoading: isEventsLoading, isError: isEventsError } = useGetEvents({
-    PageSize: 12,
-    IsDescending: true,
+    pageSize: 12,
+    isDescending: true,
   });
 
   const { data: categoriesResponse, isLoading: isCategoriesLoading } = useGetCategories();
   const { data: organizersResponse, isLoading: isOrganizersLoading } = useGetOrganizers({
-    PageSize: 8,
-    IsDescending: true,
+    pageSize: 8,
+    isDescending: true,
   });
 
   if (isEventsLoading || isCategoriesLoading || isOrganizersLoading) return <Loading />;

@@ -150,9 +150,7 @@ async function httpRequest<T>(
             : JSON.stringify(options.body)
         : undefined;
 
-    if (method !== "GET") {
-        console.log(`[HTTP ${method}] ${url}`, options?.body);
-    }
+
 
     // Get auth token
     const authToken = options?.skipAuth

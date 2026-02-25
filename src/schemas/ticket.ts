@@ -2,16 +2,16 @@ import { z } from "zod";
 import { TicketStatus } from "@/utils/enum";
 
 export const ticketCreateSchema = z.object({
-    ticketTypeId: z.uuid(),
-    eventId: z.uuid(),
+    ticketTypeId: z.string().uuid(),
+    eventId: z.string().uuid(),
     zone: z.string().optional(),
-    status: z.enum(TicketStatus).default(TicketStatus.READY),
+    status: z.nativeEnum(TicketStatus).default(TicketStatus.AVAILABLE),
 });
 
 export const ticketUpdateSchema = z.object({
-    ticketTypeId: z.uuid().optional(),
+    ticketTypeId: z.string().uuid().optional(),
     zone: z.string().optional(),
-    status: z.enum(TicketStatus).optional(),
+    status: z.nativeEnum(TicketStatus).optional(),
 });
 
 

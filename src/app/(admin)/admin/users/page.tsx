@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import UsersList from "./_components/UsersList";
 import AdminPageHeader from "@/components/layout/admin/AdminPageHeader";
 import { useGetUsers } from "@/hooks/useUser";
@@ -7,8 +8,13 @@ import Loading from "@/components/loading";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { BasePagination } from "@/components/base/BasePagination";
 import BaseFilterHeader, { FilterHeaderConfig } from "@/components/base/BaseFilterHeader";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
+import UserCreateModal from "./_components/UserCreateModal";
 
 export default function AdminUsersPage() {
+  const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [showDeleted, setShowDeleted] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -17,9 +23,10 @@ export default function AdminUsersPage() {
   const name = searchParams.get("name") || "";
 
   const { data: usersRes, isLoading } = useGetUsers({
-    PageNumber: pageNumber,
-    PageSize: pageSize,
-    FullName: name,
+    pageNumber,
+    pageSize,
+    fullName: name || undefined,
+    isDeleted: showDeleted,
   });
 
   const filterConfigs: FilterHeaderConfig[] = [
@@ -56,6 +63,21 @@ export default function AdminUsersPage() {
           title="Quản lý người dùng"
           description="Xem và quản lý tất cả người dùng trên nền tảng"
         >
+          <label className="flex items-center gap-2 text-sm font-medium text-zinc-600 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={showDeleted}
+              onChange={(e) => setShowDeleted(e.target.checked)}
+              className="rounded border-zinc-300"
+            />
+            Xem đã xóa
+          </label>
+          <Button
+            onClick={() => setCreateModalOpen(true)}
+            className="rounded-full h-9 px-4 bg-primary hover:bg-primary/90 text-white font-bold text-xs"
+          >
+            <Plus className="w-4 h-4 mr-2" /> Thêm người dùng
+          </Button>
           <BaseFilterHeader filters={filterConfigs}>
             <BasePagination
               currentPage={pageNumber}
@@ -101,6 +123,12 @@ export default function AdminUsersPage() {
           </>
         )}
       </div>
+
+      <UserCreateModal
+        isOpen={createModalOpen}
+        onClose={() => setCreateModalOpen(false)}
+        onSuccess={() => setCreateModalOpen(false)}
+      />
     </div>
   );
 }
