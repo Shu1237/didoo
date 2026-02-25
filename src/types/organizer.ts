@@ -1,9 +1,10 @@
+import { OrganizerStatus } from "@/utils/enum";
 import { BasePaginationQuery } from "./base";
 import { Event } from "./event";
 
 export interface OrganizerGetListQuery extends BasePaginationQuery {
-    name?: string;
-    status?: string;
+    Name?: string;
+    Status?: OrganizerStatus;
 }
 
 export interface Organizer {
@@ -21,7 +22,7 @@ export interface Organizer {
     tiktokUrl?: string;
     address?: string;
     isVerified: boolean;
-    status: string;
+    status: OrganizerStatus;
     createdAt?: string;
     updatedAt?: string;
     events?: Partial<Event>[];

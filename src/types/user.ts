@@ -22,13 +22,13 @@ export interface Role {
 }
 
 export interface UserGetListQuery extends BasePaginationQuery {
-    fullName?: string;
-    email?: string;
-    phone?: string;
-    isVerified?: boolean;
-    gender?: number;
-    status?: string;
-    hasLocation?: boolean;
+    FullName?: string;
+    Email?: string;
+    Phone?: string;
+    IsVerified?: boolean;
+    Gender?: number;
+    Status?: string;
+    HasLocation?: boolean;
 }
 
 export interface User {
@@ -45,4 +45,7 @@ export interface User {
     role: Role;
     organizerId?: string | null;
     locations: any[];
+    createdAt?: string;
+    updatedAt?: string;
+    isDeleted?: boolean;
 }

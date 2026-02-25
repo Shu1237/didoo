@@ -5,17 +5,18 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Calendar, MapPin, Ticket, ArrowUpRight } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { Event } from '../../types/base';
+import { Event } from '@/types/event';
 
 const EventCard = ({
   id,
-  title,
-  date,
-  location,
-  price,
-  image,
+  name,
+  startTime,
+  locations,
+  thumbnailUrl,
   category,
 }: Event) => {
+  const address = locations && locations.length > 0 ? locations[0].address : "N/A";
+  const price = "N/A"; // price not in Event type, using placeholder or handle accordingly
   return (
     <Link href={`/events/${id}`} className="block group">
       <motion.div
@@ -28,8 +29,8 @@ const EventCard = ({
           {/* Image Container */}
           <div className='relative h-[220px] overflow-hidden'>
             <Image
-              src={image}
-              alt={title}
+              src={thumbnailUrl || "/placeholder.png"}
+              alt={name}
               fill
               className="object-cover transition-transform duration-700 ease-out group-hover:scale-110"
             />
@@ -37,9 +38,9 @@ const EventCard = ({
 
             {/* Badges on Image */}
             <div className="absolute top-4 left-4 right-4 flex justify-between items-start">
-              {category && (
+              {category?.name && (
                 <div className="bg-primary/20 backdrop-blur-md border border-primary/30 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider text-primary">
-                  {category}
+                  {category.name}
                 </div>
               )}
               <motion.div
@@ -61,7 +62,7 @@ const EventCard = ({
           {/* Content */}
           <div className="p-6 flex flex-col gap-4">
             <h3 className="text-xl font-bold leading-tight line-clamp-2 text-white group-hover:text-primary transition-colors duration-300">
-              {title}
+              {name}
             </h3>
 
             <div className="space-y-3">
@@ -69,14 +70,14 @@ const EventCard = ({
                 <div className="w-8 h-8 rounded-xl bg-white/5 flex items-center justify-center border border-white/5">
                   <Calendar className="w-4 h-4 text-primary" />
                 </div>
-                <span>{new Date(date).toLocaleDateString('vi-VN', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+                <span>{new Date(startTime).toLocaleDateString('vi-VN', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
               </div>
 
               <div className="flex items-center gap-2.5 text-sm text-gray-400 font-medium translate-y-0 group-hover:-translate-y-1 transition-transform duration-300 delay-150">
                 <div className="w-8 h-8 rounded-xl bg-white/5 flex items-center justify-center border border-white/5">
                   <MapPin className="w-4 h-4 text-primary" />
                 </div>
-                <span className="truncate">{location}</span>
+                <span className="truncate">{address}</span>
               </div>
             </div>
 

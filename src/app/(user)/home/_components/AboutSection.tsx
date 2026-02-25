@@ -1,10 +1,13 @@
-'use client';
-
 import { motion } from "framer-motion";
 import { PlayCircle } from "lucide-react";
 import Image from "next/image";
+import { Category } from "@/types/category";
 
-export function AboutSection() {
+interface AboutSectionProps {
+    categories: Category[];
+}
+
+export function AboutSection({ categories }: AboutSectionProps) {
     return (
         <section className="relative py-20 bg-white">
             <div className="container mx-auto px-4">
@@ -52,8 +55,8 @@ export function AboutSection() {
                         className="w-full lg:w-1/2 py-12 lg:py-0 lg:pl-12"
                     >
                         <h2 className="text-4xl md:text-6xl font-black text-black leading-[0.9] tracking-tighter mb-8 uppercase">
-                            The Event For <br />
-                            <span className="text-gray-400">Experienced.</span>
+                            Connect with <br />
+                            <span className="text-gray-400">The Community.</span>
                         </h2>
 
                         <p className="text-lg text-gray-600 font-medium leading-relaxed mb-12 max-w-lg">
@@ -64,9 +67,9 @@ export function AboutSection() {
                         <div className="space-y-6">
                             <h4 className="text-sm font-bold text-black uppercase tracking-widest">Covering Topics Such As</h4>
                             <div className="flex flex-wrap gap-3">
-                                {['Psychology', 'Design', 'Strategy', 'Business', 'UX', 'Leadership', 'Management', 'AI', 'Innovation', 'Creative Operations', 'Tech'].map((tag) => (
-                                    <span key={tag} className="px-4 py-2 rounded-full border border-gray-200 text-xs font-bold text-gray-600 uppercase hover:bg-black hover:text-white transition-colors cursor-default">
-                                        {tag}
+                                {categories.map((cat) => (
+                                    <span key={cat.id} className="px-4 py-2 rounded-full border border-gray-200 text-xs font-bold text-gray-600 uppercase hover:bg-black hover:text-white transition-colors cursor-default">
+                                        {cat.name}
                                     </span>
                                 ))}
                             </div>

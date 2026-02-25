@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { Event } from '../../../../types/base';
+import { Event } from '@/types/event';
 import Image from 'next/image';
 
 interface Props {
@@ -42,8 +42,8 @@ export default function CustomHeroCarousel({ events, onSelect }: Props) {
                                     className="absolute inset-0 w-full h-full"
                                 >
                                     <Image
-                                        src={event.image}
-                                        alt={event.title}
+                                        src={event.thumbnailUrl || event.bannerUrl || 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=2070&auto=format&fit=crop'}
+                                        alt={event.name}
                                         fill
                                         className="object-cover transition-transform duration-500 group-hover:scale-105"
                                     />
@@ -53,10 +53,10 @@ export default function CustomHeroCarousel({ events, onSelect }: Props) {
 
                                 <div className="absolute bottom-0 p-4 w-full">
                                     <p className="text-pink-500 text-[10px] font-black uppercase mb-1">
-                                        {new Date(event.date).toLocaleDateString('vi', { day: 'numeric', month: 'short' })}
+                                        {new Date(event.startTime).toLocaleDateString('vi', { day: 'numeric', month: 'short' })}
                                     </p>
                                     <h4 className="text-white text-xs md:text-sm font-bold uppercase leading-tight line-clamp-2">
-                                        {event.title}
+                                        {event.name}
                                     </h4>
                                 </div>
                             </div>

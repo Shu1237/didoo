@@ -9,13 +9,21 @@ import {
     PaginationNext,
     PaginationPrevious,
 } from '@/components/ui/pagination';
+import { cn } from "@/lib/utils";
+
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface BasePaginationProps {
     currentPage: number;
     totalPages: number;
-    onPageChange: (page: number) => void;
+    onPageChange?: (page: number) => void;
     totalItems?: number;
     itemsPerPage?: number;
+    onPageSizeChange?: (size: number) => void;
+    pageSizeOptions?: number[];
+    showInfo?: boolean;
+    showSizeSelector?: boolean;
+    showNavigation?: boolean;
 }
 
 export function BasePagination({
@@ -24,6 +32,11 @@ export function BasePagination({
     onPageChange,
     totalItems,
     itemsPerPage,
+    onPageSizeChange,
+    pageSizeOptions = [5, 10, 15, 20, 50],
+    showInfo = true,
+    showSizeSelector = true,
+    showNavigation = true,
 }: BasePaginationProps) {
     const generatePageNumbers = () => {
         const pages: (number | string)[] = [];
@@ -57,48 +70,86 @@ export function BasePagination({
     };
 
     return (
-        <div className="flex items-center justify-between">
-            {/* Info text - Left side */}
-            {totalItems !== undefined && itemsPerPage !== undefined && (
-                <p className="text-sm text-muted-foreground">
-                    Hiển thị {Math.min((currentPage - 1) * itemsPerPage + 1, totalItems)} - {Math.min(currentPage * itemsPerPage, totalItems)} trong tổng số {totalItems}
-                </p>
+        <div className={cn("flex items-center gap-4", (showInfo || showSizeSelector) && showNavigation ? "justify-between w-full" : "justify-end")}>
+            {/* Info text & Size selector - Left side */}
+            {(showInfo || (showSizeSelector && onPageSizeChange)) && (
+                <div className="flex items-center gap-4">
+                    {showInfo && totalItems !== undefined && itemsPerPage !== undefined && totalItems > 0 && (
+                        <p className="text-sm text-muted-foreground whitespace-nowrap">
+                            Hiển thị {Math.min((currentPage - 1) * itemsPerPage + 1, totalItems)}-{Math.min(currentPage * itemsPerPage, totalItems)} / {totalItems}
+                        </p>
+                    )}
+                    {showSizeSelector && onPageSizeChange && itemsPerPage !== undefined && (
+                        <div className="flex items-center gap-2">
+                            <span className="text-sm text-muted-foreground whitespace-nowrap font-medium">Số dòng:</span>
+                            <Select
+                                value={itemsPerPage.toString()}
+                                onValueChange={(val) => onPageSizeChange(Number(val))}
+                            >
+                                <SelectTrigger className="h-9 w-[70px] bg-white border-zinc-200 rounded-xl focus:ring-1 focus:ring-zinc-400 font-medium">
+                                    <SelectValue placeholder={itemsPerPage.toString()} />
+                                </SelectTrigger>
+                                <SelectContent className="rounded-xl border-zinc-100 shadow-xl">
+                                    {pageSizeOptions.map((size) => (
+                                        <SelectItem key={size} value={size.toString()} className="text-xs font-medium">
+                                            {size}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    )}
+                </div>
             )}
 
-            {/* Pagination - Right side */}
-            <Pagination className="mx-0 w-auto">
-                <PaginationContent>
-                    <PaginationItem>
-                        <PaginationPrevious
-                            onClick={() => currentPage > 1 && onPageChange(currentPage - 1)}
-                            className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
-                        />
-                    </PaginationItem>
-
-                    {generatePageNumbers().map((page, index) => (
-                        <PaginationItem key={index}>
-                            {page === '...' ? (
-                                <PaginationEllipsis />
-                            ) : (
-                                <PaginationLink
-                                    onClick={() => onPageChange(page as number)}
-                                    isActive={currentPage === page}
-                                    className="cursor-pointer"
-                                >
-                                    {page}
-                                </PaginationLink>
-                            )}
+            {/* Pagination - Right side (conditionally rendered) */}
+            {showNavigation && (
+                <Pagination className="mx-0 w-auto">
+                    <PaginationContent>
+                        <PaginationItem>
+                            <PaginationPrevious
+                                href="#"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    if (currentPage > 1 && onPageChange) onPageChange(currentPage - 1);
+                                }}
+                                className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                            />
                         </PaginationItem>
-                    ))}
 
-                    <PaginationItem>
-                        <PaginationNext
-                            onClick={() => currentPage < totalPages && onPageChange(currentPage + 1)}
-                            className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
-                        />
-                    </PaginationItem>
-                </PaginationContent>
-            </Pagination>
+                        {generatePageNumbers().map((page, index) => (
+                            <PaginationItem key={index}>
+                                {page === '...' ? (
+                                    <PaginationEllipsis />
+                                ) : (
+                                    <PaginationLink
+                                        href="#"
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            if (onPageChange) onPageChange(page as number);
+                                        }}
+                                        isActive={currentPage === page}
+                                        className="cursor-pointer"
+                                    >
+                                        {page}
+                                    </PaginationLink>
+                                )}
+                            </PaginationItem>
+                        ))}
+
+                        <PaginationItem>
+                            <PaginationNext
+                                href="#"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    if (currentPage < totalPages && onPageChange) onPageChange(currentPage + 1);
+                                }}
+                                className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                            />
+                        </PaginationItem>
+                    </PaginationContent>
+                </Pagination>
+            )}
         </div>
     );
 }

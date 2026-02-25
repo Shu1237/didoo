@@ -150,6 +150,10 @@ async function httpRequest<T>(
             : JSON.stringify(options.body)
         : undefined;
 
+    if (method !== "GET") {
+        console.log(`[HTTP ${method}] ${url}`, options?.body);
+    }
+
     // Get auth token
     const authToken = options?.skipAuth
         ? null
@@ -165,6 +169,8 @@ async function httpRequest<T>(
     if (authToken) {
         baseHeaders["Authorization"] = `Bearer ${authToken}`;
     }
+
+    baseHeaders["ngrok-skip-browser-warning"] = "true";
 
     // Prepare URL
     const baseUrl = options?.baseURL === undefined

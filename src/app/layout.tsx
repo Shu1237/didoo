@@ -6,9 +6,7 @@ import QueryClientProviderWrapper from "@/components/QueryClientProviderWrapper"
 import { cookies } from "next/headers";
 import { AuthProvider } from "@/contexts/authContext";
 import { Toaster } from "sonner";
-import { GoogleOAuthProvider } from "@react-oauth/google";
-import envconfig from "../../config";
-
+import GoogleAuthProvider from "@/components/GoogleAuthProvider";
 
 const inter = Inter({
   subsets: ['latin'],
@@ -22,7 +20,6 @@ const plusJakarta = Plus_Jakarta_Sans({
   display: 'swap',
   variable: '--font-heading',
 })
-
 
 export const metadata: Metadata = {
   title: "DiDoo",
@@ -39,11 +36,11 @@ export default async function RootLayout({
   const refreshToken = cookieStore.get("refreshToken");
 
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${inter.variable} ${plusJakarta.variable} antialiased`}
       >
-        <GoogleOAuthProvider clientId={envconfig.NEXT_PUBLIC_GOOGLE_API_KEY}>
+        <GoogleAuthProvider>
           <AuthProvider initialAccessToken={accessToken?.value || null} initialRefreshToken={refreshToken?.value || null}>
             <QueryClientProviderWrapper>
               <ThemeProvider
@@ -57,9 +54,8 @@ export default async function RootLayout({
               </ThemeProvider>
             </QueryClientProviderWrapper>
           </AuthProvider>
-        </GoogleOAuthProvider>
+        </GoogleAuthProvider>
       </body>
     </html>
   );
 }
-

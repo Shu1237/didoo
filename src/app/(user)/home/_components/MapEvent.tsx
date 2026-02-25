@@ -8,7 +8,7 @@ import { useEffect, useRef, useState, useMemo } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Spinner } from "@/components/ui/spinner";
 import { getDistanceKm } from "@/utils/helper";
-import { Event } from "../../../../types/base";
+import { Event } from "@/types/event";
 import envconfig from "../../../../../config";
 
 interface MapEventProps {
@@ -84,8 +84,8 @@ export default function MapEvent({ eventData }: MapEventProps) {
         distance: getDistanceKm(
           userLocation.lat,
           userLocation.lng,
-          event.lat,
-          event.lng
+          event.locations?.[0]?.latitude || 0,
+          event.locations?.[0]?.longitude || 0
         ),
       }))
       .filter((e) => e.distance <= RADIUS_KM)
@@ -150,8 +150,8 @@ export default function MapEvent({ eventData }: MapEventProps) {
                   <MapComponent
                     mapboxAccessToken={envconfig.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN!}
                     initialViewState={{
-                      longitude: selectedEvent ? selectedEvent.lng : userLocation.lng,
-                      latitude: selectedEvent ? selectedEvent.lat : userLocation.lat,
+                      longitude: selectedEvent && selectedEvent.locations?.[0] ? selectedEvent.locations[0].longitude : userLocation.lng,
+                      latitude: selectedEvent && selectedEvent.locations?.[0] ? selectedEvent.locations[0].latitude : userLocation.lat,
                       zoom: 13,
                     }}
                     style={{ width: "100%", height: "520px" }}
@@ -172,8 +172,8 @@ export default function MapEvent({ eventData }: MapEventProps) {
                     {nearbyEvents.map((event) => (
                       <Marker
                         key={event.id}
-                        longitude={event.lng}
-                        latitude={event.lat}
+                        longitude={event.locations?.[0]?.longitude || 0}
+                        latitude={event.locations?.[0]?.latitude || 0}
                         anchor="bottom"
                         onClick={(e) => {
                           e.originalEvent.stopPropagation();
@@ -186,7 +186,7 @@ export default function MapEvent({ eventData }: MapEventProps) {
                             ? 'bg-red-500 scale-125 animate-bounce'
                             : 'bg-orange-500'
                             }`}
-                          title={event.title}
+                          title={event.name}
                         />
                       </Marker>
                     ))}
@@ -239,8 +239,8 @@ export default function MapEvent({ eventData }: MapEventProps) {
                     >
                       <div className="relative w-24 h-20 rounded-xl overflow-hidden shrink-0">
                         <Image
-                          src={event.image}
-                          alt={event.title}
+                          src={event.thumbnailUrl || "/placeholder.png"}
+                          alt={event.name}
                           fill
                           className="object-cover"
                         />
@@ -248,17 +248,17 @@ export default function MapEvent({ eventData }: MapEventProps) {
 
                       <div className="flex-1 min-w-0">
                         <h3 className="text-sm font-bold uppercase line-clamp-2 text-foreground">
-                          {event.title}
+                          {event.name}
                         </h3>
 
                         <div className="flex items-center gap-1.5 text-xs mt-1 text-muted-foreground">
                           <Calendar className="w-3 h-3" />
-                          {new Date(event.date).toLocaleDateString()}
+                          {new Date(event.startTime).toLocaleDateString()}
                         </div>
 
                         <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                           <MapPin className="w-3 h-3" />
-                          {event.location}
+                          {event.locations?.[0]?.address || "N/A"}
                         </div>
 
                         <div className="flex justify-between items-center mt-2">
@@ -266,7 +266,7 @@ export default function MapEvent({ eventData }: MapEventProps) {
                             {event.distance.toFixed(1)} km away
                           </div>
                           <div className="text-xs font-bold text-foreground bg-accent/10 px-2 py-1 rounded-full">
-                            {event.price}
+                            TBA
                           </div>
                         </div>
                       </div>

@@ -60,24 +60,24 @@ export default function ForgotPasswordForm() {
             className="grid grid-cols-1 lg:grid-cols-2 bg-[#2D2D2D]/60 backdrop-blur-[40px] rounded-[50px] border border-white/10 shadow-[0_50px_100px_rgba(0,0,0,0.4)] overflow-hidden relative max-w-6xl w-full"
         >
             {/* LEFT SIDE: FORM */}
-            <div className="p-8 lg:p-16 text-white overflow-y-auto no-scrollbar">
-                <Link href="/login" className="inline-flex items-center text-white/40 hover:text-white transition-colors mb-8 group">
-                    <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
+            <div className="p-6 lg:p-10 text-white overflow-y-auto no-scrollbar">
+                <Link href="/login" className="inline-flex items-center text-white/40 hover:text-white transition-colors mb-4 group text-xs">
+                    <ArrowLeft className="w-3 h-3 mr-1.5 group-hover:-translate-x-1 transition-transform" />
                     Back to Login
                 </Link>
 
-                <div className="flex justify-center mb-6">
-                    <div className="h-16 w-16 bg-[#FF9B8A]/10 rounded-2xl flex items-center justify-center text-[#FF9B8A] shadow-inner">
-                        {step === 1 ? <Mail className="w-8 h-8" /> : <CheckCircle2 className="w-8 h-8" />}
+                <div className="flex justify-center mb-4">
+                    <div className="h-12 w-12 bg-[#FF9B8A]/10 rounded-xl flex items-center justify-center text-[#FF9B8A] shadow-inner">
+                        {step === 1 ? <Mail className="w-6 h-6" /> : <CheckCircle2 className="w-6 h-6" />}
                     </div>
                 </div>
 
-                <h1 className="text-[40px] font-bold mb-3 leading-tight text-center">
+                <h1 className="text-3xl font-bold mb-1 text-center">
                     {step === 1 ? 'Forgot Password?' : 'Check Your Email'}
                 </h1>
-                <p className="text-white/40 text-lg mb-10 text-center max-w-sm mx-auto">
+                <p className="text-white/40 text-sm mb-6 text-center max-w-xs mx-auto">
                     {step === 1
-                        ? "Enter your email and we'll send you a link to reset your password."
+                        ? "Enter your email and we'll send you a reset link."
                         : `We've sent a password reset link to ${email}`}
                 </p>
 
@@ -88,31 +88,29 @@ export default function ForgotPasswordForm() {
                             initial={{ opacity: 0, x: 20 }}
                             animate={{ opacity: 1, x: 0 }}
                             exit={{ opacity: 0, x: -20 }}
-                            className="space-y-6"
+                            className="space-y-4"
                             onSubmit={handleSubmit(onSubmit)}
                         >
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium text-white/60 ml-2">Email Address</label>
-                                <div className="relative">
-                                    <input
-                                        type="email"
-                                        placeholder="johndoe@gmail.com"
-                                        {...register("email")}
-                                        className={`w-full bg-black/50 border border-transparent rounded-full px-6 py-4 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#FF9B8A]/20 transition-all placeholder:text-gray-500 text-white ${errors.email ? '!border-red-500 bg-red-500/10' : ''}`}
-                                    />
-                                </div>
+                            <div className="space-y-1">
+                                <label className="text-xs font-medium text-white/60 ml-2">Email Address</label>
+                                <input
+                                    type="email"
+                                    placeholder="johndoe@gmail.com"
+                                    {...register("email")}
+                                    className={`w-full bg-black/50 border border-transparent rounded-full px-5 py-3 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#FF9B8A]/20 transition-all placeholder:text-gray-500 text-white ${errors.email ? '!border-red-500 bg-red-500/10' : ''}`}
+                                />
                                 {errors.email && (
-                                    <p className="text-xs text-red-500 ml-4 mt-1 font-medium">{errors.email.message}</p>
+                                    <p className="text-[10px] text-red-500 ml-2 mt-0.5 font-medium">{errors.email.message}</p>
                                 )}
                             </div>
 
                             <button
                                 type="submit"
                                 disabled={forgotPassword.isPending || !isValid}
-                                className="w-full h-14 bg-[#FF9B8A] text-white font-bold rounded-full py-4 shadow-lg shadow-[#FF9B8A]/20 hover:bg-[#FF8A75] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-lg active:scale-[0.98]"
+                                className="w-full h-12 bg-[#FF9B8A] text-white font-bold rounded-full py-2 shadow-lg shadow-[#FF9B8A]/20 hover:bg-[#FF8A75] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-base active:scale-[0.98]"
                             >
                                 {forgotPassword.isPending ? (
-                                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
                                 ) : (
                                     "Send Reset Link"
                                 )}
@@ -123,23 +121,23 @@ export default function ForgotPasswordForm() {
                             key="step2"
                             initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1 }}
-                            className="text-center space-y-8"
+                            className="text-center space-y-6"
                         >
-                            <div className="bg-white/5 border border-white/10 rounded-3xl p-6 backdrop-blur-sm">
-                                <p className="text-white/60 text-sm leading-relaxed">
-                                    Please check your inbox and click the reset link. The link will expire in 15-30 minutes.
+                            <div className="bg-white/5 border border-white/10 rounded-2xl p-4 backdrop-blur-sm">
+                                <p className="text-white/60 text-xs leading-relaxed">
+                                    Please check your inbox and click the reset link. It expires in 30 minutes.
                                     If you don't see it, check your spam folder.
                                 </p>
                             </div>
 
                             <button
                                 onClick={() => setStep(1)}
-                                className="text-[#FF9B8A] font-semibold hover:underline bg-transparent border-none p-0 cursor-pointer block mx-auto"
+                                className="text-[#FF9B8A] text-xs font-semibold hover:underline bg-transparent border-none p-0 cursor-pointer block mx-auto"
                             >
                                 Didn't receive the email? Try again
                             </button>
 
-                            <Link href="/login" className="block w-full h-14 bg-white/5 hover:bg-white/10 text-white font-bold rounded-full py-4 transition-all flex items-center justify-center border border-white/10">
+                            <Link href="/login" className="block w-full h-12 bg-white/5 hover:bg-white/10 text-white font-bold rounded-full py-2 transition-all flex items-center justify-center border border-white/10 text-sm">
                                 Return to Login
                             </Link>
                         </motion.div>

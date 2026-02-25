@@ -22,8 +22,9 @@ export default function OrganizerHeader() {
   const router = useRouter();
 
   const handleLogout = async () => {
+    if (!user?.UserId) return;
     try {
-      await authRequest.logoutClient();
+      await authRequest.logoutClient({ userId: user.UserId });
       router.push("/login");
     } catch (error) {
       console.error("Logout error:", error);
@@ -65,17 +66,17 @@ export default function OrganizerHeader() {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="w-11 h-11 rounded-full bg-zinc-900 hover:bg-zinc-800 p-0 overflow-hidden shadow-md border border-zinc-200">
               <Avatar className="h-full w-full">
-                <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.name || "Organizer"}`} />
+                <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.FullName || "Organizer"}`} />
                 <AvatarFallback className="bg-zinc-900 text-white font-black italic">
-                  {user?.name?.[0] || "O"}
+                  {user?.FullName?.[0] || "O"}
                 </AvatarFallback>
               </Avatar>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56 mt-2 rounded-xl border-zinc-100 shadow-xl bg-white p-2">
             <DropdownMenuLabel className="px-2 py-1.5">
-              <p className="text-sm font-bold text-zinc-900">{user?.name || "Organizer"}</p>
-              <p className="text-xs text-zinc-500 font-medium">{user?.email || "organizer@example.com"}</p>
+              <p className="text-sm font-bold text-zinc-900">{user?.FullName || "Organizer"}</p>
+              <p className="text-xs text-zinc-500 font-medium">{user?.Email || "organizer@example.com"}</p>
             </DropdownMenuLabel>
             <DropdownMenuSeparator className="bg-zinc-100 my-1" />
             <DropdownMenuItem asChild className="rounded-lg cursor-pointer focus:bg-zinc-50">

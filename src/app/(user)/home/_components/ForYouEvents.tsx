@@ -1,6 +1,7 @@
 'use client';
 
-import { Category, Event } from '../../../../types/base';
+import { Category } from '@/types/category';
+import { Event } from '@/types/event';
 import EventCard from '@/components/ui/CardEvent';
 import { Trophy } from 'lucide-react';
 import { SectionHeader } from './SectionHeader';
@@ -48,7 +49,7 @@ export const ForYouEvents = ({ events, categories }: ForYouEventsProps) => {
                 {/* Tabs Content */}
                 {categories.map((cat) => {
                     const filteredEvents = events.filter(
-                        (e) => e.category === cat.name
+                        (e) => e.category?.name === cat.name
                     );
 
                     return (

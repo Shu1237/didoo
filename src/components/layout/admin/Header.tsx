@@ -22,8 +22,9 @@ export default function AdminHeader() {
   const router = useRouter();
 
   const handleLogout = async () => {
+    if (!user?.UserId) return;
     try {
-      await authRequest.logoutClient();
+      await authRequest.logoutClient({ userId: user.UserId });
       router.push("/login");
     } catch (error) {
       console.error("Logout error:", error);
@@ -65,21 +66,21 @@ export default function AdminHeader() {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="w-10 h-10 rounded-full bg-zinc-900 hover:bg-zinc-800 p-0 overflow-hidden shadow-lg shadow-zinc-900/20">
               <Avatar className="h-full w-full">
-                <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.name || "Admin"}`} />
+                <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.FullName || "Admin"}`} />
                 <AvatarFallback className="bg-zinc-900 text-white font-bold">
-                  {user?.name?.[0] || "A"}
+                  {user?.FullName?.[0] || "A"}
                 </AvatarFallback>
               </Avatar>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56 mt-2 rounded-xl border-zinc-100 shadow-xl bg-white p-2">
+          <DropdownMenuContent align="end" className="w-56 mt-2 rounded-xl border-zinc-100 shadow-xl bg-white p-2 text-zinc-600">
             <DropdownMenuLabel className="px-2 py-1.5">
-              <p className="text-sm font-bold text-zinc-900">{user?.name || "Admin"}</p>
-              <p className="text-xs text-zinc-500 font-medium">{user?.email || "admin@example.com"}</p>
+              <p className="text-sm font-bold text-zinc-900">{user?.FullName || "Admin"}</p>
+              <p className="text-xs text-zinc-500 font-medium">{user?.Email || "admin@example.com"}</p>
             </DropdownMenuLabel>
             <DropdownMenuSeparator className="bg-zinc-100 my-1" />
             <DropdownMenuItem asChild className="rounded-lg cursor-pointer focus:bg-zinc-50">
-              <Link href="/user/profile" className="flex items-center gap-2">
+              <Link href="/admin/profile" className="flex items-center gap-2">
                 <User className="w-4 h-4 text-zinc-500" />
                 <span>Profile</span>
               </Link>

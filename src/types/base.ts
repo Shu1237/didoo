@@ -20,10 +20,14 @@ export type ResponseError = {
 };
 
 export type PaginatedData<T> = {
-  totalCount: number;
+  totalItems: number;
+  totalCount?: number;
   pageNumber: number;
   pageSize: number;
-  totalPage: number;
+  totalPages: number;
+  totalPage?: number;
+  hasNextPage?: boolean;
+  hasPreviousPage?: boolean;
   items: T[];
 };
 
@@ -32,11 +36,11 @@ export type PaginatedData<T> = {
 export type BasePaginationResponse<T> = ResponseData<PaginatedData<T>>;
 
 export interface BasePaginationQuery {
-  pageNumber?: number;
-  pageSize?: number;
-  isDescending?: boolean;
-  isDeleted?: boolean;
-  fields?: string;
+  PageNumber?: number;
+  PageSize?: number;
+  IsDescending?: boolean;
+  IsDeleted?: boolean;
+  Fields?: string;
   [key: string]: string | number | boolean | undefined;
 }
 

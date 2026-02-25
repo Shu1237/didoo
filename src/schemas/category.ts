@@ -2,21 +2,22 @@ import { z } from "zod";
 import { CategoryStatus } from "@/utils/enum";
 
 export const categoryCreateSchema = z.object({
-    name: z.string().min(1),
-    slug: z.string().min(1),
-    description: z.string().optional(),
-    iconUrl: z.url().optional(),
-    status: z.enum(CategoryStatus).default(CategoryStatus.ACTIVE),
-    parentCategoryId: z.uuid().nullable().optional(),
+    Name: z.string().min(1, "Tên danh mục là bắt buộc"),
+    Slug: z.string().min(1, "Slug là bắt buộc"),
+    Description: z.string().optional().or(z.literal("")),
+    IconUrl: z.string().url("Link icon không hợp lệ").optional().or(z.literal("")),
+    Status: z.nativeEnum(CategoryStatus).default(CategoryStatus.ACTIVE),
+    ParentCategoryId: z.string().nullable().optional(),
 });
 
 export const categoryUpdateSchema = z.object({
-    name: z.string().min(1).optional(),
-    slug: z.string().optional(),
-    description: z.string().optional(),
-    iconUrl: z.url().optional(),
-    status: z.enum(CategoryStatus).optional(),
-    parentCategoryId: z.uuid().nullable().optional(),
+    Name: z.string().min(1).optional(),
+    Slug: z.string().optional(),
+    Description: z.string().optional(),
+    IconUrl: z.string().url().optional().or(z.literal("")),
+    Status: z.nativeEnum(CategoryStatus).optional(),
+    ParentCategoryId: z.string().nullable().optional(),
+    IsDeleted: z.boolean().optional(),
 });
 
 

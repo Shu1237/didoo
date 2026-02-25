@@ -4,7 +4,7 @@ import React from 'react';
 import Image from 'next/image';
 import { Calendar, MapPin } from 'lucide-react';
 import Link from 'next/link';
-import { Event } from "../../../types/base";
+import { Event } from '../../../types/event';
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import { Button } from '@/components/ui/button';
@@ -16,7 +16,7 @@ interface DetailPlaceProps {
 
 const DetailPlace = ({ eventData, setSelectedEvent }: DetailPlaceProps) => {
   // Safe date parsing
-  const eventDate = new Date(eventData.date);
+  const eventDate = new Date(eventData.startTime);
   const isValidDate = !isNaN(eventDate.getTime());
 
   return (
@@ -28,14 +28,14 @@ const DetailPlace = ({ eventData, setSelectedEvent }: DetailPlaceProps) => {
       <div className="flex flex-col gap-3 shrink-0 w-28">
         <div className="relative w-28 h-28 rounded-2xl overflow-hidden shadow-md">
           <Image
-            src={eventData.image}
-            alt={eventData.title}
+            src={eventData.thumbnailUrl || "/placeholder.png"}
+            alt={eventData.name}
             fill
             className="object-cover group-hover:scale-105 transition-transform duration-500"
           />
           {/* Category Badge */}
           <div className="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md border border-white/20">
-            <span className="text-[10px] font-bold text-white uppercase tracking-wider">{eventData.category}</span>
+            <span className="text-[10px] font-bold text-white uppercase tracking-wider">{eventData.category?.name}</span>
           </div>
         </div>
 
@@ -53,15 +53,15 @@ const DetailPlace = ({ eventData, setSelectedEvent }: DetailPlaceProps) => {
         {/* Top: Title */}
         <div className="flex justify-between items-start">
           <h3 className="text-base font-bold text-foreground leading-tight line-clamp-2 group-hover:text-primary transition-colors">
-            {eventData.title}
+            {eventData.name}
           </h3>
         </div>
 
         {/* Organizer */}
         <div className="flex items-center gap-2">
           <div className="w-5 h-5 rounded-full bg-muted overflow-hidden relative border border-border">
-            {eventData.organizer?.avatar ? (
-              <Image src={eventData.organizer.avatar} alt={eventData.organizer.name} fill className="object-cover" />
+            {eventData.organizer?.logoUrl ? (
+              <Image src={eventData.organizer.logoUrl} alt={eventData.organizer.name} fill className="object-cover" />
             ) : (
               <div className="w-full h-full bg-primary/20" />
             )}
@@ -74,7 +74,7 @@ const DetailPlace = ({ eventData, setSelectedEvent }: DetailPlaceProps) => {
         {/* Price - Full Row */}
         <div className="w-full py-1">
           <span className="font-extrabold text-lg bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-            {eventData.price}
+            TBA
           </span>
         </div>
 
@@ -87,7 +87,7 @@ const DetailPlace = ({ eventData, setSelectedEvent }: DetailPlaceProps) => {
             </div>
             <div className="flex items-center gap-2">
               <MapPin className="w-3.5 h-3.5 text-secondary" />
-              <span className="truncate max-w-[180px]">{eventData.location}</span>
+              <span className="truncate max-w-[180px]">{eventData.locations?.[0]?.address || "N/A"}</span>
             </div>
           </div>
         </div>
@@ -95,7 +95,7 @@ const DetailPlace = ({ eventData, setSelectedEvent }: DetailPlaceProps) => {
       </div>
 
       {/* Status Indicator (Dot) */}
-      <div className={`absolute top-4 right-4 w-2 h-2 rounded-full ${eventData.status === 'completed' ? 'bg-red-500' : 'bg-green-500'} ring-4 ring-background/50`} />
+      <div className={`absolute top-4 right-4 w-2 h-2 rounded-full ${eventData.status === 2 ? 'bg-red-500' : 'bg-green-500'} ring-4 ring-background/50`} />
 
     </div>
   );

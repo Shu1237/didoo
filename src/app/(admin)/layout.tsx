@@ -24,7 +24,7 @@ export default function AdminLayout({
         <AdminHeader />
 
         {/* QUAN TRỌNG: Không cho phép main cuộn dọc, lề p-6 để card không sát đáy */}
-        <main className="flex-1 overflow-hidden p-6 min-h-0">
+        <main className="flex-1 overflow-hidden p-6 min-h-0 flex flex-col relative w-full">
           {children}
         </main>
       </div>

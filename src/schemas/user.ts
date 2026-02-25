@@ -11,29 +11,31 @@ export const locationSchema = z.object({
 
 // User schemas
 export const userCreateSchema = z.object({
-    fullName: z.string().min(1, "Full name is required"),
-    email: z.email(),
-    phone: z.string().optional(), // regex validation?
-    password: z.string().min(6),
-    avatarUrl: z.url().optional(),
-    gender: z.number().int().min(0).max(2).default(0),
-    dateOfBirth: z.date(),
-    address: z.string().optional(),
-    status: z.string().default("Active"), // Enum?
-    roleName: z.string().default(Roles.USER),
-    organizerId: z.uuid().nullable().optional(),
+    FullName: z.string().min(1, "Full name is required"),
+    Email: z.string().email(),
+    Phone: z.string().optional(),
+    Password: z.string().min(6),
+    AvatarUrl: z.string().url().optional(),
+    Gender: z.number().int().min(0).max(2).default(0),
+    DateOfBirth: z.coerce.date(),
+    Address: z.string().optional(),
+    Status: z.string().default("Active"),
+    RoleName: z.string().default(Roles.USER),
+    OrganizerId: z.string().uuid().nullable().optional(),
 });
 
 export const userUpdateSchema = z.object({
-    fullName: z.string().min(1).optional(),
-    phone: z.string().optional(),
-    avatarUrl: z.url().optional(),
-    gender: z.number().int().min(0).max(2).optional(),
-    dateOfBirth: z.date().optional(),
-    address: z.string().optional(),
-    status: z.string().optional(),
-    roleName: z.string().optional(),
-    organizerId: z.uuid().nullable().optional(),
+    FullName: z.string().min(1).optional(),
+    Phone: z.string().optional(),
+    AvatarUrl: z.string().url().optional(),
+    Gender: z.number().int().min(0).max(2).optional(),
+    DateOfBirth: z.coerce.date().optional(),
+    Address: z.string().optional(),
+    Status: z.string().optional(),
+    RoleName: z.string().optional(),
+    OrganizerId: z.string().uuid().nullable().optional(),
+    IsVerified: z.boolean().optional(),
+    IsDeleted: z.boolean().optional(),
 });
 
 

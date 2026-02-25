@@ -7,7 +7,7 @@ import Map from './_components/Map';
 import { MapPin, Satellite } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { EVENTS } from '@/utils/mock';
-import { Event } from '../../types/base';
+import { Event } from '@/types/event';
 import { Button } from '@/components/ui/button';
 
 // 1. Component Mũi tên thuần (Đã sửa hướng và xóa khung)
@@ -71,25 +71,29 @@ const Page = () => {
 
     // Filter by category
     if (category) {
-      filtered = filtered.filter(e => e.category.toLowerCase().includes(category.toLowerCase()));
+      filtered = filtered.filter(e => e.category?.name.toLowerCase().includes(category.toLowerCase()));
     }
 
     // Filter by search query
     if (searchQuery) {
       filtered = filtered.filter(e =>
-        e.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        e.location.toLowerCase().includes(searchQuery.toLowerCase())
+        e.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        e.locations?.[0]?.address.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
 
     // Sort
     filtered = [...filtered].sort((a, b) => {
       if (sortBy === 'date') {
-        return new Date(a.date).getTime() - new Date(b.date).getTime();
+        return new Date(a.startTime).getTime() - new Date(b.startTime).getTime();
       }
       if (sortBy === 'distance' && coordinates) {
-        const distA = Math.sqrt(Math.pow(a.lat - coordinates.lat, 2) + Math.pow(a.lng - coordinates.lng, 2));
-        const distB = Math.sqrt(Math.pow(b.lat - coordinates.lat, 2) + Math.pow(b.lng - coordinates.lng, 2));
+        const aLat = a.locations?.[0]?.latitude || 0;
+        const aLng = a.locations?.[0]?.longitude || 0;
+        const bLat = b.locations?.[0]?.latitude || 0;
+        const bLng = b.locations?.[0]?.longitude || 0;
+        const distA = Math.sqrt(Math.pow(aLat - coordinates.lat, 2) + Math.pow(aLng - coordinates.lng, 2));
+        const distB = Math.sqrt(Math.pow(bLat - coordinates.lat, 2) + Math.pow(bLng - coordinates.lng, 2));
         return distA - distB;
       }
       return 0;
