@@ -2,11 +2,14 @@ import { OrganizerStatus } from "@/utils/enum";
 import { BasePaginationQuery } from "./base";
 import { Event } from "./event";
 
+/** Match BE OrganizerGetListQuery */
 export interface OrganizerGetListQuery extends BasePaginationQuery {
-    Name?: string;
-    Status?: OrganizerStatus;
+    name?: string;
+    slug?: string;
+    status?: OrganizerStatus;
 }
 
+/** Match BE OrganizerDTO */
 export interface Organizer {
     id: string;
     name: string;

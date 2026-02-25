@@ -19,10 +19,12 @@ export default function OrganizerEventsPage() {
   const user = userData?.data;
   const organizerId = user?.organizerId;
 
+  const [showDeleted, setShowDeleted] = useState(false);
   const { data: eventsRes, isLoading: isEventsLoading } = useGetEvents({
     organizerId: organizerId || undefined,
     pageNumber,
     pageSize,
+    isDeleted: showDeleted,
   });
 
   const [modalState, setModalState] = useState<{
@@ -45,9 +47,9 @@ export default function OrganizerEventsPage() {
   if (isUserLoading || isEventsLoading) return <Loading />;
 
   const events = eventsRes?.data?.items || [];
-  const totalPages = eventsRes?.data?.totalPage || 1;
-  const totalItems = eventsRes?.data?.totalCount || 0;
-  const isActiveOrganizer = user?.role?.name === "ORGANIZER" && user?.status === "Active";
+  const totalPages = eventsRes?.data?.totalPages || 1;
+  const totalItems = eventsRes?.data?.totalItems || 0;
+  const isActiveOrganizer = user?.role?.name === "ORGANIZER" && user?.status === 1;
 
   return (
     <div className="h-full flex flex-col space-y-8">
@@ -58,7 +60,18 @@ export default function OrganizerEventsPage() {
             Chỉnh sửa và tối ưu hóa các sự kiện của bạn
           </p>
         </div>
-        {isActiveOrganizer && <CreateEventButton onClick={() => openModal("CREATE")} />}
+        <div className="flex items-center gap-3">
+          <label className="flex items-center gap-2 text-sm font-medium text-zinc-600 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={showDeleted}
+              onChange={(e) => setShowDeleted(e.target.checked)}
+              className="rounded border-zinc-300"
+            />
+            Xem đã xóa
+          </label>
+          {isActiveOrganizer && <CreateEventButton onClick={() => openModal("CREATE")} />}
+        </div>
       </div>
 
       <div className="flex-1 min-h-0 overflow-auto scrollbar-thin rounded-3xl">

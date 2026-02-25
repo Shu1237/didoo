@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { OrganizerStatus } from "@/utils/enum";
 
+/** api.md: status 1=Pending 2=Verified 3=Banned */
 export const organizerCreateSchema = z.object({
     Name: z.string().min(1, "Tên tổ chức là bắt buộc"),
     Slug: z.string().min(1, "Slug là bắt buộc"),
@@ -14,6 +15,8 @@ export const organizerCreateSchema = z.object({
     InstagramUrl: z.string().url("Link Instagram không hợp lệ").optional().or(z.literal("")),
     TiktokUrl: z.string().url("Link TikTok không hợp lệ").optional().or(z.literal("")),
     Address: z.string().optional().or(z.literal("")),
+    IsVerified: z.boolean().default(false),
+    Status: z.nativeEnum(OrganizerStatus).default(OrganizerStatus.PENDING),
 });
 
 export const organizerUpdateSchema = z.object({
@@ -29,6 +32,7 @@ export const organizerUpdateSchema = z.object({
     FacebookUrl: z.string().url().optional().or(z.literal("")),
     InstagramUrl: z.string().url().optional().or(z.literal("")),
     TiktokUrl: z.string().url().optional().or(z.literal("")),
+    Address: z.string().optional().or(z.literal("")),
     Status: z.nativeEnum(OrganizerStatus).optional(),
     IsVerified: z.boolean().optional(),
 });

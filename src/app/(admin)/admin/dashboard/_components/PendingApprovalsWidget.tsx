@@ -12,26 +12,26 @@ import Loading from "@/components/loading";
 
 export default function PendingApprovalsWidget() {
     const { data: organizersRes, isLoading } = useGetOrganizers({
-        Status: OrganizerStatus.PENDING,
-        PageSize: 10,
+        status: OrganizerStatus.PENDING,
+        pageSize: 10,
     });
     const { update } = useOrganizer();
 
     const organizers = organizersRes?.data?.items || [];
 
     const handleAction = async (org: any, status: OrganizerStatus) => {
-        const actionName = status === OrganizerStatus.ACTIVE ? "Phê duyệt" : "Từ chối";
+        const actionName = status === OrganizerStatus.VERIFIED ? "Phê duyệt" : "Từ chối";
         let message = `Bạn có chắc chắn muốn ${actionName.toLowerCase()} organizer "${org.name}" không?`;
 
-        if (status === OrganizerStatus.ACTIVE && !org.isVerified) {
+        if (status === OrganizerStatus.VERIFIED && !org.isVerified) {
             message += "\n\nCẢNH BÁO: Organizer này CHƯA được verify danh tính!";
         }
 
         if (!window.confirm(message)) return;
 
         try {
-            await update.mutateAsync({ id: org.id, body: { Status: status } as any });
-            toast.success(status === OrganizerStatus.ACTIVE ? "Đã phê duyệt!" : "Đã từ chối!");
+            await update.mutateAsync({ id: org.id, body: { status } as any });
+            toast.success(status === OrganizerStatus.VERIFIED ? "Đã phê duyệt!" : "Đã từ chối!");
         } catch (err) { }
     };
 
@@ -86,7 +86,7 @@ export default function PendingApprovalsWidget() {
                             <div className="col-span-3 flex items-center justify-end gap-2 text-right">
                                 <div className="flex gap-2">
                                     <Button
-                                        onClick={() => handleAction(org, OrganizerStatus.ACTIVE)}
+                                        onClick={() => handleAction(org, OrganizerStatus.VERIFIED)}
                                         disabled={update.isPending}
                                         size="icon"
                                         className="w-8 h-8 rounded-full bg-zinc-900 text-white hover:bg-primary shadow-lg shadow-zinc-200 transition-all active:scale-90"
@@ -94,7 +94,7 @@ export default function PendingApprovalsWidget() {
                                         {update.isPending ? <Loader2 className="w-3 h-3 animate-spin" /> : <Check className="w-4 h-4" />}
                                     </Button>
                                     <Button
-                                        onClick={() => handleAction(org, OrganizerStatus.REJECTED)}
+                                        onClick={() => handleAction(org, OrganizerStatus.BANNED)}
                                         disabled={update.isPending}
                                         size="icon"
                                         variant="outline"

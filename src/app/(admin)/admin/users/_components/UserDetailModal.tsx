@@ -30,7 +30,7 @@ export default function UserDetailModal({
 }: UserDetailModalProps) {
     if (!user) return null;
 
-    const isBlocked = user.status === "Blocked";
+    const isBlocked = user.status === 2;
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
@@ -64,7 +64,7 @@ export default function UserDetailModal({
                                         className={`text-white hover:text-white rounded-full px-3 py-0 border-none pointer-events-none uppercase text-[9px] tracking-widest ${isBlocked ? "bg-red-500" : "bg-green-500"
                                             }`}
                                     >
-                                        {user.status || "Active"}
+                                        {user.status === 1 ? "Active" : "Inactive"}
                                     </Badge>
                                 </div>
                             </DialogDescription>
@@ -140,7 +140,7 @@ export default function UserDetailModal({
                                 <div className="flex items-center justify-between mb-3">
                                     <h5 className="text-[10px] font-bold uppercase tracking-[0.2em] opacity-60">Status Actions</h5>
                                     <Badge className={isBlocked ? "bg-rose-500 text-[9px]" : "bg-emerald-500 text-[9px]"}>
-                                        {user.status || "Active"}
+                                        {user.status === 1 ? "Active" : "Inactive"}
                                     </Badge>
                                 </div>
                                 <p className="text-[11px] text-zinc-400 mb-4 leading-relaxed">

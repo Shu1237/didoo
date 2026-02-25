@@ -49,7 +49,7 @@ export default function EventModal({ isOpen, onClose, mode, event, organizerId }
 
     const { create, update } = useEvent();
     const { uploadImage } = useMedia();
-    const { data: categoriesRes } = useGetCategories({ PageSize: 100 });
+    const { data: categoriesRes } = useGetCategories({ pageSize: 100 });
     const { data: userData } = useGetMe();
     const currentUser = userData?.data;
     const categories = categoriesRes?.data?.items || [];

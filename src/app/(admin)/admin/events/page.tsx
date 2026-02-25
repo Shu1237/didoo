@@ -20,10 +20,10 @@ export default function AdminEventsPage() {
   const status = statusRaw && statusRaw !== "ALL" ? (Number(statusRaw) as EventStatus) : undefined;
 
   const { data: eventsRes, isLoading } = useGetEvents({
-    PageNumber: pageNumber,
-    PageSize: pageSize,
-    Name: name,
-    Status: status,
+    pageNumber,
+    pageSize,
+    name: name || undefined,
+    status,
   });
 
   const filterConfigs: FilterHeaderConfig[] = [
@@ -42,7 +42,7 @@ export default function AdminEventsPage() {
         { label: "Bản nháp", value: EventStatus.DRAFT },
         { label: "Đang diễn ra", value: EventStatus.PUBLISHED },
         { label: "Đã hủy", value: EventStatus.CANCELLED },
-        { label: "Đã hoàn thành", value: EventStatus.COMPLETED },
+        { label: "Đã hoàn thành", value: EventStatus.CLOSED },
       ]
     }
   ];

@@ -4,6 +4,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import { ShieldCheck, Ticket, Clock, Zap, Globe, Cpu, Music, Wind, MapPin, Calendar } from "lucide-react";
 import { Event } from "@/types/event";
+import { EventStatus } from "@/utils/enum";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -66,7 +67,7 @@ export default function EventInfor({ event }: EventInforProps) {
                             {[
                                 { label: "Danh mục", value: event.category?.name || "Sự kiện", icon: Cpu, color: "text-blue-400" },
                                 { label: "Độ tuổi", value: event.ageRestriction > 0 ? `${event.ageRestriction}+` : "Mọi lứa tuổi", icon: ShieldCheck, color: "text-emerald-400" },
-                                { label: "Trạng thái", value: event.status === 1 ? "Đang diễn ra" : "Sắp tới", icon: Globe, color: "text-amber-400" },
+                                { label: "Trạng thái", value: event.status === EventStatus.PUBLISHED ? "Đang diễn ra" : "Sắp tới", icon: Globe, color: "text-amber-400" },
                                 { label: "Địa điểm", value: `${event.locations?.length || 0} điểm`, icon: MapPin, color: "text-rose-400" }
                             ].map((spec, i) => (
                                 <motion.div

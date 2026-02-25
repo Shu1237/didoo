@@ -21,16 +21,20 @@ export interface Role {
     description: string;
 }
 
+/** Match BE UserGetListQuery */
 export interface UserGetListQuery extends BasePaginationQuery {
-    FullName?: string;
-    Email?: string;
-    Phone?: string;
-    IsVerified?: boolean;
-    Gender?: number;
-    Status?: string;
-    HasLocation?: boolean;
+    fullName?: string;
+    email?: string;
+    phone?: string;
+    isVerified?: boolean;
+    gender?: number;
+    status?: number;
+    roleId?: string;
+    organizerId?: string;
+    hasLocation?: boolean;
 }
 
+/** Match BE UserDTO */
 export interface User {
     id: string;
     fullName: string;
@@ -39,13 +43,11 @@ export interface User {
     isVerified: boolean;
     avatarUrl?: string;
     gender: number;
-    dateOfBirth: string;
+    dateOfBirth?: string;
     address?: string;
-    status: string;
+    status: number;
     role: Role;
     organizerId?: string | null;
     locations: any[];
-    createdAt?: string;
-    updatedAt?: string;
     isDeleted?: boolean;
 }

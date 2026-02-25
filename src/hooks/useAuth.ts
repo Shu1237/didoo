@@ -14,6 +14,7 @@ import {
     LogoutInput
 } from "@/schemas/auth";
 import { useSessionStore } from "@/stores/sesionStore";
+import { getRedirectPathForRole } from "@/utils/enum";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -31,7 +32,8 @@ export const useAuth = () => {
             setSession(data);
             await authRequest.loginServer(data);
             toast.success("Login successfully");
-            router.replace("/");
+            const u = useSessionStore.getState().user;
+            router.replace(getRedirectPathForRole(u?.RoleId));
         },
 
     })
@@ -45,7 +47,8 @@ export const useAuth = () => {
             setSession(data);
             await authRequest.loginServer(data)
             toast.success("Login successfully");
-            router.replace("/");
+            const u = useSessionStore.getState().user;
+            router.replace(getRedirectPathForRole(u?.RoleId));
         },
     })
 

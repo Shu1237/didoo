@@ -2,6 +2,7 @@
 
 import React from "react";
 import { Ticket } from "@/types/ticket";
+import { TicketStatus } from "@/utils/enum";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import {
@@ -89,9 +90,9 @@ export default function AttendeesList({ tickets, isLoading }: AttendeesListProps
                             <td className="px-8 py-6">
                                 <Badge className={cn(
                                     "rounded-full px-3 py-1 text-[9px] font-black uppercase tracking-widest border-none shadow-sm",
-                                    ticket.status === "Sold" ? "bg-emerald-500 text-white" : "bg-zinc-400 text-white"
+                                    ticket.status === TicketStatus.FULL ? "bg-emerald-500 text-white" : "bg-zinc-400 text-white"
                                 )}>
-                                    {ticket.status === "Sold" ? "Đã thanh toán" : "Chờ xử lý"}
+                                    {ticket.status === TicketStatus.FULL ? "Đã thanh toán" : "Chờ xử lý"}
                                 </Badge>
                             </td>
                             <td className="px-8 py-6 text-right">

@@ -11,24 +11,18 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { authRequest } from "@/apiRequest/auth";
-import { useRouter } from "next/navigation";
 import { Search, Bell, Mail, Command, LogOut, Settings, User } from "lucide-react";
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function OrganizerHeader() {
   const user = useSessionStore((state) => state.user);
-  const router = useRouter();
+  const { logout } = useAuth();
 
   const handleLogout = async () => {
     if (!user?.UserId) return;
-    try {
-      await authRequest.logoutClient({ userId: user.UserId });
-      router.push("/login");
-    } catch (error) {
-      console.error("Logout error:", error);
-    }
+    await logout.mutateAsync({ userId: user.UserId });
   };
 
   return (

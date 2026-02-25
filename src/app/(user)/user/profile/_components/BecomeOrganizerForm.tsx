@@ -44,10 +44,8 @@ export default function BecomeOrganizerForm({ onSuccess }: { onSuccess?: () => v
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>, field: "LogoUrl" | "BannerUrl") => {
         const file = e.target.files?.[0];
         if (file) {
-            try {
-                const result = await uploadImage.mutateAsync(file);
-                form.setValue(field, result.secure_url);
-            } catch (err) { }
+            const result = await uploadImage.mutateAsync(file);
+            form.setValue(field, result.secure_url);
         }
     };
 

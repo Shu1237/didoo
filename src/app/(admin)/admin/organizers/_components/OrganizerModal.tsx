@@ -68,14 +68,14 @@ export default function OrganizerModal({
                                     <Badge
                                         className={`text-white hover:text-white rounded-full px-3 py-0.5 border-none pointer-events-none uppercase text-[9px] tracking-widest ${organizer.status === OrganizerStatus.PENDING
                                             ? "bg-amber-500"
-                                            : organizer.status === OrganizerStatus.ACTIVE
+                                            : organizer.status === OrganizerStatus.VERIFIED
                                                 ? "bg-green-500"
                                                 : "bg-red-500"
                                             }`}
                                     >
                                         {organizer.status === OrganizerStatus.PENDING
                                             ? "Chờ phê duyệt"
-                                            : organizer.status === OrganizerStatus.ACTIVE
+                                            : organizer.status === OrganizerStatus.VERIFIED
                                                 ? "Đã phê duyệt"
                                                 : "Từ chối"}
                                     </Badge>

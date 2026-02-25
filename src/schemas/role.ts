@@ -7,9 +7,9 @@ export const genericListQuerySchema = z.object({
     isDeleted: z.boolean().default(false),
 });
 
+/** api.md: name is RoleNameEnum 1=Admin, 2=User, 3=Manager, 4=Guest */
 export const roleCreateSchema = z.object({
-    name: z.string().min(1),
-    description: z.string().optional(),
+    name: z.number().int().min(1).max(4),
 });
 
 export type RoleCreateBody = z.infer<typeof roleCreateSchema>;

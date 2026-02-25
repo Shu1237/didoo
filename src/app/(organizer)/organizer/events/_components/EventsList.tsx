@@ -1,12 +1,20 @@
 "use client";
 
+import { useState } from "react";
 import { Card } from "@/components/ui/card";
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, MapPin, Tag } from "lucide-react";
+import { Calendar, MapPin, Tag, MoreVertical, Trash2, RotateCcw } from "lucide-react";
 import { Event } from "@/types/event";
 import { EventStatus } from "@/utils/enum";
+import { useEvent } from "@/hooks/useEvent";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { handleErrorApi } from "@/lib/errors";
 
 interface EventsListProps {
   events: any[];
@@ -15,6 +23,28 @@ interface EventsListProps {
 }
 
 export default function EventsList({ events, onViewDetail, onEdit }: EventsListProps) {
+  const { deleteEvent, restore } = useEvent();
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  const handleDelete = async (event: Event) => {
+    if (!window.confirm(`Xóa sự kiện "${event.name}"? Hành động này không thể hoàn tác.`)) return;
+    setDeletingId(event.id);
+    try {
+      await deleteEvent.mutateAsync(event.id);
+    } catch (e) {
+      handleErrorApi({ error: e });
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
+  const handleRestore = async (event: Event) => {
+    try {
+      await restore.mutateAsync(event.id);
+    } catch (e) {
+      handleErrorApi({ error: e });
+    }
+  };
 
   if (!events || events.length === 0) {
     return (
@@ -89,6 +119,28 @@ export default function EventsList({ events, onViewDetail, onEdit }: EventsListP
             >
               Sửa
             </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-12 w-12 rounded-full shrink-0">
+                  <MoreVertical className="w-5 h-5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="rounded-xl">
+                {event.isDeleted ? (
+                  <DropdownMenuItem onClick={() => handleRestore(event)} className="gap-2">
+                    <RotateCcw className="w-4 h-4" /> Khôi phục
+                  </DropdownMenuItem>
+                ) : (
+                  <DropdownMenuItem
+                    onClick={() => handleDelete(event)}
+                    className="gap-2 text-red-600 focus:text-red-600"
+                    disabled={deletingId === event.id}
+                  >
+                    <Trash2 className="w-4 h-4" /> Xóa
+                  </DropdownMenuItem>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </Card>
       ))}

@@ -20,10 +20,10 @@ export default function AdminOrganizersPage() {
   const status = statusRaw && statusRaw !== "ALL" ? (Number(statusRaw) as OrganizerStatus) : undefined;
 
   const { data: organizersRes, isLoading } = useGetOrganizers({
-    PageNumber: pageNumber,
-    PageSize: pageSize,
-    Name: name,
-    Status: status,
+    pageNumber,
+    pageSize,
+    name: name || undefined,
+    status,
   });
 
   const filterConfigs: FilterHeaderConfig[] = [
@@ -40,8 +40,8 @@ export default function AdminOrganizersPage() {
       type: "select",
       options: [
         { label: "Chờ phê duyệt", value: OrganizerStatus.PENDING },
-        { label: "Đã phê duyệt", value: OrganizerStatus.ACTIVE },
-        { label: "Từ chối", value: OrganizerStatus.REJECTED },
+        { label: "Đã phê duyệt", value: OrganizerStatus.VERIFIED },
+        { label: "Từ chối", value: OrganizerStatus.BANNED },
       ]
     }
   ];

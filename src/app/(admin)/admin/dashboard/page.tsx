@@ -11,16 +11,16 @@ import { EventStatus } from "@/utils/enum";
 import Loading from "@/components/loading";
 
 export default function AdminDashboardPage() {
-  const { data: usersRes, isLoading: isUsersLoading } = useGetUsers({ PageSize: 1 });
+  const { data: usersRes, isLoading: isUsersLoading } = useGetUsers({ pageSize: 1 });
   const { data: eventsRes, isLoading: isEventsLoading } = useGetEvents({
-    Status: EventStatus.PUBLISHED,
-    PageSize: 1
+    status: EventStatus.PUBLISHED,
+    pageSize: 1
   });
 
   if (isUsersLoading || isEventsLoading) return <Loading />;
 
-  const totalUsers = usersRes?.data?.totalCount || 0;
-  const activeEvents = eventsRes?.data?.totalCount || 0;
+  const totalUsers = usersRes?.data?.totalItems || 0;
+  const activeEvents = eventsRes?.data?.totalItems || 0;
 
   return (
     <div className="h-full w-full max-w-[1800px] mx-auto flex flex-col overflow-hidden">

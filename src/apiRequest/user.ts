@@ -12,9 +12,9 @@ export const userRequest = {
     create: (body: UserCreateBody) =>
         http.post<User>(ENDPOINT_CLIENT.USERS, body),
     update: (id: string, body: UserUpdateBody) =>
-        http.put<Partial<User>>(ENDPOINT_CLIENT.USER_DETAIL(id), { request: body }),
+        http.put<Partial<User>>(ENDPOINT_CLIENT.USER_DETAIL(id), body),
     updatePartial: (id: string, body: UserUpdateBody) =>
-        http.patch<Partial<User>>(ENDPOINT_CLIENT.USER_DETAIL(id), { request: body }),
+        http.patch<Partial<User>>(ENDPOINT_CLIENT.USER_DETAIL(id), body),
     delete: (id: string) =>
         http.delete<null>(ENDPOINT_CLIENT.USER_DETAIL(id)),
     restore: (id: string) =>

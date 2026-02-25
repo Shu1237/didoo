@@ -1,7 +1,7 @@
 "use client"
 import LayoutAuth from "@/components/layout/auth/layout";
 import { useSessionStore } from "@/stores/sesionStore";
-import { Roles } from "@/utils/enum";
+import { getRedirectPathForRole } from "@/utils/enum";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
@@ -13,19 +13,13 @@ export default function AuthLayout({
 }) {
   const router = useRouter();
   const user = useSessionStore((state) => state.user);
-  const roleRedirects: Record<Roles, string> = {
-    [Roles.ADMIN]: "/admin",
-    [Roles.USER]: "/home",
-    [Roles.ORGANIZER]: "/organizer",
-    [Roles.GUEST]: "/home",
 
-
-  };
   useEffect(() => {
-    if (user) {
-      router.push(roleRedirects[user.RoleId as Roles]);
+    if (user?.RoleId) {
+      const path = getRedirectPathForRole(user.RoleId);
+      router.replace(path);
     }
-  }, [user]);
+  }, [user, router]);
   return (
     <LayoutAuth>
       {children}

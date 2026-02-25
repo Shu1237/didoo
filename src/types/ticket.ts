@@ -16,6 +16,6 @@ export interface Ticket {
     ticketType?: Partial<TicketType>;
     event?: Partial<Event>;
     zone?: string;
-    status: string; // "Ready", "Sold", etc.
+    status: number; // 1=Available 2=Full 3=Unavailable 4=Locked
     createdAt: string;
 }

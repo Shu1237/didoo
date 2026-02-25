@@ -34,8 +34,8 @@ export default function EventDetailModal({ isOpen, onClose, event, onApprove, on
                             <Badge className="bg-white/20 backdrop-blur-md text-white border-none text-[10px] mb-2">{event.category?.name || "Sự kiện"}</Badge>
                             <DialogTitle className="text-2xl font-bold text-white tracking-tight">{event.name}</DialogTitle>
                         </div>
-                        <Badge className={`text-white border-none px-3 py-1 rounded-full text-[10px] font-bold ${event.status === 1 ? "bg-emerald-500" : "bg-amber-500"}`}>
-                            {event.status === 0 ? "Chờ duyệt" : "Đang diễn ra"}
+                        <Badge className={`text-white border-none px-3 py-1 rounded-full text-[10px] font-bold ${event.status === EventStatus.PUBLISHED ? "bg-emerald-500" : "bg-amber-500"}`}>
+                            {event.status === EventStatus.DRAFT ? "Chờ duyệt" : "Đang diễn ra"}
                         </Badge>
                     </div>
                 </div>
@@ -100,7 +100,7 @@ export default function EventDetailModal({ isOpen, onClose, event, onApprove, on
                             <SidebarItem label="Số lượng vé" value={`${event.sold || 0} / ${event.total || 0} vé đã bán`} />
                         </div>
 
-                        {event.status === 0 && (
+                        {event.status === EventStatus.DRAFT && (
                             <div className="p-6 bg-amber-50 rounded-[32px] border border-amber-100">
                                 <h5 className="text-[10px] font-bold text-amber-700 uppercase mb-3">Phê duyệt</h5>
                                 <div className="space-y-2">

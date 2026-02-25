@@ -21,7 +21,7 @@ export default function OrganizerDashboardPage() {
     let statusText = "Đang bán vé";
     if (event.status === EventStatus.DRAFT) statusText = "Nháp";
     if (event.status === EventStatus.CANCELLED) statusText = "Đã hủy";
-    if (event.status === EventStatus.COMPLETED) statusText = "Đã kết thúc";
+    if (event.status === EventStatus.CLOSED) statusText = "Đã kết thúc";
     if (event.sold && event.total && event.sold >= event.total) statusText = "Hết vé";
 
     return {

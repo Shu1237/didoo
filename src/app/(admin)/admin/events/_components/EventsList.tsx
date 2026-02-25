@@ -44,8 +44,8 @@ export default function EventsList({ events }: EventsListProps) {
   return (
     <div className="grid grid-cols-1 gap-4">
       {events.map((event: any) => {
-        const isPending = event.status === 0; // Draft/Pending
-        const isActive = event.status === 1;
+        const isPending = event.status === EventStatus.DRAFT;
+        const isActive = event.status === EventStatus.PUBLISHED;
 
         return (
           <Card key={event.id} className="p-4 bg-white border-zinc-100 shadow-sm hover:shadow-md transition-all duration-300 rounded-[24px] border group">
