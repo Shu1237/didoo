@@ -1,17 +1,18 @@
-'use client';
+"use client";
 
-import { Heart, Share2, Bookmark } from 'lucide-react';
-import { useGetMe } from '@/hooks/useUser';
-import { useGetFavorites } from '@/hooks/useFavorite';
-import { useGetInteractions } from '@/hooks/useInteraction';
-import { useFavorite } from '@/hooks/useFavorite';
-import { useInteraction } from '@/hooks/useInteraction';
-import { InteractionType } from '@/utils/enum';
-import { toast } from 'sonner';
+import { Bookmark, Heart, Share2 } from "lucide-react";
+import { toast } from "sonner";
+import { useGetMe } from "@/hooks/useUser";
+import { useFavorite, useGetFavorites } from "@/hooks/useFavorite";
+import { useGetInteractions, useInteraction } from "@/hooks/useInteraction";
+import { InteractionType } from "@/utils/enum";
 
 interface EventActionsProps {
   eventId: string;
 }
+
+const baseButtonClass =
+  "inline-flex h-12 items-center justify-center gap-2 rounded-full border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-700 transition hover:border-slate-400 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60";
 
 export default function EventActions({ eventId }: EventActionsProps) {
   const { data: userData } = useGetMe();
@@ -22,75 +23,104 @@ export default function EventActions({ eventId }: EventActionsProps) {
     eventId,
     pageSize: 1,
   });
+
   const { data: interactionsRes } = useGetInteractions({
     userId: userId || undefined,
     eventId,
-    pageSize: 50,
+    pageSize: 20,
   });
 
   const { create: createFavorite, remove: removeFavorite } = useFavorite();
   const { create: createInteraction, remove: removeInteraction } = useInteraction();
 
   const isFavorited = (favoritesRes?.data?.items?.length ?? 0) > 0;
-  const saved = (interactionsRes?.data?.items ?? []).some((i) => i.type === InteractionType.SAVE);
+  const isSaved = (interactionsRes?.data?.items ?? []).some(
+    (item) => item.type === InteractionType.SAVE,
+  );
+
+  const favoriteBusy = createFavorite.isPending || removeFavorite.isPending;
+  const saveBusy = createInteraction.isPending || removeInteraction.isPending;
+
+  const requireLogin = () => {
+    toast.error("Vui long dang nhap de su dung tinh nang nay");
+  };
 
   const handleFavorite = () => {
     if (!userId) {
-      toast.error('Vui lòng đăng nhập để thêm yêu thích');
+      requireLogin();
       return;
     }
+
     if (isFavorited) {
       removeFavorite.mutate({ userId, eventId });
-    } else {
-      createFavorite.mutate({ userId, eventId });
+      return;
     }
+
+    createFavorite.mutate({ userId, eventId });
   };
 
   const handleSave = () => {
     if (!userId) {
-      toast.error('Vui lòng đăng nhập để lưu');
+      requireLogin();
       return;
     }
-    if (saved) {
+
+    if (isSaved) {
       removeInteraction.mutate({ userId, eventId, type: InteractionType.SAVE });
-    } else {
-      createInteraction.mutate({ type: InteractionType.SAVE, eventId, userId });
+      return;
     }
+
+    createInteraction.mutate({ type: InteractionType.SAVE, eventId, userId });
   };
 
-  const handleShare = () => {
-    if (navigator.share) {
-      navigator.share({
-        title: document.title,
-        url: window.location.href,
-      }).catch(() => toast.info('Chia sẻ đã bị hủy'));
-    } else {
-      navigator.clipboard.writeText(window.location.href);
-      toast.success('Đã sao chép link');
+  const handleShare = async () => {
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: document.title,
+          url: window.location.href,
+        });
+      } else {
+        await navigator.clipboard.writeText(window.location.href);
+        toast.success("Da sao chep lien ket su kien");
+      }
+    } catch {
+      toast.info("Da huy chia se");
     }
   };
-
-  const btnClass = 'h-16 w-16 flex items-center justify-center rounded-full border border-white/10 bg-white/5 text-white hover:bg-white hover:text-black transition-colors';
-  const activeClass = 'bg-primary/20 border-primary/50 text-primary';
 
   return (
-    <div className="flex gap-3">
+    <div className="flex flex-wrap gap-2">
       <button
+        type="button"
         onClick={handleFavorite}
-        className={`${btnClass} ${isFavorited ? activeClass : ''}`}
-        title={isFavorited ? 'Bỏ yêu thích' : 'Thêm yêu thích'}
+        disabled={favoriteBusy}
+        className={`${baseButtonClass} ${isFavorited ? "border-rose-200 bg-rose-50 text-rose-600" : ""}`}
+        title={isFavorited ? "Bo yeu thich" : "Them yeu thich"}
       >
-        <Heart className={`w-5 h-5 ${isFavorited ? 'fill-current' : ''}`} />
+        <Heart className={`h-4 w-4 ${isFavorited ? "fill-current" : ""}`} />
+        <span>{isFavorited ? "Da yeu thich" : "Yeu thich"}</span>
       </button>
+
       <button
+        type="button"
         onClick={handleSave}
-        className={`${btnClass} ${saved ? activeClass : ''}`}
-        title={saved ? 'Bỏ lưu' : 'Lưu'}
+        disabled={saveBusy}
+        className={`${baseButtonClass} ${isSaved ? "border-sky-200 bg-sky-50 text-sky-700" : ""}`}
+        title={isSaved ? "Bo luu" : "Luu su kien"}
       >
-        <Bookmark className={`w-5 h-5 ${saved ? 'fill-current' : ''}`} />
+        <Bookmark className={`h-4 w-4 ${isSaved ? "fill-current" : ""}`} />
+        <span>{isSaved ? "Da luu" : "Luu"}</span>
       </button>
-      <button onClick={handleShare} className={btnClass} title="Chia sẻ">
-        <Share2 className="w-5 h-5" />
+
+      <button
+        type="button"
+        onClick={handleShare}
+        className={baseButtonClass}
+        title="Chia se su kien"
+      >
+        <Share2 className="h-4 w-4" />
+        <span>Chia se</span>
       </button>
     </div>
   );

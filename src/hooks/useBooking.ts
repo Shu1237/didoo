@@ -7,10 +7,11 @@ import { BookingGetListQuery } from "@/types/booking";
 import { BookingDetailGetListQuery } from "@/types/bookingDetail";
 import { handleErrorApi } from "@/lib/errors";
 
-export const useGetBookings = (params?: BookingGetListQuery) => {
+export const useGetBookings = (params?: BookingGetListQuery, options?: { enabled?: boolean }) => {
     return useQuery({
         queryKey: QUERY_KEY.bookings.list(params),
         queryFn: () => bookingRequest.getList(params || {}),
+        enabled: options?.enabled ?? true,
     });
 };
 
@@ -22,10 +23,11 @@ export const useGetBooking = (id: string) => {
     });
 };
 
-export const useGetBookingDetails = (params?: BookingDetailGetListQuery) => {
+export const useGetBookingDetails = (params?: BookingDetailGetListQuery, options?: { enabled?: boolean }) => {
     return useQuery({
         queryKey: QUERY_KEY.bookingDetails.list(params),
         queryFn: () => bookingDetailRequest.getList(params || {}),
+        enabled: options?.enabled ?? true,
     });
 };
 

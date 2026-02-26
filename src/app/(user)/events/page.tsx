@@ -1,248 +1,207 @@
-'use client';
+"use client";
 
-import { useGetEvents } from "@/hooks/useEvent";
+import { useState } from "react";
+import Link from "next/link";
+import { motion } from "framer-motion";
+import {
+  CalendarDays,
+  LayoutGrid,
+  Music2,
+  Search,
+  Sparkles,
+  TrendingUp,
+  X,
+} from "lucide-react";
 import { useGetCategories } from "@/hooks/useCategory";
-import SearchFilter from "../home/_components/SearchFilter";
+import { useGetEvents } from "@/hooks/useEvent";
+import Loading from "@/components/loading";
+import { Button } from "@/components/ui/button";
 import EventsHero from "./_components/EventsHero";
 import EventsGrid from "./_components/EventsGrid";
-import { motion } from "framer-motion";
-import { TrendingUp, Music, CalendarDays, Zap, LayoutGrid, Sparkles, MapPin, Calendar, ArrowRight, Ticket } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import Image from "next/image";
-import Link from "next/link";
-import Loading from "@/components/loading";
 
 export default function EventsPage() {
-    const { data: eventsResponse, isLoading: isEventsLoading } = useGetEvents({
-        pageSize: 20,
-        isDescending: true,
-    });
-    const { data: categoriesResponse, isLoading: isCategoriesLoading } = useGetCategories();
+  const { data: eventsResponse, isLoading: isEventsLoading } = useGetEvents({
+    pageSize: 30,
+    isDescending: true,
+  });
+  const { data: categoriesResponse, isLoading: isCategoriesLoading } = useGetCategories();
 
-    if (isEventsLoading || isCategoriesLoading) return <Loading />;
+  const [keyword, setKeyword] = useState("");
+  const [activeCategory, setActiveCategory] = useState("all");
 
-    const events = eventsResponse?.data.items || [];
-    const allCategories = categoriesResponse?.data.items || [];
+  if (isEventsLoading || isCategoriesLoading) return <Loading />;
 
-    // categorizing events for display
-    const featuredEvent = events[0]; // The main highlight
-    const trendingEvents = events.slice(1, 9);
-    const upcomingEvents = [...events].sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime()).slice(0, 4);
-    const musicEvents = events.filter(e => e.category?.name === 'Music' || e.category?.name === 'Âm nhạc').slice(0, 4);
+  const events = eventsResponse?.data.items || [];
+  const allCategories = categoriesResponse?.data.items || [];
 
-    const staticCategories = [
-        { name: "Tất cả", icon: <LayoutGrid className="w-4 h-4" /> },
-        { name: "Âm nhạc", icon: <Music className="w-4 h-4" /> },
-        { name: "Workshop", icon: <Zap className="w-4 h-4" /> },
-        { name: "Nghệ thuật", icon: <Sparkles className="w-4 h-4" /> },
-    ];
+  const visibleCategories = allCategories.slice(0, 6);
+  const normalizedKeyword = keyword.trim().toLowerCase();
 
-    return (
-        <div className="min-h-screen bg-[#050505] pb-20 text-white overflow-x-hidden relative">
-            {/* 1. Global Immersive Background Effects */}
-            <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
-                {/* Grainy Noise Overlay */}
-                <div className="absolute inset-0 opacity-[0.03] mix-blend-overlay"
-                    style={{ backgroundImage: 'url("https://grainy-gradients.vercel.app/noise.svg")' }} />
+  const filteredEvents = events.filter((event) => {
+    const matchesCategory = activeCategory === "all" || event.category?.id === activeCategory;
+    const matchesKeyword =
+      !normalizedKeyword ||
+      event.name.toLowerCase().includes(normalizedKeyword) ||
+      (event.subtitle || "").toLowerCase().includes(normalizedKeyword) ||
+      (event.description || "").toLowerCase().includes(normalizedKeyword);
 
-                {/* Animated Orbs */}
-                <motion.div
-                    animate={{
-                        x: [0, 100, 0],
-                        y: [0, -50, 0],
-                        scale: [1, 1.2, 1]
-                    }}
-                    transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                    className="absolute -top-[10%] -left-[10%] w-[800px] h-[800px] bg-primary/20 rounded-full blur-[150px]"
-                />
-                <motion.div
-                    animate={{
-                        x: [0, -100, 0],
-                        y: [0, 100, 0],
-                        scale: [1, 1.3, 1]
-                    }}
-                    transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-                    className="absolute top-[40%] -right-[10%] w-[600px] h-[600px] bg-purple-500/10 rounded-full blur-[150px]"
-                />
-                <motion.div
-                    animate={{
-                        x: [0, 50, 0],
-                        y: [0, 200, 0]
-                    }}
-                    transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-                    className="absolute -bottom-[10%] left-[20%] w-[700px] h-[700px] bg-cyan-500/10 rounded-full blur-[150px]"
-                />
-            </div>
+    return matchesCategory && matchesKeyword;
+  });
 
-            <div className="relative z-10">
-                {/* Decorative Background Fillers (Floating Icons/Shapes) */}
-                <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden opacity-20">
-                    <motion.div
-                        animate={{ y: [0, -20, 0], rotate: [0, 45, 0] }}
-                        transition={{ duration: 10, repeat: Infinity }}
-                        className="absolute top-[20%] left-[5%] text-primary/30"
-                    >
-                        <Ticket className="w-24 h-24" />
-                    </motion.div>
-                    <motion.div
-                        animate={{ y: [0, 20, 0], rotate: [0, -45, 0] }}
-                        transition={{ duration: 12, repeat: Infinity }}
-                        className="absolute top-[60%] right-[5%] text-purple-500/30"
-                    >
-                        <Sparkles className="w-32 h-32" />
-                    </motion.div>
-                    <motion.div
-                        animate={{ scale: [1, 1.1, 1] }}
-                        transition={{ duration: 8, repeat: Infinity }}
-                        className="absolute bottom-[10%] left-[15%] text-cyan-500/20"
-                    >
-                        <Zap className="w-40 h-40" />
-                    </motion.div>
-                </div>
-
-                <EventsHero />
-
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.3 }}
-                    className="relative z-20 -mt-10 mb-20"
-                >
-                    <div className="max-w-[1920px] mx-auto px-6 md:px-12">
-                        <SearchFilter categories={allCategories} />
-                    </div>
-                </motion.div>
-
-                {/* Featured Highlight Section */}
-                {featuredEvent && (
-                    <div className="max-w-[1920px] mx-auto px-6 md:px-12 mb-40 relative z-10">
-                        <div className="flex items-center gap-4 mb-12">
-                            <span className="text-primary font-black italic tracking-widest uppercase text-sm">/ Spotlight /</span>
-                            <div className="flex-1 h-px bg-gradient-to-r from-primary/50 to-transparent" />
-                        </div>
-
-                        <Link href={`/events/${featuredEvent.id}`} className="group block relative perspective-2000">
-                            <motion.div
-                                whileHover={{ rotateX: 2, rotateY: -2, scale: 1.01 }}
-                                transition={{ type: "spring", stiffness: 100 }}
-                                className="relative h-[500px] md:h-[800px] rounded-[60px] overflow-hidden border border-white/10 shadow-[0_0_100px_-20px_rgba(var(--primary),0.2)]"
-                            >
-                                <Image
-                                    src={featuredEvent.thumbnailUrl || featuredEvent.bannerUrl || 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=2070&auto=format&fit=crop'}
-                                    alt={featuredEvent.name}
-                                    fill
-                                    className="object-cover transition-transform duration-1000 group-hover:scale-105"
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-[#050505]/40 to-transparent" />
-
-                                {/* Interactive Overlay */}
-                                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-primary/10 mix-blend-overlay" />
-
-                                <div className="absolute bottom-0 left-0 right-0 p-10 md:p-20 space-y-8">
-                                    <div className="flex flex-wrap items-center gap-4">
-                                        <motion.div
-                                            initial={{ opacity: 0, scale: 0.8 }}
-                                            whileInView={{ opacity: 1, scale: 1 }}
-                                            className="px-6 py-2 rounded-full bg-primary text-black font-black text-[10px] uppercase tracking-[0.3em] shadow-2xl"
-                                        >
-                                            Featured Event
-                                        </motion.div>
-                                        <div className="px-6 py-2 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 text-white font-black text-[10px] uppercase tracking-[0.3em]">
-                                            Live Show
-                                        </div>
-                                    </div>
-
-                                    <div className="space-y-6 max-w-5xl">
-                                        <h3 className="text-5xl md:text-9xl font-black leading-[0.85] uppercase italic tracking-tighter group-hover:text-primary transition-colors duration-500">
-                                            {featuredEvent.name}
-                                        </h3>
-
-                                        <div className="flex flex-wrap items-center gap-10 text-gray-400 font-black uppercase tracking-widest text-xs md:text-sm">
-                                            <div className="flex items-center gap-3">
-                                                <Calendar className="w-5 h-5 text-primary" />
-                                                <span className="text-white">{featuredEvent.startTime ? new Date(featuredEvent.startTime).toLocaleDateString('vi-VN', { day: 'numeric', month: 'long', year: 'numeric' }) : "TBA"}</span>
-                                            </div>
-                                            <div className="flex items-center gap-3">
-                                                <MapPin className="w-5 h-5 text-primary" />
-                                                <span className="text-white">{featuredEvent.locations?.[0]?.name || "Online/TBA"}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <Button className="h-20 px-12 rounded-[30px] bg-white text-black hover:bg-primary hover:text-white transition-all duration-500 font-black text-xl uppercase italic group/btn shadow-2xl">
-                                        Secure Your Ticket
-                                        <ArrowRight className="ml-4 w-6 h-6 group-hover/btn:translate-x-2 transition-transform" />
-                                    </Button>
-                                </div>
-                            </motion.div>
-                        </Link>
-                    </div>
-                )}
-
-                {/* Premium Floating Category Navigation */}
-                <div className="sticky top-8 z-50 flex justify-center mb-32 px-4 pointer-events-none">
-                    <div className="bg-black/40 backdrop-blur-[30px] border border-white/10 p-2 rounded-[40px] flex flex-wrap justify-center gap-2 shadow-[0_20px_50px_-10px_rgba(0,0,0,0.5)] pointer-events-auto">
-                        {staticCategories.map((cat, idx) => (
-                            <Button
-                                key={idx}
-                                variant="ghost"
-                                className={`rounded-[32px] h-14 px-10 transition-all duration-500 text-xs font-black uppercase tracking-[0.2em] ${idx === 0 ? 'bg-primary text-black shadow-xl shadow-primary/20 scale-105' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
-                            >
-                                <span className="mr-3">{cat.icon}</span>
-                                {cat.name}
-                            </Button>
-                        ))}
-                    </div>
-                </div>
-
-                {/* Event Grid Sections */}
-                <div className="max-w-[1920px] mx-auto px-6 md:px-12 space-y-32">
-                    <EventsGrid
-                        title="Xu hướng"
-                        icon={<TrendingUp className="w-6 h-6" />}
-                        description="Những sự kiện đang bùng nổ và nhận được nhiều sự quan tâm nhất."
-                        eventData={trendingEvents}
-                    />
-
-                    <EventsGrid
-                        title="Sắp diễn ra"
-                        icon={<CalendarDays className="w-6 h-6" />}
-                        description="Chuẩn bị sẵn sàng cho lịch trình sự kiện trong tuần tới của bạn."
-                        eventData={upcomingEvents}
-                    />
-
-                    {musicEvents.length > 0 && (
-                        <EventsGrid
-                            title="Vũ trụ Âm nhạc"
-                            icon={<Music className="w-6 h-6" />}
-                            description="Hòa mình vào những giai điệu sôi động từ các nghệ sĩ hàng đầu."
-                            eventData={musicEvents}
-                        />
-                    )}
-                </div>
-
-                {/* Newsletter / CTA Section (Optional but adds to UI) */}
-                <div className="container mx-auto px-4 mt-40">
-                    <div className="relative rounded-[50px] overflow-hidden bg-gradient-to-br from-primary/20 via-purple-500/10 to-transparent border border-white/10 p-12 md:p-24 text-center space-y-8">
-                        <h2 className="text-4xl md:text-6xl font-black tracking-tight leading-none">
-                            ĐỪNG BỎ LỠ <br /> <span className="text-primary italic">BẤT KỲ SỰ KIỆN NÀO</span>
-                        </h2>
-                        <p className="text-gray-400 max-w-xl mx-auto font-medium text-lg">
-                            Đăng ký nhận bản tin để cập nhật những sự kiện mới nhất và ưu đãi độc quyền dành riêng cho bạn.
-                        </p>
-                        <div className="flex flex-col md:flex-row justify-center items-center gap-4 max-w-md mx-auto">
-                            <input
-                                type="email"
-                                placeholder="Email của bạn..."
-                                className="w-full h-14 bg-white/5 border border-white/10 rounded-2xl px-6 font-medium focus:outline-none focus:border-primary transition-colors"
-                            />
-                            <Button className="h-14 px-8 rounded-2xl bg-primary hover:bg-primary/80 text-white font-bold whitespace-nowrap">
-                                Đăng ký
-                            </Button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+  const featuredEvent = filteredEvents[0];
+  const trendingEvents = filteredEvents.slice(1, 7);
+  const upcomingEvents = [...filteredEvents]
+    .sort(
+      (a, b) =>
+        new Date(a.startTime).getTime() - new Date(b.startTime).getTime(),
     )
+    .slice(0, 6);
+  const musicEvents = filteredEvents
+    .filter((event) => {
+      const categoryName = event.category?.name?.toLowerCase() || "";
+      return categoryName.includes("music") || categoryName.includes("nhac");
+    })
+    .slice(0, 6);
+
+  const hasFilters = keyword.trim().length > 0 || activeCategory !== "all";
+
+  return (
+    <div className="min-h-screen bg-slate-50 pb-16">
+      <EventsHero
+        featuredEvent={featuredEvent}
+        totalEvents={events.length}
+        totalCategories={allCategories.length}
+      />
+
+      <div className="relative mx-auto -mt-2 w-full max-w-7xl px-4">
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="space-y-4 rounded-3xl border border-slate-200 bg-white p-4 shadow-[0_20px_40px_-34px_rgba(15,23,42,0.4)] md:p-6"
+        >
+          <div className="grid gap-3 lg:grid-cols-[1fr_auto] lg:items-center">
+            <label className="relative block">
+              <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <input
+                value={keyword}
+                onChange={(event) => setKeyword(event.target.value)}
+                placeholder="Tim su kien, artist, workshop..."
+                className="h-11 w-full rounded-full border border-slate-200 bg-slate-50 px-11 text-sm text-slate-700 outline-none transition focus:border-sky-300 focus:bg-white focus:ring-2 focus:ring-sky-100"
+              />
+            </label>
+
+            {hasFilters && (
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setKeyword("");
+                  setActiveCategory("all");
+                }}
+                className="h-11 rounded-full border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
+              >
+                Xoa bo loc
+                <X className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            <Button
+              variant={activeCategory === "all" ? "default" : "outline"}
+              onClick={() => setActiveCategory("all")}
+              className="h-9 rounded-full px-4"
+            >
+              <LayoutGrid className="h-4 w-4" />
+              Tat ca
+            </Button>
+            {visibleCategories.map((category) => (
+              <Button
+                key={category.id}
+                variant={activeCategory === category.id ? "default" : "outline"}
+                onClick={() => setActiveCategory(category.id)}
+                className="h-9 rounded-full px-4"
+              >
+                {category.name}
+              </Button>
+            ))}
+          </div>
+        </motion.div>
+      </div>
+
+      <div className="mx-auto mt-10 flex w-full max-w-7xl flex-col gap-14 px-4">
+        {filteredEvents.length === 0 ? (
+          <div className="rounded-3xl border border-dashed border-slate-300 bg-white/90 p-10 text-center">
+            <h2 className="text-2xl font-bold text-slate-900">Khong tim thay su kien</h2>
+            <p className="mx-auto mt-2 max-w-lg text-slate-600">
+              Thu doi tu khoa hoac chon danh muc khac de xem them su kien phu hop.
+            </p>
+            <Button
+              className="mt-6 rounded-full px-6"
+              onClick={() => {
+                setKeyword("");
+                setActiveCategory("all");
+              }}
+            >
+              Xem lai tat ca
+            </Button>
+          </div>
+        ) : (
+          <>
+            <EventsGrid
+              title="Dang duoc quan tam"
+              icon={<TrendingUp className="h-4 w-4" />}
+              description="Nhung su kien duoc tim kiem va dat ve nhieu trong tuan nay."
+              eventData={trendingEvents.length ? trendingEvents : filteredEvents.slice(0, 6)}
+            />
+
+            <EventsGrid
+              title="Sap dien ra"
+              icon={<CalendarDays className="h-4 w-4" />}
+              description="Danh sach su kien gan ngay nhat de ban len lich nhanh."
+              eventData={upcomingEvents}
+            />
+
+            {musicEvents.length > 0 && (
+              <EventsGrid
+                title="Am nhac noi bat"
+                icon={<Music2 className="h-4 w-4" />}
+                description="Goi y cac dem nhac, concert va mini show dang mo ban."
+                eventData={musicEvents}
+              />
+            )}
+
+            <div className="overflow-hidden rounded-3xl border border-slate-200 bg-gradient-to-r from-sky-100 via-white to-amber-100 p-6 md:p-10">
+              <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+                <div className="space-y-2">
+                  <div className="inline-flex items-center gap-2 rounded-full bg-white/80 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-sky-700">
+                    <Sparkles className="h-3.5 w-3.5" />
+                    Nhan thong bao moi
+                  </div>
+                  <h3 className="text-2xl font-bold text-slate-900 md:text-3xl">
+                    Theo doi su kien moi phu hop voi ban
+                  </h3>
+                  <p className="max-w-2xl text-slate-600">
+                    Nhan cap nhat ve su kien moi, gia ve va dia diem de khong bo lo co hoi.
+                  </p>
+                </div>
+                <div className="flex flex-wrap gap-3">
+                  <Button asChild className="h-11 rounded-full px-6">
+                    <Link href="/home">Ve trang chu</Link>
+                  </Button>
+                  <Button
+                    asChild
+                    variant="outline"
+                    className="h-11 rounded-full border-slate-300 bg-white/90 px-6 text-slate-700"
+                  >
+                    <Link href="/user/tickets">Xem ve cua toi</Link>
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
 }

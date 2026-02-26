@@ -1,136 +1,107 @@
-'use client';
+"use client";
 
-import Image from 'next/image';
-import Link from 'next/link';
-import { Calendar, MapPin, ArrowUpRight } from 'lucide-react';
-import EventActions from './EventActions';
-import { Button } from '@/components/ui/button';
-import { Event } from '@/types/event';
-import { motion, useScroll, useTransform } from 'framer-motion';
-import { format, isValid } from 'date-fns';
-import { vi } from 'date-fns/locale';
-import { TicketType } from '@/types/ticketType';
+import Image from "next/image";
+import Link from "next/link";
+import { format, isValid } from "date-fns";
+import { vi } from "date-fns/locale";
+import { ArrowUpRight, CalendarDays, Clock3, MapPin } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import EventActions from "./EventActions";
+import { Event } from "@/types/event";
+import { TicketType } from "@/types/ticketType";
 
 interface DetailEventProps {
   event: Event;
   ticketTypes: TicketType[];
 }
 
+const FALLBACK_IMAGE =
+  "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=2070&auto=format&fit=crop";
+
 export default function HeroSection({ event, ticketTypes }: DetailEventProps) {
   const eventDate = new Date(event.startTime);
-  const isValidDate = event.startTime && isValid(eventDate);
-  const { scrollY } = useScroll();
-  const y1 = useTransform(scrollY, [0, 500], [0, 100]);
+  const dateLabel =
+    event.startTime && isValid(eventDate)
+      ? format(eventDate, "EEEE, dd MMMM yyyy", { locale: vi })
+      : "Dang cap nhat";
 
-  const minPrice = ticketTypes.length > 0 ? Math.min(...ticketTypes.map(t => t.price)) : 0;
-  const maxPrice = ticketTypes.length > 0 ? Math.max(...ticketTypes.map(t => t.price)) : 0;
+  const minPrice = ticketTypes.length > 0 ? Math.min(...ticketTypes.map((ticket) => ticket.price)) : 0;
+  const maxPrice = ticketTypes.length > 0 ? Math.max(...ticketTypes.map((ticket) => ticket.price)) : 0;
 
-  const priceDisplay = ticketTypes.length === 0
-    ? "Miễn phí"
-    : minPrice === maxPrice
-      ? `${minPrice.toLocaleString('vi-VN')} VND`
-      : `${minPrice.toLocaleString('vi-VN')} - ${maxPrice.toLocaleString('vi-VN')} VND`;
+  const priceLabel =
+    ticketTypes.length === 0
+      ? "Mien phi"
+      : minPrice === maxPrice
+        ? `${minPrice.toLocaleString("vi-VN")} VND`
+        : `${minPrice.toLocaleString("vi-VN")} - ${maxPrice.toLocaleString("vi-VN")} VND`;
 
   return (
-    <section className="relative w-full min-h-screen flex items-center justify-center pt-24 pb-12 overflow-hidden bg-[#050505]">
-      {/* Background Layer */}
-      <div className="absolute inset-0 z-0">
-        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-soft-light" />
-        <div className="absolute top-[-10%] left-[-10%] w-[80%] h-[80%] bg-primary/30 blur-[150px] rounded-full" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[70%] h-[70%] bg-purple-600/20 blur-[150px] rounded-full" />
-      </div>
-
-      <div className="container max-w-7xl mx-auto px-6 relative z-10">
-        <div className="grid lg:grid-cols-12 gap-12 items-center">
-
-          {/* LEFT CONTENT */}
-          <div className="lg:col-span-7 order-2 lg:order-1">
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8 }}
-              className="space-y-8"
-            >
-              <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-white/10 border border-white/20 backdrop-blur-xl">
-                <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-white">
-                  {event.category?.name || "Sự kiện đặc biệt"}
-                </span>
-              </div>
-
-              {/* SỬA QUAN TRỌNG: 
-                  - leading-[1.2] thay vì [0.95] để dấu không chạm dòng dưới
-                  - tracking-normal thay vì tighter để các chữ không dính nhau 
-              */}
-              <h1 className="text-5xl md:text-7xl lg:text-8xl font-black text-white leading-[1.2] tracking-normal uppercase transition-all duration-300">
-                {event.name}
-              </h1>
-
-              <p className="text-lg md:text-xl text-white/70 max-w-xl leading-relaxed font-medium">
-                {event.subtitle || event.description}
-              </p>
-
-              {/* Data Strip */}
-              <div className="flex flex-wrap gap-10 py-8 border-y border-white/10">
-                <div className="space-y-1">
-                  <p className="text-[10px] uppercase tracking-widest text-white/40 font-bold">Thời gian</p>
-                  <p className="text-xl font-medium text-white flex items-center gap-2">
-                    <Calendar className="w-4 h-4 text-primary" />
-                    {isValidDate ? format(eventDate, "dd MMMM, yyyy", { locale: vi }) : "Sắp công bố"}
-                  </p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-[10px] uppercase tracking-widest text-white/40 font-bold">Địa điểm</p>
-                  <p className="text-xl font-medium text-white flex items-center gap-2">
-                    <MapPin className="w-4 h-4 text-primary" />
-                    {event.locations?.[0]?.name || "Trực tuyến / TBA"}
-                  </p>
-                </div>
-              </div>
-
-              {/* Action Group */}
-              <div className="flex flex-wrap gap-5 pt-4">
-                <Button asChild className="group relative h-16 px-10 overflow-hidden rounded-full bg-primary text-black font-bold text-lg transition-all hover:bg-primary/90">
-                  <Link href={`/events/${event.id}/booking`}>
-                    <span className="relative z-10 uppercase">Đặt vé ngay</span>
-                    <ArrowUpRight className="inline-block ml-2 w-5 h-5 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
-                  </Link>
-                </Button>
-
-                <EventActions eventId={event.id} />
-              </div>
-            </motion.div>
+    <section className="relative px-4 pb-10 pt-28 md:pb-14">
+      <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-12 lg:items-center">
+        <div className="space-y-7 lg:col-span-7">
+          <div className="inline-flex items-center rounded-full border border-sky-200 bg-white/90 px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-sky-700 shadow-sm">
+            {event.category?.name || "Event"}
           </div>
 
-          {/* RIGHT CONTENT */}
-          <motion.div
-            style={{ y: y1 }}
-            className="lg:col-span-5 order-1 lg:order-2 relative"
-          >
-            <div className="relative aspect-[3/4] rounded-[40px] overflow-hidden group border border-white/10">
+          <div className="space-y-4">
+            <h1 className="text-4xl font-extrabold leading-tight tracking-tight text-slate-900 md:text-6xl">
+              {event.name}
+            </h1>
+            <p className="max-w-3xl text-base leading-relaxed text-slate-600 md:text-lg">
+              {event.subtitle || event.description}
+            </p>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Thoi gian</p>
+              <p className="mt-2 flex items-start gap-2 text-sm font-semibold text-slate-800 md:text-base">
+                <CalendarDays className="mt-0.5 h-4 w-4 shrink-0 text-sky-600" />
+                <span>{dateLabel}</span>
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Dia diem</p>
+              <p className="mt-2 flex items-start gap-2 text-sm font-semibold text-slate-800 md:text-base">
+                <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-sky-600" />
+                <span>{event.locations?.[0]?.name || "Dang cap nhat dia diem"}</span>
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap gap-3">
+            <Button asChild className="h-12 rounded-full px-7 text-base">
+              <Link href={`/events/${event.id}/booking`}>
+                Dat ve ngay
+                <ArrowUpRight className="h-4 w-4" />
+              </Link>
+            </Button>
+            <EventActions eventId={event.id} />
+          </div>
+        </div>
+
+        <div className="lg:col-span-5">
+          <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-[0_24px_40px_-32px_rgba(15,23,42,0.6)]">
+            <div className="relative aspect-[4/5] overflow-hidden">
               <Image
-                src={event.thumbnailUrl || event.bannerUrl || ''}
+                src={event.thumbnailUrl || event.bannerUrl || FALLBACK_IMAGE}
                 alt={event.name}
                 fill
-                className="object-cover transition-transform duration-1000 group-hover:scale-110"
                 priority
+                className="object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-transparent to-transparent opacity-80" />
-
-              {/* Price Tag */}
-              <div className="absolute bottom-10 left-10 right-10 p-6 rounded-3xl bg-white/10 backdrop-blur-xl border border-white/20">
-                <div className="flex justify-between items-end">
-                  <div>
-                    <p className="text-[10px] uppercase tracking-widest text-white/60 mb-1">Giá vé từ</p>
-                    <p className="text-2xl md:text-3xl font-bold text-white">{priceDisplay}</p>
-                  </div>
-                  <div className="h-12 w-12 rounded-full bg-primary flex items-center justify-center">
-                    <ArrowUpRight className="w-6 h-6 text-black" />
-                  </div>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/5 to-transparent" />
+              <div className="absolute bottom-4 left-4 right-4 rounded-2xl bg-white/90 p-4 shadow-sm backdrop-blur-sm">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Gia ve</p>
+                <p className="mt-1 text-xl font-bold text-slate-900 md:text-2xl">{priceLabel}</p>
+                <div className="mt-3 flex items-center gap-2 text-sm text-slate-600">
+                  <Clock3 className="h-4 w-4 text-sky-600" />
+                  <span>{event.openTime || "Mo cua theo thong bao BTC"}</span>
                 </div>
               </div>
             </div>
-          </motion.div>
+          </div>
         </div>
       </div>
     </section>

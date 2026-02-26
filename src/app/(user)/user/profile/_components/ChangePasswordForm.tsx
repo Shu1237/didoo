@@ -1,162 +1,165 @@
 "use client";
 
-import { useAuth } from "@/hooks/useAuth";
-import { useForm } from "react-hook-form";
+import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ChangePasswordInput, changePasswordSchema } from "@/schemas/auth";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useForm, useWatch, type UseFormRegister } from "react-hook-form";
+import { Eye, EyeOff, Loader2, LockKeyhole, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Key, Save, X, Eye, EyeOff, Lock, Loader2 } from "lucide-react";
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useAuth } from "@/hooks/useAuth";
+import { ChangePasswordInput, changePasswordSchema } from "@/schemas/auth";
 import { handleErrorApi } from "@/lib/errors";
 import { useSessionStore } from "@/stores/sesionStore";
 
 export default function ChangePasswordForm() {
-    const { changePassword } = useAuth();
-    const user = useSessionStore((state) => state.user);
-    const [showOldPassword, setShowOldPassword] = useState(false);
-    const [showNewPassword, setShowNewPassword] = useState(false);
-    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const { changePassword } = useAuth();
+  const userId = useSessionStore((state) => state.user?.UserId ?? "");
+  const [showOldPassword, setShowOldPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-    const {
-        register,
-        handleSubmit,
-        watch,
-        setError,
-        formState: { errors, isValid },
-    } = useForm<ChangePasswordInput>({
-        resolver: zodResolver(changePasswordSchema),
-        defaultValues: {
-            userId: user?.UserId || "",
-            oldPassword: "",
-            password: "",
-            confirmPassword: "",
-        },
-        mode: "onChange",
-    });
+  const form = useForm<ChangePasswordInput>({
+    resolver: zodResolver(changePasswordSchema),
+    defaultValues: {
+      userId,
+      oldPassword: "",
+      password: "",
+      confirmPassword: "",
+    },
+    mode: "onChange",
+  });
 
-    const currentPassword = watch("password");
-    const isPasswordSecure =
-        currentPassword.length >= 8 &&
-        /[A-Z]/.test(currentPassword) &&
-        /[!@#$%^&*(),?":{}|<>]/.test(currentPassword);
+  const passwordValue = useWatch({ control: form.control, name: "password" }) || "";
+  const hasMinLength = passwordValue.length >= 8;
+  const hasUppercase = /[A-Z]/.test(passwordValue);
+  const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(passwordValue);
 
-    const onSubmit = async (data: ChangePasswordInput) => {
-        try {
-            await changePassword.mutateAsync(data);
-        } catch (error: any) {
-            handleErrorApi({
-                error,
-                setError,
-            });
-        }
-    };
+  const onSubmit = async (data: ChangePasswordInput) => {
+    try {
+      await changePassword.mutateAsync(data);
+      form.reset({
+        userId,
+        oldPassword: "",
+        password: "",
+        confirmPassword: "",
+      });
+    } catch (error) {
+      handleErrorApi({ error, setError: form.setError });
+    }
+  };
 
-    return (
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            <input type="hidden" {...register("userId")} />
+  return (
+    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <input type="hidden" {...form.register("userId")} />
 
-            <div className="space-y-2">
-                <label className="text-[13px] font-bold text-slate-400 ml-1">Mật khẩu cũ</label>
-                <div className="relative">
-                    <Input
-                        type={showOldPassword ? "text" : "password"}
-                        placeholder="Nhập mật khẩu cũ"
-                        {...register("oldPassword")}
-                        className={`h-12 bg-slate-50 border-slate-200 rounded-2xl px-5 pr-12 text-sm font-semibold text-slate-900 focus-visible:ring-[#FF9B8A]/20 focus-visible:border-[#FF9B8A] transition-all placeholder:text-slate-300 ${errors.oldPassword ? "border-red-500 bg-red-50/30" : ""}`}
-                    />
-                    <button
-                        type="button"
-                        onClick={() => setShowOldPassword(!showOldPassword)}
-                        className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
-                    >
-                        {showOldPassword ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
-                    </button>
-                </div>
-                {errors.oldPassword && (
-                    <p className="text-[10px] text-red-500 ml-4 mt-1 font-bold">{errors.oldPassword.message}</p>
-                )}
-            </div>
+      <PasswordField
+        fieldName="oldPassword"
+        label="Current Password"
+        placeholder="Nhap mat khau hien tai"
+        typeVisible={showOldPassword}
+        onToggleVisible={() => setShowOldPassword((value) => !value)}
+        register={form.register}
+        error={form.formState.errors.oldPassword?.message}
+      />
 
-            <div className="space-y-2">
-                <label className="text-[13px] font-bold text-slate-400 ml-1">Mật khẩu mới</label>
-                <div className="relative">
-                    <Input
-                        type={showNewPassword ? "text" : "password"}
-                        placeholder="Nhập mật khẩu mới"
-                        {...register("password")}
-                        className={`h-12 bg-slate-50 border-slate-200 rounded-2xl px-5 pr-12 text-sm font-semibold text-slate-900 focus-visible:ring-[#FF9B8A]/20 focus-visible:border-[#FF9B8A] transition-all placeholder:text-slate-300 ${errors.password ? "border-red-500 bg-red-50/30" : ""}`}
-                    />
-                    <button
-                        type="button"
-                        onClick={() => setShowNewPassword(!showNewPassword)}
-                        className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
-                    >
-                        {showNewPassword ? <Lock className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
-                    </button>
-                </div>
-                {errors.password && (
-                    <p className="text-[11px] text-red-500 ml-4 mt-1 font-bold leading-relaxed">{errors.password.message}</p>
-                )}
+      <PasswordField
+        fieldName="password"
+        label="New Password"
+        placeholder="Nhap mat khau moi"
+        typeVisible={showPassword}
+        onToggleVisible={() => setShowPassword((value) => !value)}
+        register={form.register}
+        error={form.formState.errors.password?.message}
+      />
 
-                {/* Password Requirements Checklist */}
-                <div className="mt-3 space-y-2 p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                    <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider mb-2">Yêu cầu bảo mật:</p>
-                    <div className="flex items-center gap-2 text-[11px] font-bold">
-                        <div className={`w-1.5 h-1.5 rounded-full ${watch("password").length >= 8 ? "bg-green-500" : "bg-slate-300"}`} />
-                        <span className={watch("password").length >= 8 ? "text-slate-700" : "text-slate-400"}>Tối thiểu 8 ký tự</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-[11px] font-bold">
-                        <div className={`w-1.5 h-1.5 rounded-full ${/[A-Z]/.test(watch("password")) ? "bg-green-500" : "bg-slate-300"}`} />
-                        <span className={/[A-Z]/.test(watch("password")) ? "text-slate-700" : "text-slate-400"}>Có 1 chữ hoa</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-[11px] font-bold">
-                        <div className={`w-1.5 h-1.5 rounded-full ${/[!@#$%^&*(),.?\":{}|<>]/.test(watch("password")) ? "bg-green-500" : "bg-slate-300"}`} />
-                        <span className={/[!@#$%^&*(),.?\":{}|<>]/.test(watch("password")) ? "text-slate-700" : "text-slate-400"}>Có 1 ký tự đặc biệt</span>
-                    </div>
-                </div>
-            </div>
+      <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3">
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+          Password rules
+        </p>
+        <ul className="mt-2 space-y-1.5 text-xs font-medium">
+          <RuleItem ok={hasMinLength} label="At least 8 characters" />
+          <RuleItem ok={hasUppercase} label="At least 1 uppercase letter" />
+          <RuleItem ok={hasSpecial} label="At least 1 special character" />
+        </ul>
+      </div>
 
-            <div className="space-y-2">
-                <label className="text-[13px] font-bold text-slate-400 ml-1">Xác nhận mật khẩu</label>
-                <div className="relative">
-                    <Input
-                        type={showConfirmPassword ? "text" : "password"}
-                        placeholder="Nhập lại mật khẩu mới"
-                        {...register("confirmPassword")}
-                        className={`h-12 bg-slate-50 border-slate-200 rounded-2xl px-5 pr-12 text-sm font-semibold text-slate-900 focus-visible:ring-[#FF9B8A]/20 focus-visible:border-[#FF9B8A] transition-all placeholder:text-slate-300 ${errors.confirmPassword ? "border-red-500 bg-red-50/30" : ""}`}
-                    />
-                    <button
-                        type="button"
-                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
-                    >
-                        {showConfirmPassword ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
-                    </button>
-                </div>
-                {errors.confirmPassword && (
-                    <p className="text-[11px] text-red-500 ml-4 mt-1 font-bold">{errors.confirmPassword.message}</p>
-                )}
-            </div>
+      <PasswordField
+        fieldName="confirmPassword"
+        label="Confirm Password"
+        placeholder="Nhap lai mat khau moi"
+        typeVisible={showConfirmPassword}
+        onToggleVisible={() => setShowConfirmPassword((value) => !value)}
+        register={form.register}
+        error={form.formState.errors.confirmPassword?.message}
+      />
 
-            <div className="flex justify-end gap-3 pt-6">
-                <Button
-                    type="submit"
-                    disabled={changePassword.isPending}
-                    className="bg-slate-900 hover:bg-slate-800 text-white rounded-full px-10 shadow-lg shadow-slate-900/10 font-bold flex items-center gap-2 h-11"
-                >
-                    {changePassword.isPending ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : (
-                        <>
-                            <Save className="w-4 h-4" />
-                            Đổi mật khẩu
-                        </>
-                    )}
-                </Button>
-            </div>
-        </form>
-    );
+      <div className="flex justify-end pt-2">
+        <Button type="submit" disabled={changePassword.isPending} className="h-10 rounded-full px-6 font-semibold">
+          {changePassword.isPending ? (
+            <>
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Dang cap nhat...
+            </>
+          ) : (
+            <>
+              <Save className="h-4 w-4" />
+              Update Password
+            </>
+          )}
+        </Button>
+      </div>
+    </form>
+  );
+}
+
+function PasswordField({
+  fieldName,
+  label,
+  placeholder,
+  typeVisible,
+  onToggleVisible,
+  register,
+  error,
+}: {
+  fieldName: "oldPassword" | "password" | "confirmPassword";
+  label: string;
+  placeholder: string;
+  typeVisible: boolean;
+  onToggleVisible: () => void;
+  register: UseFormRegister<ChangePasswordInput>;
+  error?: string;
+}) {
+  return (
+    <div className="space-y-1.5">
+      <label className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">{label}</label>
+      <div className="relative">
+        <LockKeyhole className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+        <Input
+          type={typeVisible ? "text" : "password"}
+          placeholder={placeholder}
+          {...register(fieldName)}
+          className={`h-11 rounded-xl border-slate-200 bg-white pl-10 pr-10 ${
+            error ? "border-rose-300 ring-1 ring-rose-200" : ""
+          }`}
+        />
+        <button
+          type="button"
+          onClick={onToggleVisible}
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+        >
+          {typeVisible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+        </button>
+      </div>
+      {error && <p className="text-xs font-medium text-rose-600">{error}</p>}
+    </div>
+  );
+}
+
+function RuleItem({ ok, label }: { ok: boolean; label: string }) {
+  return (
+    <li className={`flex items-center gap-2 ${ok ? "text-emerald-700" : "text-slate-500"}`}>
+      <span className={`h-1.5 w-1.5 rounded-full ${ok ? "bg-emerald-500" : "bg-slate-300"}`} />
+      {label}
+    </li>
+  );
 }

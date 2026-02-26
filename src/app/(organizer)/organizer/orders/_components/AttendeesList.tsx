@@ -5,105 +5,87 @@ import { Ticket } from "@/types/ticket";
 import { TicketStatus } from "@/utils/enum";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import {
-    User,
-    Mail,
-    Calendar,
-    Ticket as TicketIcon,
-    CheckCircle2,
-    XCircle,
-    Clock
-} from "lucide-react";
+import { Calendar } from "lucide-react";
 
 interface AttendeesListProps {
     tickets: Ticket[];
     isLoading?: boolean;
 }
 
-export default function AttendeesList({ tickets, isLoading }: AttendeesListProps) {
+export default function AttendeesList({
+    tickets,
+    isLoading,
+}: AttendeesListProps) {
     if (isLoading) {
         return (
-            <div className="flex flex-col items-center justify-center py-20 animate-pulse">
-                <div className="w-12 h-12 bg-zinc-100 rounded-2xl mb-4" />
-                <div className="h-4 w-32 bg-zinc-100 rounded-full" />
+            <div className="flex justify-center py-10 text-sm text-zinc-500">
+                Đang tải dữ liệu...
             </div>
         );
     }
 
     if (tickets.length === 0) {
         return (
-            <div className="flex flex-col items-center justify-center py-20 text-center">
-                <div className="w-20 h-20 rounded-[32px] bg-zinc-50 flex items-center justify-center text-zinc-300 mb-6">
-                    <TicketIcon className="w-10 h-10" />
-                </div>
-                <h3 className="text-xl font-black tracking-tighter text-zinc-900 uppercase italic">Chưa có người tham gia</h3>
-                <p className="text-zinc-400 text-sm font-medium mt-2 max-w-[280px]">
-                    Khi có người mua vé cho sự kiện này, danh sách sẽ được hiển thị tại đây.
-                </p>
+            <div className="flex justify-center py-16 text-sm text-zinc-500">
+                Chưa có người tham gia
             </div>
         );
     }
 
     return (
-        <div className="w-full overflow-hidden">
-            <table className="w-full text-left border-collapse">
-                <thead>
-                    <tr className="bg-zinc-50/50 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">
-                        <th className="px-8 py-5">Người tham gia</th>
-                        <th className="px-8 py-5">Loại vé</th>
-                        <th className="px-8 py-5">Ngày đặt</th>
-                        <th className="px-8 py-5">Trạng thái</th>
-                        <th className="px-8 py-5 text-right">Mã vé</th>
+        <table className="w-full text-sm">
+            <thead className="bg-zinc-50 text-zinc-500 text-xs">
+                <tr>
+                    <th className="px-5 py-3 text-left">Khách hàng</th>
+                    <th className="px-5 py-3 text-left">Loại vé</th>
+                    <th className="px-5 py-3 text-left">Ngày đặt</th>
+                    <th className="px-5 py-3 text-left">Trạng thái</th>
+                    <th className="px-5 py-3 text-right">Mã</th>
+                </tr>
+            </thead>
+
+            <tbody className="divide-y">
+                {tickets.map((ticket) => (
+                    <tr key={ticket.id} className="hover:bg-zinc-50 transition">
+                        <td className="px-5 py-4">
+                            <div className="font-medium">Nguyễn Văn A</div>
+                            <div className="text-xs text-zinc-400">
+                                user@example.com
+                            </div>
+                        </td>
+
+                        <td className="px-5 py-4">
+                            {ticket.ticketType?.name}
+                        </td>
+
+                        <td className="px-5 py-4 text-xs text-zinc-500">
+                            <div className="flex items-center gap-1">
+                                <Calendar className="w-3 h-3" />
+                                24/02/2026
+                            </div>
+                        </td>
+
+                        <td className="px-5 py-4">
+                            <Badge
+                                className={cn(
+                                    "text-xs",
+                                    ticket.status === TicketStatus.FULL
+                                        ? "bg-emerald-500 text-white"
+                                        : "bg-zinc-400 text-white"
+                                )}
+                            >
+                                {ticket.status === TicketStatus.FULL
+                                    ? "Đã thanh toán"
+                                    : "Chờ xử lý"}
+                            </Badge>
+                        </td>
+
+                        <td className="px-5 py-4 text-right text-xs font-mono text-primary">
+                            {ticket.id.split("-")[0]}
+                        </td>
                     </tr>
-                </thead>
-                <tbody className="divide-y divide-zinc-100">
-                    {tickets.map((ticket) => (
-                        <tr key={ticket.id} className="hover:bg-zinc-50 transition-colors group">
-                            <td className="px-8 py-6">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-full bg-zinc-100 flex items-center justify-center text-zinc-500 overflow-hidden border border-zinc-200">
-                                        <User className="w-5 h-5" />
-                                    </div>
-                                    <div className="flex flex-col">
-                                        <span className="text-sm font-black text-zinc-900 tracking-tight">Nguyễn Văn A</span>
-                                        <span className="text-[10px] text-zinc-400 font-bold flex items-center gap-1">
-                                            <Mail className="w-3 h-3" /> user@example.com
-                                        </span>
-                                    </div>
-                                </div>
-                            </td>
-                            <td className="px-8 py-6">
-                                <Badge variant="outline" className="rounded-full px-3 py-1 bg-zinc-50 text-zinc-600 border-zinc-200 text-[9px] font-black uppercase tracking-widest">
-                                    {ticket.ticketType?.name || "Standard"}
-                                </Badge>
-                            </td>
-                            <td className="px-8 py-6 text-[11px] text-zinc-500 font-bold">
-                                <div className="flex flex-col gap-1">
-                                    <div className="flex items-center gap-1.5 uppercase tracking-tighter">
-                                        <Calendar className="w-3 h-3" /> 24/02/2026
-                                    </div>
-                                    <div className="flex items-center gap-1.5 text-zinc-400">
-                                        <Clock className="w-3 h-3" /> 14:30
-                                    </div>
-                                </div>
-                            </td>
-                            <td className="px-8 py-6">
-                                <Badge className={cn(
-                                    "rounded-full px-3 py-1 text-[9px] font-black uppercase tracking-widest border-none shadow-sm",
-                                    ticket.status === TicketStatus.FULL ? "bg-emerald-500 text-white" : "bg-zinc-400 text-white"
-                                )}>
-                                    {ticket.status === TicketStatus.FULL ? "Đã thanh toán" : "Chờ xử lý"}
-                                </Badge>
-                            </td>
-                            <td className="px-8 py-6 text-right">
-                                <code className="text-[11px] font-black text-primary bg-primary/5 px-3 py-1.5 rounded-lg border border-primary/10 tracking-widest">
-                                    {ticket.id.split('-')[0].toUpperCase()}
-                                </code>
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-        </div>
+                ))}
+            </tbody>
+        </table>
     );
 }

@@ -1,117 +1,145 @@
-'use client';
+"use client";
 
-import { motion, useScroll, useTransform } from "framer-motion";
-import { Sparkles } from "lucide-react";
-import { useRef } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { motion } from "framer-motion";
+import { ArrowRight, CalendarDays, MapPin, Sparkles } from "lucide-react";
+import { format, isValid } from "date-fns";
+import { vi } from "date-fns/locale";
+import { Button } from "@/components/ui/button";
+import { Event } from "@/types/event";
 
-export default function EventsHero() {
-    const containerRef = useRef<HTMLDivElement>(null);
-    const { scrollY } = useScroll();
+interface EventsHeroProps {
+  featuredEvent?: Event;
+  totalEvents: number;
+  totalCategories: number;
+}
 
-    const y1 = useTransform(scrollY, [0, 500], [0, -100]);
-    const y2 = useTransform(scrollY, [0, 500], [0, 100]);
-    const opacity = useTransform(scrollY, [0, 300], [1, 0]);
+export default function EventsHero({
+  featuredEvent,
+  totalEvents,
+  totalCategories,
+}: EventsHeroProps) {
+  const featuredDate =
+    featuredEvent?.startTime && isValid(new Date(featuredEvent.startTime))
+      ? format(new Date(featuredEvent.startTime), "dd MMMM, yyyy", { locale: vi })
+      : "Dang cap nhat";
 
-    return (
-        <div ref={containerRef} className="relative pt-32 pb-24 md:pt-48 md:pb-40 overflow-hidden bg-background">
-            <div className="absolute inset-0 z-0 opacity-[0.03] pointer-events-none"
-                style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '40px 40px' }} />
+  return (
+    <section className="relative overflow-hidden px-4 pt-28 pb-14 md:pb-20">
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute -top-36 left-[-6%] h-80 w-80 rounded-full bg-sky-200/60 blur-3xl" />
+        <div className="absolute top-0 right-[-8%] h-[22rem] w-[22rem] rounded-full bg-amber-200/60 blur-3xl" />
+        <div className="absolute bottom-[-10rem] left-1/3 h-72 w-72 rounded-full bg-teal-200/50 blur-3xl" />
+      </div>
 
-            <motion.div
-                style={{ y: y1 }}
-                className="absolute top-[-10%] right-[-5%] w-[600px] h-[600px] bg-primary/30 rounded-full blur-[120px] pointer-events-none animate-pulse"
-            />
-            <motion.div
-                style={{ y: y2 }}
-                className="absolute bottom-[-10%] left-[-5%] w-[600px] h-[600px] bg-purple-500/20 rounded-full blur-[120px] pointer-events-none"
-            />
+      <div className="relative mx-auto grid w-full max-w-7xl gap-8 lg:grid-cols-12 lg:items-center">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="space-y-8 lg:col-span-7"
+        >
+          <div className="inline-flex items-center gap-2 rounded-full border border-sky-200 bg-white/90 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-sky-700 shadow-sm">
+            <Sparkles className="h-3.5 w-3.5" />
+            Event Discovery
+          </div>
 
-            {/* Tăng space-y-8 lên space-y-12 để dãn cách các block lớn */}
-            <div className="container mx-auto px-4 relative z-10 text-center space-y-12 md:space-y-16">
+          <div className="space-y-4">
+            <h1 className="max-w-3xl text-4xl font-extrabold leading-tight tracking-tight text-slate-900 md:text-6xl">
+              Tim su kien phu hop
+              <span className="block text-sky-600">de dat ve nhanh hon</span>
+            </h1>
+            <p className="max-w-2xl text-base leading-relaxed text-slate-600 md:text-lg">
+              Giao dien moi giup ban xem lich, dia diem va thong tin ve ro rang hon,
+              thao tac dat ve nhanh va de tren ca mobile lan desktop.
+            </p>
+          </div>
 
-                <motion.div
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8, type: "spring" }}
-                    className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-primary/10 text-primary font-semibold backdrop-blur-md border border-primary/20 shadow-lg shadow-primary/5"
-                >
-                    <Sparkles className="w-4 h-4" />
-                    <span className="text-sm tracking-wide uppercase">Khám phá thế giới giải trí</span>
-                </motion.div>
+          <div className="grid max-w-xl grid-cols-2 gap-4">
+            <div className="rounded-2xl border border-slate-200/80 bg-white/90 p-4 shadow-sm">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
+                Tong su kien
+              </p>
+              <p className="mt-1 text-2xl font-bold text-slate-900">{totalEvents}</p>
+            </div>
+            <div className="rounded-2xl border border-slate-200/80 bg-white/90 p-4 shadow-sm">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
+                Danh muc
+              </p>
+              <p className="mt-1 text-2xl font-bold text-slate-900">{totalCategories}</p>
+            </div>
+          </div>
 
-                {/* Tăng space-y-4 lên space-y-8 để H1 và Paragraph không dính nhau */}
-                <div className="space-y-8 md:space-y-10">
-                    <motion.h1
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8, delay: 0.1 }}
-                        className="text-6xl md:text-8xl font-black tracking-tight leading-[1.1]"
-                    >
-                        KIẾN TẠO <br />
-                        <span className="text-transparent bg-clip-text bg-gradient-to-br from-primary via-purple-500 to-pink-500">
-                            TRẢI NGHIỆM
-                        </span>
-                    </motion.h1>
+          <div className="flex flex-wrap items-center gap-3">
+            <Button asChild className="h-11 rounded-full px-6">
+              <Link href="/events">
+                Kham pha ngay
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </Button>
+            <Button
+              asChild
+              variant="outline"
+              className="h-11 rounded-full border-slate-300 bg-white/80 px-6 text-slate-700 hover:bg-white"
+            >
+              <Link href="/map">Xem ban do</Link>
+            </Button>
+          </div>
+        </motion.div>
 
-                    <motion.p
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8, delay: 0.2 }}
-                        className="text-lg md:text-2xl text-muted-foreground max-w-2xl mx-auto font-medium leading-relaxed"
-                    >
-                        Didoo kết nối bạn với những sự kiện độc đáo, từ âm nhạc sôi động đến những workshop đầy cảm hứng.
-                    </motion.p>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+          className="lg:col-span-5"
+        >
+          {featuredEvent ? (
+            <Link href={`/events/${featuredEvent.id}`} className="group block">
+              <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-[0_20px_40px_-25px_rgba(15,23,42,0.45)]">
+                <div className="relative aspect-[16/10] overflow-hidden">
+                  <Image
+                    src={
+                      featuredEvent.thumbnailUrl ||
+                      featuredEvent.bannerUrl ||
+                      "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=2070&auto=format&fit=crop"
+                    }
+                    alt={featuredEvent.name}
+                    fill
+                    className="object-cover transition-transform duration-700 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/10 to-transparent" />
+                  <div className="absolute bottom-4 left-4 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-slate-900">
+                    Spotlight
+                  </div>
                 </div>
 
-                {/* Thêm pt-8 để đẩy khu vực Avatar xuống thấp hơn một chút */}
-                <motion.div
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.4, type: "spring" }}
-                    className="flex justify-center items-center gap-4 pt-8"
-                >
-                    <div className="flex -space-x-3">
-                        {[1, 2, 3, 4].map((i) => (
-                            <div key={i} className="w-10 h-10 rounded-full border-2 border-background bg-secondary flex items-center justify-center overflow-hidden shadow-sm">
-                                <img src={`https://i.pravatar.cc/100?img=${i + 10}`} alt="avatar" />
-                            </div>
-                        ))}
+                <div className="space-y-4 p-5">
+                  <h2 className="line-clamp-2 text-2xl font-bold tracking-tight text-slate-900">
+                    {featuredEvent.name}
+                  </h2>
+                  <div className="space-y-2 text-sm text-slate-600">
+                    <div className="flex items-center gap-2">
+                      <CalendarDays className="h-4 w-4 text-sky-600" />
+                      <span>{featuredDate}</span>
                     </div>
-                    <p className="text-sm font-medium text-muted-foreground">
-                        <span className="text-foreground font-bold">5,000+</span> người đang tham gia
-                    </p>
-                </motion.div>
+                    <div className="flex items-center gap-2">
+                      <MapPin className="h-4 w-4 text-sky-600" />
+                      <span className="line-clamp-1">
+                        {featuredEvent.locations?.[0]?.name || "Dang cap nhat dia diem"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </Link>
+          ) : (
+            <div className="rounded-3xl border border-dashed border-slate-300 bg-white/80 p-10 text-center text-slate-600 shadow-sm">
+              Chua co su kien noi bat.
             </div>
-
-            {/* Tăng mt-24 để tách biệt hoàn toàn phần chữ với dải Marquee */}
-            {/* PHẦN MARQUEE ĐÃ SỬA: Nằm ngang và Cao hơn */}
-            <div className="relative z-20 w-full bg-primary py-8 whitespace-nowrap overflow-hidden border-y border-white/10 rotate-0 mt-20 mb-12 shadow-2xl">
-                <motion.div
-                    animate={{ x: [0, -1000] }}
-                    transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                    className="flex gap-12 items-center"
-                >
-                    {[1, 2, 3, 4, 5].map((i) => (
-                        <div key={i} className="flex gap-12 items-center">
-                            <span className="text-2xl md:text-5xl font-black italic uppercase text-black">Live Events</span>
-                            <Sparkles className="w-10 h-10 text-white fill-white" />
-
-                            <span className="text-2xl md:text-5xl font-black italic uppercase text-white/50">Sold Out Soon</span>
-                            <Sparkles className="w-10 h-10 text-black" />
-
-                            <span className="text-2xl md:text-5xl font-black italic uppercase text-black outline-text">Unlimited Experience</span>
-                            <Sparkles className="w-10 h-10 text-white" />
-                        </div>
-                    ))}
-                </motion.div>
-            </div>
-
-            <style jsx>{`
-                .outline-text {
-                    -webkit-text-stroke: 1px black;
-                    color: transparent;
-                }
-            `}</style>
-        </div>
-    );
+          )}
+        </motion.div>
+      </div>
+    </section>
+  );
 }

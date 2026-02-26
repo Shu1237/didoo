@@ -75,7 +75,7 @@ export default function OrganizerEventsPage() {
         </div>
       </div>
 
-      <div className="flex-1 min-h-0 overflow-auto scrollbar-thin rounded-3xl">
+      <div className="flex-1 min-h-0 overflow-auto scrollbar-thin rounded-3xl p-4 -m-4">
         <EventsList
           events={events}
           onViewDetail={(event) => openModal("DETAIL", event)}

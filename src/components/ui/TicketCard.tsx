@@ -1,122 +1,78 @@
-'use client';
+"use client";
 
-import Image from 'next/image';
-import Link from 'next/link';
-import { Calendar, MapPin, ArrowUpRight } from 'lucide-react';
-import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
-import { Event } from '@/types/event';
-import { format, isValid } from 'date-fns';
+import Image from "next/image";
+import Link from "next/link";
+import { motion } from "framer-motion";
+import { format, isValid } from "date-fns";
+import { vi } from "date-fns/locale";
+import { ArrowUpRight, CalendarDays, MapPin } from "lucide-react";
+import { Event } from "@/types/event";
+
+const FALLBACK_IMAGE =
+  "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=2070&auto=format&fit=crop";
 
 const TicketCard = ({
-    id,
-    name,
-    startTime,
-    locations,
-    thumbnailUrl,
-    bannerUrl,
-    category,
+  id,
+  name,
+  startTime,
+  locations,
+  thumbnailUrl,
+  bannerUrl,
+  category,
 }: Event) => {
-    // Subtle Magnetic effect
-    const x = useMotionValue(0);
-    const y = useMotionValue(0);
+  const dateLabel =
+    startTime && isValid(new Date(startTime))
+      ? format(new Date(startTime), "dd MMM yyyy", { locale: vi })
+      : "Dang cap nhat";
 
-    const mouseXSpring = useSpring(x, { stiffness: 150, damping: 20 });
-    const mouseYSpring = useSpring(y, { stiffness: 150, damping: 20 });
+  const locationLabel = locations?.[0]?.name || "Dia diem sap cap nhat";
 
-    const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["5deg", "-5deg"]);
-    const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-5deg", "5deg"]);
+  return (
+    <Link href={`/events/${id}`} className="group block h-full">
+      <motion.article
+        whileHover={{ y: -6 }}
+        transition={{ duration: 0.25, ease: "easeOut" }}
+        className="flex h-full flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition-shadow duration-300 hover:shadow-[0_20px_40px_-30px_rgba(14,116,144,0.55)]"
+      >
+        <div className="relative aspect-[16/10] overflow-hidden">
+          <Image
+            src={thumbnailUrl || bannerUrl || FALLBACK_IMAGE}
+            alt={name}
+            fill
+            className="object-cover transition-transform duration-700 group-hover:scale-105"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/5 to-transparent" />
+          <span className="absolute left-4 top-4 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-slate-700">
+            {category?.name || "Event"}
+          </span>
+        </div>
 
-    const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-        const rect = e.currentTarget.getBoundingClientRect();
-        const width = rect.width;
-        const height = rect.height;
-        const mouseX = e.clientX - rect.left;
-        const mouseY = e.clientY - rect.top;
-        const xPct = mouseX / width - 0.5;
-        const yPct = mouseY / height - 0.5;
-        x.set(xPct);
-        y.set(yPct);
-    };
+        <div className="flex flex-1 flex-col gap-4 p-5">
+          <h3 className="line-clamp-2 text-xl font-bold leading-snug text-slate-900 transition-colors group-hover:text-sky-700">
+            {name}
+          </h3>
 
-    const handleMouseLeave = () => {
-        x.set(0);
-        y.set(0);
-    };
+          <div className="space-y-2 text-sm text-slate-600">
+            <div className="flex items-center gap-2">
+              <CalendarDays className="h-4 w-4 text-sky-600" />
+              <span>{dateLabel}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <MapPin className="h-4 w-4 text-sky-600" />
+              <span className="line-clamp-1">{locationLabel}</span>
+            </div>
+          </div>
 
-    const displayDate = startTime && isValid(new Date(startTime))
-        ? format(new Date(startTime), "dd MMM, yyyy")
-        : "TBA";
-
-    return (
-        <Link href={`/events/${id}`} className="block group">
-            <motion.div
-                onMouseMove={handleMouseMove}
-                onMouseLeave={handleMouseLeave}
-                style={{
-                    rotateX,
-                    rotateY,
-                    transformStyle: "preserve-3d"
-                }}
-                className="relative h-full transition-all duration-300 ease-out will-change-transform"
-            >
-                <div className="relative flex flex-col h-full bg-[#121212] rounded-[32px] overflow-hidden border border-white/10 group-hover:border-primary transition-all duration-500 shadow-2xl">
-
-                    {/* Media Container */}
-                    <div className="relative aspect-[4/5] w-full overflow-hidden">
-                        <Image
-                            src={thumbnailUrl || bannerUrl || 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=2070&auto=format&fit=crop'}
-                            alt={name}
-                            fill
-                            className="object-cover transition-transform duration-1000 group-hover:scale-110"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-[#121212] via-transparent to-transparent opacity-90" />
-
-                        {/* Elegant Category Tag */}
-                        <div className="absolute top-6 left-6 flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/20 backdrop-blur-md border border-white/20">
-                            <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                            <span className="text-[10px] font-black text-white uppercase tracking-[0.2em]">{category?.name || "Event"}</span>
-                        </div>
-                    </div>
-
-                    {/* Content Section */}
-                    <div className="absolute inset-x-0 bottom-0 p-8 flex flex-col justify-end">
-                        <div className="space-y-4">
-                            <h3 className="text-4xl font-black text-white leading-[0.85] tracking-tighter group-hover:text-primary transition-colors uppercase italic-none">
-                                {name}
-                            </h3>
-
-                            <div className="flex flex-col gap-2 pt-6 border-t border-white/10">
-                                <div className="flex items-center gap-3 text-white/60">
-                                    <Calendar className="w-4 h-4 text-primary" />
-                                    <span className="text-xs font-black uppercase tracking-widest leading-none">
-                                        {displayDate}
-                                    </span>
-                                </div>
-                                <div className="flex items-center gap-3 text-white/60">
-                                    <MapPin className="w-4 h-4 text-primary" />
-                                    <span className="text-xs font-black uppercase tracking-widest truncate leading-none">{locations?.[0]?.name || "Online/TBA"}</span>
-                                </div>
-                            </div>
-
-                            <div className="flex items-center justify-between pt-6">
-                                <div>
-                                    <p className="text-[10px] uppercase tracking-widest text-white/40 font-black mb-1 leading-none">Pass Value</p>
-                                    <p className="text-2xl font-black text-white tracking-widest uppercase">Free</p>
-                                </div>
-
-                                <div className="w-14 h-14 rounded-full border border-white/20 flex items-center justify-center bg-white/10 group-hover:bg-primary group-hover:text-black transition-all duration-500 shadow-xl">
-                                    <ArrowUpRight className="w-6 h-6" />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Subtle soft glow on hover */}
-                <div className="absolute -inset-4 opacity-0 group-hover:opacity-10 bg-primary/40 blur-[40px] transition-opacity duration-700 -z-10" />
-            </motion.div>
-        </Link>
-    );
+          <div className="mt-auto flex items-center justify-between border-t border-slate-100 pt-4">
+            <span className="text-sm font-semibold text-slate-500">Xem chi tiet</span>
+            <span className="rounded-full bg-sky-50 p-2 text-sky-700 transition-colors group-hover:bg-sky-100">
+              <ArrowUpRight className="h-4 w-4" />
+            </span>
+          </div>
+        </div>
+      </motion.article>
+    </Link>
+  );
 };
 
 export default TicketCard;
