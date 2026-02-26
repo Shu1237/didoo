@@ -46,6 +46,20 @@ export const useEvent = () => {
         },
     });
 
+    const updateStatus = useMutation({
+        mutationFn: async ({ id, status }: { id: string; status: number }) => {
+            const res = await eventRequest.updateStatus(id, { status });
+            return res.data;
+        },
+        onSuccess: () => {
+            toast.success('Cập nhật trạng thái sự kiện thành công');
+            queryClient.invalidateQueries({ queryKey: KEY.events });
+        },
+        onError: (error) => {
+            handleErrorApi({ error });
+        },
+    });
+
     const deleteEvent = useMutation({
         mutationFn: async (id: string) => {
             const res = await eventRequest.delete(id);
@@ -74,6 +88,6 @@ export const useEvent = () => {
         }
     });
 
-    return { create, update, deleteEvent, restore };
+    return { create, update, updateStatus, deleteEvent, restore };
 };
 

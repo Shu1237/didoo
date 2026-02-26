@@ -14,24 +14,24 @@ The Event Management System uses a microservices architecture with an API Gatewa
 
 The API Gateway routes incoming requests to the following services:
 
-| Route Pattern | Cluster | Backend Service Address | Port |
-|---|---|---|---|
-| `/api/auth/*` | auth-cluster | http://localhost:6003 | 6003 |
-| `/api/roles/*` | auth-cluster | http://localhost:6003 | 6003 |
-| `/api/users/*` | auth-cluster | http://localhost:6003 | 6003 |
-| `/api/events/*` | event-cluster | http://localhost:6101 | 6101 |
-| `/api/categories/*` | event-cluster | http://localhost:6101 | 6101 |
-| `/api/organizers/*` | event-cluster | http://localhost:6101 | 6101 |
-| `/api/eventreviews/*` | event-cluster | http://localhost:6101 | 6101 |
-| `/api/favorites/*` | event-cluster | http://localhost:6101 | 6101 |
-| `/api/interactions/*` | event-cluster | http://localhost:6101 | 6101 |
-| `/api/tickets/*` | ticket-cluster | http://localhost:6201 | 6201 |
-| `/api/tickettypes/*` | ticket-cluster | http://localhost:6201 | 6201 |
-| `/hubs/ticket/*` | ticket-cluster | http://localhost:6201 | 6201 |
-| `/api/bookings/*` | booking-cluster | http://localhost:6301 | 6301 |
-| `/api/paymentmethods/*` | payment-cluster | http://localhost:6401 | 6401 |
-| `/api/notifications/*` | operation-cluster | http://localhost:6501 | 6501 |
-| `/api/checkins/*` | operation-cluster | http://localhost:6501 | 6501 |
+| Route Pattern           | Cluster           | Backend Service Address | Port |
+| ----------------------- | ----------------- | ----------------------- | ---- |
+| `/api/auth/*`           | auth-cluster      | http://localhost:6003   | 6003 |
+| `/api/roles/*`          | auth-cluster      | http://localhost:6003   | 6003 |
+| `/api/users/*`          | auth-cluster      | http://localhost:6003   | 6003 |
+| `/api/events/*`         | event-cluster     | http://localhost:6101   | 6101 |
+| `/api/categories/*`     | event-cluster     | http://localhost:6101   | 6101 |
+| `/api/organizers/*`     | event-cluster     | http://localhost:6101   | 6101 |
+| `/api/eventreviews/*`   | event-cluster     | http://localhost:6101   | 6101 |
+| `/api/favorites/*`      | event-cluster     | http://localhost:6101   | 6101 |
+| `/api/interactions/*`   | event-cluster     | http://localhost:6101   | 6101 |
+| `/api/tickets/*`        | ticket-cluster    | http://localhost:6201   | 6201 |
+| `/api/tickettypes/*`    | ticket-cluster    | http://localhost:6201   | 6201 |
+| `/hubs/ticket/*`        | ticket-cluster    | http://localhost:6201   | 6201 |
+| `/api/bookings/*`       | booking-cluster   | http://localhost:6301   | 6301 |
+| `/api/paymentmethods/*` | payment-cluster   | http://localhost:6401   | 6401 |
+| `/api/notifications/*`  | operation-cluster | http://localhost:6501   | 6501 |
+| `/api/checkins/*`       | operation-cluster | http://localhost:6501   | 6501 |
 
 ### Swagger/OpenAPI Endpoints
 
@@ -72,19 +72,19 @@ Authorization: Bearer <your_jwt_token>
 
 ##### Endpoints:
 
-| HTTP Method | Endpoint | Request | Response | Status Code | Notes |
-|---|---|---|---|---|---|
-| **POST** | `/api/auth/login` | `LoginCommand` | `LoginResponse` | 200/400 | Email + Password authentication |
-| **POST** | `/api/auth/login-google` | `LoginGoogleCommand` | `LoginGoogleResponse` | 200/400 | OAuth2 Google login |
-| **POST** | `/api/auth/refresh` | `RefreshCommand` | `RefreshResponse` | 200/400 | Refresh JWT token |
-| **POST** | `/api/auth/logout` | `LogoutCommand` | `LogoutResponse` | 200/400 | Logout user |
-| **POST** | `/api/auth/register` | `RegisterCommand` | `RegisterResponse` | 200/400 | Register new user |
-| **POST** | `/api/auth/verify-register` | `VerifyRegisterCommand` | `VerifyRegisterResponse` | 201/400 | Verify registration via OTP/Email |
-| **POST** | `/api/auth/forgot-password` | `ForgotPasswordCommand` | `ForgotPasswordResponse` | 200/400 | Request password reset |
-| **POST** | `/api/auth/verify-forgot-password` | `VerifyForgotPasswordCommand` | `VerifyForgotPasswordResponse` | 200/400 | Verify and reset password |
-| **POST** | `/api/auth/change-email` | `ChangeEmailCommand` | `ChangeEmailResponse` | 200/400 | Request email change |
-| **POST** | `/api/auth/verify-change-email` | `VerifyChangeEmailCommand` | `VerifyChangeEmailResponse` | 200/400 | Verify new email |
-| **POST** | `/api/auth/change-password` | `ChangePasswordCommand` | `ChangePasswordResponse` | 200/400 | Change user password |
+| HTTP Method | Endpoint                           | Request                       | Response                       | Status Code | Notes                             |
+| ----------- | ---------------------------------- | ----------------------------- | ------------------------------ | ----------- | --------------------------------- |
+| **POST**    | `/api/auth/login`                  | `LoginCommand`                | `LoginResponse`                | 200/400     | Email + Password authentication   |
+| **POST**    | `/api/auth/login-google`           | `LoginGoogleCommand`          | `LoginGoogleResponse`          | 200/400     | OAuth2 Google login               |
+| **POST**    | `/api/auth/refresh`                | `RefreshCommand`              | `RefreshResponse`              | 200/400     | Refresh JWT token                 |
+| **POST**    | `/api/auth/logout`                 | `LogoutCommand`               | `LogoutResponse`               | 200/400     | Logout user                       |
+| **POST**    | `/api/auth/register`               | `RegisterCommand`             | `RegisterResponse`             | 200/400     | Register new user                 |
+| **POST**    | `/api/auth/verify-register`        | `VerifyRegisterCommand`       | `VerifyRegisterResponse`       | 201/400     | Verify registration via OTP/Email |
+| **POST**    | `/api/auth/forgot-password`        | `ForgotPasswordCommand`       | `ForgotPasswordResponse`       | 200/400     | Request password reset            |
+| **POST**    | `/api/auth/verify-forgot-password` | `VerifyForgotPasswordCommand` | `VerifyForgotPasswordResponse` | 200/400     | Verify and reset password         |
+| **POST**    | `/api/auth/change-email`           | `ChangeEmailCommand`          | `ChangeEmailResponse`          | 200/400     | Request email change              |
+| **POST**    | `/api/auth/verify-change-email`    | `VerifyChangeEmailCommand`    | `ChangeEmailResponse`          | 200/400     | Verify new email                  |
+| **POST**    | `/api/auth/change-password`        | `ChangePasswordCommand`       | `ChangePasswordResponse`       | 200/400     | Change user password              |
 
 ##### Request/Response Models:
 
@@ -93,20 +93,21 @@ Authorization: Bearer <your_jwt_token>
 ```json
 {
   "email": "user@example.com",
-  "password": "Password123!",
+  "password": "password123",
   "location": {
     "latitude": 10.8231,
-    "longitude": 106.6883
+    "longitude": 106.6883,
+    "address": "123 Main Street, City"
   }
 }
 ```
-Note: `location` is required (LocationRequest). Password: min 8 chars, 1 upper, 1 lower, 1 digit, 1 special char.
 
 **LoginResponse:**
+
 ```json
 {
   "isSuccess": true,
-  "message": "Login successfully",
+  "message": "Login successful",
   "data": {
     "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
     "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
@@ -124,25 +125,24 @@ Note: `location` is required (LocationRequest). Password: min 8 chars, 1 upper, 
   "fullName": "John Doe",
   "email": "john@example.com",
   "phone": "0912345678",
-  "password": "Password123!",
+  "password": "password123",
   "avatarUrl": "https://example.com/avatar.jpg",
   "gender": 1,
   "dateOfBirth": "1990-01-01T00:00:00Z",
   "address": "123 Main Street"
 }
 ```
-Note: Password: min 8 chars, 1 upper, 1 lower, 1 digit, 1 special. Phone: Vietnam format (0[3|5|7|8|9]xxxxxxxx). OTP sent to email.
 
 **RegisterResponse:**
+
 ```json
 {
   "isSuccess": true,
-  "message": "Send register email successfully",
-  "data": null,
+  "message": "Registration successful",
+  "data": {},
   "listErrors": []
 }
 ```
-Note: User receives OTP via email. Must call `POST /api/auth/verify-register` with email + OTP to complete registration.
 
 ---
 
@@ -153,13 +153,14 @@ Note: User receives OTP via email. Must call `POST /api/auth/verify-register` wi
   "googleToken": "ya29.a0AfH6SMBx...",
   "location": {
     "latitude": 10.8231,
-    "longitude": 106.6883
+    "longitude": 106.6883,
+    "address": "123 Main Street, City"
   }
 }
 ```
-Note: `location` is optional. Creates user on first login if not exists.
 
 **LoginGoogleResponse:**
+
 ```json
 {
   "isSuccess": true,
@@ -183,13 +184,13 @@ Note: `location` is optional. Creates user on first login if not exists.
   "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 }
 ```
-Note: `id` is UserId (GUID string). Uses current accessToken + refreshToken to get new tokens.
 
 **RefreshResponse:**
+
 ```json
 {
   "isSuccess": true,
-  "message": "Refresh successfully!",
+  "message": "Token refreshed successfully",
   "data": {
     "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
     "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
@@ -209,6 +210,7 @@ Note: `id` is UserId (GUID string). Uses current accessToken + refreshToken to g
 ```
 
 **LogoutResponse:**
+
 ```json
 {
   "isSuccess": true,
@@ -228,21 +230,30 @@ Note: `id` is UserId (GUID string). Uses current accessToken + refreshToken to g
   "otp": "123456"
 }
 ```
-Note: `otp` must be 6 digits. Returns 201 on success.
 
 **VerifyRegisterResponse:**
+
 ```json
 {
   "isSuccess": true,
-  "message": "Register successfully",
+  "message": "Email verified successfully",
   "data": {
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "fullName": "John Doe",
     "email": "john@example.com",
-    "otp": "123456"
+    "phone": "0912345678",
+    "isVerified": true,
+    "avatarUrl": "https://example.com/avatar.jpg",
+    "gender": 1,
+    "dateOfBirth": "1990-01-01T00:00:00Z",
+    "address": "123 Main Street",
+    "status": "Active",
+    "roleId": "550e8400-e29b-41d4-a716-446655440001",
+    "organizerId": null
   },
   "listErrors": []
 }
 ```
-Note: Returns VerifyOtpDTO. OTP must be 6 digits. User is created in DB after successful verification.
 
 ---
 
@@ -255,6 +266,7 @@ Note: Returns VerifyOtpDTO. OTP must be 6 digits. User is created in DB after su
 ```
 
 **ForgotPasswordResponse:**
+
 ```json
 {
   "isSuccess": true,
@@ -270,13 +282,14 @@ Note: Returns VerifyOtpDTO. OTP must be 6 digits. User is created in DB after su
 
 ```json
 {
-  "key": "reset_key_from_forgot_password_email",
-  "newPassword": "NewPassword123!"
+  "email": "john@example.com",
+  "otp": "123456",
+  "newPassword": "newPassword123"
 }
 ```
-Note: `key` from forgot-password email. `newPassword` same rules as register password.
 
 **VerifyForgotPasswordResponse:**
+
 ```json
 {
   "isSuccess": true,
@@ -298,6 +311,7 @@ Note: `key` from forgot-password email. `newPassword` same rules as register pas
 ```
 
 **ChangeEmailResponse:**
+
 ```json
 {
   "isSuccess": true,
@@ -313,18 +327,8 @@ Note: `key` from forgot-password email. `newPassword` same rules as register pas
 
 ```json
 {
-  "userId": "550e8400-e29b-41d4-a716-446655440000",
+  "email": "newemail@example.com",
   "otp": "123456"
-}
-```
-
-**VerifyChangeEmailResponse:**
-```json
-{
-  "isSuccess": true,
-  "message": "Email change verified successfully",
-  "data": null,
-  "listErrors": []
 }
 ```
 
@@ -335,13 +339,13 @@ Note: `key` from forgot-password email. `newPassword` same rules as register pas
 ```json
 {
   "userId": "550e8400-e29b-41d4-a716-446655440000",
-  "password": "OldPassword123!",
-  "newPassword": "NewPassword123!"
+  "password": "oldPassword123",
+  "newPassword": "newPassword123"
 }
 ```
-Note: `newPassword` same validation as register. Requires valid current password.
 
 **ChangePasswordResponse:**
+
 ```json
 {
   "isSuccess": true,
@@ -351,7 +355,6 @@ Note: `newPassword` same validation as register. Requires valid current password
 }
 ```
 
-
 ---
 
 #### 2. User Controller (`/api/users`)
@@ -360,24 +363,14 @@ Note: `newPassword` same validation as register. Requires valid current password
 
 ##### Endpoints:
 
-| HTTP Method | Endpoint | Request | Response | Status Code | Notes |
-|---|---|---|---|---|---|
-| **POST** | `/api/users` | `UserCreateCommand` | `UserCreateResponse` | 201/400 | Create new user |
-| **GET** | `/api/users/{id}` | `UserGetByIdQuery` | `UserGetByIdResponse` | 200/400 | Get user by ID |
-| **GET** | `/api/users` | `UserGetListQuery` | `UserGetListResponse` | 200/400 | Get paginated list of users |
-| **PUT** | `/api/users/{id}` | `UserUpdateCommand` | `UserUpdateResponse` | 201/400 | Update user information |
-| **DELETE** | `/api/users/{id}` | - | `UserDeleteResponse` | 200/400 | Hard delete user |
-| **PATCH** | `/api/users/{id}` | - | `UserRestoreResponse` | 200/400 | Restore soft-deleted user |
-
-##### User Status Enum:
-- `1` = Active
-- `2` = Inactive
-
-##### RoleName Enum (for roleName):
-- `1` = Admin
-- `2` = User
-- `3` = Manager
-- `4` = Guest
+| HTTP Method | Endpoint          | Request             | Response              | Status Code | Notes                       |
+| ----------- | ----------------- | ------------------- | --------------------- | ----------- | --------------------------- |
+| **POST**    | `/api/users`      | `UserCreateCommand` | `UserCreateResponse`  | 201/400     | Create new user             |
+| **GET**     | `/api/users/{id}` | `UserGetByIdQuery`  | `UserGetByIdResponse` | 200/400     | Get user by ID              |
+| **GET**     | `/api/users`      | `UserGetListQuery`  | `UserGetListResponse` | 200/400     | Get paginated list of users |
+| **PUT**     | `/api/users/{id}` | `UserUpdateCommand` | `UserUpdateResponse`  | 201/400     | Update user information     |
+| **DELETE**  | `/api/users/{id}` | -                   | `UserDeleteResponse`  | 200/400     | Hard delete user            |
+| **PATCH**   | `/api/users/{id}` | -                   | `UserRestoreResponse` | 200/400     | Restore soft-deleted user   |
 
 ##### Request/Response Models:
 
@@ -393,14 +386,14 @@ Note: `newPassword` same validation as register. Requires valid current password
   "gender": 0,
   "dateOfBirth": "1995-05-15T00:00:00Z",
   "address": "456 Oak Avenue",
-  "status": 1,
-  "roleName": 2,
+  "status": "Active",
+  "roleName": "User",
   "organizerId": null
 }
 ```
-Note: `status` is StatusEnum (1=Active, 2=Inactive). `roleName` is RoleNameEnum (1=Admin, 2=User, 3=Manager, 4=Guest). `organizerId` is GUID string or null.
 
 **UserCreateResponse:**
+
 ```json
 {
   "isSuccess": true,
@@ -415,7 +408,7 @@ Note: `status` is StatusEnum (1=Active, 2=Inactive). `roleName` is RoleNameEnum 
     "gender": 0,
     "dateOfBirth": "1995-05-15T00:00:00Z",
     "address": "456 Oak Avenue",
-    "status": 1,
+    "status": "Active",
     "role": {
       "id": "550e8400-e29b-41d4-a716-446655440003",
       "name": "User"
@@ -432,6 +425,7 @@ Note: `status` is StatusEnum (1=Active, 2=Inactive). `roleName` is RoleNameEnum 
 **GET /api/users/{id} - UserGetByIdQuery:**
 
 Query Parameters:
+
 ```json
 {
   "fields": "id,fullName,email,phone",
@@ -440,6 +434,7 @@ Query Parameters:
 ```
 
 **UserGetByIdResponse:**
+
 ```json
 {
   "isSuccess": true,
@@ -454,7 +449,7 @@ Query Parameters:
     "gender": 0,
     "dateOfBirth": "1995-05-15T00:00:00Z",
     "address": "456 Oak Avenue",
-    "status": 1,
+    "status": "Active",
     "role": {
       "id": "550e8400-e29b-41d4-a716-446655440003",
       "name": "User"
@@ -471,6 +466,7 @@ Query Parameters:
 **GET /api/users - UserGetListQuery:**
 
 Query Parameters:
+
 ```json
 {
   "pageNumber": 1,
@@ -489,15 +485,16 @@ Query Parameters:
 ```
 
 **UserGetListResponse:**
+
 ```json
 {
   "isSuccess": true,
   "message": "Users retrieved successfully",
   "data": {
-    "totalItems": 150,
+    "totalCount": 150,
     "pageNumber": 1,
     "pageSize": 10,
-    "totalPages": 15,
+    "totalPage": 15,
     "items": [
       {
         "id": "550e8400-e29b-41d4-a716-446655440002",
@@ -505,7 +502,7 @@ Query Parameters:
         "email": "jane@example.com",
         "phone": "0987654321",
         "isVerified": true,
-        "status": 1,
+        "status": "Active",
         "role": {
           "id": "550e8400-e29b-41d4-a716-446655440003",
           "name": "User"
@@ -529,13 +526,14 @@ Query Parameters:
   "gender": 0,
   "dateOfBirth": "1995-05-15T00:00:00Z",
   "address": "789 Pine Road",
-  "status": 1,
-  "roleName": 2,
+  "status": "Active",
+  "roleName": "User",
   "organizerId": null
 }
 ```
 
 **UserUpdateResponse:**
+
 ```json
 {
   "isSuccess": true,
@@ -546,7 +544,7 @@ Query Parameters:
     "email": "jane@example.com",
     "phone": "0987654322",
     "isVerified": true,
-    "status": 1,
+    "status": "Active",
     "role": {
       "id": "550e8400-e29b-41d4-a716-446655440003",
       "name": "User"
@@ -561,6 +559,7 @@ Query Parameters:
 **DELETE /api/users/{id}:**
 
 **UserDeleteResponse:**
+
 ```json
 {
   "isSuccess": true,
@@ -575,6 +574,7 @@ Query Parameters:
 **PATCH /api/users/{id}:**
 
 **UserRestoreResponse:**
+
 ```json
 {
   "isSuccess": true,
@@ -592,13 +592,13 @@ Query Parameters:
 
 ##### Endpoints:
 
-| HTTP Method | Endpoint | Request | Response | Status Code | Authorization | Notes |
-|---|---|---|---|---|---|---|
-| **GET** | `/api/roles` | `RoleGetAllQuery` | `RoleGetAllResponse` | 200/400 | Required | Get all roles |
-| **POST** | `/api/roles` | `RoleCreateCommand` | `RoleCreateResponse` | 201/400 | - | Create new role |
-| **POST** | `/api/roles/dumb` | `RoleDumbCommand` | `RoleResponse` | 200/400 | - | Initialize default roles |
-| **DELETE** | `/api/roles/{id}` | - | `RoleDeleteResponse` | 200/400 | - | Hard delete role |
-| **PATCH** | `/api/roles/{id}` | - | `RoleRestoreResponse` | 200/400 | - | Restore soft-deleted role |
+| HTTP Method | Endpoint          | Request             | Response              | Status Code | Authorization | Notes                     |
+| ----------- | ----------------- | ------------------- | --------------------- | ----------- | ------------- | ------------------------- |
+| **GET**     | `/api/roles`      | `RoleGetAllQuery`   | `RoleGetAllResponse`  | 200/400     | Required      | Get all roles             |
+| **POST**    | `/api/roles`      | `RoleCreateCommand` | `RoleCreateResponse`  | 201/400     | -             | Create new role           |
+| **POST**    | `/api/roles/dumb` | `RoleDumbCommand`   | `RoleResponse`        | 200/400     | -             | Initialize default roles  |
+| **DELETE**  | `/api/roles/{id}` | -                   | `RoleDeleteResponse`  | 200/400     | -             | Hard delete role          |
+| **PATCH**   | `/api/roles/{id}` | -                   | `RoleRestoreResponse` | 200/400     | -             | Restore soft-deleted role |
 
 ##### Request/Response Models:
 
@@ -607,6 +607,7 @@ Query Parameters:
 No parameters required
 
 **RoleGetAllResponse:**
+
 ```json
 {
   "isSuccess": true,
@@ -615,20 +616,17 @@ No parameters required
     {
       "id": "550e8400-e29b-41d4-a716-446655440003",
       "name": "User",
-      "status": 1,
-      "createdAt": "2024-02-16T10:00:00Z"
+      "description": "Standard user role"
     },
     {
       "id": "550e8400-e29b-41d4-a716-446655440004",
       "name": "Admin",
-      "status": 1,
-      "createdAt": "2024-02-16T10:00:00Z"
+      "description": "Administrator role"
     },
     {
       "id": "550e8400-e29b-41d4-a716-446655440005",
       "name": "Organizer",
-      "status": 1,
-      "createdAt": "2024-02-16T10:00:00Z"
+      "description": "Event organizer role"
     }
   ],
   "listErrors": []
@@ -641,17 +639,22 @@ No parameters required
 
 ```json
 {
-  "name": 3
+  "name": "Premium Member",
+  "description": "Premium membership role with additional features"
 }
 ```
-Note: `name` is RoleNameEnum (1=Admin, 2=User, 3=Manager, 4=Guest)
 
 **RoleCreateResponse:**
+
 ```json
 {
   "isSuccess": true,
-  "message": "Create role successfully",
-  "data": null,
+  "message": "Role created successfully",
+  "data": {
+    "id": "550e8400-e29b-41d4-a716-446655440006",
+    "name": "Premium Member",
+    "description": "Premium membership role with additional features"
+  },
   "listErrors": []
 }
 ```
@@ -665,6 +668,7 @@ Note: `name` is RoleNameEnum (1=Admin, 2=User, 3=Manager, 4=Guest)
 ```
 
 **RoleResponse:**
+
 ```json
 {
   "isSuccess": true,
@@ -679,6 +683,7 @@ Note: `name` is RoleNameEnum (1=Admin, 2=User, 3=Manager, 4=Guest)
 **DELETE /api/roles/{id}:**
 
 **RoleDeleteResponse:**
+
 ```json
 {
   "isSuccess": true,
@@ -693,6 +698,7 @@ Note: `name` is RoleNameEnum (1=Admin, 2=User, 3=Manager, 4=Guest)
 **PATCH /api/roles/{id}:**
 
 **RoleRestoreResponse:**
+
 ```json
 {
   "isSuccess": true,
@@ -714,24 +720,15 @@ Note: `name` is RoleNameEnum (1=Admin, 2=User, 3=Manager, 4=Guest)
 
 ##### Endpoints:
 
-| HTTP Method | Endpoint | Request | Response | Status Code | Notes |
-|---|---|---|---|---|---|
-| **GET** | `/api/events` | `EventGetListQuery` | `EventGetListResponse` | 200/400 | Get paginated list of events |
-| **GET** | `/api/events/{id}` | `EventGetByIdQuery` | `EventGetByIdResponse` | 200/400 | Get event details by ID |
-| **POST** | `/api/events` | `EventCreateCommand` | `EventCreateResponse` | 201/400 | Create new event |
-| **PUT** | `/api/events/{id}` | `EventUpdateCommand` | `EventUpdateResponse` | 200/400 | Update event information |
-| **DELETE** | `/api/events/{id}` | - | `EventDeleteResponse` | 200/400 | Hard delete event |
-| **PATCH** | `/api/events/{id}` | - | `EventRestoreResponse` | 200/400 | Restore soft-deleted event |
-
-##### Event Status Enum:
-- `1` = Draft
-- `2` = Published
-- `3` = Cancelled
-- `4` = Opened
-- `5` = Closed
-
-##### Event Location Request (in EventCreateCommand):
-Each location object requires: `address`, `province`, `district`, `ward`, `zipcode`, `contactEmail`, `contactPhone`. Optional: `latitude`, `longitude`. Note: Location `name` is auto-set from event name.
+| HTTP Method | Endpoint           | Request              | Response               | Status Code | Notes                        |
+| ----------- | ------------------ | -------------------- | ---------------------- | ----------- | ---------------------------- |
+| **GET**     | `/api/events`      | `EventGetListQuery`  | `EventGetListResponse` | 200/400     | Get paginated list of events |
+| **GET**     | `/api/events/{id}` | `EventGetByIdQuery`  | `EventGetByIdResponse` | 200/400     | Get event details by ID      |
+| **POST**    | `/api/events`      | `EventCreateCommand` | `EventCreateResponse`  | 201/400     | Create new event             |
+| **PUT**     | `/api/events/{id}` | `EventUpdateCommand` | `EventUpdateResponse`  | 200/400     | Update event information     |
+| **DELETE**  | `/api/events/{id}` | -                    | `EventDeleteResponse`  | 200/400     | Hard delete event            |
+| **PATCH**   | `/api/events/{id}` | -                    | `EventRestoreResponse` | 200/400     | Restore soft-deleted event   |
+| **PATCH**   | `/api/events/{id}/status` | `{ "status": 1 }` | `EventUpdateResponse` | 200/400     | Cập nhật trạng thái sự kiện (1=Draft, 2=Published, 3=Cancelled, 4=Opened, 5=Closed) |
 
 ##### Request/Response Models:
 
@@ -744,9 +741,9 @@ Each location object requires: `address`, `province`, `district`, `ward`, `zipco
   "subtitle": "Future of Technology",
   "description": "Join us for an exciting tech conference showcasing innovations in AI and cloud computing",
   "tags": [
-    { "tagName": "Technology" },
-    { "tagName": "Conference" },
-    { "tagName": "AI" }
+    { "name": "Technology" },
+    { "name": "Conference" },
+    { "name": "AI" }
   ],
   "startTime": "2024-06-01T09:00:00Z",
   "endTime": "2024-06-01T17:00:00Z",
@@ -759,65 +756,70 @@ Each location object requires: `address`, `province`, `district`, `ward`, `zipco
   "organizerId": "550e8400-e29b-41d4-a716-446655440008",
   "locations": [
     {
+      "name": "Main Hall",
       "address": "123 Tech Street",
-      "province": "Ho Chi Minh City",
-      "district": "District 1",
-      "ward": "Ward 1",
-      "zipcode": "700000",
       "latitude": 10.8231,
-      "longitude": 106.6883,
-      "contactEmail": "contact@event.com",
-      "contactPhone": "0912345678"
+      "longitude": 106.6883
+    },
+    {
+      "name": "Conference Room A",
+      "address": "456 Tech Avenue",
+      "latitude": 10.824,
+      "longitude": 106.689
     }
   ]
 }
 ```
 
 **EventCreateResponse:**
+
 ```json
 {
   "isSuccess": true,
-  "message": "Create Event Successfully",
+  "message": "Event created successfully",
   "data": {
     "id": "550e8400-e29b-41d4-a716-446655440009",
     "name": "Tech Conference 2024",
     "slug": "tech-conference-2024",
     "subtitle": "Future of Technology",
     "description": "Join us for an exciting tech conference...",
-    "tags": [
-      { "tagName": "Technology" },
-      { "tagName": "Conference" }
-    ],
+    "tags": [{ "name": "Technology" }, { "name": "Conference" }],
     "startTime": "2024-06-01T09:00:00Z",
     "endTime": "2024-06-01T17:00:00Z",
     "openTime": "09:00",
     "closedTime": "17:00",
-    "status": 1,
+    "status": "Draft",
     "thumbnailUrl": "https://example.com/thumb.jpg",
     "bannerUrl": "https://example.com/banner.jpg",
     "ageRestriction": 18,
     "category": {
       "id": "550e8400-e29b-41d4-a716-446655440007",
-      "name": "Technology",
-      "iconUrl": "https://example.com/icons/tech.png"
+      "name": "Technology"
     },
     "organizer": {
       "id": "550e8400-e29b-41d4-a716-446655440008",
-      "name": "Tech Leaders",
-      "email": "contact@techleaders.com",
-      "phone": "0912345678"
-    }
+      "name": "Tech Leaders"
+    },
+    "locations": [
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440010",
+        "name": "Main Hall",
+        "address": "123 Tech Street",
+        "latitude": 10.8231,
+        "longitude": 106.6883
+      }
+    ]
   },
-  "listErrors": [  ]
+  "listErrors": []
 }
 ```
-Note: `openTime`/`closedTime` format: "HH:mm" or "HH:mm:ss". `locations` optional. EventId/OrganizerId/CategoryId are GUIDs.
 
 ---
 
 **GET /api/events - EventGetListQuery:**
 
 Query Parameters:
+
 ```json
 {
   "pageNumber": 1,
@@ -835,23 +837,21 @@ Query Parameters:
   "ageRestriction": null,
   "fields": "id,name,slug,description,thumbnailUrl",
   "isDescending": false,
-  "isDeleted": false,
-  "hasCategory": false,
-  "hasOrganizer": false,
-  "hasLocations": false
+  "isDeleted": false
 }
 ```
 
 **EventGetListResponse:**
+
 ```json
 {
   "isSuccess": true,
-  "message": "Retrieve Event Successfully",
+  "message": "Events retrieved successfully",
   "data": {
-    "totalItems": 250,
+    "totalCount": 250,
     "pageNumber": 1,
     "pageSize": 20,
-    "totalPages": 13,
+    "totalPage": 13,
     "items": [
       {
         "id": "550e8400-e29b-41d4-a716-446655440009",
@@ -859,7 +859,7 @@ Query Parameters:
         "slug": "tech-conference-2024",
         "subtitle": "Future of Technology",
         "description": "Join us...",
-        "status": 1,
+        "status": "Draft",
         "thumbnailUrl": "https://example.com/thumb.jpg",
         "category": {
           "id": "550e8400-e29b-41d4-a716-446655440007",
@@ -881,42 +881,39 @@ Query Parameters:
 **GET /api/events/{id} - EventGetByIdQuery:**
 
 Query Parameters:
+
 ```json
 {
-  "fields": "id,name,slug,description,category,organizer,locations",
-  "hasCategory": false,
-  "hasOrganizer": false,
-  "hasLocations": false
+  "fields": "id,name,slug,description,category,organizer,locations"
 }
 ```
 
 **EventGetByIdResponse:**
+
 ```json
 {
   "isSuccess": true,
-  "message": "Get Event By Id Successfully",
+  "message": "Event retrieved successfully",
   "data": {
     "id": "550e8400-e29b-41d4-a716-446655440009",
     "name": "Tech Conference 2024",
     "slug": "tech-conference-2024",
     "subtitle": "Future of Technology",
     "description": "Join us for an exciting tech conference...",
-    "tags": [
-      { "tagName": "Technology" },
-      { "tagName": "Conference" }
-    ],
+    "tags": [{ "name": "Technology" }, { "name": "Conference" }],
     "startTime": "2024-06-01T09:00:00Z",
     "endTime": "2024-06-01T17:00:00Z",
     "openTime": "09:00",
     "closedTime": "17:00",
-    "status": 2,
+    "status": "Published",
     "thumbnailUrl": "https://example.com/thumb.jpg",
     "bannerUrl": "https://example.com/banner.jpg",
     "ageRestriction": 18,
     "category": {
       "id": "550e8400-e29b-41d4-a716-446655440007",
       "name": "Technology",
-      "iconUrl": "https://example.com/icons/tech.png"
+      "slug": "technology",
+      "description": "Technology events"
     },
     "organizer": {
       "id": "550e8400-e29b-41d4-a716-446655440008",
@@ -927,9 +924,8 @@ Query Parameters:
     "locations": [
       {
         "id": "550e8400-e29b-41d4-a716-446655440010",
-        "name": "Tech Conference 2024",
+        "name": "Main Hall",
         "address": "123 Tech Street",
-        "province": "Ho Chi Minh City",
         "latitude": 10.8231,
         "longitude": 106.6883
       }
@@ -949,15 +945,12 @@ Query Parameters:
   "slug": "tech-conference-2024",
   "subtitle": "Future of Technology and Innovation",
   "description": "Updated description...",
-  "tags": [
-    { "tagName": "Technology" },
-    { "tagName": "Conference" }
-  ],
+  "tags": [{ "name": "Technology" }, { "name": "Conference" }],
   "startTime": "2024-06-05T09:00:00Z",
   "endTime": "2024-06-05T18:00:00Z",
   "openTime": "09:00",
   "closedTime": "18:00",
-  "status": 2,
+  "status": "Published",
   "thumbnailUrl": "https://example.com/thumb-new.jpg",
   "bannerUrl": "https://example.com/banner-new.jpg",
   "ageRestriction": 16,
@@ -967,16 +960,17 @@ Query Parameters:
 ```
 
 **EventUpdateResponse:**
+
 ```json
 {
   "isSuccess": true,
-  "message": "Update Event Successfully",
+  "message": "Event updated successfully",
   "data": {
     "id": "550e8400-e29b-41d4-a716-446655440009",
     "name": "Tech Conference 2024 - Updated",
     "slug": "tech-conference-2024",
     "subtitle": "Future of Technology and Innovation",
-    "status": 2
+    "status": "Published"
   },
   "listErrors": []
 }
@@ -987,19 +981,12 @@ Query Parameters:
 **DELETE /api/events/{id}:**
 
 **EventDeleteResponse:**
+
 ```json
 {
   "isSuccess": true,
-  "message": "Delete Event Successfully",
-  "data": {
-    "id": "550e8400-e29b-41d4-a716-446655440009",
-    "name": "Tech Conference 2024",
-    "slug": "tech-conference-2024",
-    "subtitle": "Future of Technology",
-    "description": "Join us...",
-    "category": { "id": "...", "name": "Technology", "iconUrl": "..." },
-    "organizer": { "id": "...", "name": "Tech Leaders", "email": "...", "phone": "..." }
-  },
+  "message": "Event deleted successfully",
+  "data": null,
   "listErrors": []
 }
 ```
@@ -1009,17 +996,12 @@ Query Parameters:
 **PATCH /api/events/{id}:**
 
 **EventRestoreResponse:**
+
 ```json
 {
   "isSuccess": true,
-  "message": "Restore Event Successfully",
-  "data": {
-    "id": "550e8400-e29b-41d4-a716-446655440009",
-    "name": "Tech Conference 2024",
-    "slug": "tech-conference-2024",
-    "category": { "id": "...", "name": "Technology" },
-    "organizer": { "id": "...", "name": "Tech Leaders" }
-  },
+  "message": "Event restored successfully",
+  "data": null,
   "listErrors": []
 }
 ```
@@ -1028,22 +1010,18 @@ Query Parameters:
 
 #### 2. Category Controller (`/api/categories`)
 
-**Purpose:** Manage event categories (requires authorization for list).
+**Purpose:** Manage event categories.
 
 ##### Endpoints:
 
-| HTTP Method | Endpoint | Request | Response | Status Code | Authorization | Notes |
-|---|---|---|---|---|---|---|
-| **GET** | `/api/categories` | `CategoryGetListQuery` | `CategoryGetListResponse` | 200/400 | Required | Get all categories |
-| **GET** | `/api/categories/{id}` | `CategoryGetByIdQuery` | `CategoryGetByIdResponse` | 200/400 | - | Get category by ID |
-| **POST** | `/api/categories` | `CategoryCreateCommand` | `CategoryCreateResponse` | 201/400 | - | Create new category |
-| **PUT** | `/api/categories/{id}` | `CategoryUpdateCommand` | `CategoryUpdateResponse` | 200/400 | - | Update category |
-| **DELETE** | `/api/categories/{id}` | - | `CategoryDeleteResponse` | 200/400 | - | Hard delete category |
-| **PATCH** | `/api/categories/{id}` | - | `CategoryRestoreResponse` | 200/400 | - | Restore soft-deleted category |
-
-##### Category Status Enum:
-- `1` = Active
-- `2` = Inactive
+| HTTP Method | Endpoint               | Request                 | Response                  | Status Code | Notes                         |
+| ----------- | ---------------------- | ----------------------- | ------------------------- | ----------- | ----------------------------- |
+| **GET**     | `/api/categories`      | `CategoryGetListQuery`  | `CategoryGetListResponse` | 200/400     | Get all categories             |
+| **GET**     | `/api/categories/{id}` | `CategoryGetByIdQuery`  | `CategoryGetByIdResponse` | 200/400     | Get category by ID            |
+| **POST**    | `/api/categories`      | `CategoryCreateCommand` | `CategoryCreateResponse`  | 201/400     | Create new category           |
+| **PUT**     | `/api/categories/{id}` | `CategoryUpdateCommand` | `CategoryUpdateResponse`  | 200/400     | Update category               |
+| **DELETE**  | `/api/categories/{id}` | -                       | `CategoryDeleteResponse`  | 200/400     | Hard delete category          |
+| **PATCH**   | `/api/categories/{id}` | -                       | `CategoryRestoreResponse` | 200/400     | Restore soft-deleted category |
 
 ##### Request/Response Models:
 
@@ -1055,13 +1033,13 @@ Query Parameters:
   "slug": "music-concerts",
   "description": "Live music events and concerts",
   "iconUrl": "https://example.com/icons/music.png",
-  "status": 1,
+  "status": "Active",
   "parentCategoryId": null
 }
 ```
-Note: `status` is StatusEnum (1=Active, 2=Inactive). `parentCategoryId` is GUID string or null.
 
 **CategoryCreateResponse:**
+
 ```json
 {
   "isSuccess": true,
@@ -1072,7 +1050,7 @@ Note: `status` is StatusEnum (1=Active, 2=Inactive). `parentCategoryId` is GUID 
     "slug": "music-concerts",
     "description": "Live music events and concerts",
     "iconUrl": "https://example.com/icons/music.png",
-    "status": 1,
+    "status": "Active",
     "parentCategory": null,
     "subCategories": []
   },
@@ -1085,57 +1063,45 @@ Note: `status` is StatusEnum (1=Active, 2=Inactive). `parentCategoryId` is GUID 
 **GET /api/categories - CategoryGetListQuery:**
 
 Query Parameters:
+
 ```json
 {
   "pageNumber": 1,
   "pageSize": 50,
   "name": null,
-  "slug": null,
-  "description": null,
   "status": null,
-  "parentCategoryId": null,
-  "fields": "id,name,slug,description",
-  "hasParent": false,
-  "hasSub": false,
-  "isDescending": null,
-  "isDeleted": false
+  "fields": "id,name,slug,description"
 }
 ```
 
 **CategoryGetListResponse:**
+
 ```json
 {
   "isSuccess": true,
   "message": "Categories retrieved successfully",
-  "data": {
-    "totalItems": 2,
-    "pageNumber": 1,
-    "pageSize": 50,
-    "totalPages": 1,
-    "items": [
-      {
-        "id": "550e8400-e29b-41d4-a716-446655440007",
-        "name": "Technology",
-        "slug": "technology",
-        "description": "Tech conferences and workshops",
-        "iconUrl": "https://example.com/icons/tech.png",
-        "status": 1,
-        "parentCategory": null,
-        "subCategories": []
-      },
-      {
-        "id": "550e8400-e29b-41d4-a716-446655440011",
-        "name": "Music & Concerts",
-        "slug": "music-concerts",
-        "description": "Live music events and concerts",
-        "iconUrl": "https://example.com/icons/music.png",
-        "status": 1,
-        "parentCategory": null,
-        "subCategories": []
-      }
-    ]
-  },
-  "listErrors": []
+  "data": [
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440007",
+      "name": "Technology",
+      "slug": "technology",
+      "description": "Tech conferences and workshops",
+      "iconUrl": "https://example.com/icons/tech.png",
+      "status": "Active",
+      "parentCategory": null,
+      "subCategories": []
+    },
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440011",
+      "name": "Music & Concerts",
+      "slug": "music-concerts",
+      "description": "Live music events and concerts",
+      "iconUrl": "https://example.com/icons/music.png",
+      "status": "Active",
+      "parentCategory": null,
+      "subCategories": []
+    }
+  ]
 }
 ```
 
@@ -1144,6 +1110,7 @@ Query Parameters:
 **GET /api/categories/{id} - CategoryGetByIdQuery:**
 
 **CategoryGetByIdResponse:**
+
 ```json
 {
   "isSuccess": true,
@@ -1154,7 +1121,7 @@ Query Parameters:
     "slug": "technology",
     "description": "Tech conferences and workshops",
     "iconUrl": "https://example.com/icons/tech.png",
-    "status": 1,
+    "status": "Active",
     "parentCategory": null,
     "subCategories": []
   },
@@ -1172,12 +1139,13 @@ Query Parameters:
   "slug": "music-concerts",
   "description": "Updated: Live music events, concerts, and festivals",
   "iconUrl": "https://example.com/icons/music-new.png",
-  "status": 1,
+  "status": "Active",
   "parentCategoryId": null
 }
 ```
 
 **CategoryUpdateResponse:**
+
 ```json
 {
   "isSuccess": true,
@@ -1187,7 +1155,7 @@ Query Parameters:
     "name": "Music & Concerts",
     "slug": "music-concerts",
     "description": "Updated: Live music events, concerts, and festivals",
-    "status": 1
+    "status": "Active"
   },
   "listErrors": []
 }
@@ -1198,6 +1166,7 @@ Query Parameters:
 **DELETE /api/categories/{id}:**
 
 **CategoryDeleteResponse:**
+
 ```json
 {
   "isSuccess": true,
@@ -1212,6 +1181,7 @@ Query Parameters:
 **PATCH /api/categories/{id}:**
 
 **CategoryRestoreResponse:**
+
 ```json
 {
   "isSuccess": true,
@@ -1229,19 +1199,15 @@ Query Parameters:
 
 ##### Endpoints:
 
-| HTTP Method | Endpoint | Request | Response | Status Code | Notes |
-|---|---|---|---|---|---|
-| **GET** | `/api/organizers` | `OrganizerGetListQuery` | `OrganizerGetListResponse` | 200/400 | Get all organizers |
-| **GET** | `/api/organizers/{id}` | `OrganizerGetByIdQuery` | `OrganizerGetByIdResponse` | 200/400 | Get organizer by ID |
-| **POST** | `/api/organizers` | `OrganizerCreateCommand` | `OrganizerCreateResponse` | 201/400 | Create new organizer |
-| **PUT** | `/api/organizers/{id}` | `OrganizerUpdateCommand` | `OrganizerUpdateResponse` | 200/400 | Update organizer |
-| **DELETE** | `/api/organizers/{id}` | - | `OrganizerDeleteResponse` | 200/400 | Hard delete organizer |
-| **PATCH** | `/api/organizers/{id}` | - | `OrganizerRestoreResponse` | 200/400 | Restore soft-deleted organizer |
-
-##### Organizer Status Enum:
-- `1` = Pending
-- `2` = Verified
-- `3` = Banned
+| HTTP Method | Endpoint               | Request                  | Response                   | Status Code | Notes                          |
+| ----------- | ---------------------- | ------------------------ | -------------------------- | ----------- | ------------------------------ |
+| **GET**     | `/api/organizers`      | `OrganizerGetListQuery`  | `OrganizerGetListResponse` | 200/400     | Get all organizers             |
+| **GET**     | `/api/organizers/{id}` | `OrganizerGetByIdQuery`  | `OrganizerGetByIdResponse` | 200/400     | Get organizer by ID            |
+| **POST**    | `/api/organizers`      | `OrganizerCreateCommand` | `OrganizerCreateResponse`  | 201/400     | Create new organizer           |
+| **PUT**     | `/api/organizers/{id}` | `OrganizerUpdateCommand` | `OrganizerUpdateResponse`  | 200/400     | Update organizer               |
+| **DELETE**  | `/api/organizers/{id}` | -                        | `OrganizerDeleteResponse`  | 200/400     | Hard delete organizer          |
+| **PATCH**   | `/api/organizers/{id}` | -                        | `OrganizerRestoreResponse` | 200/400     | Restore soft-deleted organizer |
+| **PATCH**   | `/api/organizers/{id}/verify` | -                    | `OrganizerUpdateResponse`  | 200/400     | Xác minh organizer (id: UUID) |
 
 ##### Request/Response Models:
 
@@ -1262,12 +1228,12 @@ Query Parameters:
   "tiktokUrl": "https://tiktok.com/@techleaders",
   "address": "123 Tech Street, City",
   "isVerified": false,
-  "status": 1
+  "status": "Pending"
 }
 ```
-Note: `status` is OrganizerStatusEnum (1=Pending, 2=Verified, 3=Banned)
 
 **OrganizerCreateResponse:**
+
 ```json
 {
   "isSuccess": true,
@@ -1287,7 +1253,7 @@ Note: `status` is OrganizerStatusEnum (1=Pending, 2=Verified, 3=Banned)
     "tiktokUrl": "https://tiktok.com/@techleaders",
     "address": "123 Tech Street, City",
     "isVerified": false,
-    "status": 1,
+    "status": "Pending",
     "createdAt": "2024-02-16T10:30:00Z",
     "updatedAt": null,
     "events": []
@@ -1301,36 +1267,28 @@ Note: `status` is OrganizerStatusEnum (1=Pending, 2=Verified, 3=Banned)
 **GET /api/organizers - OrganizerGetListQuery:**
 
 Query Parameters:
+
 ```json
 {
   "pageNumber": 1,
   "pageSize": 20,
   "name": null,
-  "slug": null,
-  "description": null,
-  "email": null,
-  "phone": null,
-  "mediaUrl": null,
-  "address": null,
-  "isVerified": null,
   "status": null,
-  "fields": "id,name,slug,email,phone",
-  "isDescending": false,
-  "isDeleted": false,
-  "hasEvents": false
+  "fields": "id,name,slug,email,phone"
 }
 ```
 
 **OrganizerGetListResponse:**
+
 ```json
 {
   "isSuccess": true,
   "message": "Organizers retrieved successfully",
   "data": {
-    "totalItems": 50,
+    "totalCount": 50,
     "pageNumber": 1,
     "pageSize": 20,
-    "totalPages": 3,
+    "totalPage": 3,
     "items": [
       {
         "id": "550e8400-e29b-41d4-a716-446655440008",
@@ -1338,11 +1296,10 @@ Query Parameters:
         "slug": "tech-leaders",
         "email": "contact@techleaders.com",
         "phone": "0912345678",
-        "status": 1
+        "status": "Pending"
       }
     ]
-  },
-  "listErrors": []
+  }
 }
 ```
 
@@ -1356,21 +1313,15 @@ Query Parameters:
   "slug": "tech-leaders-intl",
   "description": "Global tech conference organizer",
   "logoUrl": "https://example.com/logo-new.png",
-  "bannerUrl": "https://example.com/banner-new.jpg",
   "email": "info@techleaders.com",
   "phone": "0912345679",
   "websiteUrl": "https://techleaders.com",
-  "facebookUrl": "https://facebook.com/techleaders",
-  "instagramUrl": "https://instagram.com/techleaders",
-  "tiktokUrl": "https://tiktok.com/@techleaders",
-  "address": "456 Tech Avenue, City",
-  "isVerified": true,
-  "status": 2
+  "status": "Active"
 }
 ```
-Note: `status` is OrganizerStatusEnum (1=Pending, 2=Verified, 3=Banned)
 
 **OrganizerUpdateResponse:**
+
 ```json
 {
   "isSuccess": true,
@@ -1379,7 +1330,7 @@ Note: `status` is OrganizerStatusEnum (1=Pending, 2=Verified, 3=Banned)
     "id": "550e8400-e29b-41d4-a716-446655440008",
     "name": "Tech Leaders International",
     "email": "info@techleaders.com",
-    "status": 2
+    "status": "Active"
   },
   "listErrors": []
 }
@@ -1390,6 +1341,7 @@ Note: `status` is OrganizerStatusEnum (1=Pending, 2=Verified, 3=Banned)
 **GET /api/organizers/{id} - OrganizerGetByIdQuery:**
 
 **OrganizerGetByIdResponse:**
+
 ```json
 {
   "isSuccess": true,
@@ -1404,7 +1356,7 @@ Note: `status` is OrganizerStatusEnum (1=Pending, 2=Verified, 3=Banned)
     "phone": "0912345678",
     "websiteUrl": "https://techleaders.com",
     "isVerified": true,
-    "status": 2,
+    "status": "Active",
     "createdAt": "2024-02-16T10:30:00Z",
     "updatedAt": "2024-02-16T15:45:00Z",
     "events": [
@@ -1423,6 +1375,7 @@ Note: `status` is OrganizerStatusEnum (1=Pending, 2=Verified, 3=Banned)
 **DELETE /api/organizers/{id}:**
 
 **OrganizerDeleteResponse:**
+
 ```json
 {
   "isSuccess": true,
@@ -1437,6 +1390,7 @@ Note: `status` is OrganizerStatusEnum (1=Pending, 2=Verified, 3=Banned)
 **PATCH /api/organizers/{id}:**
 
 **OrganizerRestoreResponse:**
+
 ```json
 {
   "isSuccess": true,
@@ -1454,14 +1408,14 @@ Note: `status` is OrganizerStatusEnum (1=Pending, 2=Verified, 3=Banned)
 
 ##### Endpoints:
 
-| HTTP Method | Endpoint | Request | Response | Status Code | Notes |
-|---|---|---|---|---|---|
-| **GET** | `/api/eventreviews` | `EventReviewGetListQuery` | `EventReviewGetListResponse` | 200/400 | Get reviews (paginated) |
-| **GET** | `/api/eventreviews/{id}` | `EventReviewGetByIdQuery` | `EventReviewGetByIdResponse` | 200/400 | Get review by ID |
-| **POST** | `/api/eventreviews` | `EventReviewCreateCommand` | `EventReviewCreateResponse` | 201/400 | Create new review |
-| **PUT** | `/api/eventreviews/{id}` | `EventReviewUpdateCommand` | `EventReviewUpdateResponse` | 200/400 | Update review |
-| **DELETE** | `/api/eventreviews/{id}` | - | `EventReviewDeleteResponse` | 200/400 | Hard delete review |
-| **PATCH** | `/api/eventreviews/{id}` | - | `EventReviewRestoreResponse` | 200/400 | Restore soft-deleted review |
+| HTTP Method | Endpoint                 | Request                    | Response                     | Status Code | Notes                       |
+| ----------- | ------------------------ | -------------------------- | ---------------------------- | ----------- | --------------------------- |
+| **GET**     | `/api/eventreviews`      | `EventReviewGetListQuery`  | `EventReviewGetListResponse` | 200/400     | Get reviews (paginated)     |
+| **GET**     | `/api/eventreviews/{id}` | `EventReviewGetByIdQuery`  | `EventReviewGetByIdResponse` | 200/400     | Get review by ID            |
+| **POST**    | `/api/eventreviews`      | `EventReviewCreateCommand` | `EventReviewCreateResponse`  | 201/400     | Create new review           |
+| **PUT**     | `/api/eventreviews/{id}` | `EventReviewUpdateCommand` | `EventReviewUpdateResponse`  | 200/400     | Update review               |
+| **DELETE**  | `/api/eventreviews/{id}` | -                          | `EventReviewDeleteResponse`  | 200/400     | Hard delete review          |
+| **PATCH**   | `/api/eventreviews/{id}` | -                          | `EventReviewRestoreResponse` | 200/400     | Restore soft-deleted review |
 
 ##### Request/Response Models:
 
@@ -1478,28 +1432,18 @@ Note: `status` is OrganizerStatusEnum (1=Pending, 2=Verified, 3=Banned)
 ```
 
 **EventReviewCreateResponse:**
+
 ```json
 {
   "isSuccess": true,
   "message": "Review created successfully",
   "data": {
     "id": "550e8400-e29b-41d4-a716-446655440012",
-    "user": {
-      "id": "550e8400-e29b-41d4-a716-446655440002",
-      "fullName": "Jane Smith",
-      "avatarUrl": "https://example.com/avatar.jpg",
-      "gender": 1
-    },
-    "event": {
-      "id": "550e8400-e29b-41d4-a716-446655440009",
-      "name": "Tech Conference 2024",
-      "slug": "tech-conference-2024",
-      "description": "Join us for an exciting tech conference...",
-      "subtitle": "Future of Technology"
-    },
+    "eventId": "550e8400-e29b-41d4-a716-446655440009",
+    "userId": "550e8400-e29b-41d4-a716-446655440002",
     "rating": 5,
     "comment": "Excellent event! Great organization and amazing speakers.",
-    "parentReview": null
+    "parentReviewId": null
   },
   "listErrors": []
 }
@@ -1510,54 +1454,46 @@ Note: `status` is OrganizerStatusEnum (1=Pending, 2=Verified, 3=Banned)
 **GET /api/eventreviews - EventReviewGetListQuery:**
 
 Query Parameters:
+
 ```json
 {
   "pageNumber": 1,
   "pageSize": 20,
   "eventId": "550e8400-e29b-41d4-a716-446655440009",
   "userId": null,
-  "rating": 5,
-  "comment": null,
-  "fields": "id,rating,comment,user,event",
+  "minRating": 1,
+  "maxRating": 5,
+  "fields": "id,rating,comment,userId",
   "isDescending": true,
-  "isDeleted": false,
-  "hasParent": false,
-  "hasReplies": false
+  "isDeleted": false
 }
 ```
 
 **EventReviewGetListResponse:**
+
 ```json
 {
   "isSuccess": true,
   "message": "Reviews retrieved successfully",
   "data": {
-    "totalItems": 45,
+    "totalCount": 45,
     "pageNumber": 1,
     "pageSize": 20,
-    "totalPages": 3,
+    "totalPage": 3,
     "items": [
       {
         "id": "550e8400-e29b-41d4-a716-446655440012",
+        "eventId": "550e8400-e29b-41d4-a716-446655440009",
+        "userId": "550e8400-e29b-41d4-a716-446655440002",
+        "rating": 5,
+        "comment": "Excellent event!",
         "user": {
           "id": "550e8400-e29b-41d4-a716-446655440002",
-          "fullName": "Jane Smith",
-          "avatarUrl": "https://example.com/avatar.jpg",
-          "gender": 1
-        },
-        "event": {
-          "id": "550e8400-e29b-41d4-a716-446655440009",
-          "name": "Tech Conference 2024",
-          "slug": "tech-conference-2024",
-          "description": "Join us...",
-          "subtitle": "Future of Technology"
-        },
-        "rating": 5,
-        "comment": "Excellent event!"
+          "fullName": "Jane Smith"
+        }
       }
     ]
-  },
-  "listErrors": []
+  }
 }
 ```
 
@@ -1573,25 +1509,13 @@ Query Parameters:
 ```
 
 **EventReviewUpdateResponse:**
+
 ```json
 {
   "isSuccess": true,
   "message": "Review updated successfully",
   "data": {
     "id": "550e8400-e29b-41d4-a716-446655440012",
-    "user": {
-      "id": "550e8400-e29b-41d4-a716-446655440002",
-      "fullName": "Jane Smith",
-      "avatarUrl": "https://example.com/avatar.jpg",
-      "gender": 1
-    },
-    "event": {
-      "id": "550e8400-e29b-41d4-a716-446655440009",
-      "name": "Tech Conference 2024",
-      "slug": "tech-conference-2024",
-      "description": "Join us...",
-      "subtitle": "Future of Technology"
-    },
     "rating": 4,
     "comment": "Great event with minor organization issues"
   },
@@ -1604,6 +1528,7 @@ Query Parameters:
 **DELETE /api/eventreviews/{id}:**
 
 **EventReviewDeleteResponse:**
+
 ```json
 {
   "isSuccess": true,
@@ -1618,6 +1543,7 @@ Query Parameters:
 **PATCH /api/eventreviews/{id}:**
 
 **EventReviewRestoreResponse:**
+
 ```json
 {
   "isSuccess": true,
@@ -1635,14 +1561,14 @@ Query Parameters:
 
 ##### Endpoints:
 
-| HTTP Method | Endpoint | Request | Response | Status Code | Notes |
-|---|---|---|---|---|---|
-| **GET** | `/api/favorites` | `FavoriteGetListQuery` | `FavoriteGetListResponse` | 200/400 | Get user's favorites (paginated) |
-| **GET** | `/api/favorites/{id}` | `FavoriteGetByIdQuery` | `FavoriteGetByIdResponse` | 200/400 | Get favorite by ID |
-| **POST** | `/api/favorites` | `FavoriteCreateCommand` | `FavoriteCreateResponse` | 201/400 | Add event to favorites |
-| **DELETE** | `/api/favorites/{userId}/{eventId}` | - | `FavoriteDeleteResponse` | 200/400 | Hard delete from favorites |
-| **DELETE** | `/api/favorites/{userId}/{eventId}/soft` | - | `FavoriteSoftDeleteResponse` | 200/400 | Soft delete from favorites |
-| **PATCH** | `/api/favorites/{userId}/{eventId}` | - | `FavoriteRestoreResponse` | 200/400 | Restore favorite |
+| HTTP Method | Endpoint                                 | Request                 | Response                     | Status Code | Notes                            |
+| ----------- | ---------------------------------------- | ----------------------- | ---------------------------- | ----------- | -------------------------------- |
+| **GET**     | `/api/favorites`                         | `FavoriteGetListQuery`  | `FavoriteGetListResponse`    | 200/400     | Get user's favorites (paginated) |
+| **GET**     | `/api/favorites/{id}`                    | `FavoriteGetByIdQuery`  | `FavoriteGetByIdResponse`    | 200/400     | Get favorite by ID               |
+| **POST**    | `/api/favorites`                         | `FavoriteCreateCommand` | `FavoriteCreateResponse`     | 201/400     | Add event to favorites           |
+| **DELETE**  | `/api/favorites/{userId}/{eventId}`      | -                       | `FavoriteDeleteResponse`     | 200/400     | Hard delete from favorites       |
+| **DELETE**  | `/api/favorites/{userId}/{eventId}/soft` | -                       | `FavoriteSoftDeleteResponse` | 200/400     | Soft delete from favorites       |
+| **PATCH**   | `/api/favorites/{userId}/{eventId}`      | -                       | `FavoriteRestoreResponse`    | 200/400     | Restore favorite                 |
 
 ##### Request/Response Models:
 
@@ -1656,25 +1582,16 @@ Query Parameters:
 ```
 
 **FavoriteCreateResponse:**
+
 ```json
 {
   "isSuccess": true,
   "message": "Event added to favorites successfully",
   "data": {
     "id": "550e8400-e29b-41d4-a716-446655440013",
-    "user": {
-      "id": "550e8400-e29b-41d4-a716-446655440002",
-      "fullName": "Jane Smith",
-      "avatarUrl": "https://example.com/avatar.jpg",
-      "gender": 1
-    },
-    "event": {
-      "id": "550e8400-e29b-41d4-a716-446655440009",
-      "name": "Tech Conference 2024",
-      "slug": "tech-conference-2024",
-      "description": "Join us for an exciting tech conference...",
-      "subtitle": "Future of Technology"
-    }
+    "userId": "550e8400-e29b-41d4-a716-446655440002",
+    "eventId": "550e8400-e29b-41d4-a716-446655440009",
+    "createdAt": "2024-02-16T12:00:00Z"
   },
   "listErrors": []
 }
@@ -1685,45 +1602,44 @@ Query Parameters:
 **GET /api/favorites - FavoriteGetListQuery:**
 
 Query Parameters:
+
 ```json
 {
   "pageNumber": 1,
   "pageSize": 20,
   "userId": "550e8400-e29b-41d4-a716-446655440002",
   "eventId": null,
-  "fields": "id,user,event",
+  "fields": "id,userId,eventId",
   "isDescending": true,
   "isDeleted": false
 }
 ```
 
 **FavoriteGetListResponse:**
+
 ```json
 {
   "isSuccess": true,
   "message": "Favorites retrieved successfully",
   "data": {
-    "totalItems": 12,
+    "totalCount": 12,
     "pageNumber": 1,
     "pageSize": 20,
-    "totalPages": 1,
+    "totalPage": 1,
     "items": [
       {
         "id": "550e8400-e29b-41d4-a716-446655440013",
-        "user": {
-          "id": "550e8400-e29b-41d4-a716-446655440002"
-        },
+        "userId": "550e8400-e29b-41d4-a716-446655440002",
+        "eventId": "550e8400-e29b-41d4-a716-446655440009",
         "event": {
           "id": "550e8400-e29b-41d4-a716-446655440009",
           "name": "Tech Conference 2024",
-          "slug": "tech-conference-2024",
-          "description": "Join us for an exciting tech conference...",
-          "subtitle": "Future of Technology"
-        }
+          "thumbnailUrl": "https://example.com/thumb.jpg"
+        },
+        "createdAt": "2024-02-16T12:00:00Z"
       }
     ]
-  },
-  "listErrors": []
+  }
 }
 ```
 
@@ -1732,25 +1648,24 @@ Query Parameters:
 **GET /api/favorites/{id} - FavoriteGetByIdQuery:**
 
 **FavoriteGetByIdResponse:**
+
 ```json
 {
   "isSuccess": true,
   "message": "Favorite retrieved successfully",
   "data": {
     "id": "550e8400-e29b-41d4-a716-446655440013",
+    "userId": "550e8400-e29b-41d4-a716-446655440002",
+    "eventId": "550e8400-e29b-41d4-a716-446655440009",
     "user": {
       "id": "550e8400-e29b-41d4-a716-446655440002",
-      "fullName": "Jane Smith",
-      "avatarUrl": "https://example.com/avatar.jpg",
-      "gender": 1
+      "fullName": "Jane Smith"
     },
     "event": {
       "id": "550e8400-e29b-41d4-a716-446655440009",
-      "name": "Tech Conference 2024",
-      "slug": "tech-conference-2024",
-      "description": "Join us...",
-      "subtitle": "Future of Technology"
-    }
+      "name": "Tech Conference 2024"
+    },
+    "createdAt": "2024-02-16T12:00:00Z"
   },
   "listErrors": []
 }
@@ -1761,6 +1676,7 @@ Query Parameters:
 **DELETE /api/favorites/{userId}/{eventId}:**
 
 **FavoriteDeleteResponse:**
+
 ```json
 {
   "isSuccess": true,
@@ -1775,6 +1691,7 @@ Query Parameters:
 **DELETE /api/favorites/{userId}/{eventId}/soft:**
 
 **FavoriteSoftDeleteResponse:**
+
 ```json
 {
   "isSuccess": true,
@@ -1789,6 +1706,7 @@ Query Parameters:
 **PATCH /api/favorites/{userId}/{eventId}:**
 
 **FavoriteRestoreResponse:**
+
 ```json
 {
   "isSuccess": true,
@@ -1806,19 +1724,21 @@ Query Parameters:
 
 ##### Endpoints:
 
-| HTTP Method | Endpoint | Request | Response | Status Code | Notes |
-|---|---|---|---|---|---|
-| **GET** | `/api/interactions` | `InteractionGetListQuery` | `InteractionGetListResponse` | 200/400 | Get interactions (paginated) |
-| **GET** | `/api/interactions/{id}` | `InteractionGetByIdQuery` | `InteractionGetByIdResponse` | 200/400 | Get interaction by ID |
-| **POST** | `/api/interactions` | `InteractionCreateCommand` | `InteractionCreateResponse` | 201/400 | Record user interaction |
-| **DELETE** | `/api/interactions/{userId}/{eventId}/{type}` | - | `InteractionDeleteResponse` | 200/400 | Hard delete interaction |
-| **DELETE** | `/api/interactions/{userId}/{eventId}/{type}/soft` | - | `InteractionSoftDeleteResponse` | 200/400 | Soft delete interaction |
-| **PATCH** | `/api/interactions/{userId}/{eventId}/{type}` | - | `InteractionRestoreResponse` | 200/400 | Restore interaction |
+| HTTP Method | Endpoint                                           | Request                    | Response                        | Status Code | Notes                        |
+| ----------- | -------------------------------------------------- | -------------------------- | ------------------------------- | ----------- | ---------------------------- |
+| **GET**     | `/api/interactions`                                | `InteractionGetListQuery`  | `InteractionGetListResponse`    | 200/400     | Get interactions (paginated) |
+| **GET**     | `/api/interactions/{id}`                           | `InteractionGetByIdQuery`  | `InteractionGetByIdResponse`    | 200/400     | Get interaction by ID        |
+| **POST**    | `/api/interactions`                                | `InteractionCreateCommand` | `InteractionCreateResponse`     | 201/400     | Record user interaction      |
+| **DELETE**  | `/api/interactions/{userId}/{eventId}/{type}`      | -                          | `InteractionDeleteResponse`     | 200/400     | Hard delete interaction      |
+| **DELETE**  | `/api/interactions/{userId}/{eventId}/{type}/soft` | -                          | `InteractionSoftDeleteResponse` | 200/400     | Soft delete interaction      |
+| **PATCH**   | `/api/interactions/{userId}/{eventId}/{type}`      | -                          | `InteractionRestoreResponse`    | 200/400     | Restore interaction          |
 
-##### Interaction Types (Enum values):
-- `1` = View
-- `2` = Heart
-- `3` = Save
+##### Interaction Types:
+
+- `0` = View
+- `1` = Like
+- `2` = Share
+- `3` = Comment
 
 ##### Request/Response Models:
 
@@ -1833,26 +1753,17 @@ Query Parameters:
 ```
 
 **InteractionCreateResponse:**
+
 ```json
 {
   "isSuccess": true,
   "message": "Interaction recorded successfully",
   "data": {
     "id": "550e8400-e29b-41d4-a716-446655440014",
-    "type": 1,
-    "user": {
-      "id": "550e8400-e29b-41d4-a716-446655440002",
-      "fullName": "Jane Smith",
-      "avatarUrl": "https://example.com/avatar.jpg",
-      "gender": 1
-    },
-    "event": {
-      "id": "550e8400-e29b-41d4-a716-446655440009",
-      "name": "Tech Conference 2024",
-      "slug": "tech-conference-2024",
-      "description": "Join us for an exciting tech conference...",
-      "subtitle": "Future of Technology"
-    }
+    "type": "Like",
+    "eventId": "550e8400-e29b-41d4-a716-446655440009",
+    "userId": "550e8400-e29b-41d4-a716-446655440002",
+    "createdAt": "2024-02-16T13:15:00Z"
   },
   "listErrors": []
 }
@@ -1863,6 +1774,7 @@ Query Parameters:
 **GET /api/interactions - InteractionGetListQuery:**
 
 Query Parameters:
+
 ```json
 {
   "pageNumber": 1,
@@ -1870,54 +1782,48 @@ Query Parameters:
   "userId": null,
   "eventId": "550e8400-e29b-41d4-a716-446655440009",
   "type": null,
-  "fields": "id,type,user,event",
+  "fields": "id,type,userId,eventId",
   "isDescending": true,
   "isDeleted": false
 }
 ```
 
 **InteractionGetListResponse:**
+
 ```json
 {
   "isSuccess": true,
   "message": "Interactions retrieved successfully",
   "data": {
-    "totalItems": 234,
+    "totalCount": 234,
     "pageNumber": 1,
     "pageSize": 50,
-    "totalPages": 5,
+    "totalPage": 5,
     "items": [
       {
         "id": "550e8400-e29b-41d4-a716-446655440014",
-        "type": 1,
+        "type": "Like",
+        "eventId": "550e8400-e29b-41d4-a716-446655440009",
+        "userId": "550e8400-e29b-41d4-a716-446655440002",
         "user": {
           "id": "550e8400-e29b-41d4-a716-446655440002",
-          "fullName": "Jane Smith",
-          "avatarUrl": "https://example.com/avatar.jpg",
-          "gender": 1
-        },
-        "event": {
-          "id": "550e8400-e29b-41d4-a716-446655440009",
-          "name": "Tech Conference 2024",
-          "slug": "tech-conference-2024",
-          "description": "Join us...",
-          "subtitle": "Future of Technology"
-        }
-      },
-      {
-        "id": "550e8400-e29b-41d4-a716-446655440015",
-        "type": 2,
-        "user": {
-          "id": "550e8400-e29b-41d4-a716-446655440003"
+          "fullName": "Jane Smith"
         },
         "event": {
           "id": "550e8400-e29b-41d4-a716-446655440009",
           "name": "Tech Conference 2024"
-        }
+        },
+        "createdAt": "2024-02-16T13:15:00Z"
+      },
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440015",
+        "type": "View",
+        "eventId": "550e8400-e29b-41d4-a716-446655440009",
+        "userId": "550e8400-e29b-41d4-a716-446655440003",
+        "createdAt": "2024-02-16T12:50:00Z"
       }
     ]
-  },
-  "listErrors": []
+  }
 }
 ```
 
@@ -1926,26 +1832,25 @@ Query Parameters:
 **GET /api/interactions/{id} - InteractionGetByIdQuery:**
 
 **InteractionGetByIdResponse:**
+
 ```json
 {
   "isSuccess": true,
   "message": "Interaction retrieved successfully",
   "data": {
     "id": "550e8400-e29b-41d4-a716-446655440014",
-    "type": 1,
+    "type": "Like",
+    "eventId": "550e8400-e29b-41d4-a716-446655440009",
+    "userId": "550e8400-e29b-41d4-a716-446655440002",
     "user": {
       "id": "550e8400-e29b-41d4-a716-446655440002",
-      "fullName": "Jane Smith",
-      "avatarUrl": "https://example.com/avatar.jpg",
-      "gender": 1
+      "fullName": "Jane Smith"
     },
     "event": {
       "id": "550e8400-e29b-41d4-a716-446655440009",
-      "name": "Tech Conference 2024",
-      "slug": "tech-conference-2024",
-      "description": "Join us...",
-      "subtitle": "Future of Technology"
-    }
+      "name": "Tech Conference 2024"
+    },
+    "createdAt": "2024-02-16T13:15:00Z"
   },
   "listErrors": []
 }
@@ -1956,6 +1861,7 @@ Query Parameters:
 **DELETE /api/interactions/{userId}/{eventId}/{type}:**
 
 **InteractionDeleteResponse:**
+
 ```json
 {
   "isSuccess": true,
@@ -1970,6 +1876,7 @@ Query Parameters:
 **DELETE /api/interactions/{userId}/{eventId}/{type}/soft:**
 
 **InteractionSoftDeleteResponse:**
+
 ```json
 {
   "isSuccess": true,
@@ -1984,6 +1891,7 @@ Query Parameters:
 **PATCH /api/interactions/{userId}/{eventId}/{type}:**
 
 **InteractionRestoreResponse:**
+
 ```json
 {
   "isSuccess": true,
@@ -2005,20 +1913,21 @@ Query Parameters:
 
 ##### Endpoints:
 
-| HTTP Method | Endpoint | Request | Response | Status Code | Notes |
-|---|---|---|---|---|---|
-| **GET** | `/api/tickets` | `TicketGetListQuery` | `TicketGetListResponse` | 200/400 | Get paginated list of tickets |
-| **GET** | `/api/tickets/{id}` | `TicketGetByIdQuery` | `TicketGetByIdResponse` | 200/400 | Get ticket details by ID |
-| **POST** | `/api/tickets` | `TicketCreateCommand` | `TicketCreateResponse` | 201/400 | Create new ticket |
-| **PUT** | `/api/tickets/{id}` | `TicketUpdateCommand` | `TicketUpdateResponse` | 200/400 | Update ticket information |
-| **DELETE** | `/api/tickets/{id}` | - | `TicketDeleteResponse` | 200/400 | Hard delete ticket |
-| **PATCH** | `/api/tickets/{id}` | - | `TicketRestoreResponse` | 200/400 | Restore soft-deleted ticket |
+| HTTP Method | Endpoint            | Request               | Response                | Status Code | Notes                         |
+| ----------- | ------------------- | --------------------- | ----------------------- | ----------- | ----------------------------- |
+| **GET**     | `/api/tickets`      | `TicketGetListQuery`  | `TicketGetListResponse` | 200/400     | Get paginated list of tickets |
+| **GET**     | `/api/tickets/{id}` | `TicketGetByIdQuery`  | `TicketGetByIdResponse` | 200/400     | Get ticket details by ID      |
+| **POST**    | `/api/tickets`      | `TicketCreateCommand` | `TicketCreateResponse`  | 201/400     | Create new ticket             |
+| **PUT**     | `/api/tickets/{id}` | `TicketUpdateCommand` | `TicketUpdateResponse`  | 200/400     | Update ticket information     |
+| **DELETE**  | `/api/tickets/{id}` | -                     | `TicketDeleteResponse`  | 200/400     | Hard delete ticket            |
+| **PATCH**   | `/api/tickets/{id}` | -                     | `TicketRestoreResponse` | 200/400     | Restore soft-deleted ticket   |
 
 ##### Ticket Status Enum:
-- `1` = Available
-- `2` = Full
-- `3` = Unavailable
-- `4` = Locked
+
+- `0` = Ready
+- `1` = Sold
+- `2` = Expired
+- `3` = Cancelled
 
 ##### Request/Response Models:
 
@@ -2029,29 +1938,29 @@ Query Parameters:
   "ticketTypeId": "550e8400-e29b-41d4-a716-446655440020",
   "eventId": "550e8400-e29b-41d4-a716-446655440009",
   "zone": "A1",
-  "status": 1
+  "status": 0
 }
 ```
-Note: `eventId` must exist in EventService (gRPC validation). `status` is TicketStatusEnum (1=Available, 2=Full, 3=Unavailable, 4=Locked).
 
 **TicketCreateResponse:**
+
 ```json
 {
   "isSuccess": true,
-  "message": "Create Ticket Type Successfully",
+  "message": "Ticket created successfully",
   "data": {
     "id": "550e8400-e29b-41d4-a716-446655440030",
     "ticketType": {
       "id": "550e8400-e29b-41d4-a716-446655440020",
       "name": "VIP",
-      "price": 150.00
+      "price": 150.0
     },
     "event": {
       "id": "550e8400-e29b-41d4-a716-446655440009",
       "name": "Tech Conference 2024"
     },
     "zone": "A1",
-    "status": 1,
+    "status": "Ready",
     "createdAt": "2024-02-16T14:20:00Z"
   },
   "listErrors": []
@@ -2063,6 +1972,7 @@ Note: `eventId` must exist in EventService (gRPC validation). `status` is Ticket
 **GET /api/tickets - TicketGetListQuery:**
 
 Query Parameters:
+
 ```json
 {
   "pageNumber": 1,
@@ -2080,34 +1990,34 @@ Query Parameters:
 ```
 
 **TicketGetListResponse:**
+
 ```json
 {
   "isSuccess": true,
-  "message": "Retrieve Tickets Successfully",
+  "message": "Tickets retrieved successfully",
   "data": {
-    "totalItems": 500,
+    "totalCount": 500,
     "pageNumber": 1,
     "pageSize": 50,
-    "totalPages": 10,
+    "totalPage": 10,
     "items": [
       {
         "id": "550e8400-e29b-41d4-a716-446655440030",
         "ticketType": {
           "id": "550e8400-e29b-41d4-a716-446655440020",
           "name": "VIP",
-          "price": 150.00
+          "price": 150.0
         },
         "event": {
           "id": "550e8400-e29b-41d4-a716-446655440009",
           "name": "Tech Conference 2024"
         },
         "zone": "A1",
-        "status": 1,
+        "status": "Ready",
         "createdAt": "2024-02-16T14:20:00Z"
       }
     ]
-  },
-  "listErrors": []
+  }
 }
 ```
 
@@ -2116,6 +2026,7 @@ Query Parameters:
 **GET /api/tickets/{id} - TicketGetByIdQuery:**
 
 Query Parameters:
+
 ```json
 {
   "fields": "id,zone,status,ticketType,event",
@@ -2125,16 +2036,17 @@ Query Parameters:
 ```
 
 **TicketGetByIdResponse:**
+
 ```json
 {
   "isSuccess": true,
-  "message": "Update Ticket Successfully",
+  "message": "Ticket retrieved successfully",
   "data": {
     "id": "550e8400-e29b-41d4-a716-446655440030",
     "ticketType": {
       "id": "550e8400-e29b-41d4-a716-446655440020",
       "name": "VIP",
-      "price": 150.00,
+      "price": 150.0,
       "totalQuantity": 100,
       "availableQuantity": 85,
       "description": "VIP access with premium seating"
@@ -2146,7 +2058,7 @@ Query Parameters:
       "endTime": "2024-06-01T17:00:00Z"
     },
     "zone": "A1",
-    "status": 1,
+    "status": "Ready",
     "createdAt": "2024-02-16T14:20:00Z"
   },
   "listErrors": []
@@ -2161,19 +2073,20 @@ Query Parameters:
 {
   "ticketTypeId": "550e8400-e29b-41d4-a716-446655440020",
   "zone": "B2",
-  "status": 2
+  "status": 1
 }
 ```
 
 **TicketUpdateResponse:**
+
 ```json
 {
   "isSuccess": true,
-  "message": "Update Ticket Successfully",
+  "message": "Ticket updated successfully",
   "data": {
     "id": "550e8400-e29b-41d4-a716-446655440030",
     "zone": "B2",
-    "status": 2
+    "status": "Sold"
   },
   "listErrors": []
 }
@@ -2184,44 +2097,30 @@ Query Parameters:
 **DELETE /api/tickets/{id}:**
 
 **TicketDeleteResponse:**
+
 ```json
 {
   "isSuccess": true,
-  "message": "Update Ticket Successfully",
-  "data": {
-    "id": "550e8400-e29b-41d4-a716-446655440030",
-    "ticketType": { "id": "...", "name": "VIP", "price": 150.00 },
-    "event": { "id": "...", "name": "Tech Conference 2024" },
-    "zone": "A1",
-    "status": 1,
-    "createdAt": "2024-02-16T14:20:00Z"
-  },
+  "message": "Ticket deleted successfully",
+  "data": null,
   "listErrors": []
 }
 ```
-Note: Handler returns deleted ticket in data (message typo: says "Update" instead of "Delete").
 
 ---
 
 **PATCH /api/tickets/{id}:**
 
 **TicketRestoreResponse:**
+
 ```json
 {
   "isSuccess": true,
-  "message": "Update Ticket Successfully",
-  "data": {
-    "id": "550e8400-e29b-41d4-a716-446655440030",
-    "ticketType": { "id": "...", "name": "VIP" },
-    "event": { "id": "...", "name": "Tech Conference 2024" },
-    "zone": "A1",
-    "status": 1,
-    "createdAt": "2024-02-16T14:20:00Z"
-  },
+  "message": "Ticket restored successfully",
+  "data": null,
   "listErrors": []
 }
 ```
-Note: Handler message typo: says "Update" instead of "Restore".
 
 ---
 
@@ -2231,14 +2130,14 @@ Note: Handler message typo: says "Update" instead of "Restore".
 
 ##### Endpoints:
 
-| HTTP Method | Endpoint | Request | Response | Status Code | Notes |
-|---|---|---|---|---|---|
-| **GET** | `/api/tickettypes` | `TicketTypeGetListQuery` | `TicketTypeGetListResponse` | 200/400 | Get paginated list of ticket types |
-| **GET** | `/api/tickettypes/{id}` | `TicketTypeGetByIdQuery` | `TicketTypeGetByIdResponse` | 200/400 | Get ticket type by ID |
-| **POST** | `/api/tickettypes` | `TicketTypeCreateCommand` | `TicketTypeCreateResponse` | 201/400 | Create new ticket type |
-| **PUT** | `/api/tickettypes/{id}` | `TicketTypeUpdateCommand` | `TicketTypeUpdateResponse` | 200/400 | Update ticket type |
-| **DELETE** | `/api/tickettypes/{id}` | - | `TicketTypeDeleteResponse` | 200/400 | Hard delete ticket type |
-| **PATCH** | `/api/tickettypes/{id}` | - | `TicketTypeRestoreResponse` | 200/400 | Restore soft-deleted ticket type |
+| HTTP Method | Endpoint                | Request                   | Response                    | Status Code | Notes                              |
+| ----------- | ----------------------- | ------------------------- | --------------------------- | ----------- | ---------------------------------- |
+| **GET**     | `/api/tickettypes`      | `TicketTypeGetListQuery`  | `TicketTypeGetListResponse` | 200/400     | Get paginated list of ticket types |
+| **GET**     | `/api/tickettypes/{id}` | `TicketTypeGetByIdQuery`  | `TicketTypeGetByIdResponse` | 200/400     | Get ticket type by ID              |
+| **POST**    | `/api/tickettypes`      | `TicketTypeCreateCommand` | `TicketTypeCreateResponse`  | 201/400     | Create new ticket type             |
+| **PUT**     | `/api/tickettypes/{id}` | `TicketTypeUpdateCommand` | `TicketTypeUpdateResponse`  | 200/400     | Update ticket type                 |
+| **DELETE**  | `/api/tickettypes/{id}` | -                         | `TicketTypeDeleteResponse`  | 200/400     | Hard delete ticket type            |
+| **PATCH**   | `/api/tickettypes/{id}` | -                         | `TicketTypeRestoreResponse` | 200/400     | Restore soft-deleted ticket type   |
 
 ##### Request/Response Models:
 
@@ -2248,29 +2147,24 @@ Note: Handler message typo: says "Update" instead of "Restore".
 {
   "eventId": "550e8400-e29b-41d4-a716-446655440009",
   "name": "VIP",
-  "price": 150.00,
+  "price": 150.0,
   "totalQuantity": 100,
   "availableQuantity": 100,
   "description": "VIP access with premium seating and exclusive lounge"
 }
 ```
-Note: `eventId` must exist in EventService (gRPC validation). TicketTypeUpdateCommand does NOT have eventId (from path).
 
 **TicketTypeCreateResponse:**
+
 ```json
 {
   "isSuccess": true,
-  "message": "Create Ticket Type Successfully",
+  "message": "Ticket type created successfully",
   "data": {
     "id": "550e8400-e29b-41d4-a716-446655440020",
-    "event": {
-      "id": "550e8400-e29b-41d4-a716-446655440009",
-      "name": "Tech Conference 2024",
-      "slug": "tech-conference-2024",
-      "description": "Join us..."
-    },
+    "eventId": "550e8400-e29b-41d4-a716-446655440009",
     "name": "VIP",
-    "price": 150.00,
+    "price": 150.0,
     "totalQuantity": 100,
     "availableQuantity": 100,
     "description": "VIP access with premium seating and exclusive lounge",
@@ -2285,55 +2179,55 @@ Note: `eventId` must exist in EventService (gRPC validation). TicketTypeUpdateCo
 **GET /api/tickettypes - TicketTypeGetListQuery:**
 
 Query Parameters:
+
 ```json
 {
   "pageNumber": 1,
   "pageSize": 20,
   "eventId": "550e8400-e29b-41d4-a716-446655440009",
   "name": null,
-  "fromPrice": 0.00,
-  "toPrice": 1000.00,
+  "fromPrice": 0.0,
+  "toPrice": 1000.0,
   "description": null,
-  "fields": "id,name,price,totalQuantity,availableQuantity",
-  "isDescending": null,
-  "isDeleted": false
+  "fields": "id,name,price,totalQuantity,availableQuantity"
 }
 ```
 
 **TicketTypeGetListResponse:**
+
 ```json
 {
   "isSuccess": true,
-  "message": "Retrieve Ticket Types Successfully",
+  "message": "Ticket types retrieved successfully",
   "data": {
-    "totalItems": 4,
+    "totalCount": 4,
     "pageNumber": 1,
     "pageSize": 20,
-    "totalPages": 1,
+    "totalPage": 1,
     "items": [
       {
         "id": "550e8400-e29b-41d4-a716-446655440020",
-        "event": { "id": "550e8400-e29b-41d4-a716-446655440009" },
+        "eventId": "550e8400-e29b-41d4-a716-446655440009",
         "name": "VIP",
-        "price": 150.00,
+        "price": 150.0,
         "totalQuantity": 100,
         "availableQuantity": 85,
         "description": "VIP access with premium seating"
       },
       {
         "id": "550e8400-e29b-41d4-a716-446655440021",
-        "event": { "id": "550e8400-e29b-41d4-a716-446655440009" },
+        "eventId": "550e8400-e29b-41d4-a716-446655440009",
         "name": "Standard",
-        "price": 50.00,
+        "price": 50.0,
         "totalQuantity": 500,
         "availableQuantity": 420,
         "description": "Standard event ticket"
       },
       {
         "id": "550e8400-e29b-41d4-a716-446655440022",
-        "event": { "id": "550e8400-e29b-41d4-a716-446655440009" },
+        "eventId": "550e8400-e29b-41d4-a716-446655440009",
         "name": "Student",
-        "price": 30.00,
+        "price": 30.0,
         "totalQuantity": 200,
         "availableQuantity": 180,
         "description": "Student discount ticket"
@@ -2348,33 +2242,35 @@ Query Parameters:
 **GET /api/tickettypes/{id} - TicketTypeGetByIdQuery:**
 
 Query Parameters:
+
 ```json
 {
-  "fields": "id,name,price,totalQuantity,availableQuantity,description,event"
+  "fields": "id,name,price,totalQuantity,availableQuantity,description,eventId"
 }
 ```
 
 **TicketTypeGetByIdResponse:**
+
 ```json
 {
   "isSuccess": true,
-  "message": "Update Ticket Type Successfully",
+  "message": "Ticket type retrieved successfully",
   "data": {
     "id": "550e8400-e29b-41d4-a716-446655440020",
+    "eventId": "550e8400-e29b-41d4-a716-446655440009",
     "name": "VIP",
-    "price": 150.00,
+    "price": 150.0,
     "totalQuantity": 100,
     "availableQuantity": 85,
     "description": "VIP access with premium seating and exclusive lounge access",
     "event": {
       "id": "550e8400-e29b-41d4-a716-446655440009",
       "name": "Tech Conference 2024",
-      "slug": "tech-conference-2024",
-      "description": "Join us...",
       "startTime": "2024-06-01T09:00:00Z",
       "endTime": "2024-06-01T17:00:00Z"
     },
-    "createdAt": "2024-02-16T11:30:00Z"
+    "createdAt": "2024-02-16T11:30:00Z",
+    "updatedAt": "2024-02-16T15:45:00Z"
   },
   "listErrors": []
 }
@@ -2387,7 +2283,7 @@ Query Parameters:
 ```json
 {
   "name": "VIP Premium",
-  "price": 175.00,
+  "price": 175.0,
   "totalQuantity": 100,
   "availableQuantity": 85,
   "description": "VIP Premium access with extra benefits"
@@ -2395,14 +2291,15 @@ Query Parameters:
 ```
 
 **TicketTypeUpdateResponse:**
+
 ```json
 {
   "isSuccess": true,
-  "message": "Update Ticket Type Successfully",
+  "message": "Ticket type updated successfully",
   "data": {
     "id": "550e8400-e29b-41d4-a716-446655440020",
     "name": "VIP Premium",
-    "price": 175.00,
+    "price": 175.0,
     "totalQuantity": 100,
     "availableQuantity": 85,
     "description": "VIP Premium access with extra benefits"
@@ -2416,164 +2313,515 @@ Query Parameters:
 **DELETE /api/tickettypes/{id}:**
 
 **TicketTypeDeleteResponse:**
+
 ```json
 {
   "isSuccess": true,
-  "message": "Update Ticket Type Successfully",
-  "data": {
-    "id": "550e8400-e29b-41d4-a716-446655440020",
-    "name": "VIP",
-    "price": 150.00,
-    "totalQuantity": 100,
-    "availableQuantity": 85,
-    "description": "VIP access",
-    "event": { "id": "...", "name": "Tech Conference 2024" },
-    "createdAt": "2024-02-16T11:30:00Z"
-  },
+  "message": "Ticket type deleted successfully",
+  "data": null,
   "listErrors": []
 }
 ```
-Note: Handler message typo: says "Update" instead of "Delete".
 
 ---
 
 **PATCH /api/tickettypes/{id}:**
 
 **TicketTypeRestoreResponse:**
+
 ```json
 {
   "isSuccess": true,
-  "message": "Update Ticket Type Successfully",
+  "message": "Ticket type restored successfully",
+  "data": null,
+  "listErrors": []
+}
+```
+
+---
+
+## BOOKING SERVICE (Port 6301)
+
+### Controllers and Endpoints
+
+#### 1. Booking Controller (`/api/bookings`)
+
+**Purpose:** Manage ticket bookings made by users for events.
+
+##### Endpoints:
+
+| HTTP Method | Endpoint             | Request                | Response                 | Status Code | Notes                                        |
+| ----------- | -------------------- | ---------------------- | ------------------------ | ----------- | -------------------------------------------- |
+| **GET**     | `/api/bookings`      | `BookingGetListQuery`  | `BookingGetListResponse` | 200/400     | Get paginated list of bookings               |
+| **GET**     | `/api/bookings/{id}` | `BookingGetByIdQuery`  | `BookingGetByIdResponse` | 200/400     | Get booking by ID (includes booking details) |
+| **POST**    | `/api/bookings`      | `BookingCreateCommand` | `CreateBookingResponse`  | 201/400     | Create new booking                           |
+
+##### Request/Response Models:
+
+**GET /api/bookings - BookingGetListQuery:**
+
+Query Parameters:
+
+```json
+{
+  "pageNumber": 1,
+  "pageSize": 10,
+  "userId": "550e8400-e29b-41d4-a716-446655440000",
+  "eventId": "550e8400-e29b-41d4-a716-446655440009",
+  "status": 1,
+  "fields": "id,userId,eventId,fullname,amount,totalPrice,status,bookingDetails",
+  "isDescending": true,
+  "isDeleted": false
+}
+```
+
+**BookingGetListResponse:**
+
+```json
+{
+  "isSuccess": true,
+  "message": "Retrieve Bookings Successfully",
   "data": {
-    "id": "550e8400-e29b-41d4-a716-446655440020",
-    "name": "VIP",
-    "price": 150.00,
-    "event": { "id": "...", "name": "Tech Conference 2024" },
-    "createdAt": "2024-02-16T11:30:00Z"
+    "totalCount": 2,
+    "pageNumber": 1,
+    "pageSize": 10,
+    "totalPage": 1,
+    "items": [
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440030",
+        "userId": "550e8400-e29b-41d4-a716-446655440000",
+        "eventId": "550e8400-e29b-41d4-a716-446655440009",
+        "fullname": "John Doe",
+        "email": "john@example.com",
+        "phone": "0912345678",
+        "amount": 2,
+        "totalPrice": 300.0,
+        "status": "Pending",
+        "paidAt": null,
+        "createdAt": "2024-06-01T10:00:00Z",
+        "updatedAt": null,
+        "isDeleted": false,
+        "deletedAt": null,
+        "bookingDetails": [
+          {
+            "id": "550e8400-e29b-41d4-a716-446655440040",
+            "seatId": null,
+            "ticketId": "550e8400-e29b-41d4-a716-446655440050",
+            "quantity": 2,
+            "pricePerTicket": 150.0,
+            "totalPrice": 300.0
+          }
+        ]
+      }
+    ]
   },
   "listErrors": []
 }
 ```
-Note: Handler message typo: says "Update" instead of "Restore".
 
 ---
 
-## OPERATION SERVICE (Port 6501)
+**GET /api/bookings/{id} - BookingGetByIdQuery:**
 
-### Controllers and Endpoints
+Query Parameters:
 
-#### 1. Notification Controller (`/api/notifications`)
-
-**Purpose:** Quản lý thông báo cho người dùng.
-
-##### Endpoints:
-
-| HTTP Method | Endpoint | Request | Response | Status Code | Notes |
-|---|---|---|---|---|---|
-| **GET** | `/api/notifications` | `NotificationGetListQuery` | `NotificationGetListResponse` | 200/400 | Danh sách thông báo |
-| **GET** | `/api/notifications/{id}` | `NotificationGetByIdQuery` | `NotificationGetByIdResponse` | 200/400 | Chi tiết thông báo |
-| **POST** | `/api/notifications` | `NotificationCreateCommand` | `NotificationCreateResponse` | 201/400 | Tạo thông báo |
-| **PUT** | `/api/notifications/{id}` | `NotificationUpdateCommand` | `NotificationUpdateResponse` | 200/400 | Cập nhật thông báo |
-| **DELETE** | `/api/notifications/{id}` | - | `NotificationDeleteResponse` | 200/400 | Xóa thông báo |
-| **PATCH** | `/api/notifications/{id}` | - | `NotificationRestoreResponse` | 200/400 | Khôi phục thông báo |
-
-##### NotificationCreateCommand:
 ```json
 {
-  "userId": "550e8400-e29b-41d4-a716-446655440002",
-  "eventId": "550e8400-e29b-41d4-a716-446655440009",
-  "title": "Event Reminder",
-  "message": "Your event starts in 1 hour"
+  "fields": "id,userId,eventId,fullname,email,phone,amount,totalPrice,status,paidAt,bookingDetails"
 }
 ```
 
-##### NotificationDTO (Response):
-- id, user, event, title, message, isRead
+**BookingGetByIdResponse:**
 
-##### NotificationGetListQuery params:
-- userId, eventId, title, message, isRead, fields, isDescending, isDeleted, hasUser, hasEvent
-
----
-
-#### 2. CheckIn Controller (`/api/checkins`)
-
-**Purpose:** Quản lý check-in sự kiện.
-
-##### Endpoints:
-
-| HTTP Method | Endpoint | Request | Response | Status Code | Notes |
-|---|---|---|---|---|---|
-| **GET** | `/api/checkins` | `CheckInGetListQuery` | `CheckInGetListResponse` | 200/400 | Danh sách check-in |
-| **GET** | `/api/checkins/{id}` | `CheckInGetByIdQuery` | `CheckInGetByIdResponse` | 200/400 | Chi tiết check-in |
-| **POST** | `/api/checkins` | `CheckInCreateCommand` | `CheckInCreateResponse` | 201/400 | Tạo check-in |
-| **PUT** | `/api/checkins/{id}` | `CheckInUpdateCommand` | `CheckInUpdateResponse` | 200/400 | Cập nhật check-in |
-| **DELETE** | `/api/checkins/{id}` | - | `CheckInDeleteResponse` | 200/400 | Xóa check-in |
-| **PATCH** | `/api/checkins/{id}` | - | `CheckInRestoreResponse` | 200/400 | Khôi phục check-in |
-
-##### CheckInCreateCommand:
 ```json
 {
-  "userId": "550e8400-e29b-41d4-a716-446655440002",
-  "eventId": "550e8400-e29b-41d4-a716-446655440009",
-  "bookingDetailId": "550e8400-e29b-41d4-a716-446655440050",
-  "ticketId": "550e8400-e29b-41d4-a716-446655440030",
-  "checkInAt": "2024-06-01T09:00:00Z",
-  "checkByUserId": "550e8400-e29b-41d4-a716-446655440001"
+  "isSuccess": true,
+  "message": "Retrieve Booking Successfully",
+  "data": {
+    "id": "550e8400-e29b-41d4-a716-446655440030",
+    "userId": "550e8400-e29b-41d4-a716-446655440000",
+    "eventId": "550e8400-e29b-41d4-a716-446655440009",
+    "fullname": "John Doe",
+    "email": "john@example.com",
+    "phone": "0912345678",
+    "amount": 2,
+    "totalPrice": 300.0,
+    "status": "Pending",
+    "paidAt": null,
+    "createdAt": "2024-06-01T10:00:00Z",
+    "updatedAt": null,
+    "isDeleted": false,
+    "deletedAt": null,
+    "paymentUrl": "",
+    "bookingDetails": [
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440040",
+        "seatId": null,
+        "ticketId": "550e8400-e29b-41d4-a716-446655440050",
+        "quantity": 2,
+        "pricePerTicket": 150.0,
+        "totalPrice": 300.0
+      }
+    ]
+  },
+  "listErrors": []
 }
 ```
 
-##### CheckInGetListQuery params:
-- userId, eventId, bookingDetailId, ticketId, checkInAt, checkByUserId, fields, isDescending, isDeleted, hasUser, hasEvent, hasBooking, hasTicket
+---
+
+**POST /api/bookings - BookingCreateCommand:**
+
+```json
+{
+  "userId": "550e8400-e29b-41d4-a716-446655440000",
+  "eventId": "550e8400-e29b-41d4-a716-446655440009",
+  "fullname": "John Doe",
+  "email": "john@example.com",
+  "phone": "0912345678",
+  "bookingDetails": [
+    {
+      "ticketId": "550e8400-e29b-41d4-a716-446655440050",
+      "seatId": null,
+      "quantity": 2,
+      "pricePerTicket": 150.0
+    }
+  ]
+}
+```
+
+**CreateBookingResponse:**
+
+```json
+{
+  "isSuccess": true,
+  "message": "Booking created successfully",
+  "data": {
+    "id": "550e8400-e29b-41d4-a716-446655440030",
+    "userId": "550e8400-e29b-41d4-a716-446655440000",
+    "eventId": "550e8400-e29b-41d4-a716-446655440009",
+    "fullname": "John Doe",
+    "email": "john@example.com",
+    "phone": "0912345678",
+    "amount": 2,
+    "totalPrice": 300.0,
+    "status": "Pending",
+    "paidAt": null,
+    "createdAt": "2024-06-01T10:00:00Z",
+    "paymentUrl": "https://payment.example.com/pay?orderId=..."
+  },
+  "listErrors": []
+}
+```
 
 ---
 
-## Response Structure
+#### 2. Booking Detail Controller (`/api/bookingdetails`)
 
-All responses follow a standardized wrapper structure. HTTP status code is returned in the response header (e.g., 200, 201, 400).
+**Purpose:** View individual booking detail line items (tickets within a booking).
+
+##### Endpoints:
+
+| HTTP Method | Endpoint                   | Request                     | Response                       | Status Code | Notes                                 |
+| ----------- | -------------------------- | --------------------------- | ------------------------------ | ----------- | ------------------------------------- |
+| **GET**     | `/api/bookingdetails`      | `BookingDetailGetListQuery` | `BookingDetailGetListResponse` | 200/400     | Get paginated list of booking details |
+| **GET**     | `/api/bookingdetails/{id}` | `BookingDetailGetByIdQuery` | `BookingDetailGetByIdResponse` | 200/400     | Get booking detail by ID              |
+
+##### Request/Response Models:
+
+**GET /api/bookingdetails - BookingDetailGetListQuery:**
+
+Query Parameters:
+
+```json
+{
+  "pageNumber": 1,
+  "pageSize": 10,
+  "bookingId": "550e8400-e29b-41d4-a716-446655440030",
+  "ticketId": null,
+  "seatId": null,
+  "fields": "id,bookingId,ticketId,quantity,pricePerTicket,totalPrice",
+  "isDescending": false,
+  "isDeleted": false
+}
+```
+
+**BookingDetailGetListResponse:**
+
+```json
+{
+  "isSuccess": true,
+  "message": "Retrieve Booking Details Successfully",
+  "data": {
+    "totalCount": 1,
+    "pageNumber": 1,
+    "pageSize": 10,
+    "totalPage": 1,
+    "items": [
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440040",
+        "bookingId": "550e8400-e29b-41d4-a716-446655440030",
+        "seatId": null,
+        "ticketId": "550e8400-e29b-41d4-a716-446655440050",
+        "quantity": 2,
+        "pricePerTicket": 150.0,
+        "totalPrice": 300.0,
+        "createdAt": "2024-06-01T10:00:00Z",
+        "updatedAt": null,
+        "isDeleted": false,
+        "deletedAt": null
+      }
+    ]
+  },
+  "listErrors": []
+}
+```
+
+---
+
+**GET /api/bookingdetails/{id} - BookingDetailGetByIdQuery:**
+
+Query Parameters:
+
+```json
+{
+  "fields": "id,bookingId,ticketId,seatId,quantity,pricePerTicket,totalPrice"
+}
+```
+
+**BookingDetailGetByIdResponse:**
+
+```json
+{
+  "isSuccess": true,
+  "message": "Retrieve Booking Detail Successfully",
+  "data": {
+    "id": "550e8400-e29b-41d4-a716-446655440040",
+    "bookingId": "550e8400-e29b-41d4-a716-446655440030",
+    "seatId": null,
+    "ticketId": "550e8400-e29b-41d4-a716-446655440050",
+    "quantity": 2,
+    "pricePerTicket": 150.0,
+    "totalPrice": 300.0,
+    "createdAt": "2024-06-01T10:00:00Z",
+    "updatedAt": null,
+    "isDeleted": false,
+    "deletedAt": null
+  },
+  "listErrors": []
+}
+```
+
+---
+
+#### 3. Payment Method Controller (`/api/paymentmethods`)
+
+**Purpose:** Manage available payment methods in the system.
+
+##### Endpoints:
+
+| HTTP Method | Endpoint                   | Request                     | Response                       | Status Code | Notes                                 |
+| ----------- | -------------------------- | --------------------------- | ------------------------------ | ----------- | ------------------------------------- |
+| **GET**     | `/api/paymentmethods`      | `PaymentMethodGetListQuery` | `PaymentMethodGetListResponse` | 200/400     | Get paginated list of payment methods |
+| **GET**     | `/api/paymentmethods/{id}` | `PaymentMethodGetByIdQuery` | `PaymentMethodGetByIdResponse` | 200/400     | Get payment method by ID              |
+
+##### Request/Response Models:
+
+**GET /api/paymentmethods - PaymentMethodGetListQuery:**
+
+Query Parameters:
+
+```json
+{
+  "pageNumber": 1,
+  "pageSize": 10,
+  "name": null,
+  "status": 1,
+  "fields": "id,name,description,status",
+  "isDescending": false,
+  "isDeleted": false
+}
+```
+
+**PaymentMethodGetListResponse:**
+
+```json
+{
+  "isSuccess": true,
+  "message": "Retrieve Payment Methods Successfully",
+  "data": {
+    "totalCount": 2,
+    "pageNumber": 1,
+    "pageSize": 10,
+    "totalPage": 1,
+    "items": [
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440060",
+        "name": "MoMo",
+        "description": "Pay via MoMo e-wallet",
+        "status": "Active",
+        "createdAt": "2024-01-01T00:00:00Z"
+      },
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440061",
+        "name": "VNPay",
+        "description": "Pay via VNPay gateway",
+        "status": "Active",
+        "createdAt": "2024-01-01T00:00:00Z"
+      }
+    ]
+  },
+  "listErrors": []
+}
+```
+
+---
+
+**GET /api/paymentmethods/{id} - PaymentMethodGetByIdQuery:**
+
+Query Parameters:
+
+```json
+{
+  "fields": "id,name,description,status,createdAt"
+}
+```
+
+**PaymentMethodGetByIdResponse:**
+
+```json
+{
+  "isSuccess": true,
+  "message": "Retrieve Payment Method Successfully",
+  "data": {
+    "id": "550e8400-e29b-41d4-a716-446655440060",
+    "name": "MoMo",
+    "description": "Pay via MoMo e-wallet",
+    "status": "Active",
+    "createdAt": "2024-01-01T00:00:00Z"
+  },
+  "listErrors": []
+}
+```
+
+---
+
+## Response Structure (CommonResponse)
+
+Tất cả response đều dùng `CommonResponse<T>` từ SharedContracts. **HTTP status code** nằm ở response header, **không** có trong body.
+
+### Success Response:
 
 ```json
 {
   "isSuccess": true,
   "message": "Operation successful",
   "data": {
-    // Response data here
+    "id": "...",
+    "name": "..."
   },
-  "listErrors": [
-    {
-      "field": "email",
-      "detail": "Email already exists"
-    }
-  ]
+  "listErrors": []
 }
 ```
 
-### Pagination Response Structure (for list endpoints):
+### Validation Error (IValidatable - ValidationBehavior):
 
-```json
-{
-  "totalItems": 100,
-  "pageNumber": 1,
-  "pageSize": 20,
-  "totalPages": 5,
-  "items": [ /* array of items */ ]
-}
-```
-
-### Error Response Format:
+Khi validation thất bại, handler trả về ngay với `ListErrors` đã được populate:
 
 ```json
 {
   "isSuccess": false,
-  "message": "Operation failed",
+  "message": "",
   "data": null,
   "listErrors": [
     {
-      "field": "fieldName",
-      "detail": "Error description"
+      "field": "Email",
+      "detail": "Email is not valid!"
+    },
+    {
+      "field": "Password",
+      "detail": "Password must be at least 8 characters!"
     }
   ]
 }
 ```
+
+**Errors object:** `field` (string) – tên field lỗi, `detail` (string) – mô tả chi tiết. Property names serialize camelCase trong JSON.
+
+### Business Logic Error (Handler trả về IsSuccess=false):
+
+```json
+{
+  "isSuccess": false,
+  "message": "User not found",
+  "data": null,
+  "listErrors": []
+}
+```
+
+### 401 Unauthorized (JWT middleware):
+
+```json
+{
+  "isSuccess": false,
+  "message": "Token không hợp lệ. Vui lòng đăng nhập lại.",
+  "data": {
+    "errorCode": "INVALID_TOKEN"
+  },
+  "listErrors": []
+}
+```
+
+Message thay đổi theo từng trường hợp: TOKEN_EXPIRED, INVALID_SIGNATURE, MISSING_TOKEN, v.v.
+
+Các `errorCode`: `UNAUTHORIZED`, `TOKEN_EXPIRED`, `INVALID_SIGNATURE`, `INVALID_TOKEN`, `MISSING_TOKEN`.
+
+### 403 Forbidden:
+
+```json
+{
+  "isSuccess": false,
+  "message": "You are not allowed to access this endpoint.",
+  "data": null,
+  "listErrors": []
+}
+```
+
+### 500 Internal Server Error (GlobalExceptionMiddleware):
+
+```json
+{
+  "isSuccess": false,
+  "message": "An error was caught in global exception middleware.",
+  "data": "Exception message details",
+  "listErrors": []
+}
+```
+
+**Lưu ý:** `data` chứa `ex.Message` của exception. `listErrors` luôn rỗng khi dùng GlobalExceptionMiddleware.
+
+### Pagination Response (data cho list endpoints):
+
+`PaginationResponse<T>` – khi `data` là danh sách có phân trang:
+
+```json
+{
+  "isSuccess": true,
+  "message": "Items retrieved successfully",
+  "data": {
+    "items": [],
+    "totalItems": 100,
+    "pageNumber": 1,
+    "pageSize": 20,
+    "totalPages": 5,
+    "hasNextPage": true,
+    "hasPreviousPage": false
+  },
+  "listErrors": []
+}
+```
+
+**Source:** `SharedContracts.Common.Wrappers.PaginationResponse<T>`, `SharedContracts.Common.Wrappers.CommonResponse<T>`, `SharedContracts.Common.Wrappers.Errors`
 
 ---
 
@@ -2587,10 +2835,6 @@ Most list endpoints support these pagination and filtering parameters:
 - **isDeleted** (bool): Include soft-deleted items
 - **isDescending** (bool): Sort in descending order
 
-### Enum Serialization Note
-
-Enums (Status, Type, etc.) are serialized as **integers** in JSON responses. Refer to the enum definitions in each section (e.g., Ticket Status: 1=Available, 2=Full; Interaction Types: 1=View, 2=Heart, 3=Save).
-
 ---
 
 ## Soft Delete vs Hard Delete
@@ -2603,15 +2847,15 @@ Enums (Status, Type, etc.) are serialized as **integers** in JSON responses. Ref
 
 ## Status Codes Summary
 
-| Code | Meaning |
-|---|---|
-| **200** | OK - Request successful |
-| **201** | Created - Resource successfully created |
+| Code    | Meaning                                         |
+| ------- | ----------------------------------------------- |
+| **200** | OK - Request successful                         |
+| **201** | Created - Resource successfully created         |
 | **400** | Bad Request - Invalid input or operation failed |
-| **401** | Unauthorized - Missing or invalid token |
-| **403** | Forbidden - User lacks permissions |
-| **404** | Not Found - Resource doesn't exist |
-| **500** | Internal Server Error |
+| **401** | Unauthorized - Missing or invalid token         |
+| **403** | Forbidden - User lacks permissions              |
+| **404** | Not Found - Resource doesn't exist              |
+| **500** | Internal Server Error                           |
 
 ---
 
@@ -2670,8 +2914,6 @@ Services communicate asynchronously through integration events via RabbitMQ/Mess
 ### Ticket Purchase:
 
 1. Get ticket types: `GET /api/tickettypes?eventId={eventId}`
-2. Get payment methods: `GET /api/paymentmethods`
-3. Get user bookings: `GET /api/bookings`
-4. Receive tickets: `GET /api/tickets?eventId={eventId}&status=2`
-
-**Lưu ý:** BookingService và PaymentService hiện chỉ có GET (list). API tạo booking và thanh toán có thể chưa được triển khai.
+2. Create booking: `POST /api/bookings`
+3. Process payment: `POST /api/paymentmethods`
+4. Receive tickets: `GET /api/tickets?eventId={eventId}&status=Sold`

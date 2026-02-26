@@ -1,31 +1,53 @@
 "use client";
 
-
-
-
-
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { useSessionStore } from "@/stores/sesionStore";
 import { authRequest } from "@/apiRequest/auth";
+import { userRequest } from "@/apiRequest/user";
+import { organizerRequest } from "@/apiRequest/organizer";
 import { handleErrorApi } from "@/lib/errors";
 import { AuthContextType } from "@/types/base";
 import { decodeJWT } from "@/lib/utils";
-import { JWTUserType } from "@/types/user";
-
-
+import { JWTUserType, User } from "@/types/user";
+import { Organizer } from "@/types/organizer";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+async function fetchProfileAndOrganizer(
+    userId: string,
+    setProfile: (p: User) => void,
+    setOrganizer: (o: Organizer | null) => void,
+) {
+    try {
+        const profileRes = await userRequest.getById(userId);
+        const profile = profileRes.data;
+        setProfile(profile);
+
+        if (profile?.organizerId) {
+            try {
+                const orgRes = await organizerRequest.getById(profile.organizerId);
+                setOrganizer(orgRes.data ?? null);
+            } catch {
+                setOrganizer(null);
+            }
+        } else {
+            setOrganizer(null);
+        }
+    } catch (error) {
+        console.error("Failed to fetch profile", error);
+    }
+}
 
 export const AuthProvider = ({
     children,
     initialAccessToken,
-    initialRefreshToken
+    initialRefreshToken,
 }: {
     children: ReactNode;
     initialAccessToken?: string | null;
     initialRefreshToken?: string | null;
 }) => {
-    const setSession = useSessionStore((state) => state.setSession);
+    const { setSession, setProfile, setOrganizer } = useSessionStore((state) => state);
     const [isHydrated, setIsHydrated] = useState(false);
     const [isRefreshing, setIsRefreshing] = useState(false);
 
@@ -35,36 +57,31 @@ export const AuthProvider = ({
 
     useEffect(() => {
         const initializeAuth = async () => {
-            // Case 1: Có cả access_token và refresh_token → OK, hydrate bình thường
             if (initialAccessToken && initialRefreshToken) {
                 setSession({ accessToken: initialAccessToken, refreshToken: initialRefreshToken });
+                const decoded = decodeJWT<JWTUserType>(initialAccessToken);
+                if (decoded?.UserId) {
+                    await fetchProfileAndOrganizer(decoded.UserId, setProfile, setOrganizer);
+                }
                 setIsHydrated(true);
                 return;
             }
 
-            // Case 2: Không có refresh_token → Middleware đã xử lý redirect
-            // Trường hợp này không xảy ra ở đây vì middleware đã chặn
             if (!initialRefreshToken) {
                 setIsHydrated(true);
                 return;
             }
-            // Case 3: Có refresh_token nhưng KHÔNG có access_token
-            // → Call API để lấy access_token mới
+
             if (!initialAccessToken && initialRefreshToken) {
-                console.log("Access token missing, refreshing from cookies...");
                 setIsRefreshing(true);
-
                 try {
-                    const decodedToken = decodeJWT<JWTUserType>(initialRefreshToken);
-                    if (!decodedToken?.UserId) {
-                        throw new Error("Invalid refresh token payload");
-                    }
+                    const decodedRefresh = decodeJWT<JWTUserType>(initialRefreshToken);
+                    if (!decodedRefresh?.UserId) throw new Error("Invalid refresh token payload");
 
-                    // Gọi API backend để refresh access_token
                     const result = await authRequest.refreshTokenClient({
-                        id: decodedToken.UserId,
+                        id: decodedRefresh.UserId,
                         accessToken: initialAccessToken || "",
-                        refreshToken: initialRefreshToken
+                        refreshToken: initialRefreshToken,
                     });
 
                     if (!result.data?.accessToken || !result.data?.refreshToken) {
@@ -72,33 +89,24 @@ export const AuthProvider = ({
                     }
 
                     const { accessToken: newAccessToken, refreshToken: newRefreshToken } = result.data;
-
-                    // Step 1: Set vào Zustand store
                     setSession({ accessToken: newAccessToken, refreshToken: newRefreshToken });
 
-                    // Step 2: Đồng bộ access_token mới vào cookies thông qua API route
                     await authRequest.refreshTokenServer({
                         accessToken: newAccessToken,
-                        refreshToken: newRefreshToken
+                        refreshToken: newRefreshToken,
                     });
 
-
-
-
+                    const decoded = decodeJWT<JWTUserType>(newAccessToken);
+                    if (decoded?.UserId) {
+                        await fetchProfileAndOrganizer(decoded.UserId, setProfile, setOrganizer);
+                    }
                 } catch (error) {
-                    handleErrorApi({ error })
-
-                    // Refresh thất bại → Clear hết và redirect
-
-
+                    handleErrorApi({ error });
                     try {
-                        // Xóa cookies
                         await authRequest.logoutServer();
                     } catch (logoutError) {
                         console.error("Failed to clear cookies:", logoutError);
                     }
-
-                    // Redirect về login
                     window.location.href = "/login";
                     return;
                 } finally {
@@ -112,11 +120,12 @@ export const AuthProvider = ({
         initializeAuth();
     }, []);
 
-    // Show loading khi đang hydrate hoặc đang refresh
     if (!isHydrated || isRefreshing) {
-        return <div className="loader">
-            <div className="justify-content-center jimu-primary-loading"></div>
-        </div>
+        return (
+            <div className="loader">
+                <div className="justify-content-center jimu-primary-loading"></div>
+            </div>
+        );
     }
 
     return (

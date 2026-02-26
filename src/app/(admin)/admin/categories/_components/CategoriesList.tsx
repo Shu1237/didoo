@@ -1,8 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { Category } from "@/types/category";
 import { useCategory } from "@/hooks/useCategory";
 import { CategoryStatus } from "@/utils/enum";
@@ -21,12 +23,13 @@ interface CategoriesListProps {
 }
 
 export default function CategoriesList({ categories, onEdit }: CategoriesListProps) {
+  const [deleteConfirm, setDeleteConfirm] = useState<Category | null>(null);
   const { deleteCategory, restore } = useCategory();
 
   const handleDelete = async (cat: Category) => {
-    if (!window.confirm(`Xóa danh mục "${cat.name}"?`)) return;
     try {
       await deleteCategory.mutateAsync(cat.id);
+      setDeleteConfirm(null);
     } catch (e) {
       handleErrorApi({ error: e });
     }
@@ -99,7 +102,7 @@ export default function CategoriesList({ categories, onEdit }: CategoriesListPro
                       <RotateCcw className="w-4 h-4" /> Khôi phục
                     </DropdownMenuItem>
                   ) : (
-                    <DropdownMenuItem onClick={() => handleDelete(cat)} className="gap-2 text-red-600 focus:text-red-600">
+                    <DropdownMenuItem onClick={() => setDeleteConfirm(cat)} className="gap-2 text-red-600 focus:text-red-600">
                       <Trash2 className="w-4 h-4" /> Xóa
                     </DropdownMenuItem>
                   )}
@@ -109,6 +112,17 @@ export default function CategoriesList({ categories, onEdit }: CategoriesListPro
           </div>
         </Card>
       ))}
+
+      <ConfirmModal
+        open={!!deleteConfirm}
+        onOpenChange={(open) => !open && setDeleteConfirm(null)}
+        title="Xóa danh mục"
+        description={deleteConfirm ? `Bạn có chắc chắn muốn xóa danh mục "${deleteConfirm.name}"?` : ""}
+        confirmLabel="Xóa"
+        variant="danger"
+        onConfirm={() => deleteConfirm && handleDelete(deleteConfirm)}
+        isLoading={deleteCategory.isPending}
+      />
     </div>
   );
 }

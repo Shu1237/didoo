@@ -1,12 +1,11 @@
 "use client";
 
-import { useSessionStore } from "@/stores/sesionStore";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { User as UserIcon, Mail, Save, X, Shield, Key, Phone, Loader2 } from "lucide-react";
-import { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { User as UserIcon, Mail, Save, Shield, Key, Phone, Loader2, Calendar } from "lucide-react";
+import { Gender } from "@/utils/enum";
+import { useEffect } from "react";
 import ChangePasswordForm from "./ChangePasswordForm";
 import ChangeEmailForm from "./ChangeEmailForm";
 import { useGetMe, useUser } from "@/hooks/useUser";
@@ -15,18 +14,15 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { UserUpdateBody, userUpdateSchema } from "@/schemas/user";
 import { handleErrorApi } from "@/lib/errors";
 import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-
 export default function ProfileForm() {
   const { data: userData, isLoading } = useGetMe();
   const { update } = useUser();
-
-  const form = useForm<UserUpdateBody>({
-    resolver: zodResolver(userUpdateSchema) as any,
+  const form = useForm<Pick<UserUpdateBody, 'FullName' | 'Phone' | 'Gender' | 'DateOfBirth'>>({
+    resolver: zodResolver(userUpdateSchema.pick({ FullName: true, Phone: true, Gender: true, DateOfBirth: true })) as any,
     defaultValues: {
       FullName: "",
       Phone: "",
-      Address: "",
-      Gender: 1,
+      Gender: Gender.MALE,
       DateOfBirth: undefined,
     },
   });
@@ -36,17 +32,33 @@ export default function ProfileForm() {
       form.reset({
         FullName: userData.data.fullName || "",
         Phone: userData.data.phone || "",
-        Address: userData.data.address || "",
-        Gender: userData.data.gender || 1,
-        DateOfBirth: userData.data.dateOfBirth ? new Date(userData.data.dateOfBirth).toISOString().split('T')[0] : undefined,
+        Gender: userData.data.gender ?? Gender.MALE,
+        DateOfBirth: userData.data.dateOfBirth
+          ? new Date(userData.data.dateOfBirth).toISOString().split('T')[0]
+          : undefined,
       });
     }
-  }, [userData, form]);
+  }, [userData]);
 
-  const onSubmit = async (values: UserUpdateBody) => {
+  const onSubmit = async (values: Pick<UserUpdateBody, 'FullName' | 'Phone' | 'Gender' | 'DateOfBirth'>) => {
     if (!userData?.data?.id) return;
+    const api = userData.data;
+    const body: UserUpdateBody = {
+      FullName: values.FullName,
+      Phone: values.Phone,
+      Gender: values.Gender,
+      DateOfBirth: values.DateOfBirth,
+      Address: api.address || undefined,
+      AvatarUrl: api.avatarUrl || undefined,
+      Status: api.status,
+      RoleName: api.role?.name?.toLocaleLowerCase() === 'user' ? 2
+        : api.role?.name?.toLocaleLowerCase() === 'organizer' ? 3
+        : api.role?.name?.toLocaleLowerCase() === 'admin' ? 1
+        : 4,
+      OrganizerId: api.organizerId ?? undefined,
+    };
     try {
-      await update.mutateAsync({ id: userData.data.id, body: values });
+      await update.mutateAsync({ id: api.id, body });
     } catch (error) {
       handleErrorApi({ error, setError: form.setError });
     }
@@ -77,11 +89,9 @@ export default function ProfileForm() {
         <CardContent className="p-10">
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8">
-              {/* Email */}
+              {/* Row 1: Email + Role */}
               <div className="space-y-2.5">
-                <label className="text-[13px] font-bold text-slate-400 ml-1">
-                  Email Address
-                </label>
+                <label className="text-[13px] font-bold text-slate-400 ml-1">Email Address</label>
                 <div className="relative">
                   <Input
                     value={user?.email || ""}
@@ -96,11 +106,36 @@ export default function ProfileForm() {
                 </div>
               </div>
 
-              {/* Phone */}
               <div className="space-y-2.5">
-                <label className="text-[13px] font-bold text-slate-400 ml-1">
-                  Phone Number
-                </label>
+                <label className="text-[13px] font-bold text-slate-400 ml-1">Role</label>
+                <div className="relative">
+                  <Shield className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300" />
+                  <Input
+                    value={user?.role?.name || "USER"}
+                    disabled
+                    className="h-12 bg-slate-50 border-slate-100 text-slate-900 font-semibold rounded-2xl pl-12 pr-5 text-sm cursor-not-allowed border-dashed"
+                  />
+                </div>
+              </div>
+
+              {/* Row 2: Full Name + Phone */}
+              <div className="space-y-2.5">
+                <label className="text-[13px] font-bold text-slate-400 ml-1">Full Name</label>
+                <div className="relative">
+                  <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300" />
+                  <Input
+                    {...form.register("FullName")}
+                    placeholder="Enter your name"
+                    className="h-12 bg-slate-50 border-slate-100 text-slate-900 font-semibold rounded-2xl pl-12 pr-5 text-sm focus:bg-white focus:border-slate-300 transition-all"
+                  />
+                </div>
+                {form.formState.errors.FullName && (
+                  <p className="text-[10px] text-red-500 ml-1">{form.formState.errors.FullName.message}</p>
+                )}
+              </div>
+
+              <div className="space-y-2.5">
+                <label className="text-[13px] font-bold text-slate-400 ml-1">Phone Number</label>
                 <div className="relative">
                   <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300" />
                   <Input
@@ -111,34 +146,33 @@ export default function ProfileForm() {
                 </div>
               </div>
 
-              {/* Full Name */}
+              {/* Row 3: Gender + Date of Birth */}
               <div className="space-y-2.5">
-                <label className="text-[13px] font-bold text-slate-400 ml-1">
-                  Full Name
-                </label>
-                <div className="relative">
-                  <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300" />
-                  <Input
-                    {...form.register("FullName")}
-                    placeholder="Enter your name"
-                    className="h-12 bg-slate-50 border-slate-100 text-slate-900 font-semibold rounded-2xl pl-12 pr-5 text-sm focus:bg-white focus:border-slate-300 transition-all"
-                  />
-                </div>
+                <label className="text-[13px] font-bold text-slate-400 ml-1">Gender</label>
+                <select
+                  {...form.register("Gender", { valueAsNumber: true })}
+                  className="w-full h-12 bg-slate-50 border border-slate-100 text-slate-900 font-semibold rounded-2xl px-5 text-sm focus:bg-white focus:border-slate-300 focus:outline-none transition-all appearance-none cursor-pointer"
+                  style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center', backgroundSize: '1rem' }}
+                >
+                  <option value={Gender.MALE}>Male</option>
+                  <option value={Gender.FEMALE}>Female</option>
+                  <option value={Gender.OTHER}>Other</option>
+                </select>
               </div>
 
-              {/* Role */}
               <div className="space-y-2.5">
-                <label className="text-[13px] font-bold text-slate-400 ml-1">
-                  Role
-                </label>
+                <label className="text-[13px] font-bold text-slate-400 ml-1">Date of Birth</label>
                 <div className="relative">
-                  <Shield className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300" />
-                  <Input
-                    value={user?.role?.name || "USER"}
-                    disabled
-                    className="h-12 bg-slate-50 border-slate-100 text-slate-900 font-semibold rounded-2xl pl-12 pr-5 text-sm cursor-not-allowed border-dashed"
+                  <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 pointer-events-none" />
+                  <input
+                    type="date"
+                    {...form.register("DateOfBirth")}
+                    className="w-full h-12 bg-slate-50 border border-slate-100 text-slate-900 font-semibold rounded-2xl pl-12 pr-5 text-sm focus:bg-white focus:border-slate-300 focus:outline-none transition-all [color-scheme:light]"
                   />
                 </div>
+                {form.formState.errors.DateOfBirth && (
+                  <p className="text-[10px] text-red-500 ml-1">{form.formState.errors.DateOfBirth.message as string}</p>
+                )}
               </div>
             </div>
 

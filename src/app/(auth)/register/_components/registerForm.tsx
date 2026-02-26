@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Eye, EyeOff, Mail, CheckCircle2 } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 import {
   InputOTP,
   InputOTPGroup,
@@ -47,7 +47,6 @@ export default function RegisterForm() {
     defaultValues: {
       fullName: '',
       email: '',
-      phone: '',
       gender: 0,
       password: '',
       confirmPassword: '',
@@ -147,43 +146,32 @@ export default function RegisterForm() {
           >
             {step === 1 && (
               <>
-                <div className="space-y-1">
-                  <label className="text-xs font-medium text-white/60 ml-2">Full Name</label>
-                  <input
-                    type="text"
-                    placeholder="John Doe"
-                    {...registerField("fullName")}
-                    className={`w-full bg-black/50 border border-transparent rounded-full px-5 py-3 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#FF9B8A]/20 transition-all placeholder:text-gray-400 text-white ${errors.fullName ? '!border-red-500 bg-red-500/10' : ''}`}
-                  />
-                  {errors.fullName && (
-                    <p className="text-[10px] text-red-500 ml-2 mt-0.5 whitespace-pre-line leading-relaxed">{errors.fullName.message}</p>
-                  )}
-                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1">
+                    <label className="text-xs font-medium text-white/60 ml-2">Full Name</label>
+                    <input
+                      type="text"
+                      placeholder="John Doe"
+                      {...registerField("fullName")}
+                      className={`w-full bg-black/50 border border-transparent rounded-full px-5 py-3 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#FF9B8A]/20 transition-all placeholder:text-gray-400 text-white ${errors.fullName ? '!border-red-500 bg-red-500/10' : ''}`}
+                    />
+                    {errors.fullName && (
+                      <p className="text-[10px] text-red-500 ml-2 mt-0.5 whitespace-pre-line leading-relaxed">{errors.fullName.message}</p>
+                    )}
+                  </div>
 
-                <div className="space-y-1">
-                  <label className="text-xs font-medium text-white/60 ml-2">Email</label>
-                  <input
-                    type="email"
-                    placeholder="Johndoe@gmail.com"
-                    {...registerField("email")}
-                    className={`w-full bg-black/50 border border-transparent rounded-full px-5 py-3 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#FF9B8A]/20 transition-all placeholder:text-gray-400 text-white ${errors.email ? '!border-red-500 bg-red-500/10' : ''}`}
-                  />
-                  {errors.email && (
-                    <p className="text-[10px] text-red-500 ml-2 mt-0.5 whitespace-pre-line leading-relaxed">{errors.email.message}</p>
-                  )}
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-xs font-medium text-white/60 ml-2">Phone Number</label>
-                  <input
-                    type="tel"
-                    placeholder="0123456789"
-                    {...registerField("phone")}
-                    className={`w-full bg-black/50 border border-transparent rounded-full px-5 py-3 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#FF9B8A]/20 transition-all placeholder:text-gray-400 text-white ${errors.phone ? '!border-red-500 bg-red-500/10' : ''}`}
-                  />
-                  {errors.phone && (
-                    <p className="text-[10px] text-red-500 ml-2 mt-0.5 whitespace-pre-line leading-relaxed">{errors.phone.message}</p>
-                  )}
+                  <div className="space-y-1">
+                    <label className="text-xs font-medium text-white/60 ml-2">Email</label>
+                    <input
+                      type="email"
+                      placeholder="Johndoe@gmail.com"
+                      {...registerField("email")}
+                      className={`w-full bg-black/50 border border-transparent rounded-full px-5 py-3 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#FF9B8A]/20 transition-all placeholder:text-gray-400 text-white ${errors.email ? '!border-red-500 bg-red-500/10' : ''}`}
+                    />
+                    {errors.email && (
+                      <p className="text-[10px] text-red-500 ml-2 mt-0.5 whitespace-pre-line leading-relaxed">{errors.email.message}</p>
+                    )}
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3 pb-1">
@@ -236,49 +224,40 @@ export default function RegisterForm() {
                   {/* Password Requirements */}
                   {currentPassword && (
                     <div className="mt-1 ml-2 space-y-0.5">
-                      <p className={`text-[10px] flex items-center gap-1 ${currentPassword.length >= 8 ? 'text-green-400' : 'text-white/40'}`}>
-                        <div className={`w-1 h-1 rounded-full ${currentPassword.length >= 8 ? 'bg-green-400' : 'bg-white/40'}`} /> Min 8 characters
-                      </p>
-                      <p className={`text-[10px] flex items-center gap-1 ${/[A-Z]/.test(currentPassword) ? 'text-green-400' : 'text-white/40'}`}>
-                        <div className={`w-1 h-1 rounded-full ${/[A-Z]/.test(currentPassword) ? 'bg-green-400' : 'bg-white/40'}`} /> One uppercase letter
-                      </p>
-                      <p className={`text-[10px] flex items-center gap-1 ${/[!@#$%^&*(),.?":{}|<>]/.test(currentPassword) ? 'text-green-400' : 'text-white/40'}`}>
-                        <div className={`w-1 h-1 rounded-full ${/[!@#$%^&*(),.?":{}|<>]/.test(currentPassword) ? 'bg-green-400' : 'bg-white/40'}`} /> One special character
-                      </p>
+                      <span className={`text-[10px] flex items-center gap-1 ${currentPassword.length >= 8 ? 'text-green-400' : 'text-white/40'}`}>
+                        <span className={`w-1 h-1 rounded-full inline-block flex-shrink-0 ${currentPassword.length >= 8 ? 'bg-green-400' : 'bg-white/40'}`} /> Min 8 characters
+                      </span>
+                      <span className={`text-[10px] flex items-center gap-1 ${/[A-Z]/.test(currentPassword) ? 'text-green-400' : 'text-white/40'}`}>
+                        <span className={`w-1 h-1 rounded-full inline-block flex-shrink-0 ${/[A-Z]/.test(currentPassword) ? 'bg-green-400' : 'bg-white/40'}`} /> One uppercase letter
+                      </span>
+                      <span className={`text-[10px] flex items-center gap-1 ${/[!@#$%^&*(),.?":{}|<>]/.test(currentPassword) ? 'text-green-400' : 'text-white/40'}`}>
+                        <span className={`w-1 h-1 rounded-full inline-block flex-shrink-0 ${/[!@#$%^&*(),.?":{}|<>]/.test(currentPassword) ? 'bg-green-400' : 'bg-white/40'}`} /> One special character
+                      </span>
                     </div>
                   )}
                 </div>
 
-                <AnimatePresence>
-                  {currentPassword.length > 0 && (
-                    <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: 'auto' }}
-                      exit={{ opacity: 0, height: 0 }}
-                      className="space-y-1 overflow-hidden"
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-white/60 ml-2">Confirm Password</label>
+                  <div className="relative">
+                    <input
+                      type={showConfirmPassword ? "text" : "password"}
+                      placeholder="••••••••"
+                      {...registerField("confirmPassword")}
+                      className={`w-full bg-black/50 border border-transparent rounded-full px-5 py-3 pr-12 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#FF9B8A]/20 transition-all placeholder:text-gray-400 text-white ${errors.confirmPassword ? '!border-red-500 bg-red-500/10' : ''}`}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="absolute right-5 top-1/2 -translate-y-1/2 text-white/40 hover:text-white transition-colors"
                     >
-                      <label className="text-xs font-medium text-white/60 ml-2">Confirm Password</label>
-                      <div className="relative">
-                        <input
-                          type={showConfirmPassword ? "text" : "password"}
-                          placeholder="••••••••"
-                          {...registerField("confirmPassword")}
-                          className={`w-full bg-black/50 border border-transparent rounded-full px-5 py-3 pr-12 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#FF9B8A]/20 transition-all placeholder:text-gray-400 text-white ${errors.confirmPassword ? '!border-red-500 bg-red-500/10' : ''}`}
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                          className="absolute right-5 top-1/2 -translate-y-1/2 text-white/40 hover:text-white transition-colors"
-                        >
-                          {showConfirmPassword ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
-                        </button>
-                      </div>
-                      {errors.confirmPassword && (
-                        <p className="text-[10px] text-red-500 ml-2 mt-0.5 whitespace-pre-line leading-relaxed">{errors.confirmPassword.message}</p>
-                      )}
-                    </motion.div>
+                      {showConfirmPassword ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                    </button>
+                  </div>
+                  {errors.confirmPassword && (
+                    <p className="text-[10px] text-red-500 ml-2 mt-0.5 whitespace-pre-line leading-relaxed">{errors.confirmPassword.message}</p>
                   )}
-                </AnimatePresence>
+                </div>
 
                 <button
                   type="submit"
@@ -366,7 +345,7 @@ export default function RegisterForm() {
                 try {
                   await loginGoogle.mutateAsync({
                     GoogleToken: googleToken,
-                    Location: { latitude: 0, longitude: 0, address: '' }
+                    Location: { latitude: 0, longitude: 0 }
                   });
                 } catch (err: any) {
                   handleErrorApi({ error: err });

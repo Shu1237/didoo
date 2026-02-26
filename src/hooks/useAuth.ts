@@ -1,5 +1,7 @@
 'use client'
 import { authRequest } from "@/apiRequest/auth";
+import { userRequest } from "@/apiRequest/user";
+import { organizerRequest } from "@/apiRequest/organizer";
 import { handleErrorApi } from "@/lib/errors";
 import {
     LoginInput,
@@ -19,6 +21,26 @@ import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
+async function loadProfileAndOrganizer(userId: string) {
+    const { setProfile, setOrganizer } = useSessionStore.getState();
+    try {
+        const profileRes = await userRequest.getById(userId);
+        const profile = profileRes.data;
+        setProfile(profile);
+        if (profile?.organizerId) {
+            try {
+                const orgRes = await organizerRequest.getById(profile.organizerId);
+                setOrganizer(orgRes.data ?? null);
+            } catch {
+                setOrganizer(null);
+            }
+        } else {
+            setOrganizer(null);
+        }
+    } catch (error) {
+        console.error("Failed to fetch profile", error);
+    }
+}
 
 export const useAuth = () => {
     const { user, setSession, clearSession } = useSessionStore((state) => state);
@@ -31,11 +53,11 @@ export const useAuth = () => {
         onSuccess: async (data) => {
             setSession(data);
             await authRequest.loginServer(data);
-            toast.success("Login successfully");
             const u = useSessionStore.getState().user;
-            router.replace(getRedirectPathForRole(u?.RoleId));
+            if (u?.UserId) await loadProfileAndOrganizer(u.UserId);
+            toast.success("Login successfully");
+            router.replace(getRedirectPathForRole(u?.Role));
         },
-
     })
 
     const loginGoogle = useMutation({
@@ -45,10 +67,11 @@ export const useAuth = () => {
         },
         onSuccess: async (data) => {
             setSession(data);
-            await authRequest.loginServer(data)
-            toast.success("Login successfully");
+            await authRequest.loginServer(data);
             const u = useSessionStore.getState().user;
-            router.replace(getRedirectPathForRole(u?.RoleId));
+            if (u?.UserId) await loadProfileAndOrganizer(u.UserId);
+            toast.success("Login successfully");
+            router.replace(getRedirectPathForRole(u?.Role));
         },
     })
 

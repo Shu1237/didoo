@@ -41,8 +41,21 @@ export const useOrganizer = () => {
             return res.data;
         },
         onSuccess: () => {
-            toast.success('Organizer updated successfully');
             queryClient.invalidateQueries({ queryKey: KEY.organizers });
+        },
+    });
+
+    const verify = useMutation({
+        mutationFn: async (id: string) => {
+            const res = await organizerRequest.verify(id);
+            return res.data;
+        },
+        onSuccess: () => {
+            toast.success('Đã xác minh organizer thành công');
+            queryClient.invalidateQueries({ queryKey: KEY.organizers });
+        },
+        onError: (error) => {
+            handleErrorApi({ error });
         },
     });
 
@@ -74,6 +87,6 @@ export const useOrganizer = () => {
         }
     });
 
-    return { create, update, deleteOrganizer, restore };
+    return { create, update, verify, deleteOrganizer, restore };
 };
 

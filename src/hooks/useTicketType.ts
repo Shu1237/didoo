@@ -6,10 +6,11 @@ import { TicketTypeGetListQuery } from "@/types/ticketType";
 import { toast } from "sonner";
 import { handleErrorApi } from "@/lib/errors";
 
-export const useGetTicketTypes = (params?: TicketTypeGetListQuery) => {
+export const useGetTicketTypes = (params?: TicketTypeGetListQuery, options?: { enabled?: boolean }) => {
     return useQuery({
         queryKey: QUERY_KEY.ticketTypes.list(params),
         queryFn: () => ticketTypeRequest.getList(params || {}),
+        enabled: options?.enabled ?? true,
     });
 };
 
@@ -30,7 +31,6 @@ export const useTicketType = () => {
             return res.data;
         },
         onSuccess: () => {
-            toast.success('Ticket type created successfully');
             queryClient.invalidateQueries({ queryKey: KEY.ticketTypes });
         },
     });

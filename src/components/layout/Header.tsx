@@ -23,7 +23,8 @@ import {
     Briefcase,
     Cpu,
     Search,
-    ArrowUpRight
+    ArrowUpRight,
+    User as UserIcon
 } from "lucide-react";
 import {
     DropdownMenu,
@@ -33,11 +34,12 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Roles } from "@/utils/enum";
+import { Roles, OrganizerStatus } from "@/utils/enum";
 import { useAuth } from "@/hooks/useAuth";
 
 const Header = () => {
     const user = useSessionStore((state) => state.user);
+    const organizer = useSessionStore((state) => state.organizer);
     const router = useRouter();
     const pathname = usePathname();
     const [hoveredNav, setHoveredNav] = useState<string | null>(null);
@@ -57,11 +59,19 @@ const Header = () => {
         await logout.mutateAsync({ userId: user.UserId });
     };
 
+    const isVerifiedOrganizer = organizer?.status === OrganizerStatus.VERIFIED;
+
+    const showDashboard = () => {
+        if (!user) return false;
+        if (user.Role === Roles.ADMIN || user.Role === Roles.ORGANIZER) return true;
+        return user.Role === Roles.USER && isVerifiedOrganizer;
+    };
+
     const getDashboardLink = () => {
         if (!user) return null;
-        if (user.RoleId === Roles.ADMIN) return "/admin/dashboard";
-        if (user.RoleId === Roles.ORGANIZER) return "/organizer/dashboard";
-        return "/user/profile";
+        if (user.Role === Roles.ADMIN) return "/admin/dashboard";
+        if (user.Role === Roles.ORGANIZER || isVerifiedOrganizer) return "/organizer/dashboard";
+        return null;
     };
 
     const isActive = (path: string) => pathname === path || pathname?.startsWith(path + "/");
@@ -160,7 +170,10 @@ const Header = () => {
                                         <DropdownMenuItem className="rounded-lg cursor-pointer" asChild>
                                             <Link href="/user/tickets" className="flex items-center gap-2.5 px-2 py-2"><Ticket className="w-4 h-4" /> <span>My Tickets</span></Link>
                                         </DropdownMenuItem>
-                                        {getDashboardLink() && (
+                                        <DropdownMenuItem className="rounded-lg cursor-pointer" asChild>
+                                            <Link href="/user/profile" className="flex items-center gap-2.5 px-2 py-2"><UserIcon className="w-4 h-4" /> <span>Profile</span></Link>
+                                        </DropdownMenuItem>
+                                        {showDashboard() && getDashboardLink() && (
                                             <DropdownMenuItem className="rounded-lg cursor-pointer" asChild>
                                                 <Link href={getDashboardLink()!} className="flex items-center gap-2.5 px-2 py-2"><LayoutDashboard className="w-4 h-4" /> <span>Dashboard</span></Link>
                                             </DropdownMenuItem>

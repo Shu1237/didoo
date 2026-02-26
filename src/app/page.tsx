@@ -10,7 +10,7 @@ export default async function RootPage() {
   if (accessToken) {
     try {
       const decoded = decodeJWT<JWTUserType>(accessToken);
-      redirect(getRedirectPathForRole(decoded?.RoleId));
+      redirect(getRedirectPathForRole(decoded?.Role));
     } catch {
       // Token invalid, fall through to default
     }

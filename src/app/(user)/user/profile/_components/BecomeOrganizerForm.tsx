@@ -3,6 +3,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { OrganizerCreateBody, organizerCreateSchema } from "@/schemas/organizer";
+import { OrganizerStatus } from "@/utils/enum";
 import { useOrganizer } from "@/hooks/useOrganizer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,12 +13,14 @@ import { Loader2, Send, Plus, Image as ImageIcon, Globe, Facebook, Instagram, Mu
 import { handleErrorApi } from "@/lib/errors";
 import { useMedia } from "@/hooks/useMedia";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useSessionStore } from "@/stores/sesionStore";
 
 export default function BecomeOrganizerForm({ onSuccess }: { onSuccess?: () => void }) {
     const { create } = useOrganizer();
     const { uploadImage } = useMedia();
     const logoInputRef = useRef<HTMLInputElement>(null);
     const bannerInputRef = useRef<HTMLInputElement>(null);
+    const userId = useSessionStore((state) => state.user?.UserId ?? "");
 
     const form = useForm<OrganizerCreateBody>({
         resolver: zodResolver(organizerCreateSchema),
@@ -35,6 +38,10 @@ export default function BecomeOrganizerForm({ onSuccess }: { onSuccess?: () => v
             TiktokUrl: "",
             LogoUrl: "",
             BannerUrl: "",
+            UserId: userId,
+            IsVerified: false,
+            HasSendEmail: true,
+            Status: OrganizerStatus.PENDING,
         },
     });
 

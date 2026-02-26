@@ -16,6 +16,8 @@ export const organizerCreateSchema = z.object({
     TiktokUrl: z.string().url("Link TikTok không hợp lệ").optional().or(z.literal("")),
     Address: z.string().optional().or(z.literal("")),
     IsVerified: z.boolean().default(false),
+    HasSendEmail: z.boolean().optional().default(true),
+    UserId: z.string().uuid("User ID không hợp lệ"),
     Status: z.nativeEnum(OrganizerStatus).default(OrganizerStatus.PENDING),
 });
 
@@ -33,8 +35,9 @@ export const organizerUpdateSchema = z.object({
     InstagramUrl: z.string().url().optional().or(z.literal("")),
     TiktokUrl: z.string().url().optional().or(z.literal("")),
     Address: z.string().optional().or(z.literal("")),
-    Status: z.nativeEnum(OrganizerStatus).optional(),
-    IsVerified: z.boolean().optional(),
+    HasSendEmail: z.boolean().optional().default(true),
+    Status: z.nativeEnum(OrganizerStatus).default(OrganizerStatus.PENDING),
+    IsVerified: z.boolean().optional().default(false),
 });
 
 

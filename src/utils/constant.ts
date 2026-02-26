@@ -6,6 +6,9 @@ import { InteractionGetListQuery } from "@/types/interaction";
 import { OrganizerGetListQuery } from "@/types/organizer";
 import { TicketGetListQuery } from "@/types/ticket";
 import { TicketTypeGetListQuery } from "@/types/ticketType";
+import { BookingGetListQuery } from "@/types/booking";
+import { BookingDetailGetListQuery } from "@/types/bookingDetail";
+import { PaymentMethodGetListQuery } from "@/types/paymentMethod";
 import { UserGetListQuery } from "@/types/user";
 
 
@@ -20,6 +23,9 @@ export const KEY = {
     interactions: ['interactions'],
     tickets: ['tickets'],
     ticketTypes: ['ticket-types'],
+    bookings: ['bookings'],
+    bookingDetails: ['booking-details'],
+    paymentMethods: ['payment-methods'],
 } as const;
 
 export const QUERY_KEY = {
@@ -61,5 +67,17 @@ export const QUERY_KEY = {
     ticketTypes: {
         list: (query?: TicketTypeGetListQuery) => [...KEY.ticketTypes, 'list', query] as const,
         detail: (id: string) => [...KEY.ticketTypes, 'detail', id] as const,
+    },
+    bookings: {
+        list: (query?: BookingGetListQuery) => [...KEY.bookings, 'list', query] as const,
+        detail: (id: string) => [...KEY.bookings, 'detail', id] as const,
+    },
+    bookingDetails: {
+        list: (query?: BookingDetailGetListQuery) => [...KEY.bookingDetails, 'list', query] as const,
+        detail: (id: string) => [...KEY.bookingDetails, 'detail', id] as const,
+    },
+    paymentMethods: {
+        list: (query?: PaymentMethodGetListQuery) => [...KEY.paymentMethods, 'list', query] as const,
+        detail: (id: string) => [...KEY.paymentMethods, 'detail', id] as const,
     },
 } as const;

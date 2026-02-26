@@ -9,10 +9,10 @@ export enum HttpErrorCode {
 }
 
 export enum Roles {
-    ADMIN = '4aa3c956-70b7-4ac1-a7ca-28f5de93755d',
-    ORGANIZER = '346637b8-09e2-42a1-aae7-71340c19e8f5',
-    USER = 'a9d8183a-c7c3-4e08-b31a-9a2f603bef0e',
-    GUEST = 'c2a05f94-054a-4127-b1a4-15403bcebc97',
+    ADMIN = "1",
+    ORGANIZER = "3",
+    USER = "2",
+    GUEST = "4",
 }
 
 /** Redirect path theo role - dùng cho auth layout và useAuth */
@@ -67,6 +67,19 @@ export enum OrganizerStatus {
 
 /** api.md: 1=Active, 2=Inactive */
 export enum CategoryStatus {
+    ACTIVE = 1,
+    INACTIVE = 2,
+}
+
+/** api.md: Booking status - query param */
+export enum BookingStatus {
+    PENDING = 1,
+    PAID = 2,
+    CANCELLED = 3,
+}
+
+/** api.md: Payment method status - query param */
+export enum PaymentMethodStatus {
     ACTIVE = 1,
     INACTIVE = 2,
 }

@@ -20,7 +20,9 @@ import { EventCreateBody, eventCreateSchema, eventUpdateSchema } from "@/schemas
 import { useEvent } from "@/hooks/useEvent";
 import { useMedia } from "@/hooks/useMedia";
 import { useGetCategories } from "@/hooks/useCategory";
+import { useGetTicketTypes } from "@/hooks/useTicketType";
 import { Event } from "@/types/event";
+import { EventStatus } from "@/utils/enum";
 import { handleErrorApi } from "@/lib/errors";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
@@ -47,12 +49,17 @@ export default function EventModal({ isOpen, onClose, mode, event, organizerId }
     const isDetail = mode === "DETAIL";
     const title = mode === "CREATE" ? "Tạo sự kiện mới" : mode === "EDIT" ? "Chỉnh sửa sự kiện" : "Chi tiết sự kiện";
 
-    const { create, update } = useEvent();
+    const { create, update, updateStatus } = useEvent();
     const { uploadImage } = useMedia();
-    const { data: categoriesRes } = useGetCategories({ pageSize: 100 });
+    const { data: categoriesRes } = useGetCategories({ pageNumber: 1, pageSize: 100 });
+    const { data: ticketTypesRes } = useGetTicketTypes(
+        { eventId: event?.id, pageNumber: 1, pageSize: 100 },
+        { enabled: !!event?.id }
+    );
     const { data: userData } = useGetMe();
     const currentUser = userData?.data;
     const categories = categoriesRes?.data?.items || [];
+    const ticketTypes = ticketTypesRes?.data?.items || [];
 
     const thumbnailInputRef = useRef<HTMLInputElement>(null);
     const bannerInputRef = useRef<HTMLInputElement>(null);
@@ -128,14 +135,11 @@ export default function EventModal({ isOpen, onClose, mode, event, organizerId }
     };
 
     const onSubmit = async (values: EventCreateBody) => {
-        console.log("Submitting values:", values);
         try {
             if (mode === "CREATE") {
                 await create.mutateAsync(values);
-                toast.success("Tạo sự kiện thành công!");
             } else if (mode === "EDIT" && event) {
                 await update.mutateAsync({ id: event.id, body: values });
-                toast.success("Cập nhật sự kiện thành công!");
             }
             onClose();
         } catch (error) {
@@ -166,9 +170,21 @@ export default function EventModal({ isOpen, onClose, mode, event, organizerId }
                             </DialogDescription>
                         </div>
                         {isDetail && (
-                            <Badge className="bg-emerald-500 text-white border-none font-black text-[10px] uppercase tracking-widest px-4 py-2 rounded-full">
-                                {event?.status === 1 ? "Đang diễn ra" : "Bản nháp"}
-                            </Badge>
+                            <div className="flex items-center gap-2">
+                                <Badge className={`border-none font-black text-[10px] uppercase tracking-widest px-4 py-2 rounded-full ${event?.status === EventStatus.PUBLISHED ? "bg-emerald-500 text-white" : "bg-amber-500 text-white"}`}>
+                                    {event?.status === EventStatus.PUBLISHED ? "Đã xuất bản" : "Bản nháp"}
+                                </Badge>
+                                {event?.status === EventStatus.DRAFT && (
+                                    <Button
+                                        size="sm"
+                                        disabled={updateStatus.isPending}
+                                        onClick={() => event?.id && updateStatus.mutate({ id: event.id, status: EventStatus.PUBLISHED })}
+                                        className="rounded-full bg-primary hover:bg-primary/90 text-black font-bold text-[10px] uppercase"
+                                    >
+                                        {updateStatus.isPending ? <Loader2 className="w-3 h-3 animate-spin" /> : "Xuất bản"}
+                                    </Button>
+                                )}
+                            </div>
                         )}
                     </div>
                 </DialogHeader>
@@ -233,6 +249,33 @@ export default function EventModal({ isOpen, onClose, mode, event, organizerId }
                                         ></div>
                                     </div>
                                 </div>
+
+                                {ticketTypes.length > 0 && (
+                                    <div className="space-y-3">
+                                        <div className="flex items-center gap-2 text-zinc-900 font-black text-sm uppercase tracking-widest">
+                                            <Ticket className="w-4 h-4 text-primary" />
+                                            Các loại vé
+                                        </div>
+                                        <div className="space-y-2">
+                                            {ticketTypes.map((tt) => (
+                                                <div key={tt.id} className="flex items-center justify-between p-4 rounded-2xl bg-white border border-zinc-100 shadow-sm">
+                                                    <div>
+                                                        <p className="font-bold text-zinc-900">{tt.name}</p>
+                                                        {tt.description && <p className="text-xs text-zinc-500 mt-0.5">{tt.description}</p>}
+                                                    </div>
+                                                    <div className="text-right">
+                                                        <p className="font-black text-primary">{Number(tt.price).toLocaleString("vi-VN")}đ</p>
+                                                        <p className="text-[11px] text-zinc-500 font-bold">
+                                                            Đã bán: <span className="text-zinc-700">{(tt.totalQuantity || 0) - (tt.availableQuantity || 0)}</span>
+                                                            {" / "}
+                                                            <span className="text-zinc-700">{tt.totalQuantity || 0}</span> vé
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
 
                                 <div className="space-y-4">
                                     <div className="flex items-center gap-2 text-zinc-900 font-black text-sm uppercase tracking-widest">

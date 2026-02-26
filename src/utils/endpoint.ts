@@ -30,6 +30,7 @@ export const ENDPOINT_CLIENT = {
     // Events
     EVENTS: '/events',
     EVENT_DETAIL: (id: string) => `/events/${id}`,
+    EVENT_STATUS: (id: string) => `/events/${id}/status`,
 
     // Categories
     CATEGORIES: '/categories',
@@ -38,6 +39,7 @@ export const ENDPOINT_CLIENT = {
     // Organizers
     ORGANIZERS: '/organizers',
     ORGANIZER_DETAIL: (id: string) => `/organizers/${id}`,
+    ORGANIZER_VERIFY: (id: string) => `/organizers/${id}/verify`,
 
     // Event Reviews
     EVENT_REVIEWS: '/eventreviews',
@@ -62,6 +64,18 @@ export const ENDPOINT_CLIENT = {
     // Ticket Types
     TICKET_TYPES: '/tickettypes',
     TICKET_TYPE_DETAIL: (id: string) => `/tickettypes/${id}`,
+
+    // Bookings
+    BOOKINGS: '/bookings',
+    BOOKING_DETAIL: (id: string) => `/bookings/${id}`,
+
+    // Booking Details
+    BOOKING_DETAILS: '/bookingdetails',
+    BOOKING_DETAIL_ITEM: (id: string) => `/bookingdetails/${id}`,
+
+    // Payment Methods
+    PAYMENT_METHODS: '/paymentmethods',
+    PAYMENT_METHOD_DETAIL: (id: string) => `/paymentmethods/${id}`,
 
     ORDER_DETAIL: (id: string) => `/orders/coordinator/${id}`, // Keeping existing ONE
 }

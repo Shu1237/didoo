@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import Link from 'next/link';
 import { Calendar, MapPin, ArrowUpRight } from 'lucide-react';
 import EventActions from './EventActions';
 import { Button } from '@/components/ui/button';
@@ -89,9 +90,11 @@ export default function HeroSection({ event, ticketTypes }: DetailEventProps) {
 
               {/* Action Group */}
               <div className="flex flex-wrap gap-5 pt-4">
-                <Button className="group relative h-16 px-10 overflow-hidden rounded-full bg-primary text-black font-bold text-lg transition-all hover:bg-primary/90">
-                  <span className="relative z-10 uppercase">Đặt vé ngay</span>
-                  <ArrowUpRight className="inline-block ml-2 w-5 h-5 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
+                <Button asChild className="group relative h-16 px-10 overflow-hidden rounded-full bg-primary text-black font-bold text-lg transition-all hover:bg-primary/90">
+                  <Link href={`/events/${event.id}/booking`}>
+                    <span className="relative z-10 uppercase">Đặt vé ngay</span>
+                    <ArrowUpRight className="inline-block ml-2 w-5 h-5 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
+                  </Link>
                 </Button>
 
                 <EventActions eventId={event.id} />

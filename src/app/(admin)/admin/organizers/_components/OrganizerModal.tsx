@@ -18,8 +18,8 @@ interface OrganizerModalProps {
     isOpen: boolean;
     onClose: () => void;
     organizer: Organizer | null;
-    onApprove: (org: Organizer) => Promise<void>;
-    onReject: (org: Organizer) => Promise<void>;
+    onApprove: (org: Organizer) => void | Promise<void>;
+    onReject: (org: Organizer) => void | Promise<void>;
     isUpdating: boolean;
 }
 

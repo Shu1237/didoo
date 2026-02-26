@@ -4,11 +4,13 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ConfirmModal } from "@/components/ui/confirm-modal";
 
 import { Organizer } from "@/types/organizer";
 import { useOrganizer } from "@/hooks/useOrganizer";
 import { OrganizerStatus } from "@/utils/enum";
 import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
 import { useState } from "react";
 import OrganizerModal from "./OrganizerModal";
 
@@ -17,33 +19,33 @@ interface OrganizersListProps {
 }
 
 export default function OrganizersList({ organizers }: OrganizersListProps) {
-  const { update } = useOrganizer();
+  const { update, verify } = useOrganizer();
   const [selectedOrganizer, setSelectedOrganizer] = useState<Organizer | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [confirmState, setConfirmState] = useState<{ organizer: Organizer; status: OrganizerStatus } | null>(null);
 
   const handleOpenDetail = (organizer: Organizer) => {
     setSelectedOrganizer(organizer);
     setIsModalOpen(true);
   };
 
+  const openConfirm = (organizer: Organizer, status: OrganizerStatus) => {
+    setConfirmState({ organizer, status });
+  };
+
   const handleAction = async (organizer: Organizer, status: OrganizerStatus) => {
-    const actionName = status === OrganizerStatus.VERIFIED ? "Phê duyệt & Xác minh" : "Từ chối";
-    let message = `Bạn có chắc chắn muốn ${actionName.toLowerCase()} organizer "${organizer.name}" không?`;
-
-    if (status === OrganizerStatus.VERIFIED && !organizer.isVerified) {
-      message += "\n\nLƯU Ý: Thao tác này sẽ đồng thời XÁC MINH danh tính cho Organizer này.";
-    }
-
-    if (!window.confirm(message)) return;
-
     try {
-      await update.mutateAsync({
-        id: organizer.id,
-        body: {
-          Status: status,
-          IsVerified: status === OrganizerStatus.VERIFIED ? true : undefined
-        }
-      });
+      if (status === OrganizerStatus.VERIFIED) {
+        await verify.mutateAsync(organizer.id);
+      } else {
+        await update.mutateAsync({
+          id: organizer.id,
+          body: { Status: status }
+        });
+      }
+      toast.success(status === OrganizerStatus.VERIFIED ? "Đã phê duyệt!" : "Đã từ chối!");
+      setConfirmState(null);
+      setIsModalOpen(false);
     } catch (err) { }
   };
 
@@ -113,20 +115,20 @@ export default function OrganizersList({ organizers }: OrganizersListProps) {
                   <Button
                     variant="default"
                     size="sm"
-                    disabled={update.isPending}
-                    onClick={() => handleAction(organizer, OrganizerStatus.VERIFIED)}
+                    disabled={update.isPending || verify.isPending}
+                    onClick={() => openConfirm(organizer, OrganizerStatus.VERIFIED)}
                     className="bg-zinc-900 hover:bg-zinc-800 text-white rounded-xl px-2.5 h-7 text-[10px] font-bold uppercase tracking-wider"
                   >
-                    {update.isPending ? <Loader2 className="w-3 h-3 animate-spin" /> : "Duyệt"}
+                    {verify.isPending ? <Loader2 className="w-3 h-3 animate-spin" /> : "Duyệt"}
                   </Button>
                   <Button
                     variant="destructive"
                     size="sm"
-                    disabled={update.isPending}
-                    onClick={() => handleAction(organizer, OrganizerStatus.BANNED)}
+                    disabled={update.isPending || verify.isPending}
+                    onClick={() => openConfirm(organizer, OrganizerStatus.BANNED)}
                     className="bg-rose-600 hover:bg-rose-700 text-white rounded-xl px-2.5 h-7 text-[10px] font-bold uppercase tracking-wider"
                   >
-                    {update.isPending ? <Loader2 className="w-3 h-3 animate-spin" /> : "Từ chối"}
+                    {(update.isPending || verify.isPending) ? <Loader2 className="w-3 h-3 animate-spin" /> : "Từ chối"}
                   </Button>
                 </>
               )}
@@ -139,9 +141,33 @@ export default function OrganizersList({ organizers }: OrganizersListProps) {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         organizer={selectedOrganizer}
-        onApprove={(org) => handleAction(org, OrganizerStatus.VERIFIED)}
-        onReject={(org) => handleAction(org, OrganizerStatus.BANNED)}
-        isUpdating={update.isPending}
+        onApprove={(org) => openConfirm(org, OrganizerStatus.VERIFIED)}
+        onReject={(org) => openConfirm(org, OrganizerStatus.BANNED)}
+        isUpdating={update.isPending || verify.isPending}
+      />
+
+      <ConfirmModal
+        open={!!confirmState}
+        onOpenChange={(open) => !open && setConfirmState(null)}
+        title={confirmState?.status === OrganizerStatus.VERIFIED ? "Phê duyệt & Xác minh" : "Từ chối"}
+        description={
+          confirmState
+            ? (() => {
+                const actionName = confirmState.status === OrganizerStatus.VERIFIED ? "phê duyệt & xác minh" : "từ chối";
+                let msg = `Bạn có chắc chắn muốn ${actionName} organizer "${confirmState.organizer.name}" không?`;
+                if (confirmState.status === OrganizerStatus.VERIFIED && !confirmState.organizer.isVerified) {
+                  msg += "\n\nLƯU Ý: Thao tác này sẽ đồng thời XÁC MINH danh tính cho Organizer này.";
+                }
+                return msg;
+              })()
+            : ""
+        }
+        confirmLabel={confirmState?.status === OrganizerStatus.VERIFIED ? "Duyệt" : "Từ chối"}
+        variant={confirmState?.status === OrganizerStatus.VERIFIED ? "success" : "danger"}
+        onConfirm={async () => {
+          if (confirmState) await handleAction(confirmState.organizer, confirmState.status);
+        }}
+        isLoading={update.isPending || verify.isPending}
       />
     </div>
   );

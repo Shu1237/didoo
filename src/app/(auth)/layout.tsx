@@ -15,8 +15,8 @@ export default function AuthLayout({
   const user = useSessionStore((state) => state.user);
 
   useEffect(() => {
-    if (user?.RoleId) {
-      const path = getRedirectPathForRole(user.RoleId);
+    if (user?.Role) {
+      const path = getRedirectPathForRole(user.Role);
       router.replace(path);
     }
   }, [user, router]);

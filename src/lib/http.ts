@@ -12,7 +12,10 @@ interface CustomOptions extends RequestInit {
     skipAuth?: boolean;
 }
 
-const isExpired = "Token expired";
+const isExpired = "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại hoặc làm mới Token.";
+
+
+
 
 // Helper: Check runtime
 const isServerRuntime = () => typeof window === "undefined";
@@ -204,6 +207,7 @@ async function httpRequest<T>(
 
     // Handle 401 - Token expired
     if (res.status === HttpErrorCode.UNAUTHORIZED && payload.message === isExpired && !options?.skipAuth) {
+        console.log(payload.message);
         // Server: không thể refresh, throw error
         if (isServerRuntime()) {
             tokenInterceptor.handleAuthError();

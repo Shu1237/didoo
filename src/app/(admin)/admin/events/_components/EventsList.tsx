@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { Check, X, Calendar as CalendarIcon, MapPin, ArrowRight } from "lucide-react";
 import { Event } from "@/types/event";
 import { EventStatus } from "@/utils/enum";
@@ -17,20 +18,28 @@ interface EventsListProps {
 
 export default function EventsList({ events }: EventsListProps) {
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
-  const { update } = useEvent();
+  const [confirmState, setConfirmState] = useState<{ event: Event; action: "approve" | "reject" } | null>(null);
+  const { updateStatus } = useEvent();
 
-  const handleApprove = (event: Event) => {
-    update.mutate({
+  const openApproveConfirm = (event: Event) => setConfirmState({ event, action: "approve" });
+  const openRejectConfirm = (event: Event) => setConfirmState({ event, action: "reject" });
+
+  const handleApprove = async (event: Event) => {
+    await updateStatus.mutateAsync({
       id: event.id,
-      body: { Status: EventStatus.PUBLISHED }
+      status: EventStatus.PUBLISHED
     });
+    setConfirmState(null);
+    setSelectedEvent(null);
   };
 
-  const handleReject = (event: Event) => {
-    update.mutate({
+  const handleReject = async (event: Event) => {
+    await updateStatus.mutateAsync({
       id: event.id,
-      body: { Status: EventStatus.CANCELLED }
+      status: EventStatus.CANCELLED
     });
+    setConfirmState(null);
+    setSelectedEvent(null);
   };
 
   if (!events || events.length === 0) {
@@ -114,8 +123,8 @@ export default function EventsList({ events }: EventsListProps) {
                       <Button
                         variant="outline"
                         size="icon"
-                        onClick={() => handleApprove(event)}
-                        disabled={update.isPending}
+                        onClick={() => openApproveConfirm(event)}
+                        disabled={updateStatus.isPending}
                         className="rounded-full w-9 h-9 border-zinc-200 text-emerald-500 hover:bg-emerald-50 hover:text-emerald-600 border-emerald-100 transition-all active:scale-90"
                       >
                         <Check className="w-3.5 h-3.5" />
@@ -123,8 +132,8 @@ export default function EventsList({ events }: EventsListProps) {
                       <Button
                         variant="outline"
                         size="icon"
-                        onClick={() => handleReject(event)}
-                        disabled={update.isPending}
+                        onClick={() => openRejectConfirm(event)}
+                        disabled={updateStatus.isPending}
                         className="rounded-full w-9 h-9 border-zinc-200 text-rose-500 hover:bg-rose-50 hover:text-rose-600 border-rose-100 transition-all active:scale-90"
                       >
                         <X className="w-3.5 h-3.5" />
@@ -142,9 +151,31 @@ export default function EventsList({ events }: EventsListProps) {
         isOpen={!!selectedEvent}
         onClose={() => setSelectedEvent(null)}
         event={selectedEvent}
-        onApprove={handleApprove}
-        onReject={handleReject}
-        isUpdating={update.isPending}
+        onApprove={openApproveConfirm}
+        onReject={openRejectConfirm}
+        isUpdating={updateStatus.isPending}
+      />
+
+      <ConfirmModal
+        open={!!confirmState}
+        onOpenChange={(open) => !open && setConfirmState(null)}
+        title={confirmState?.action === "approve" ? "Duyệt sự kiện" : "Từ chối sự kiện"}
+        description={
+          confirmState
+            ? confirmState.action === "approve"
+              ? `Bạn có chắc chắn muốn duyệt sự kiện "${confirmState.event.name}" để hiển thị công khai?`
+              : `Bạn có chắc chắn muốn từ chối sự kiện "${confirmState.event.name}"?`
+            : ""
+        }
+        confirmLabel={confirmState?.action === "approve" ? "Duyệt" : "Từ chối"}
+        variant={confirmState?.action === "approve" ? "success" : "danger"}
+        onConfirm={async () => {
+          if (confirmState) {
+            if (confirmState.action === "approve") await handleApprove(confirmState.event);
+            else await handleReject(confirmState.event);
+          }
+        }}
+        isLoading={updateStatus.isPending}
       />
     </div>
   );

@@ -26,6 +26,7 @@ export default function OrganizerProfilePage() {
         values: organizerRes?.data ? {
             id: organizerRes.data.id,
             Name: organizerRes.data.name || "",
+            Slug: organizerRes.data.slug || "",
             Description: organizerRes.data.description || "",
             Email: organizerRes.data.email || "",
             Phone: organizerRes.data.phone || "",
@@ -53,7 +54,10 @@ export default function OrganizerProfilePage() {
             toast.error("Không tìm thấy ID nhà tổ chức");
             return;
         }
-        update.mutate({ id, body: values });
+        update.mutate(
+            { id, body: values },
+            { onSuccess: () => toast.success("Đã lưu thay đổi") }
+        );
     };
 
     return (
@@ -141,6 +145,12 @@ export default function OrganizerProfilePage() {
                             <div className="col-span-2 space-y-2">
                                 <Label className="text-[11px] font-black uppercase text-zinc-400 ml-1">Tên nhà tổ chức *</Label>
                                 <Input {...form.register("Name")} placeholder="VD: Didoo Entertainment" className="h-12 rounded-xl bg-zinc-50/50 border-zinc-200 focus:bg-white font-bold text-lg" />
+                            </div>
+
+                            <div className="col-span-2 space-y-2">
+                                <Label className="text-[11px] font-black uppercase text-zinc-400 ml-1">Slug (đường dẫn URL)</Label>
+                                <Input {...form.register("Slug")} placeholder="VD: didoo-entertainment" className="h-12 rounded-xl bg-zinc-50/50 border-zinc-200 font-mono text-sm" />
+                                <p className="text-[10px] text-zinc-400 ml-1">Dùng để tạo URL trang nhà tổ chức: /organizers/[slug]</p>
                             </div>
 
                             <div className="space-y-2">

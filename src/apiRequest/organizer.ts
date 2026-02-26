@@ -15,6 +15,8 @@ export const organizerRequest = {
         http.put<Partial<Organizer>>(ENDPOINT_CLIENT.ORGANIZER_DETAIL(id), body),
     updatePartial: (id: string, body: OrganizerUpdateBody) =>
         http.patch<Partial<Organizer>>(ENDPOINT_CLIENT.ORGANIZER_DETAIL(id), body),
+    verify: (id: string) =>
+        http.patch<Partial<Organizer>>(ENDPOINT_CLIENT.ORGANIZER_VERIFY(id)),
     delete: (id: string) =>
         http.delete<null>(ENDPOINT_CLIENT.ORGANIZER_DETAIL(id)),
     restore: (id: string) =>

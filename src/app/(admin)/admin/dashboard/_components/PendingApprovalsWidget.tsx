@@ -1,8 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { Check, X, Search, Filter, ChevronRight, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useGetOrganizers, useOrganizer } from "@/hooks/useOrganizer";
@@ -15,23 +17,22 @@ export default function PendingApprovalsWidget() {
         status: OrganizerStatus.PENDING,
         pageSize: 10,
     });
-    const { update } = useOrganizer();
+    const { update, verify } = useOrganizer();
 
     const organizers = organizersRes?.data?.items || [];
+    const [confirmState, setConfirmState] = useState<{ org: any; status: OrganizerStatus } | null>(null);
+
+    const openConfirm = (org: any, status: OrganizerStatus) => setConfirmState({ org, status });
 
     const handleAction = async (org: any, status: OrganizerStatus) => {
-        const actionName = status === OrganizerStatus.VERIFIED ? "Phê duyệt" : "Từ chối";
-        let message = `Bạn có chắc chắn muốn ${actionName.toLowerCase()} organizer "${org.name}" không?`;
-
-        if (status === OrganizerStatus.VERIFIED && !org.isVerified) {
-            message += "\n\nCẢNH BÁO: Organizer này CHƯA được verify danh tính!";
-        }
-
-        if (!window.confirm(message)) return;
-
         try {
-            await update.mutateAsync({ id: org.id, body: { status } as any });
+            if (status === OrganizerStatus.VERIFIED) {
+                await verify.mutateAsync(org.id);
+            } else {
+                await update.mutateAsync({ id: org.id, body: { Status: status } });
+            }
             toast.success(status === OrganizerStatus.VERIFIED ? "Đã phê duyệt!" : "Đã từ chối!");
+            setConfirmState(null);
         } catch (err) { }
     };
 
@@ -86,16 +87,16 @@ export default function PendingApprovalsWidget() {
                             <div className="col-span-3 flex items-center justify-end gap-2 text-right">
                                 <div className="flex gap-2">
                                     <Button
-                                        onClick={() => handleAction(org, OrganizerStatus.VERIFIED)}
-                                        disabled={update.isPending}
+                                        onClick={() => openConfirm(org, OrganizerStatus.VERIFIED)}
+                                        disabled={update.isPending || verify.isPending}
                                         size="icon"
                                         className="w-8 h-8 rounded-full bg-zinc-900 text-white hover:bg-primary shadow-lg shadow-zinc-200 transition-all active:scale-90"
                                     >
-                                        {update.isPending ? <Loader2 className="w-3 h-3 animate-spin" /> : <Check className="w-4 h-4" />}
+                                        {(update.isPending || verify.isPending) ? <Loader2 className="w-3 h-3 animate-spin" /> : <Check className="w-4 h-4" />}
                                     </Button>
                                     <Button
-                                        onClick={() => handleAction(org, OrganizerStatus.BANNED)}
-                                        disabled={update.isPending}
+                                        onClick={() => openConfirm(org, OrganizerStatus.BANNED)}
+                                        disabled={update.isPending || verify.isPending}
                                         size="icon"
                                         variant="outline"
                                         className="w-8 h-8 rounded-full border-zinc-200 text-zinc-400 hover:text-rose-600 hover:bg-rose-50 transition-all active:scale-90"
@@ -121,6 +122,30 @@ export default function PendingApprovalsWidget() {
                     </Link>
                 </Button>
             </div>
+
+            <ConfirmModal
+                open={!!confirmState}
+                onOpenChange={(open) => !open && setConfirmState(null)}
+                title={confirmState?.status === OrganizerStatus.VERIFIED ? "Phê duyệt" : "Từ chối"}
+                description={
+                    confirmState
+                        ? (() => {
+                            const actionName = confirmState.status === OrganizerStatus.VERIFIED ? "phê duyệt" : "từ chối";
+                            let msg = `Bạn có chắc chắn muốn ${actionName} organizer "${confirmState.org.name}" không?`;
+                            if (confirmState.status === OrganizerStatus.VERIFIED && !confirmState.org.isVerified) {
+                                msg += "\n\nCẢNH BÁO: Organizer này CHƯA được verify danh tính!";
+                            }
+                            return msg;
+                        })()
+                        : ""
+                }
+                confirmLabel={confirmState?.status === OrganizerStatus.VERIFIED ? "Duyệt" : "Từ chối"}
+                variant={confirmState?.status === OrganizerStatus.VERIFIED ? "success" : "danger"}
+                onConfirm={async () => {
+                    if (confirmState) await handleAction(confirmState.org, confirmState.status);
+                }}
+                isLoading={update.isPending || verify.isPending}
+            />
         </Card>
     );
 }

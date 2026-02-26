@@ -15,6 +15,8 @@ export const eventRequest = {
         http.put<Partial<Event>>(ENDPOINT_CLIENT.EVENT_DETAIL(id), body),
     updatePartial: (id: string, body: EventUpdateBody) =>
         http.patch<Partial<Event>>(ENDPOINT_CLIENT.EVENT_DETAIL(id), body),
+    updateStatus: (id: string, body: { status: number }) =>
+        http.patch<Partial<Event>>(ENDPOINT_CLIENT.EVENT_STATUS(id), body),
     delete: (id: string) =>
         http.delete<null>(ENDPOINT_CLIENT.EVENT_DETAIL(id)),
     restore: (id: string) =>

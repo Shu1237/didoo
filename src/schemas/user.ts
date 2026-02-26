@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { Roles } from "@/utils/enum";
 
 // Shared schemas
 export const locationSchema = z.object({
@@ -24,18 +25,20 @@ export const userCreateSchema = z.object({
 });
 
 export const userUpdateSchema = z.object({
-    FullName: z.string().min(1).optional(),
+    FullName: z.string().optional(),
     Phone: z.string().optional(),
-    AvatarUrl: z.string().url().optional(),
+    AvatarUrl: z.string().url().nullable().optional(),
     Gender: z.number().int().min(0).max(2).optional(),
-    DateOfBirth: z.coerce.date().optional(),
+    DateOfBirth: z.preprocess(
+        (val) => (val === "" || val === null ? undefined : val),
+        z.coerce.date().optional()
+    ),
     Address: z.string().optional(),
     Status: z.number().int().min(1).max(2).optional(),
     RoleName: z.number().int().min(1).max(4).optional(),
     OrganizerId: z.string().uuid().nullable().optional(),
-    IsVerified: z.boolean().optional(),
-    IsDeleted: z.boolean().optional(),
 });
+
 
 
 export type UserCreateBody = z.input<typeof userCreateSchema>;

@@ -3,7 +3,6 @@ import { z } from "zod";
 export const locationSchema = z.object({
     latitude: z.number(),
     longitude: z.number(),
-    address: z.string().optional().default(""),
 });
 
 export const loginSchema = z.object({
@@ -26,7 +25,7 @@ export const registerSchema = z.object({
         .regex(/[A-Z]/, "Mật khẩu phải chứa ít nhất 1 chữ hoa")
         .regex(/[!@#$%^&*(),.?":{}|<>]/, "Mật khẩu phải chứa ít nhất 1 ký tự đặc biệt"),
     confirmPassword: z.string().min(1, "Vui lòng xác nhận mật khẩu"),
-    avatarUrl: z.url().optional(),
+    avatarUrl: z.string(),
     gender: z.number().int().min(0).max(2).default(0),
     dateOfBirth: z.coerce.date({
         message: "Vui lòng chọn ngày sinh",

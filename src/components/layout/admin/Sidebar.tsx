@@ -8,7 +8,6 @@ import { LayoutDashboard, Menu, X, Users, Building2, Calendar, DollarSign, Folde
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { useSessionStore } from "@/stores/sesionStore";
-import { authRequest } from "@/apiRequest/auth";
 
 const navItems = [
   {

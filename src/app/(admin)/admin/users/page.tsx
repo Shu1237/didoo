@@ -27,6 +27,7 @@ export default function AdminUsersPage() {
     pageSize,
     fullName: name || undefined,
     isDeleted: showDeleted,
+    roleId: "5d27bad4-a1c0-40eb-b365-5e8ab2ca1d66",
   });
 
   const filterConfigs: FilterHeaderConfig[] = [

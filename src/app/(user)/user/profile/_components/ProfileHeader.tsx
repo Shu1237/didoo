@@ -3,16 +3,19 @@
 import { useGetMe } from "@/hooks/useUser";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
-import { Mail, Shield, User as UserIcon, Settings, Rocket } from "lucide-react";
+import { Mail, Shield, Settings, Rocket, Clock, CheckCircle2, Ban } from "lucide-react";
 import { useState } from "react";
 import { Dialog, DialogContent, DialogTrigger, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import BecomeOrganizerForm from "./BecomeOrganizerForm";
-import { Roles } from "@/utils/enum";
+import { OrganizerStatus } from "@/utils/enum";
+import { useGetOrganizer } from "@/hooks/useOrganizer";
 
 export default function ProfileSidebar() {
   const { data: userData } = useGetMe();
   const user = userData?.data;
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const { data: organizerData, isLoading: isOrganizerLoading } = useGetOrganizer(user?.organizerId ?? "");
 
   const initials = user?.fullName
     ? user.fullName.substring(0, 2).toUpperCase()
@@ -70,7 +73,8 @@ export default function ProfileSidebar() {
           Quyền riêng tư
         </button>
 
-        {user?.role?.id === Roles.USER && (
+        {/* Chưa có organizerId → cho phép đăng ký */}
+        {user?.role?.name.toLowerCase() === "user" && !user?.organizerId && (
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
               <button className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[13px] font-bold text-orange-500 hover:bg-orange-50 transition-all border border-transparent hover:border-orange-100 mt-2">
@@ -85,6 +89,30 @@ export default function ProfileSidebar() {
             </DialogContent>
           </Dialog>
         )}
+
+        {/* Có organizerId → hiển thị trạng thái */}
+        {user?.organizerId && (() => {
+          const status = organizerData?.data?.status;
+          const isVerified = status === OrganizerStatus.VERIFIED;
+          const isBanned = status === OrganizerStatus.BANNED;
+          return (
+            <div className={`mt-2 px-3.5 py-2.5 rounded-xl border text-[13px] font-bold flex items-center gap-2 ${
+              isVerified ? 'text-emerald-600 bg-emerald-50 border-emerald-100'
+              : isBanned  ? 'text-red-500 bg-red-50 border-red-100'
+              : 'text-amber-500 bg-amber-50 border-amber-100'
+            }`}>
+              {isOrganizerLoading ? (
+                <span className="text-slate-400 font-medium">Đang tải...</span>
+              ) : isVerified ? (
+                <><CheckCircle2 className="w-4 h-4 shrink-0" /> Organizer đã xác minh</>
+              ) : isBanned ? (
+                <><Ban className="w-4 h-4 shrink-0" /> Organizer bị khóa</>
+              ) : (
+                <><Clock className="w-4 h-4 shrink-0" /> Đang chờ xét duyệt</>
+              )}
+            </div>
+          );
+        })()}
       </div>
     </div>
   );

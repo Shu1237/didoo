@@ -14,7 +14,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { handleErrorApi } from "@/lib/errors";
+import { useRouter } from "next/navigation";
 
 interface EventsListProps {
   events: any[];
@@ -25,25 +25,17 @@ interface EventsListProps {
 export default function EventsList({ events, onViewDetail, onEdit }: EventsListProps) {
   const { deleteEvent, restore } = useEvent();
   const [deletingId, setDeletingId] = useState<string | null>(null);
-
+  const router = useRouter();
   const handleDelete = async (event: Event) => {
     if (!window.confirm(`Xóa sự kiện "${event.name}"? Hành động này không thể hoàn tác.`)) return;
     setDeletingId(event.id);
-    try {
-      await deleteEvent.mutateAsync(event.id);
-    } catch (e) {
-      handleErrorApi({ error: e });
-    } finally {
-      setDeletingId(null);
-    }
+     await deleteEvent.mutateAsync(event.id);
+     setDeletingId(null);
   };
 
   const handleRestore = async (event: Event) => {
-    try {
-      await restore.mutateAsync(event.id);
-    } catch (e) {
-      handleErrorApi({ error: e });
-    }
+    await restore.mutateAsync(event.id);
+    setDeletingId(null);
   };
 
   if (!events || events.length === 0) {
@@ -51,7 +43,7 @@ export default function EventsList({ events, onViewDetail, onEdit }: EventsListP
       <Card className="h-full flex flex-col items-center justify-center p-12 border-dashed border-2 border-zinc-100 bg-zinc-50/50 rounded-[40px]">
         <p className="text-zinc-400 font-black uppercase tracking-widest text-xs mb-8 italic">Bạn chưa tổ chức sự kiện nào</p>
         <Button
-          onClick={() => { }} // This should ideally trigger the CREATE modal too
+          onClick={() => { router.push("/organizer/events/create")}} // This should ideally trigger the CREATE modal too
           className="rounded-full px-10 h-14 bg-primary hover:bg-primary/90 text-white font-black uppercase tracking-widest text-[11px]"
         >
           Bắt đầu ngay
