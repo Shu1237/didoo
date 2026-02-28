@@ -171,12 +171,21 @@ async function httpRequest<T>(
         baseHeaders["Authorization"] = `Bearer ${authToken}`;
     }
 
-    baseHeaders["ngrok-skip-browser-warning"] = "true";
+  
 
     // Prepare URL
-    const baseUrl = options?.baseURL === undefined
+    let baseUrl = options?.baseURL === undefined
         ? envconfig.NEXT_PUBLIC_API_URL
         : options.baseURL;
+
+    // Dùng http cho localhost khi SSL self-signed gây lỗi
+    if (
+        isServerRuntime() &&
+        envconfig.NEXT_PUBLIC_API_USE_HTTP_LOCALHOST &&
+        baseUrl?.startsWith("https://localhost")
+    ) {
+        baseUrl = baseUrl.replace("https://", "http://");
+    }
 
     const fullUrl = url.startsWith("/")
         ? `${baseUrl}${url}`
@@ -192,16 +201,24 @@ async function httpRequest<T>(
         : fullUrl;
 
     // Make request
-    const res = await fetch(urlWithParams, {
-        ...options,
-        headers: {
-            ...baseHeaders,
-            ...options?.headers,
-            "ngrok-skip-browser-warning": "true"
-        } as HeadersInit,
-        body,
-        method,
-    });
+    let res: Response;
+    try {
+        res = await fetch(urlWithParams, {
+            ...options,
+            headers: {
+                ...baseHeaders,
+                ...options?.headers,
+            } as HeadersInit,
+            body,
+            method,
+        });
+    } catch (fetchError) {
+        const err = fetchError as Error & { cause?: unknown };
+        console.error("[HTTP] fetch failed:", { url: urlWithParams, cause: err.cause ?? err.message });
+        throw new Error(
+            `Không thể kết nối API (${urlWithParams}). Kiểm tra: 1) Backend đang chạy? 2) NEXT_PUBLIC_API_URL đúng? 3) Nếu dùng https://localhost, thêm NEXT_PUBLIC_API_USE_HTTP_LOCALHOST=true vào .env`
+        );
+    }
 
     const payload: ResponseData<T> = await res.json();
 

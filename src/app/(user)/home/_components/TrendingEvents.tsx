@@ -28,7 +28,7 @@ export const TrendingEvents = ({ organizers }: TrendingEventsProps) => {
             <div className="container mx-auto px-4">
                 <div className="flex flex-col md:flex-row justify-between items-end mb-12">
                     <div className="space-y-4">
-                        <span className="text-primary font-black uppercase tracking-[0.3em] text-sm">Our Network</span>
+                        <span className="text-primary font-black uppercase tracking-[0.3em] text-sm">Mạng lưới của chúng tôi</span>
                         <h2 className="text-4xl md:text-6xl font-black text-slate-900 uppercase leading-[0.9] tracking-tighter max-w-xl">
                             Featured <br />
                             Organizers
@@ -87,12 +87,12 @@ export const TrendingEvents = ({ organizers }: TrendingEventsProps) => {
                                                 {organizer.name}
                                             </h3>
                                             <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest line-clamp-2 min-h-[30px]">
-                                                {organizer.description || "Leading event curator in Vietnam"}
+                                                {organizer.description || "Đơn vị tổ chức sự kiện hàng đầu tại Việt Nam"}
                                             </p>
 
                                             <Link href={`/organizers/${organizer.id}`} className="block w-full">
                                                 <Button variant="outline" className="h-12 w-full rounded-2xl border-slate-200 text-slate-700 hover:bg-primary hover:text-white hover:border-primary uppercase text-[10px] font-black tracking-widest transition-all duration-300">
-                                                    View Profile
+                                                    Xem hồ sơ
                                                 </Button>
                                             </Link>
                                         </div>

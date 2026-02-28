@@ -141,7 +141,7 @@ export default function AdminSidebar() {
           )}
         >
           <Plus className="w-5 h-5 shrink-0" />
-          {isOpen && <span className="text-xs whitespace-nowrap">Add a section</span>}
+          {isOpen && <span className="text-xs whitespace-nowrap">Thêm mục</span>}
         </button> */}
 
         {/* Bottom Profile */}
@@ -153,10 +153,10 @@ export default function AdminSidebar() {
                   <div className="flex items-center gap-3 mb-4">
                     <div className="w-10 h-10 rounded-full border-[3px] border-zinc-100 flex items-center justify-center text-[11px] font-black shrink-0">40%</div>
                     <div className="overflow-hidden">
-                      <p className="text-[13px] font-extrabold whitespace-nowrap">Complete profile</p>
+                      <p className="text-[13px] font-extrabold whitespace-nowrap">Hoàn thiện hồ sơ</p>
                     </div>
                   </div>
-                  <button className="w-full py-3 bg-zinc-100 rounded-2xl text-[12px] font-bold whitespace-nowrap hover:bg-zinc-200 transition-colors">Verify identity</button>
+                  <button className="w-full py-3 bg-zinc-100 rounded-2xl text-[12px] font-bold whitespace-nowrap hover:bg-zinc-200 transition-colors">Xác minh danh tính</button>
                 </div>
               </motion.div>
             )}

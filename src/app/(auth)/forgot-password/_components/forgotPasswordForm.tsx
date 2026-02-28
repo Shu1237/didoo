@@ -39,7 +39,7 @@ export default function ForgotPasswordForm() {
                 clientUri: `${window.location.origin}/confirm`
             });
             setStep(2);
-            toast.success("Reset link sent successfully");
+            toast.success("Đã gửi link đặt lại mật khẩu");
         } catch (error) {
             handleErrorApi({
                 error,
@@ -73,11 +73,11 @@ export default function ForgotPasswordForm() {
                 </div>
 
                 <h1 className="text-3xl font-bold mb-1 text-center">
-                    {step === 1 ? 'Forgot Password?' : 'Check Your Email'}
+                    {step === 1 ? 'Quên mật khẩu?' : 'Kiểm tra Email'}
                 </h1>
                 <p className="text-white/40 text-sm mb-6 text-center max-w-xs mx-auto">
                     {step === 1
-                        ? "Enter your email and we'll send you a reset link."
+                        ? "Nhập email và chúng tôi sẽ gửi link đặt lại mật khẩu."
                         : `We've sent a password reset link to ${email}`}
                 </p>
 
@@ -92,7 +92,7 @@ export default function ForgotPasswordForm() {
                             onSubmit={handleSubmit(onSubmit)}
                         >
                             <div className="space-y-1">
-                                <label className="text-xs font-medium text-white/60 ml-2">Email Address</label>
+                                <label className="text-xs font-medium text-white/60 ml-2">Địa chỉ Email</label>
                                 <input
                                     type="email"
                                     placeholder="johndoe@gmail.com"
@@ -112,7 +112,7 @@ export default function ForgotPasswordForm() {
                                 {forgotPassword.isPending ? (
                                     <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
                                 ) : (
-                                    "Send Reset Link"
+                                    "Gửi link đặt lại"
                                 )}
                             </button>
                         </motion.form>
@@ -155,9 +155,9 @@ export default function ForgotPasswordForm() {
                         <div className="inline-block p-3 bg-white/5 rounded-2xl backdrop-blur-md mb-4 border border-white/10">
                             <Lock className="w-8 h-8 text-[#FF9B8A]" />
                         </div>
-                        <h2 className="text-[52px] font-bold text-white leading-[1.1]">Security is our priority.</h2>
+                        <h2 className="text-[52px] font-bold text-white leading-[1.1]">Bảo mật là ưu tiên của chúng tôi.</h2>
                         <p className="text-xl text-white/40 font-light max-w-sm leading-relaxed">
-                            We use advanced encryption to ensure your data stays safe while you explore the best events around.
+                            Chúng tôi sử dụng mã hóa tiên tiến để đảm bảo dữ liệu của bạn an toàn khi khám phá những sự kiện tuyệt vời.
                         </p>
                     </div>
 

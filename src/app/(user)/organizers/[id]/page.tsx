@@ -113,7 +113,7 @@ export default function OrganizerProfilePage({ params }: { params: Promise<{ id:
                     {organizer.isVerified && (
                       <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">
                         <BadgeCheck className="h-3.5 w-3.5" />
-                        Verified
+                        Đã xác minh
                       </span>
                     )}
                   </div>

@@ -54,6 +54,7 @@ export interface Event {
     bannerUrl?: string;
     ageRestriction: number;
     category?: Category;
+    organizerId?: string;
     organizer?: Organizer;
     locations?: EventLocation[];
     /** BE chưa có - dùng khi có từ ticket/booking */

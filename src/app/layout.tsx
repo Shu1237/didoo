@@ -23,7 +23,7 @@ const plusJakarta = Plus_Jakarta_Sans({
 
 export const metadata: Metadata = {
   title: "DiDoo",
-  description: "DiDoo website",
+  description: "DiDoo - Nền tảng đặt vé sự kiện",
 };
 
 export default async function RootLayout({
@@ -36,7 +36,7 @@ export default async function RootLayout({
   const refreshToken = cookieStore.get("refreshToken");
 
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="vi" suppressHydrationWarning>
       <body
         className={`${inter.variable} ${plusJakarta.variable} antialiased`}
       >

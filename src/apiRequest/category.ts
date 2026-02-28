@@ -6,7 +6,7 @@ import { Category, CategoryGetListQuery } from "@/types/category";
 
 export const categoryRequest = {
     getList: (params: CategoryGetListQuery) =>
-        http.get<PaginatedData<Category>>(ENDPOINT_CLIENT.CATEGORIES, { query: params }),
+        http.get<PaginatedData<Category>>(ENDPOINT_CLIENT.CATEGORIES, { query: params,skipAuth: true }),
     getById: (id: string) =>
         http.get<Category>(ENDPOINT_CLIENT.CATEGORY_DETAIL(id)),
     create: (body: CategoryCreateBody) =>

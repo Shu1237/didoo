@@ -30,7 +30,7 @@ export const useInteraction = () => {
             return res.data;
         },
         onSuccess: () => {
-            toast.success('Interaction created successfully');
+            toast.success('Tương tác đã được ghi nhận');
             queryClient.invalidateQueries({ queryKey: KEY.interactions });
         },
     });

@@ -92,7 +92,7 @@ export default function EventDetailModal({ isOpen, onClose, event, onApprove, on
                                     <p className="text-sm font-bold truncate">{event.organizer?.name}</p>
                                     <div className="flex items-center gap-1 mt-0.5 text-blue-400">
                                         <Shield className="w-3 h-3" />
-                                        <span className="text-[9px] font-bold uppercase">Verified Vendor</span>
+                                        <span className="text-[9px] font-bold uppercase">Đã xác minh</span>
                                     </div>
                                 </div>
                             </div>

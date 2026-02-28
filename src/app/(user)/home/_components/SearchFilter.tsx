@@ -42,7 +42,7 @@ export const SearchFilter = ({ categories = [] }: SearchFilterProps) => {
                             onChange={(e) => setSelectedCategory(e.target.value)}
                             className="flex h-14 w-full pl-12 pr-4 rounded-xl bg-white/5 border border-white/10 text-white hover:bg-white/10 hover:border-white/20 focus:bg-white/10 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/20 transition-all appearance-none cursor-pointer"
                         >
-                            <option value="" className="bg-slate-900 text-gray-400">All Categories</option>
+                            <option value="" className="bg-slate-900 text-gray-400">Tất cả danh mục</option>
                             {categories.map((cat) => (
                                 <option key={cat.id} value={cat.id} className="bg-slate-900 text-white">
                                     {cat.name}
@@ -72,7 +72,7 @@ export const SearchFilter = ({ categories = [] }: SearchFilterProps) => {
                                     <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
                                         <CalendarIcon className="h-5 w-5 text-gray-400 group-hover:text-white transition-colors" />
                                     </div>
-                                    {date ? format(date, "dd/MM/yyyy") : <span>Select Date</span>}
+                                    {date ? format(date, "dd/MM/yyyy") : <span>Chọn ngày</span>}
                                 </Button>
                             </PopoverTrigger>
                             <PopoverContent className="w-auto p-0 rounded-2xl shadow-xl border-border/50" align="start">

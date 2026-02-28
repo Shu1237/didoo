@@ -45,14 +45,14 @@ export default function ConfirmForm({ resetKey }: { resetKey?: string }) {
 
     const onSubmit = async (data: VerifyForgotPasswordInput) => {
         if (!resetKey) {
-            toast.error("Invalid reset key. Please request a new link.");
+            toast.error("Link đặt lại mật khẩu không hợp lệ. Vui lòng yêu cầu link mới.");
             return;
         }
 
         try {
             await verifyForgotPassword.mutateAsync(data);
             setSuccess(true);
-            toast.success("Password reset successfully!");
+            toast.success("Đặt lại mật khẩu thành công!");
 
             // Auto redirect after 3 seconds
             setTimeout(() => {
@@ -77,7 +77,7 @@ export default function ConfirmForm({ resetKey }: { resetKey?: string }) {
                 <div className="h-20 w-20 bg-red-500/10 rounded-full flex items-center justify-center text-red-500 mx-auto mb-6">
                     <Lock className="w-10 h-10" />
                 </div>
-                <h2 className="text-2xl font-bold text-white mb-4">Invalid Reset Link</h2>
+                <h2 className="text-2xl font-bold text-white mb-4">Link đặt lại không hợp lệ</h2>
                 <p className="text-white/40 mb-8">This link is missing a security key or has already been used. Please request a new one.</p>
                 <Link href="/forgot-password" className="block w-full h-14 bg-[#FF9B8A] text-white font-bold rounded-full py-4 transition-all flex items-center justify-center shadow-lg shadow-[#FF9B8A]/20">
                     Request New Link
@@ -105,14 +105,14 @@ export default function ConfirmForm({ resetKey }: { resetKey?: string }) {
                             <div className="inline-block p-3 bg-[#FF9B8A]/10 rounded-xl text-[#FF9B8A] mb-4">
                                 <ShieldCheck className="w-6 h-6" />
                             </div>
-                            <h1 className="text-3xl font-bold mb-1 leading-tight">Reset Password</h1>
+                            <h1 className="text-3xl font-bold mb-1 leading-tight">Đặt lại mật khẩu</h1>
                             <p className="text-white/40 text-base mb-6">Enter your new secure password below.</p>
 
                             <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
                                 <input type="hidden" {...register("key")} />
 
                                 <div className="space-y-1">
-                                    <label className="text-xs font-medium text-white/60 ml-2">New Password</label>
+                                    <label className="text-xs font-medium text-white/60 ml-2">Mật khẩu mới</label>
                                     <div className="relative">
                                         <input
                                             type={showPassword ? "text" : "password"}
@@ -141,7 +141,7 @@ export default function ConfirmForm({ resetKey }: { resetKey?: string }) {
                                             exit={{ opacity: 0, height: 0 }}
                                             className="space-y-1 overflow-hidden"
                                         >
-                                            <label className="text-xs font-medium text-white/60 ml-2">Confirm New Password</label>
+                                            <label className="text-xs font-medium text-white/60 ml-2">Xác nhận mật khẩu mới</label>
                                             <div className="relative">
                                                 <input
                                                     type={showConfirmPassword ? "text" : "password"}
@@ -172,7 +172,7 @@ export default function ConfirmForm({ resetKey }: { resetKey?: string }) {
                                     {verifyForgotPassword.isPending ? (
                                         <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
                                     ) : (
-                                        "Reset Password"
+                                        "Đặt lại mật khẩu"
                                     )}
                                 </button>
                             </form>

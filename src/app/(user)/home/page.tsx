@@ -25,7 +25,7 @@ export default function Home() {
   });
 
   if (isEventsLoading || isCategoriesLoading || isOrganizersLoading) return <Loading />;
-  if (isEventsError || !eventsResponse) return <div className="min-h-screen flex items-center justify-center text-slate-500">Failed to load events.</div>;
+  if (isEventsError || !eventsResponse) return <div className="min-h-screen flex items-center justify-center text-slate-500">Không tải được sự kiện.</div>;
 
   const events = eventsResponse.data.items;
   const categories = categoriesResponse?.data.items || [];

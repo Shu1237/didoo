@@ -87,8 +87,8 @@ export default function LoginForm() {
         <Link href="/home" className="inline-block mb-4 hover:scale-105 transition-transform">
           <Image src="/DiDoo.png" alt="DiDoo logo" width={50} height={50} className="rounded-xl shadow-lg" priority />
         </Link>
-        <h1 className="text-3xl font-bold mb-1">Welcome back</h1>
-        <p className="text-white/40 text-base mb-4">Please Enter your Account details</p>
+        <h1 className="text-3xl font-bold mb-1">Chào mừng trở lại</h1>
+        <p className="text-white/40 text-base mb-4">Vui lòng nhập thông tin tài khoản</p>
 
         {error && (
           <div className="mb-4 p-3 bg-red-500/20 border border-red-500/50 text-red-200 text-sm rounded-xl text-center">
@@ -108,7 +108,7 @@ export default function LoginForm() {
           </div>
 
           <div className="space-y-1">
-            <label className="text-xs font-medium text-white/60 ml-2">Password</label>
+            <label className="text-xs font-medium text-white/60 ml-2">Mật khẩu</label>
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
@@ -126,14 +126,14 @@ export default function LoginForm() {
             </div>
           </div>
           <div className="text-right">
-            <Link href="/forgot-password" className="text-xs text-white/40 hover:text-white transition-colors">Forgot password?</Link>
+            <Link href="/forgot-password" className="text-xs text-white/40 hover:text-white transition-colors">Quên mật khẩu?</Link>
           </div>
           <button
             type="submit"
             disabled={login.isPending}
             className="w-full h-12 bg-[#FF9B8A] text-white font-bold rounded-full py-2 shadow-lg shadow-[#FF9B8A]/20 hover:bg-[#FF8A75] transition-all disabled:opacity-70 flex items-center justify-center"
           >
-            {login.isPending ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> : "Sign in"}
+            {login.isPending ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> : "Đăng nhập"}
           </button>
         </form>
 
@@ -172,9 +172,9 @@ export default function LoginForm() {
         </div>
 
         <p className="text-center text-xs text-white/40 mt-4">
-          Don&apos;t have an account?{' '}
+          Chưa có tài khoản?{' '}
           <Link href="/register" className="text-[#FF9B8A] font-bold hover:underline">
-            Sign up
+            Đăng ký
           </Link>
         </p>
       </div>
@@ -186,9 +186,9 @@ export default function LoginForm() {
           style={maskStyle}
         >
           <div className="relative z-10 space-y-10">
-            <h2 className="text-[52px] font-bold text-white leading-[1.1]">Join our explorers</h2>
+            <h2 className="text-[52px] font-bold text-white leading-[1.1]">Tham gia cùng chúng tôi</h2>
             <p className="text-xl text-white/60 font-light max-w-sm leading-relaxed">
-              Discover and book your favorite events with ease. Start your journey with DiDoo today.
+              Khám phá và đặt vé sự kiện yêu thích dễ dàng. Bắt đầu hành trình với DiDoo ngay hôm nay.
             </p>
           </div>
         </div>

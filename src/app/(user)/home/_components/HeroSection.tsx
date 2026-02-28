@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import CustomHeroCarousel from './CustomHeroCarousel';
 import Image from 'next/image';
+import Link from 'next/link';
 
 export default function HeroSection({ events: initialEvents }: { events: Event[] }) {
     // Quản lý danh sách sự kiện, phần tử đầu tiên (index 0) luôn là ảnh nền active
@@ -91,12 +92,16 @@ export default function HeroSection({ events: initialEvents }: { events: Event[]
                                     {activeEvent.name}
                                 </h1>
                                 <div className="flex gap-4">
-                                    <Button className="h-14 px-10 rounded-full bg-white text-black font-bold uppercase hover:bg-gray-200 transition-colors">
-                                        Get Tickets
+                                   <Link href={`/events/${activeEvent.id}/booking`}>
+                                   <Button className="h-14 px-10 rounded-full bg-white text-black font-bold uppercase hover:bg-gray-200 transition-colors">
+                                        Đặt vé
                                     </Button>
-                                    <Button variant="outline" className="h-14 px-8 rounded-full !bg-white/20 !text-white !border-2 !border-white/70 backdrop-blur-md uppercase font-bold hover:!bg-white/30 hover:!border-white transition-colors">
-                                        More Info
+                                   </Link>
+                                   <Link href={`/events/${activeEvent.id}`}>
+                                   <Button variant="outline" className="h-14 px-8 rounded-full !bg-white/20 !text-white !border-2 !border-white/70 backdrop-blur-md uppercase font-bold hover:!bg-white/30 hover:!border-white transition-colors">
+                                        Xem thêm
                                     </Button>
+                                   </Link>
                                 </div>
                             </motion.div>
                         </AnimatePresence>

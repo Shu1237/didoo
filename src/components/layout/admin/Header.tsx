@@ -76,13 +76,13 @@ export default function AdminHeader() {
             <DropdownMenuItem asChild className="rounded-lg cursor-pointer focus:bg-zinc-50">
               <Link href="/admin/profile" className="flex items-center gap-2">
                 <User className="w-4 h-4 text-zinc-500" />
-                <span>Profile</span>
+                <span>Hồ sơ</span>
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild className="rounded-lg cursor-pointer focus:bg-zinc-50">
               <Link href="/admin/settings" className="flex items-center gap-2">
                 <Settings className="w-4 h-4 text-zinc-500" />
-                <span>Settings</span>
+                <span>Cài đặt</span>
               </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator className="bg-zinc-100 my-1" />
@@ -91,7 +91,7 @@ export default function AdminHeader() {
               className="rounded-lg cursor-pointer text-rose-600 focus:text-rose-700 focus:bg-rose-50 flex items-center gap-2"
             >
               <LogOut className="w-4 h-4" />
-              <span>Log out</span>
+              <span>Đăng xuất</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

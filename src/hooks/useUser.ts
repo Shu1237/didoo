@@ -42,7 +42,7 @@ export const useUser = () => {
             return res.data;
         },
         onSuccess: () => {
-            toast.success('User created successfully');
+            toast.success('Tạo người dùng thành công');
             queryClient.invalidateQueries({ queryKey: KEY.users });
         },
     });
@@ -53,7 +53,7 @@ export const useUser = () => {
             return res.data;
         },
         onSuccess: () => {
-            toast.success('User updated successfully');
+            toast.success('Cập nhật người dùng thành công');
             queryClient.invalidateQueries({ queryKey: KEY.users });
         },
     });

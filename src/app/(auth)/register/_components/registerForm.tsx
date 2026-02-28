@@ -120,12 +120,12 @@ export default function RegisterForm() {
           <Image src="/DiDoo.png" alt="DiDoo logo" width={50} height={50} className="rounded-xl shadow-lg" priority />
         </Link>
         <h1 className="text-3xl font-bold mb-1">
-          {step === 1 && 'Create Account'}
-          {step === 2 && 'Verify Account'}
+          {step === 1 && 'Tạo tài khoản'}
+          {step === 2 && 'Xác minh tài khoản'}
         </h1>
         <p className="text-white/40 text-base mb-4">
-          {step === 1 && 'Join us and start exploring events'}
-          {step === 2 && `An OTP has been sent to ${watch('email')}`}
+          {step === 1 && 'Tham gia và khám phá sự kiện'}
+          {step === 2 && `Mã OTP đã được gửi đến ${watch('email')}`}
         </p>
 
         {error && (
@@ -148,7 +148,7 @@ export default function RegisterForm() {
               <>
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1">
-                    <label className="text-xs font-medium text-white/60 ml-2">Full Name</label>
+                    <label className="text-xs font-medium text-white/60 ml-2">Họ và tên</label>
                     <input
                       type="text"
                       placeholder="John Doe"
@@ -176,20 +176,20 @@ export default function RegisterForm() {
 
                 <div className="grid grid-cols-2 gap-3 pb-1">
                   <div className="space-y-1">
-                    <label className="text-xs font-medium text-white/60 ml-2">Gender</label>
+                    <label className="text-xs font-medium text-white/60 ml-2">Giới tính</label>
                     <select
                       {...registerField("gender", { valueAsNumber: true })}
                       className="w-full bg-black/50 border border-transparent rounded-full px-4 py-3 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#FF9B8A]/20 transition-all text-white appearance-none cursor-pointer"
                       style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='white'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='Length19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center', backgroundSize: '1rem' }}
                     >
-                      <option value={0} className="bg-[#1A1A1A]">Male</option>
-                      <option value={1} className="bg-[#1A1A1A]">Female</option>
-                      <option value={2} className="bg-[#1A1A1A]">Other</option>
+                      <option value={0} className="bg-[#1A1A1A]">Nam</option>
+                      <option value={1} className="bg-[#1A1A1A]">Nữ</option>
+                      <option value={2} className="bg-[#1A1A1A]">Khác</option>
                     </select>
                   </div>
 
                   <div className="space-y-1">
-                    <label className="text-xs font-medium text-white/60 ml-2">Birth Date</label>
+                    <label className="text-xs font-medium text-white/60 ml-2">Ngày sinh</label>
                     <input
                       type="date"
                       {...registerField("dateOfBirth")}
@@ -202,7 +202,7 @@ export default function RegisterForm() {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-medium text-white/60 ml-2">Password</label>
+                  <label className="text-xs font-medium text-white/60 ml-2">Mật khẩu</label>
                   <div className="relative">
                     <input
                       type={showPassword ? "text" : "password"}
@@ -225,20 +225,20 @@ export default function RegisterForm() {
                   {currentPassword && (
                     <div className="mt-1 ml-2 space-y-0.5">
                       <span className={`text-[10px] flex items-center gap-1 ${currentPassword.length >= 8 ? 'text-green-400' : 'text-white/40'}`}>
-                        <span className={`w-1 h-1 rounded-full inline-block flex-shrink-0 ${currentPassword.length >= 8 ? 'bg-green-400' : 'bg-white/40'}`} /> Min 8 characters
+                        <span className={`w-1 h-1 rounded-full inline-block flex-shrink-0 ${currentPassword.length >= 8 ? 'bg-green-400' : 'bg-white/40'}`} /> Tối thiểu 8 ký tự
                       </span>
                       <span className={`text-[10px] flex items-center gap-1 ${/[A-Z]/.test(currentPassword) ? 'text-green-400' : 'text-white/40'}`}>
-                        <span className={`w-1 h-1 rounded-full inline-block flex-shrink-0 ${/[A-Z]/.test(currentPassword) ? 'bg-green-400' : 'bg-white/40'}`} /> One uppercase letter
+                        <span className={`w-1 h-1 rounded-full inline-block flex-shrink-0 ${/[A-Z]/.test(currentPassword) ? 'bg-green-400' : 'bg-white/40'}`} /> Một chữ in hoa
                       </span>
                       <span className={`text-[10px] flex items-center gap-1 ${/[!@#$%^&*(),.?":{}|<>]/.test(currentPassword) ? 'text-green-400' : 'text-white/40'}`}>
-                        <span className={`w-1 h-1 rounded-full inline-block flex-shrink-0 ${/[!@#$%^&*(),.?":{}|<>]/.test(currentPassword) ? 'bg-green-400' : 'bg-white/40'}`} /> One special character
+                        <span className={`w-1 h-1 rounded-full inline-block flex-shrink-0 ${/[!@#$%^&*(),.?":{}|<>]/.test(currentPassword) ? 'bg-green-400' : 'bg-white/40'}`} /> Một ký tự đặc biệt
                       </span>
                     </div>
                   )}
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-medium text-white/60 ml-2">Confirm Password</label>
+                  <label className="text-xs font-medium text-white/60 ml-2">Xác nhận mật khẩu</label>
                   <div className="relative">
                     <input
                       type={showConfirmPassword ? "text" : "password"}
@@ -354,7 +354,7 @@ export default function RegisterForm() {
               }}
               onError={() => {
                 setError("Đăng nhập Google thất bại.");
-                toast.error("Google Login failed");
+                toast.error("Đăng nhập Google thất bại");
               }}
               type="icon"
               shape="circle"
@@ -367,7 +367,7 @@ export default function RegisterForm() {
         <p className="text-center text-xs text-white/40 mt-4">
           Already have an account?{' '}
           <Link href="/login" className="text-[#FF9B8A] font-bold hover:underline">
-            Sign in
+            Đăng nhập
           </Link>
         </p>
       </div>
@@ -379,7 +379,7 @@ export default function RegisterForm() {
           style={maskStyle}
         >
           <div className="relative z-10 space-y-10">
-            <h2 className="text-[52px] font-bold text-white leading-[1.1]">Join our explorers</h2>
+            <h2 className="text-[52px] font-bold text-white leading-[1.1]">Tham gia cùng chúng tôi</h2>
             <p className="text-xl text-white/60 font-light max-w-sm leading-relaxed">Discover and book your favorite events with ease. Start your journey with DiDoo today.</p>
 
           </div>
@@ -401,8 +401,8 @@ export default function RegisterForm() {
             style={maskStyle}
           >
             <div className="relative z-10">
-              <h4 className="text-black font-bold text-[24px] mb-3 leading-tight pr-14">Find your perfect event and book now</h4>
-              <p className="text-gray-500 text-base mb-8 leading-relaxed">Be among thousands of explorers discovering amazing events near you.</p>
+              <h4 className="text-black font-bold text-[24px] mb-3 leading-tight pr-14">Tìm sự kiện phù hợp và đặt vé ngay</h4>
+              <p className="text-gray-500 text-base mb-8 leading-relaxed">Tham gia hàng ngàn người khám phá sự kiện tuyệt vời quanh bạn.</p>
               <div className="flex items-center -space-x-3">
                 {[1, 2, 3, 4].map(i => (
                   <div key={i} className="w-11 h-11 rounded-full border-[4px] border-white bg-gray-200 overflow-hidden">

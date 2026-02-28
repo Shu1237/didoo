@@ -30,7 +30,7 @@ export const useEvent = () => {
             return res.data;
         },
         onSuccess: () => {
-            toast.success('Event created successfully');
+            toast.success('Tạo sự kiện thành công');
             queryClient.invalidateQueries({ queryKey: KEY.events });
         },
     });
@@ -41,7 +41,7 @@ export const useEvent = () => {
             return res.data;
         },
         onSuccess: () => {
-            toast.success('Event updated successfully');
+            toast.success('Cập nhật sự kiện thành công');
             queryClient.invalidateQueries({ queryKey: KEY.events });
         },
     });

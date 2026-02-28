@@ -117,7 +117,7 @@ export default function ProfileForm() {
         <CardContent className="p-6 md:p-7">
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <Field label="Email Address">
+              <Field label="Địa chỉ Email">
                 <Input
                   value={user?.email || ""}
                   disabled
@@ -133,7 +133,7 @@ export default function ProfileForm() {
                 />
               </Field>
 
-              <Field label="Full Name" error={form.formState.errors.FullName?.message}>
+              <Field label="Họ và tên" error={form.formState.errors.FullName?.message}>
                 <Input
                   {...form.register("FullName")}
                   placeholder="Nhap ho va ten"
@@ -141,7 +141,7 @@ export default function ProfileForm() {
                 />
               </Field>
 
-              <Field label="Phone Number" error={form.formState.errors.Phone?.message}>
+              <Field label="Số điện thoại" error={form.formState.errors.Phone?.message}>
                 <div className="relative">
                   <Phone className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                   <Input
@@ -152,18 +152,18 @@ export default function ProfileForm() {
                 </div>
               </Field>
 
-              <Field label="Gender" error={form.formState.errors.Gender?.message as string | undefined}>
+              <Field label="Giới tính" error={form.formState.errors.Gender?.message as string | undefined}>
                 <select
                   {...form.register("Gender", { valueAsNumber: true })}
                   className="h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm font-medium text-slate-700 outline-none transition focus:border-sky-300 focus:ring-2 focus:ring-sky-100"
                 >
-                  <option value={Gender.MALE}>Male</option>
-                  <option value={Gender.FEMALE}>Female</option>
-                  <option value={Gender.OTHER}>Other</option>
+                  <option value={Gender.MALE}>Nam</option>
+                  <option value={Gender.FEMALE}>Nữ</option>
+                  <option value={Gender.OTHER}>Khác</option>
                 </select>
               </Field>
 
-              <Field label="Date of Birth" error={form.formState.errors.DateOfBirth?.message as string | undefined}>
+              <Field label="Ngày sinh" error={form.formState.errors.DateOfBirth?.message as string | undefined}>
                 <div className="relative">
                   <CalendarDays className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                   <input
@@ -189,7 +189,7 @@ export default function ProfileForm() {
                 ) : (
                   <>
                     <Save className="h-4 w-4" />
-                    Save Changes
+                    Lưu thay đổi
                   </>
                 )}
               </Button>
@@ -199,7 +199,7 @@ export default function ProfileForm() {
       </Card>
 
       <Card className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-7">
-        <h3 className="text-2xl font-bold tracking-tight text-slate-900">Security Settings</h3>
+        <h3 className="text-2xl font-bold tracking-tight text-slate-900">Cài đặt bảo mật</h3>
         <p className="mt-1 text-sm text-slate-600">
           Doi mat khau va cap nhat email de bao ve tai khoan tot hon.
         </p>
@@ -207,11 +207,11 @@ export default function ProfileForm() {
         <div className="mt-5 space-y-3">
           <ActionRow
             icon={KeyRound}
-            title="Password"
+            title="Mật khẩu"
             description="Cap nhat mat khau dang nhap cua ban."
-            triggerLabel="Change"
+            triggerLabel="Đổi"
           >
-            <DialogTitle className="text-2xl font-bold text-slate-900">Update Password</DialogTitle>
+            <DialogTitle className="text-2xl font-bold text-slate-900">Cập nhật mật khẩu</DialogTitle>
             <DialogDescription className="text-sm text-slate-600">
               Dung mat khau manh hon de tang bao mat.
             </DialogDescription>
@@ -222,11 +222,11 @@ export default function ProfileForm() {
 
           <ActionRow
             icon={Mail}
-            title="Email Address"
+            title="Địa chỉ Email"
             description={user?.email || "Cap nhat email tai khoan cua ban."}
-            triggerLabel="Change"
+            triggerLabel="Đổi"
           >
-            <DialogTitle className="text-2xl font-bold text-slate-900">Update Email</DialogTitle>
+            <DialogTitle className="text-2xl font-bold text-slate-900">Cập nhật Email</DialogTitle>
             <DialogDescription className="text-sm text-slate-600">
               He thong se gui OTP de xac nhan email moi.
             </DialogDescription>

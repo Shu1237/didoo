@@ -12,7 +12,7 @@ export default function SalesChart() {
           <div className="w-9 h-9 rounded-xl bg-primary/5 flex items-center justify-center text-primary border border-primary/10">
             <BarChart3 className="w-4 h-4" />
           </div>
-          <h3 className="text-sm font-black tracking-tighter text-zinc-900 uppercase italic">Revenue Insight</h3>
+          <h3 className="text-sm font-black tracking-tighter text-zinc-900 uppercase italic">Thống kê doanh thu</h3>
         </div>
       </div>
 

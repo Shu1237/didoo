@@ -30,7 +30,7 @@ export const useOrganizer = () => {
             return res.data;
         },
         onSuccess: () => {
-            toast.success('Organizer created successfully');
+            toast.success('Tạo organizer thành công');
             queryClient.invalidateQueries({ queryKey: KEY.organizers });
         },
     });

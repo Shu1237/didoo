@@ -30,7 +30,7 @@ export const useFavorite = () => {
             return res.data;
         },
         onSuccess: () => {
-            toast.success('Favorite created successfully');
+            toast.success('Đã thêm vào yêu thích');
             queryClient.invalidateQueries({ queryKey: KEY.favorites });
         },
     });

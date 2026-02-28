@@ -130,7 +130,7 @@ export default function CategoryModal({ isOpen, onClose, category, onSuccess }: 
             />
           </div>
           <div>
-            <Label>Icon URL</Label>
+            <Label>URL biểu tượng</Label>
             <Input
               {...form.register("IconUrl")}
               placeholder="https://..."

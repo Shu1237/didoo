@@ -41,7 +41,7 @@ export default function OrganizerDashboardPage() {
     <div className="h-full flex flex-col space-y-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-zinc-100 pb-6 shrink-0">
         <div>
-          <h1 className="text-3xl font-black tracking-tighter text-zinc-900 uppercase">Dashboard</h1>
+          <h1 className="text-3xl font-black tracking-tighter text-zinc-900 uppercase">Bảng điều khiển</h1>
           <p className="text-zinc-500 text-sm font-semibold">
             Track your events performance and revenue.
           </p>
@@ -52,7 +52,7 @@ export default function OrganizerDashboardPage() {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
             </span>
-            <span className="text-[10px] font-black uppercase tracking-widest text-zinc-600">Realtime</span>
+            <span className="text-[10px] font-black uppercase tracking-widest text-zinc-600">Thời gian thực</span>
           </div>
         </div>
       </div>

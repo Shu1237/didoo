@@ -21,7 +21,7 @@ export const useRole = () => {
             return res.data;
         },
         onSuccess: () => {
-            toast.success('Role created successfully');
+            toast.success('Tạo vai trò thành công');
             queryClient.invalidateQueries({ queryKey: KEY.roles });
         },
     });

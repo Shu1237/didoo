@@ -6,7 +6,10 @@ import { TicketType, TicketTypeGetListQuery } from "@/types/ticketType";
 
 export const ticketTypeRequest = {
     getList: (params: TicketTypeGetListQuery) =>
-        http.get<PaginatedData<TicketType>>(ENDPOINT_CLIENT.TICKET_TYPES, { query: params }),
+        http.get<PaginatedData<TicketType>>(ENDPOINT_CLIENT.TICKET_TYPES, {
+            query: params,
+            skipAuth: true,
+        }),
     getById: (id: string) =>
         http.get<TicketType>(ENDPOINT_CLIENT.TICKET_TYPE_DETAIL(id)),
     create: (body: TicketTypeCreateBody) =>

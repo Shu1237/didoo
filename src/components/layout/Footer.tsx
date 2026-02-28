@@ -27,13 +27,13 @@ export default function Footer() {
                             <span className="font-black text-2xl tracking-tighter">DiDoo</span>
                         </Link>
                         <p className="text-muted-foreground leading-relaxed">
-                            Discover and experience the best events in your city. Your gateway to unforgettable moments.
+                            Khám phá và trải nghiệm những sự kiện tuyệt vời nhất tại thành phố của bạn. Cánh cửa đến những khoảnh khắc đáng nhớ.
                         </p>
                         <div className="space-y-3">
-                            <h4 className="font-bold text-sm">Subscribe to newsletter</h4>
+                            <h4 className="font-bold text-sm">Đăng ký nhận tin</h4>
                             <div className="flex gap-2">
                                 <Input
-                                    placeholder="Enter your email"
+                                    placeholder="Nhập email của bạn"
                                     className="bg-secondary/50 border-white/10 focus-visible:ring-primary/20 rounded-full"
                                 />
                                 <Button size="icon" className="rounded-full shrink-0">
@@ -47,29 +47,29 @@ export default function Footer() {
                     <div className="lg:col-span-3 grid grid-cols-2 md:grid-cols-3 gap-8">
                         {/* Column 1 */}
                         <div className="space-y-4">
-                            <h3 className="font-bold text-lg">About Us</h3>
+                            <h3 className="font-bold text-lg">Về chúng tôi</h3>
                             <ul className="space-y-3 text-muted-foreground text-sm">
-                                <li><Link href="#" className="hover:text-primary transition-colors">Our Story</Link></li>
-                                <li><Link href="#" className="hover:text-primary transition-colors">Careers</Link></li>
-                                <li><Link href="#" className="hover:text-primary transition-colors">Press</Link></li>
-                                <li><Link href="#" className="hover:text-primary transition-colors">Contact</Link></li>
+                                <li><Link href="#" className="hover:text-primary transition-colors">Câu chuyện</Link></li>
+                                <li><Link href="#" className="hover:text-primary transition-colors">Tuyển dụng</Link></li>
+                                <li><Link href="#" className="hover:text-primary transition-colors">Báo chí</Link></li>
+                                <li><Link href="#" className="hover:text-primary transition-colors">Liên hệ</Link></li>
                             </ul>
                         </div>
 
                         {/* Column 2 */}
                         <div className="space-y-4">
-                            <h3 className="font-bold text-lg">Support</h3>
+                            <h3 className="font-bold text-lg">Hỗ trợ</h3>
                             <ul className="space-y-3 text-muted-foreground text-sm">
-                                <li><Link href="#" className="hover:text-primary transition-colors">Help Center</Link></li>
-                                <li><Link href="#" className="hover:text-primary transition-colors">Terms of Service</Link></li>
-                                <li><Link href="#" className="hover:text-primary transition-colors">Privacy Policy</Link></li>
-                                <li><Link href="#" className="hover:text-primary transition-colors">Cookie Policy</Link></li>
+                                <li><Link href="#" className="hover:text-primary transition-colors">Trung tâm trợ giúp</Link></li>
+                                <li><Link href="#" className="hover:text-primary transition-colors">Điều khoản dịch vụ</Link></li>
+                                <li><Link href="#" className="hover:text-primary transition-colors">Chính sách bảo mật</Link></li>
+                                <li><Link href="#" className="hover:text-primary transition-colors">Chính sách cookie</Link></li>
                             </ul>
                         </div>
 
                         {/* Column 3 - Contact Info */}
                         <div className="space-y-4">
-                            <h3 className="font-bold text-lg">Contact</h3>
+                            <h3 className="font-bold text-lg">Liên hệ</h3>
                             <ul className="space-y-4 text-muted-foreground text-sm">
                                 <li className="flex items-start gap-3">
                                     <MapPin className="w-5 h-5 text-primary shrink-0" />

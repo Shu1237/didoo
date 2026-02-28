@@ -29,7 +29,7 @@ export function ConfirmModal({
   title,
   description,
   confirmLabel = "Xác nhận",
-  cancelLabel = "Hủy",
+  cancelLabel = "Hủy bỏ",
   onConfirm,
   isLoading = false,
   variant = "default",

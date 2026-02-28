@@ -75,12 +75,12 @@ export default function ChangeEmailForm() {
         <input type="hidden" {...changeForm.register("userId")} />
 
         <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Current email</p>
-          <p className="mt-1 text-sm font-semibold text-slate-900">{currentEmail || "Not available"}</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Email hiện tại</p>
+          <p className="mt-1 text-sm font-semibold text-slate-900">{currentEmail || "Chưa cập nhật"}</p>
         </div>
 
         <div className="space-y-1.5">
-          <label className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">New email</label>
+          <label className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Email mới</label>
           <div className="relative">
             <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
             <Input
@@ -178,7 +178,7 @@ export default function ChangeEmailForm() {
               Verifying...
             </>
           ) : (
-            "Verify Email"
+            "Xác minh Email"
           )}
         </Button>
       </div>

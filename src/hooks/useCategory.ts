@@ -11,8 +11,7 @@ import { useSessionStore } from "@/stores/sesionStore";
 export const useGetCategories = (params?: CategoryGetListQuery) => {
     return useQuery({
         queryKey: QUERY_KEY.categories.list(params),
-        queryFn: () => categoryRequest.getList(params || {}),// chỉ khi có params
-        enabled: !!params,
+        queryFn: () => categoryRequest.getList(params || {}),
     });
 };
 
@@ -33,7 +32,7 @@ export const useCategory = () => {
             return res.data;
         },
         onSuccess: () => {
-            toast.success('Category created successfully');
+            toast.success('Tạo danh mục thành công');
             queryClient.invalidateQueries({ queryKey: KEY.categories });
         },
     });
@@ -44,7 +43,7 @@ export const useCategory = () => {
             return res.data;
         },
         onSuccess: () => {
-            toast.success('Category updated successfully');
+            toast.success('Cập nhật danh mục thành công');
             queryClient.invalidateQueries({ queryKey: KEY.categories });
         },
     });

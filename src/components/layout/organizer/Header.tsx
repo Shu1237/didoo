@@ -76,7 +76,7 @@ export default function OrganizerHeader() {
             <DropdownMenuItem asChild className="rounded-lg cursor-pointer focus:bg-zinc-50">
               <Link href="/organizer/profile" className="flex items-center gap-2">
                 <User className="w-4 h-4 text-zinc-500" />
-                <span>Profile</span>
+                <span>Hồ sơ</span>
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild className="rounded-lg cursor-pointer focus:bg-zinc-50">
@@ -91,7 +91,7 @@ export default function OrganizerHeader() {
               className="rounded-lg cursor-pointer text-rose-600 focus:text-rose-700 focus:bg-rose-50 flex items-center gap-2"
             >
               <LogOut className="w-4 h-4" />
-              <span>Log out</span>
+              <span>Đăng xuất</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

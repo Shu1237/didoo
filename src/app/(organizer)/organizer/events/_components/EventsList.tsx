@@ -88,8 +88,8 @@ export default function EventsList({
                   }`}
               >
                 {event.status === EventStatus.PUBLISHED
-                  ? "Published"
-                  : "Draft"}
+                  ? "Đã xuất bản"
+                  : "Bản nháp"}
               </Badge>
             </div>
 
@@ -100,7 +100,7 @@ export default function EventsList({
             <div className="flex items-center gap-2 text-xs text-zinc-500">
               <MapPin className="w-3 h-3" />
               <span className="truncate">
-                {event.locations?.[0]?.name || "Online"}
+                {event.locations?.[0]?.name || "Trực tuyến"}
               </span>
             </div>
 

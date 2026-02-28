@@ -26,6 +26,7 @@ export default function OrganizerEventsPage() {
     pageSize,
     isDeleted: showDeleted,
     hasCategory: true,
+    hasOrganizer: true,
   });
 
   const [modalState, setModalState] = useState<{

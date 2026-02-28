@@ -24,7 +24,7 @@ export default function RecentEvents({ upcomingEvents }: RecentEventsProps) {
           <div className="w-9 h-9 rounded-xl bg-zinc-50 flex items-center justify-center text-primary border border-zinc-100">
             <Calendar className="w-4 h-4" />
           </div>
-          <h3 className="text-sm font-black tracking-tighter text-zinc-900 uppercase italic">Events</h3>
+          <h3 className="text-sm font-black tracking-tighter text-zinc-900 uppercase italic">Sự kiện</h3>
         </div>
         <Link href="/organizer/events/create" className="text-[10px] font-black uppercase tracking-widest text-primary hover:underline flex items-center gap-1.5">
           All <ArrowUpRight className="w-3 h-3" />
@@ -60,7 +60,7 @@ export default function RecentEvents({ upcomingEvents }: RecentEventsProps) {
 
               <div className="space-y-3">
                 <div className="flex justify-between text-[9px] font-black uppercase tracking-widest">
-                  <span className="text-zinc-400">Sold</span>
+                  <span className="text-zinc-400">Đã bán</span>
                   <span className="text-zinc-800">{event.sold} / {event.total}</span>
                 </div>
                 <div className="h-1.5 w-full bg-zinc-100 rounded-full overflow-hidden border border-zinc-200/30">

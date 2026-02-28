@@ -30,7 +30,7 @@ export const useTicket = () => {
             return res.data;
         },
         onSuccess: () => {
-            toast.success('Ticket created successfully');
+            toast.success('Tạo vé thành công');
             queryClient.invalidateQueries({ queryKey: KEY.tickets });
         },
     });
@@ -41,7 +41,7 @@ export const useTicket = () => {
             return res.data;
         },
         onSuccess: () => {
-            toast.success('Ticket updated successfully');
+            toast.success('Cập nhật vé thành công');
             queryClient.invalidateQueries({ queryKey: KEY.tickets });
         },
     });

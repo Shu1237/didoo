@@ -129,7 +129,7 @@ export default function BecomeOrganizerForm({ onSuccess }: { onSuccess?: () => v
                     ) : (
                       <ImageIcon className="h-6 w-6" />
                     )}
-                    <span className="text-xs font-medium">Upload banner</span>
+                    <span className="text-xs font-medium">Tải banner lên</span>
                   </div>
                 )}
               </button>
@@ -147,7 +147,7 @@ export default function BecomeOrganizerForm({ onSuccess }: { onSuccess?: () => v
           <div className="space-y-4 lg:col-span-8">
             <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
               <Field label="Organization name *" error={form.formState.errors.Name?.message}>
-                <Input {...form.register("Name")} placeholder="Enter organization name" className="h-11 rounded-xl" />
+                <Input {...form.register("Name")} placeholder="Nhập tên tổ chức" className="h-11 rounded-xl" />
               </Field>
 
               <Field label="Slug *" error={form.formState.errors.Slug?.message}>
@@ -155,7 +155,7 @@ export default function BecomeOrganizerForm({ onSuccess }: { onSuccess?: () => v
               </Field>
 
               <Field label="Email *" error={form.formState.errors.Email?.message}>
-                <Input {...form.register("Email")} placeholder="contact@example.com" className="h-11 rounded-xl" />
+                <Input {...form.register("Email")} placeholder="lienhe@vidu.com" className="h-11 rounded-xl" />
               </Field>
 
               <Field label="Phone *" error={form.formState.errors.Phone?.message}>
@@ -178,7 +178,7 @@ export default function BecomeOrganizerForm({ onSuccess }: { onSuccess?: () => v
               </Field>
             </div>
 
-            <Field label="Description" error={form.formState.errors.Description?.message}>
+            <Field label="Mô tả" error={form.formState.errors.Description?.message}>
               <Textarea
                 {...form.register("Description")}
                 placeholder="Short description about your organization..."
@@ -186,24 +186,24 @@ export default function BecomeOrganizerForm({ onSuccess }: { onSuccess?: () => v
               />
             </Field>
 
-            <Field label="Address" error={form.formState.errors.Address?.message}>
-              <Input {...form.register("Address")} placeholder="Office address" className="h-11 rounded-xl" />
+            <Field label="Địa chỉ" error={form.formState.errors.Address?.message}>
+              <Input {...form.register("Address")} placeholder="Địa chỉ văn phòng" className="h-11 rounded-xl" />
             </Field>
           </div>
         </div>
 
         <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 pt-4">
-          <p className="text-xs text-slate-500">Fields marked with * are required.</p>
+          <p className="text-xs text-slate-500">Các trường có dấu * là bắt buộc.</p>
           <Button type="submit" disabled={create.isPending} className="h-10 rounded-full px-6 font-semibold">
             {create.isPending ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin" />
-                Submitting...
+                Đang gửi...
               </>
             ) : (
               <>
                 <SendHorizonal className="h-4 w-4" />
-                Submit Request
+                Gửi yêu cầu
               </>
             )}
           </Button>

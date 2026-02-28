@@ -109,19 +109,19 @@ const Header = () => {
 
                         {/* CENTER: Navigation */}
                         <nav className="hidden md:flex items-center gap-1 bg-slate-100/50 p-1 rounded-full border border-slate-200/50">
-                            <NavItem href="/home" active={isActive('/home')} label="Home" />
+                            <NavItem href="/home" active={isActive('/home')} label="Trang chủ" />
 
                             {/* Events Dropdown */}
                             <div className="relative group" onMouseEnter={() => setHoveredNav('events')}>
                                 <button className="flex items-center gap-1 px-4 py-1.5 text-[14px] font-medium transition-colors rounded-full text-slate-600 hover:text-slate-900 hover:bg-white shadow-sm hover:shadow-none">
-                                    Events <ChevronDown className="w-3.5 h-3.5 opacity-70" />
+                                    Sự kiện <ChevronDown className="w-3.5 h-3.5 opacity-70" />
                                 </button>
                                 <div className="absolute top-full left-0 pt-4 w-52 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
                                     <div className="bg-white/90 backdrop-blur-lg border border-slate-200/50 rounded-2xl shadow-xl p-2 space-y-1">
-                                        <DropdownItem href="/events" icon={<List className="w-4 h-4" />} title="All Events" />
-                                        <DropdownItem href="/events?filter=near-me" icon={<MapPin className="w-4 h-4 text-cyan-500" />} title="Near Me" />
-                                        <DropdownItem href="/events?filter=online" icon={<Wifi className="w-4 h-4 text-indigo-500" />} title="Online" />
-                                        <DropdownItem href="/events?filter=free" icon={<Gift className="w-4 h-4 text-pink-500" />} title="Free" />
+                                        <DropdownItem href="/events" icon={<List className="w-4 h-4" />} title="Tất cả sự kiện" />
+                                        <DropdownItem href="/events?filter=near-me" icon={<MapPin className="w-4 h-4 text-cyan-500" />} title="Gần tôi" />
+                                        <DropdownItem href="/events?filter=online" icon={<Wifi className="w-4 h-4 text-indigo-500" />} title="Trực tuyến" />
+                                        <DropdownItem href="/events?filter=free" icon={<Gift className="w-4 h-4 text-pink-500" />} title="Miễn phí" />
                                     </div>
                                 </div>
                             </div>
@@ -129,27 +129,27 @@ const Header = () => {
                             {/* Categories Mega Menu */}
                             <div className="relative group" onMouseEnter={() => setHoveredNav('categories')}>
                                 <button className="flex items-center gap-1 px-4 py-1.5 text-[14px] font-medium transition-colors rounded-full text-slate-600 hover:text-slate-900 hover:bg-white">
-                                    Categories <ChevronDown className="w-3.5 h-3.5 opacity-70" />
+                                    Danh mục <ChevronDown className="w-3.5 h-3.5 opacity-70" />
                                 </button>
                                 <div className="absolute top-full left-1/2 -translate-x-1/2 pt-4 w-[700px] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
                                     <div className="bg-white/90 backdrop-blur-xl border border-slate-200/50 rounded-3xl shadow-2xl p-6 grid grid-cols-3 gap-6">
-                                        <CategorySection title="Creative" items={[
-                                            { href: "/events/design", icon: <Palette className="w-5 h-5 text-pink-500" />, title: "UI/UX Design", desc: "Interfaces" },
-                                            { href: "/events/art", icon: <Brush className="w-5 h-5 text-cyan-500" />, title: "Art Direction", desc: "Aesthetics" }
+                                        <CategorySection title="Sáng tạo" items={[
+                                            { href: "/events/design", icon: <Palette className="w-5 h-5 text-pink-500" />, title: "Thiết kế UI/UX", desc: "Giao diện" },
+                                            { href: "/events/art", icon: <Brush className="w-5 h-5 text-cyan-500" />, title: "Đạo diễn nghệ thuật", desc: "Thẩm mỹ" }
                                         ]} />
-                                        <CategorySection title="Tech" items={[
-                                            { href: "/events/tech", icon: <Cpu className="w-5 h-5 text-blue-500" />, title: "Technology", desc: "Software" },
-                                            { href: "/events/innovation", icon: <Zap className="w-5 h-5 text-orange-500" />, title: "Innovation", desc: "Trends" }
+                                        <CategorySection title="Công nghệ" items={[
+                                            { href: "/events/tech", icon: <Cpu className="w-5 h-5 text-blue-500" />, title: "Công nghệ", desc: "Phần mềm" },
+                                            { href: "/events/innovation", icon: <Zap className="w-5 h-5 text-orange-500" />, title: "Đổi mới", desc: "Xu hướng" }
                                         ]} />
-                                        <CategorySection title="Business" items={[
-                                            { href: "/events/leadership", icon: <Briefcase className="w-5 h-5 text-slate-700" />, title: "Leadership", desc: "Skills" },
-                                            { href: "/events/startup", icon: <Rocket className="w-5 h-5 text-emerald-500" />, title: "Startups", desc: "Growth" }
+                                        <CategorySection title="Kinh doanh" items={[
+                                            { href: "/events/leadership", icon: <Briefcase className="w-5 h-5 text-slate-700" />, title: "Lãnh đạo", desc: "Kỹ năng" },
+                                            { href: "/events/startup", icon: <Rocket className="w-5 h-5 text-emerald-500" />, title: "Khởi nghiệp", desc: "Phát triển" }
                                         ]} />
                                     </div>
                                 </div>
                             </div>
 
-                            <NavItem href="/map" active={isActive('/map')} label="Map" />
+                            <NavItem href="/map" active={isActive('/map')} label="Bản đồ" />
                         </nav>
 
                         {/* RIGHT: Auth / Actions */}
@@ -162,32 +162,32 @@ const Header = () => {
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
                                         <Button className="bg-orange-500 hover:bg-orange-600 text-white rounded-full px-5 h-9 text-sm font-medium shadow-lg shadow-orange-500/20 transition-all">
-                                            Account
+                                            Tài khoản
                                         </Button>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end" className="w-56 bg-white/90 backdrop-blur-md rounded-xl border-slate-100 shadow-xl p-2 mt-4">
-                                        <DropdownMenuLabel className="text-[10px] uppercase text-slate-400 font-bold px-2 py-1.5">Settings</DropdownMenuLabel>
+                                        <DropdownMenuLabel className="text-[10px] uppercase text-slate-400 font-bold px-2 py-1.5">Cài đặt</DropdownMenuLabel>
                                         <DropdownMenuItem className="rounded-lg cursor-pointer" asChild>
-                                            <Link href="/user/tickets" className="flex items-center gap-2.5 px-2 py-2"><Ticket className="w-4 h-4" /> <span>My Tickets</span></Link>
+                                            <Link href="/user/tickets" className="flex items-center gap-2.5 px-2 py-2"><Ticket className="w-4 h-4" /> <span>Vé của tôi</span></Link>
                                         </DropdownMenuItem>
                                         <DropdownMenuItem className="rounded-lg cursor-pointer" asChild>
-                                            <Link href="/user/profile" className="flex items-center gap-2.5 px-2 py-2"><UserIcon className="w-4 h-4" /> <span>Profile</span></Link>
+                                            <Link href="/user/profile" className="flex items-center gap-2.5 px-2 py-2"><UserIcon className="w-4 h-4" /> <span>Hồ sơ</span></Link>
                                         </DropdownMenuItem>
                                         {showDashboard() && getDashboardLink() && (
                                             <DropdownMenuItem className="rounded-lg cursor-pointer" asChild>
-                                                <Link href={getDashboardLink()!} className="flex items-center gap-2.5 px-2 py-2"><LayoutDashboard className="w-4 h-4" /> <span>Dashboard</span></Link>
+                                                <Link href={getDashboardLink()!} className="flex items-center gap-2.5 px-2 py-2"><LayoutDashboard className="w-4 h-4" /> <span>Bảng điều khiển</span></Link>
                                             </DropdownMenuItem>
                                         )}
                                         <DropdownMenuSeparator />
                                         <DropdownMenuItem onClick={handleLogout} className="text-red-500 rounded-lg cursor-pointer flex items-center gap-2.5 px-2 py-2">
-                                            <LogOut className="w-4 h-4" /> <span className="font-medium">Logout</span>
+                                            <LogOut className="w-4 h-4" /> <span className="font-medium">Đăng xuất</span>
                                         </DropdownMenuItem>
                                     </DropdownMenuContent>
                                 </DropdownMenu>
                             ) : (
                                 <Link href="/login">
                                     <Button className="rounded-full px-5 h-9 text-sm font-semibold flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white shadow-lg">
-                                        Ticket <ArrowUpRight className="w-4 h-4" />
+                                        Đặt vé <ArrowUpRight className="w-4 h-4" />
                                     </Button>
                                 </Link>
                             )}

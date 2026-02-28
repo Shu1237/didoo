@@ -82,7 +82,7 @@ export default function OrganizerModal({
                                     {organizer.isVerified && (
                                         <Badge className="bg-blue-500 text-white border-none text-[9px] uppercase tracking-widest px-2 py-0.5 rounded-full flex items-center gap-1">
                                             <Shield className="w-2.5 h-2.5" />
-                                            Verified
+                                            Đã xác minh
                                         </Badge>
                                     )}
                                 </div>

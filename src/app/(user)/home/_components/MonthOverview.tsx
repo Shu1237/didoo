@@ -27,7 +27,7 @@ export const MonthOverview = ({ events }: MonthOverviewProps) => {
                 <div className="mb-12">
                     <h2 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight leading-[1.1]">
                         Discover Events <br />
-                        <span className="text-slate-500">Beyond Expectations</span>
+                        <span className="text-slate-500">Vượt mong đợi</span>
                     </h2>
                 </div>
 
@@ -73,7 +73,7 @@ export const MonthOverview = ({ events }: MonthOverviewProps) => {
                                     className="object-cover group-hover:scale-105 transition-transform duration-500"
                                 />
                                 <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-[10px] font-bold uppercase text-slate-900 shadow-sm">
-                                    {event.category?.name || "Event"}
+                                    {event.category?.name || "Sự kiện"}
                                 </div>
                             </div>
                             <div className="px-2 flex-1 flex flex-col">
@@ -90,10 +90,10 @@ export const MonthOverview = ({ events }: MonthOverviewProps) => {
                                             {new Date(event.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                         </div>
                                         <div className="text-[10px] opacity-70">
-                                            {new Date(event.startTime).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}
+                                            {new Date(event.startTime).toLocaleDateString("vi-VN", { weekday: 'short', month: 'short', day: 'numeric' })}
                                         </div>
                                     </div>
-                                    <span className="text-xs font-bold px-3 py-1 bg-zinc-100 rounded-full text-zinc-600 uppercase">Details</span>
+                                    <span className="text-xs font-bold px-3 py-1 bg-zinc-100 rounded-full text-zinc-600 uppercase">Chi tiết</span>
                                 </div>
                             </div>
                         </Link>

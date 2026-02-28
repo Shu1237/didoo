@@ -91,10 +91,10 @@ export default function UserCreateModal({ isOpen, onClose, onSuccess }: UserCrea
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="1">Admin</SelectItem>
-                <SelectItem value="2">User</SelectItem>
-                <SelectItem value="3">Manager</SelectItem>
-                <SelectItem value="4">Guest</SelectItem>
+                <SelectItem value="1">Quản trị viên</SelectItem>
+                <SelectItem value="2">Người dùng</SelectItem>
+                <SelectItem value="3">Quản lý</SelectItem>
+                <SelectItem value="4">Khách</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -105,8 +105,8 @@ export default function UserCreateModal({ isOpen, onClose, onSuccess }: UserCrea
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="1">Active</SelectItem>
-                <SelectItem value="2">Inactive</SelectItem>
+                <SelectItem value="1">Hoạt động</SelectItem>
+                <SelectItem value="2">Không hoạt động</SelectItem>
               </SelectContent>
             </Select>
           </div>

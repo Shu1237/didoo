@@ -55,7 +55,7 @@ export const useAuth = () => {
             await authRequest.loginServer(data);
             const u = useSessionStore.getState().user;
             if (u?.UserId) await loadProfileAndOrganizer(u.UserId);
-            toast.success("Login successfully");
+            toast.success("Đăng nhập thành công");
             router.replace(getRedirectPathForRole(u?.Role));
         },
     })
@@ -70,7 +70,7 @@ export const useAuth = () => {
             await authRequest.loginServer(data);
             const u = useSessionStore.getState().user;
             if (u?.UserId) await loadProfileAndOrganizer(u.UserId);
-            toast.success("Login successfully");
+            toast.success("Đăng nhập thành công");
             router.replace(getRedirectPathForRole(u?.Role));
         },
     })
@@ -104,7 +104,7 @@ export const useAuth = () => {
         onSuccess: async () => {
             await authRequest.logoutServer()
             clearSession();
-            toast.success("Logout successfully");
+            toast.success("Đăng xuất thành công");
             router.replace("/login");
         },
         onError: (error) => {
