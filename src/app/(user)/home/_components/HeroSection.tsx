@@ -82,22 +82,45 @@ export default function HeroSection({ events: initialEvents }: { events: Event[]
                         <AnimatePresence mode="wait">
                             <motion.div
                                 key={activeEvent.id}
-                                initial={{ opacity: 0, y: 30 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: -30 }}
-                                transition={{ duration: 0.5 }}
+                                initial="hidden"
+                                animate="visible"
+                                exit="exit"
+                                variants={{
+                                    hidden: { opacity: 0 },
+                                    visible: {
+                                        opacity: 1,
+                                        transition: { staggerChildren: 0.1, delayChildren: 0.2 }
+                                    },
+                                    exit: { opacity: 0, transition: { duration: 0.3 } }
+                                }}
                             >
-                                <h1 className="text-6xl lg:text-8xl font-black text-white uppercase leading-[0.9] tracking-tighter mb-8 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
+                                <motion.h1
+                                    variants={{
+                                        hidden: { opacity: 0, y: 50, filter: 'blur(10px)' },
+                                        visible: { opacity: 1, y: 0, filter: 'blur(0px)', transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } }
+                                    }}
+                                    className="text-6xl lg:text-8xl font-black text-white uppercase leading-[0.9] tracking-tighter mb-8 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]"
+                                >
                                     {activeEvent.name}
-                                </h1>
-                                <div className="flex gap-4">
-                                    <Button className="h-14 px-10 rounded-full bg-white text-black font-bold uppercase hover:bg-gray-200 transition-colors">
-                                        Get Tickets
-                                    </Button>
-                                    <Button variant="outline" className="h-14 px-8 rounded-full !bg-white/20 !text-white !border-2 !border-white/70 backdrop-blur-md uppercase font-bold hover:!bg-white/30 hover:!border-white transition-colors">
-                                        More Info
-                                    </Button>
-                                </div>
+                                </motion.h1>
+                                <motion.div
+                                    variants={{
+                                        hidden: { opacity: 0, y: 30 },
+                                        visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } }
+                                    }}
+                                    className="flex gap-4"
+                                >
+                                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                                        <Button className="h-14 px-10 rounded-full bg-white text-black font-bold uppercase hover:bg-gray-200 transition-colors shadow-lg">
+                                            Get Tickets
+                                        </Button>
+                                    </motion.div>
+                                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                                        <Button variant="outline" className="h-14 px-8 rounded-full !bg-white/10 !text-white !border-2 !border-white/50 backdrop-blur-md uppercase font-bold hover:!bg-white/30 hover:!border-white transition-colors shadow-lg">
+                                            More Info
+                                        </Button>
+                                    </motion.div>
+                                </motion.div>
                             </motion.div>
                         </AnimatePresence>
                     </div>

@@ -5,71 +5,78 @@ import Link from "next/link";
 import { CalendarDays, Clock3, Globe2, ShieldCheck, Tag } from "lucide-react";
 import { Event } from "@/types/event";
 import { EventStatus } from "@/utils/enum";
+import { useGetOrganizer } from "@/hooks/useOrganizer";
 import { Button } from "@/components/ui/button";
 
 interface EventInforProps {
   event: Event;
 }
 
-const FALLBACK_ORGANIZER_IMAGE = "https://i.pravatar.cc/240?u=organizer-profile";
+const FALLBACK_ORGANIZER_IMAGE = "https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=2070&auto=format&fit=crop";
 
 function getStatusLabel(status: EventStatus) {
   if (status === EventStatus.PUBLISHED || status === EventStatus.OPENED) {
-    return "Dang mo ban";
+    return "Open";
   }
 
   if (status === EventStatus.CLOSED) {
-    return "Da dong";
+    return "Closed";
   }
 
   if (status === EventStatus.CANCELLED) {
-    return "Da huy";
+    return "Cancelled";
   }
 
-  return "Sap mo ban";
+  return "Coming Soon";
 }
 
 export default function EventInfor({ event }: EventInforProps) {
   const infoItems = [
-    { label: "Danh muc", value: event.category?.name || "Su kien tong hop", icon: Tag },
+    { label: "Category", value: event.category?.name || "General Event", icon: Tag },
     {
-      label: "Do tuoi",
-      value: event.ageRestriction > 0 ? `${event.ageRestriction}+` : "Moi lua tuoi",
+      label: "Age",
+      value: event.ageRestriction > 0 ? `${event.ageRestriction}+` : "All Ages",
       icon: ShieldCheck,
     },
-    { label: "Trang thai", value: getStatusLabel(event.status), icon: Globe2 },
-    { label: "Khung gio", value: `${event.openTime || "TBA"} - ${event.closedTime || "TBA"}`, icon: Clock3 },
+    { label: "Status", value: getStatusLabel(event.status), icon: Globe2 },
+    { label: "Timeframe", value: `${event.openTime || "TBA"} - ${event.closedTime || "TBA"}`, icon: Clock3 },
   ];
 
   const timelineItems = [
     {
-      label: "Ngay bat dau",
+      label: "Start Date",
       value: event.startTime
-        ? new Date(event.startTime).toLocaleDateString("vi-VN", {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric",
-          })
-        : "Dang cap nhat",
+        ? new Date(event.startTime).toLocaleDateString("en-US", {
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+        })
+        : "Updating",
     },
     {
-      label: "Ngay ket thuc",
+      label: "End Date",
       value: event.endTime
-        ? new Date(event.endTime).toLocaleDateString("vi-VN", {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric",
-          })
-        : "Dang cap nhat",
+        ? new Date(event.endTime).toLocaleDateString("en-US", {
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+        })
+        : "Updating",
     },
   ];
 
+  const orgId = event.organizer?.id;
+  const { data: orgDataResponse } = useGetOrganizer(orgId || "");
+  const organizerDetails = orgDataResponse?.data;
+
+  const orgImage = organizerDetails?.bannerUrl || organizerDetails?.logoUrl || event.organizer?.logoUrl || FALLBACK_ORGANIZER_IMAGE;
+
   return (
-    <section className="grid gap-6 lg:grid-cols-12">
-      <div className="space-y-6 lg:col-span-8">
-        <article className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
-          <h2 className="text-2xl font-bold tracking-tight text-slate-900 md:text-3xl">
-            Thong tin su kien
+    <section className="grid gap-12 lg:grid-cols-12">
+      <div className="space-y-12 lg:col-span-8">
+        <article className="space-y-6">
+          <h2 className="text-3xl font-black tracking-tight text-slate-900 md:text-4xl">
+            Event Information
           </h2>
           <p className="mt-4 whitespace-pre-line text-base leading-relaxed text-slate-700">
             {event.description}
@@ -93,8 +100,8 @@ export default function EventInfor({ event }: EventInforProps) {
           )}
         </article>
 
-        <article className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
-          <h3 className="text-xl font-bold text-slate-900">Thong tin nhanh</h3>
+        <article className="space-y-6">
+          <h3 className="text-xl font-bold text-slate-900 uppercase tracking-widest text-slate-400">Quick Facts</h3>
           <div className="mt-5 grid gap-3 sm:grid-cols-2">
             {infoItems.map((item) => (
               <div
@@ -131,41 +138,64 @@ export default function EventInfor({ event }: EventInforProps) {
         </article>
       </div>
 
-      <aside className="lg:col-span-4">
-        <div className="sticky top-24 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-7">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Nha to chuc</p>
-          <div className="mt-4 flex items-center gap-4">
-            <div className="relative h-14 w-14 overflow-hidden rounded-2xl border border-slate-200">
+      <aside className="lg:col-span-4 pl-0 lg:pl-10">
+        <div className="sticky top-24 pt-6 space-y-6">
+          <p className="text-xs font-black uppercase tracking-[0.25em] text-slate-400">Organizer</p>
+
+          <div className="group relative overflow-hidden rounded-[2.5rem] bg-white shadow-xl shadow-slate-200/50 border border-slate-100 transition-all hover:shadow-2xl hover:-translate-y-1">
+            {/* Banner Area */}
+            <div className="relative h-32 w-full overflow-hidden">
               <Image
-                src={event.organizer?.logoUrl || FALLBACK_ORGANIZER_IMAGE}
-                alt={event.organizer?.name || "Organizer"}
+                src={orgImage}
+                alt={organizerDetails?.name || event.organizer?.name || "Organizer"}
                 fill
-                className="object-cover"
+                className="object-cover transition-transform duration-700 group-hover:scale-105"
               />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
             </div>
-            <div className="min-w-0">
-              <h3 className="truncate text-xl font-bold text-slate-900">
-                {event.organizer?.name || "Organizer"}
-              </h3>
-              <p className="text-sm text-slate-500">Thong tin don vi to chuc su kien</p>
+
+            {/* Content Area */}
+            <div className="relative px-6 pb-6 pt-4">
+              {/* Floating Logo if available, else just title */}
+              {organizerDetails?.logoUrl && organizerDetails.logoUrl !== orgImage && (
+                <div className="absolute -top-10 left-6 h-16 w-16 overflow-hidden rounded-2xl border-4 border-white bg-white shadow-md">
+                  <Image
+                    src={organizerDetails.logoUrl}
+                    alt="Logo"
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+              )}
+
+              <div className={organizerDetails?.logoUrl && organizerDetails.logoUrl !== orgImage ? "mt-4" : ""}>
+                <h3 className="text-xl font-black text-slate-900 line-clamp-1">
+                  {organizerDetails?.name || event.organizer?.name || "Organizer"}
+                </h3>
+                {organizerDetails?.isVerified && (
+                  <div className="mt-1 inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-emerald-600">
+                    <ShieldCheck className="h-3 w-3" />
+                    Verified
+                  </div>
+                )}
+              </div>
+
+              <p className="mt-4 text-sm font-medium leading-relaxed text-slate-600 line-clamp-3">
+                {organizerDetails?.description || "The organizer provides schedule, location and check-in instructions. Follow them to receive updates sooner."}
+              </p>
+
+              <div className="mt-6 flex flex-col gap-3">
+                <Button asChild className="h-12 w-full rounded-2xl font-black tracking-widest uppercase text-[10px] shadow-md shadow-slate-900/10">
+                  <Link href={`/organizers/${event.organizer?.id || ""}`}>View Profile</Link>
+                </Button>
+                <Button
+                  variant="outline"
+                  className="h-12 w-full rounded-2xl border-slate-200 bg-slate-50 text-slate-700 hover:bg-white font-black tracking-widest uppercase text-[10px]"
+                >
+                  Follow
+                </Button>
+              </div>
             </div>
-          </div>
-
-          <p className="mt-5 text-sm leading-relaxed text-slate-600">
-            Don vi to chuc cung cap thong tin ve lich trinh, dia diem va huong dan check-in.
-            Ban co the theo doi de nhan cap nhat som hon.
-          </p>
-
-          <div className="mt-6 space-y-3">
-            <Button asChild className="h-11 w-full rounded-full">
-              <Link href={`/organizers/${event.organizer?.id || ""}`}>Xem trang organizer</Link>
-            </Button>
-            <Button
-              variant="outline"
-              className="h-11 w-full rounded-full border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
-            >
-              Theo doi
-            </Button>
           </div>
         </div>
       </aside>

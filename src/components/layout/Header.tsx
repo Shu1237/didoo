@@ -110,44 +110,9 @@ const Header = () => {
                         {/* CENTER: Navigation */}
                         <nav className="hidden md:flex items-center gap-1 bg-slate-100/50 p-1 rounded-full border border-slate-200/50">
                             <NavItem href="/home" active={isActive('/home')} label="Home" />
+                            <NavItem href="/events" active={isActive('/events')} label="Events" />
 
-                            {/* Events Dropdown */}
-                            <div className="relative group" onMouseEnter={() => setHoveredNav('events')}>
-                                <button className="flex items-center gap-1 px-4 py-1.5 text-[14px] font-medium transition-colors rounded-full text-slate-600 hover:text-slate-900 hover:bg-white shadow-sm hover:shadow-none">
-                                    Events <ChevronDown className="w-3.5 h-3.5 opacity-70" />
-                                </button>
-                                <div className="absolute top-full left-0 pt-4 w-52 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-                                    <div className="bg-white/90 backdrop-blur-lg border border-slate-200/50 rounded-2xl shadow-xl p-2 space-y-1">
-                                        <DropdownItem href="/events" icon={<List className="w-4 h-4" />} title="All Events" />
-                                        <DropdownItem href="/events?filter=near-me" icon={<MapPin className="w-4 h-4 text-cyan-500" />} title="Near Me" />
-                                        <DropdownItem href="/events?filter=online" icon={<Wifi className="w-4 h-4 text-indigo-500" />} title="Online" />
-                                        <DropdownItem href="/events?filter=free" icon={<Gift className="w-4 h-4 text-pink-500" />} title="Free" />
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Categories Mega Menu */}
-                            <div className="relative group" onMouseEnter={() => setHoveredNav('categories')}>
-                                <button className="flex items-center gap-1 px-4 py-1.5 text-[14px] font-medium transition-colors rounded-full text-slate-600 hover:text-slate-900 hover:bg-white">
-                                    Categories <ChevronDown className="w-3.5 h-3.5 opacity-70" />
-                                </button>
-                                <div className="absolute top-full left-1/2 -translate-x-1/2 pt-4 w-[700px] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
-                                    <div className="bg-white/90 backdrop-blur-xl border border-slate-200/50 rounded-3xl shadow-2xl p-6 grid grid-cols-3 gap-6">
-                                        <CategorySection title="Creative" items={[
-                                            { href: "/events/design", icon: <Palette className="w-5 h-5 text-pink-500" />, title: "UI/UX Design", desc: "Interfaces" },
-                                            { href: "/events/art", icon: <Brush className="w-5 h-5 text-cyan-500" />, title: "Art Direction", desc: "Aesthetics" }
-                                        ]} />
-                                        <CategorySection title="Tech" items={[
-                                            { href: "/events/tech", icon: <Cpu className="w-5 h-5 text-blue-500" />, title: "Technology", desc: "Software" },
-                                            { href: "/events/innovation", icon: <Zap className="w-5 h-5 text-orange-500" />, title: "Innovation", desc: "Trends" }
-                                        ]} />
-                                        <CategorySection title="Business" items={[
-                                            { href: "/events/leadership", icon: <Briefcase className="w-5 h-5 text-slate-700" />, title: "Leadership", desc: "Skills" },
-                                            { href: "/events/startup", icon: <Rocket className="w-5 h-5 text-emerald-500" />, title: "Startups", desc: "Growth" }
-                                        ]} />
-                                    </div>
-                                </div>
-                            </div>
+                            {/* Categories Mega Menu Removed as requested */}
 
                             <NavItem href="/map" active={isActive('/map')} label="Map" />
                         </nav>

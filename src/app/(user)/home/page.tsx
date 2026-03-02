@@ -35,21 +35,20 @@ export default function Home() {
     <div className="min-h-screen bg-slate-50 text-slate-900 selection:bg-[#DA4167] selection:text-white">
       <HeroSection events={events.slice(0, 5)} />
 
+      {/* 1. Discovery Bar: Search & Categories */}
       <SearchFilter categories={categories} />
-
-      {/* Category Selection */}
       <CategorySection categories={categories} />
 
-      {/* 1. Grid Section: DAYS TO UP LEVEL... */}
+      {/* 2. Editorial Highlights */}
       <SpecialEvents events={events} />
 
-      {/* 2. Split Feature: THE EVENT FOR EXPERIENCED... */}
+      {/* 3. The Didoo Experience */}
       <AboutSection categories={categories} />
 
-      {/* 3. Keynotes: FEATURING KEYNOTES... */}
+      {/* 4. Curated Organizers Marquee */}
       <TrendingEvents organizers={organizers} />
 
-      {/* 4. Venue: WHERE CREATIVITY MEETS... */}
+      {/* 5. More to Discover */}
       <MonthOverview events={events} />
     </div>
   );

@@ -1,8 +1,10 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import type { ComponentType } from "react";
+import useEmblaCarousel from "embla-carousel-react";
+import Barcode from "react-barcode";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import Loading from "@/components/loading";
@@ -10,116 +12,79 @@ import { useGetBookings } from "@/hooks/useBooking";
 import { useGetEvent } from "@/hooks/useEvent";
 import { useGetMe } from "@/hooks/useUser";
 import { Booking } from "@/types/booking";
-import { CalendarDays, Clock3, MapPin, QrCode, ReceiptText } from "lucide-react";
+import { ChevronLeft, ChevronRight, QrCode } from "lucide-react";
 
-const FALLBACK_IMAGE =
-  "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=2070&auto=format&fit=crop";
+const FALLBACK_IMAGE = "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=2070&auto=format&fit=crop";
 
 function getStatusStyle(status: string) {
-  const normalized = status.toLowerCase();
-
+  const normalized = status?.toLowerCase() || "";
   if (normalized.includes("paid") || normalized.includes("success")) {
-    return {
-      label: "Da thanh toan",
-      className: "border-emerald-200 bg-emerald-50 text-emerald-700",
-    };
+    return { label: "Đã thanh toán", className: "bg-[#00c98b] text-white" };
   }
-
   if (normalized.includes("pending")) {
-    return {
-      label: "Cho thanh toan",
-      className: "border-amber-200 bg-amber-50 text-amber-700",
-    };
+    return { label: "Chờ thanh toán", className: "bg-amber-500 text-white" };
   }
-
-  if (normalized.includes("cancel")) {
-    return {
-      label: "Da huy",
-      className: "border-rose-200 bg-rose-50 text-rose-700",
-    };
-  }
-
-  return {
-    label: status,
-    className: "border-slate-200 bg-slate-50 text-slate-700",
-  };
+  return { label: "Đã hủy", className: "bg-rose-500 text-white" };
 }
 
 export default function TicketsList() {
   const { data: userRes, isLoading: isUserLoading } = useGetMe();
   const user = userRes?.data;
 
-  const {
-    data: bookingsRes,
-    isLoading: isBookingsLoading,
-    isError,
-  } = useGetBookings(
-    {
-      userId: user?.id,
-      pageNumber: 1,
-      pageSize: 20,
-      isDescending: true,
-    },
-    { enabled: !!user?.id },
+  const { data: bookingsRes, isLoading: isBookingsLoading, isError } = useGetBookings(
+    { userId: user?.id, pageNumber: 1, pageSize: 20, isDescending: true },
+    { enabled: !!user?.id }
   );
 
   const bookings = bookingsRes?.data.items || [];
+  const [emblaRef, emblaApi] = useEmblaCarousel({ align: "center", containScroll: false });
+  const [selectedIndex, setSelectedIndex] = useState(0);
 
-  if (isUserLoading) return <Loading />;
+  useEffect(() => {
+    if (!emblaApi) return;
+    const onSelect = () => setSelectedIndex(emblaApi.selectedScrollSnap());
+    emblaApi.on("select", onSelect);
+    return () => { emblaApi.off("select", onSelect); };
+  }, [emblaApi]);
 
-  if (!user) {
-    return (
-      <div className="rounded-3xl border border-slate-200 bg-white p-10 text-center shadow-sm">
-        <h2 className="text-2xl font-bold text-slate-900">Ban chua dang nhap</h2>
-        <p className="mt-2 text-slate-600">
-          Dang nhap de xem booking va thong tin ve da dat.
-        </p>
-        <Button asChild className="mt-5 rounded-full px-6">
-          <Link href="/login?redirect=/user/tickets">Dang nhap ngay</Link>
-        </Button>
-      </div>
-    );
-  }
+  const scrollPrev = () => emblaApi && emblaApi.scrollPrev();
+  const scrollNext = () => emblaApi && emblaApi.scrollNext();
 
-  if (isBookingsLoading) {
-    return (
-      <div className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
-        <Loading text="Dang tai danh sach booking..." />
-      </div>
-    );
-  }
-
-  if (isError) {
-    return (
-      <div className="rounded-3xl border border-slate-200 bg-white p-10 text-center shadow-sm">
-        <h2 className="text-2xl font-bold text-slate-900">Khong tai duoc booking</h2>
-        <p className="mt-2 text-slate-600">Vui long thu lai sau it phut.</p>
-      </div>
-    );
-  }
-
-  if (bookings.length === 0) {
-    return (
-      <div className="rounded-3xl border border-dashed border-slate-300 bg-white p-10 text-center shadow-sm">
-        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-sky-100 text-sky-700">
-          <QrCode className="h-6 w-6" />
-        </div>
-        <h2 className="mt-4 text-2xl font-bold text-slate-900">Chua co booking nao</h2>
-        <p className="mx-auto mt-2 max-w-lg text-slate-600">
-          Ban chua dat ve cho su kien nao. Hay kham pha va dat ve de bat dau trai nghiem.
-        </p>
-        <Button asChild className="mt-6 rounded-full px-6">
-          <Link href="/events">Kham pha su kien</Link>
-        </Button>
-      </div>
-    );
-  }
+  if (isUserLoading || isBookingsLoading) return <Loading />;
+  if (isError || !user || bookings.length === 0) return null; // Logic xử lý lỗi/trống đơn giản
 
   return (
-    <div className="grid gap-4 lg:grid-cols-2">
-      {bookings.map((booking) => (
-        <BookingCard key={booking.id} booking={booking} />
-      ))}
+    <div className="relative">
+      <div className="overflow-hidden py-10" ref={emblaRef}>
+        <div className="flex -ml-4 items-center touch-pan-y">
+          {bookings.map((booking, index) => (
+            <div
+              key={booking.id}
+              className={`min-w-0 shrink-0 grow-0 basis-[90%] sm:basis-[420px] pl-4 transition-all duration-500 ${index === selectedIndex ? "opacity-100 scale-100" : "opacity-40 scale-95"
+                }`}
+            >
+              <BookingCard booking={booking} />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {bookings.length > 1 && (
+        <div className="absolute top-1/2 -translate-y-1/2 left-0 right-0 flex justify-between px-4 md:px-10 pointer-events-none z-20">
+          <button
+            onClick={scrollPrev}
+            className="pointer-events-auto h-12 w-12 rounded-full bg-white/90 border border-slate-200 shadow-xl backdrop-blur-sm flex items-center justify-center text-slate-800 hover:bg-white hover:scale-110 active:scale-95 transition-all group"
+          >
+            <ChevronLeft className="h-6 w-6 group-hover:-translate-x-0.5 transition-transform" />
+          </button>
+          <button
+            onClick={scrollNext}
+            className="pointer-events-auto h-12 w-12 rounded-full bg-white/90 border border-slate-200 shadow-xl backdrop-blur-sm flex items-center justify-center text-slate-800 hover:bg-white hover:scale-110 active:scale-95 transition-all group"
+          >
+            <ChevronRight className="h-6 w-6 group-hover:translate-x-0.5 transition-transform" />
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -127,104 +92,94 @@ export default function TicketsList() {
 function BookingCard({ booking }: { booking: Booking }) {
   const { data: eventRes } = useGetEvent(booking.eventId);
   const event = eventRes?.data;
+  const status = getStatusStyle(booking.status || "");
 
-  const status = getStatusStyle(booking.status || "Dang xu ly");
-  const eventDate = event?.startTime
-    ? new Date(event.startTime)
-    : booking.createdAt
-      ? new Date(booking.createdAt)
-      : null;
-
-  const dateText = eventDate
-    ? eventDate.toLocaleDateString("vi-VN", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-      })
-    : "Dang cap nhat";
-
-  const timeText = eventDate
-    ? eventDate.toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" })
-    : "--:--";
-
-  const locationText = event?.locations?.[0]?.name || "Dia diem dang cap nhat";
-  const eventTitle = event?.name || "Su kien";
+  const eventDate = event?.startTime ? new Date(event.startTime) : new Date();
+  const dateStr = eventDate.toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit", year: "2-digit" }).replace(/\//g, ".");
+  const timeStr = eventDate.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
 
   return (
-    <article className="group overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition hover:shadow-[0_24px_40px_-32px_rgba(15,23,42,0.5)]">
-      <div className="relative aspect-[16/9] overflow-hidden">
+    <article className="relative w-full overflow-hidden rounded-[3rem] bg-white shadow-[0_20px_50px_rgba(0,0,0,0.08)] [mask-image:radial-gradient(circle_20px_at_0_264px,transparent_98%,white),radial-gradient(circle_20px_at_100%_264px,transparent_98%,white)] [mask-composite:intersect]">
+      {/* PHẦN TRÊN: ẢNH */}
+      <div className="relative h-[240px] w-full">
         <Image
           src={event?.thumbnailUrl || event?.bannerUrl || FALLBACK_IMAGE}
-          alt={eventTitle}
+          alt="Event"
           fill
-          className="object-cover transition-transform duration-700 group-hover:scale-105"
+          className="object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/5 to-transparent" />
-        <Badge className={`absolute left-4 top-4 border ${status.className}`}>{status.label}</Badge>
+        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/60" />
+
+        <Badge className={`absolute right-6 top-8 border-0 px-4 py-1.5 rounded-full font-bold shadow-lg ${status.className}`}>
+          {status.label}
+        </Badge>
+
+        <div className="absolute inset-x-0 bottom-8 flex flex-col items-center text-center px-6">
+          <p className="text-[10px] font-bold uppercase tracking-[0.5em] text-white/80">Boarding Pass</p>
+          <h3 className="mt-2 text-2xl font-bold text-white tracking-tight leading-tight uppercase">
+            {event?.name || "Event Ticket"}
+          </h3>
+        </div>
       </div>
 
-      <div className="space-y-4 p-5">
-        <h3 className="line-clamp-2 text-xl font-bold text-slate-900">{eventTitle}</h3>
+      {/* PHẦN KHOÉT LỖ & ĐƯỜNG CHIA */}
+      <div className="relative h-12 w-full bg-white flex items-center justify-center">
+        {/* Đường đứt đoạn nối giữa */}
+        <div className="w-[85%] border-t-2 border-dashed border-slate-100" />
+      </div>
 
-        <div className="grid grid-cols-2 gap-3 text-sm">
-          <InfoItem icon={CalendarDays} label="Ngay" value={dateText} />
-          <InfoItem icon={Clock3} label="Gio" value={timeText} />
-          <InfoItem icon={MapPin} label="Dia diem" value={locationText} className="col-span-2" />
-          <InfoItem
-            icon={ReceiptText}
-            label="Tong tien"
-            value={`${Number(booking.totalPrice ?? booking.amount ?? 0).toLocaleString("vi-VN")} VND`}
-            className="col-span-2"
-          />
+      {/* PHẦN DƯỚI: THÔNG TIN */}
+      <div className="px-10 pb-12 pt-2 bg-white">
+        {/* Info Grid */}
+        <div className="grid grid-cols-2 gap-y-8 mb-10">
+          <DetailItem label="Booking ID" value={`#${booking.id?.substring(0, 8).toUpperCase()}`} />
+          <DetailItem label="Date" value={dateStr} />
+          <DetailItem label="Start Time" value={timeStr} />
+          <DetailItem label="Total Price" value={`${Number(booking.totalPrice || 0).toLocaleString("vi-VN")}đ`} />
+          <div className="col-span-2">
+            <DetailItem label="Venue" value={event?.locations?.[0]?.name || "Online/TBD"} />
+          </div>
         </div>
 
-        <div className="flex items-center justify-between border-t border-slate-200 pt-4">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
-              Ma booking
-            </p>
-            <p className="mt-1 font-mono text-sm font-semibold text-slate-800">{booking.id}</p>
+        {/* Barcode chuẩn ảnh mẫu */}
+        <div className="flex flex-col items-center">
+          <div className="w-full grayscale opacity-90 scale-x-110 mb-2">
+            <Barcode
+              value={booking.id || "000000"}
+              width={1.6}
+              height={55}
+              displayValue={false}
+              background="transparent"
+              lineColor="#000"
+              margin={0}
+            />
           </div>
+          <p className="text-[10px] font-mono font-bold text-slate-400 tracking-widest break-all text-center">
+            {booking.id}
+          </p>
+        </div>
 
-          <div className="flex gap-2">
-            <Button
-              asChild
-              variant="outline"
-              size="sm"
-              className="h-9 rounded-full border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
-            >
-              <Link href={`/events/${booking.eventId}`}>Chi tiet</Link>
-            </Button>
-            <Button asChild size="sm" className="h-9 rounded-full px-4">
-              <Link href={`/events/${booking.eventId}/booking/confirm?bookingId=${booking.id}`}>
-                Xem ve
-              </Link>
-            </Button>
-          </div>
+        {/* Buttons */}
+        <div className="mt-10 flex gap-4">
+          <Button asChild variant="outline" className="flex-1 h-14 rounded-3xl border-slate-200 text-[#1d234d] font-bold text-base hover:bg-slate-50">
+            <Link href={`/events/${booking.eventId}`}>Details</Link>
+          </Button>
+          <Button asChild className="flex-1 h-14 rounded-3xl bg-[#1d234d] hover:bg-[#2a3166] text-white font-bold text-base shadow-xl shadow-blue-900/20">
+            <Link href={`/events/${booking.eventId}/booking/confirm?bookingId=${booking.id}`}>
+              View Ticket
+            </Link>
+          </Button>
         </div>
       </div>
     </article>
   );
 }
 
-function InfoItem({
-  icon: Icon,
-  label,
-  value,
-  className,
-}: {
-  icon: ComponentType<{ className?: string }>;
-  label: string;
-  value: string;
-  className?: string;
-}) {
+function DetailItem({ label, value }: { label: string; value: string }) {
   return (
-    <div className={className}>
-      <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
-        <Icon className="h-3.5 w-3.5 text-sky-600" />
-        {label}
-      </p>
-      <p className="mt-1 text-sm font-semibold text-slate-900">{value}</p>
+    <div className="flex flex-col">
+      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">{label}</span>
+      <span className="text-lg font-black text-[#1d234d] leading-tight">{value}</span>
     </div>
   );
 }

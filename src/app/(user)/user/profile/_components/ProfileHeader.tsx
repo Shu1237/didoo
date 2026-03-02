@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -43,6 +44,13 @@ export default function ProfileSidebar() {
   const { data: userData } = useGetMe();
   const user = userData?.data;
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const tab = searchParams.get("tab") || "general";
+
+  const handleTabChange = (newTab: string) => {
+    router.push(`/user/profile?tab=${newTab}`);
+  };
 
   const { data: organizerData, isLoading: isOrganizerLoading } = useGetOrganizer(
     user?.organizerId ?? "",
@@ -50,11 +58,11 @@ export default function ProfileSidebar() {
 
   const initials = user?.fullName
     ? user.fullName
-        .split(" ")
-        .filter(Boolean)
-        .slice(0, 2)
-        .map((word) => word[0]?.toUpperCase())
-        .join("")
+      .split(" ")
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((word) => word[0]?.toUpperCase())
+      .join("")
     : "U";
 
   const isUserRole = (user?.role?.name || "").toLowerCase() === "user";
@@ -62,15 +70,15 @@ export default function ProfileSidebar() {
   const statusConfig = organizerStatus ? STATUS_CONFIG[organizerStatus] : null;
 
   return (
-    <div className="sticky top-24 space-y-4">
-      <Card className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+    <div className="space-y-4">
+      <div className="overflow-hidden">
         <div className="h-24 bg-gradient-to-r from-sky-300 via-indigo-300 to-amber-200" />
 
         <div className="-mt-12 px-5 pb-6">
           <div className="flex items-end gap-3">
-            <Avatar className="h-20 w-20 border-4 border-white shadow-sm">
+            <Avatar className="h-20 w-20 border-4 border-slate-50 shadow-sm">
               <AvatarImage src={user?.avatarUrl || ""} alt={user?.fullName || "User"} />
-              <AvatarFallback className="bg-slate-100 text-xl font-bold text-slate-700">
+              <AvatarFallback className="bg-slate-200 text-xl font-bold text-slate-700">
                 {initials}
               </AvatarFallback>
             </Avatar>
@@ -88,21 +96,27 @@ export default function ProfileSidebar() {
             <Metric label="Reviews" value="--" icon={UserCircle2} />
           </div>
         </div>
-      </Card>
+      </div>
 
-      <Card className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
-        <p className="mb-2 px-2 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
-          Tai khoan
+      <div className="p-5 pt-0">
+        <p className="mb-3 px-1 text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">
+          Account Settings
         </p>
 
-        <ul className="space-y-2">
-          <li className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm font-semibold text-slate-700">
-            <Settings2 className="h-4 w-4 text-slate-500" />
-            Cai dat chung
+        <ul className="space-y-1">
+          <li
+            onClick={() => handleTabChange('general')}
+            className={`flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-semibold cursor-pointer transition-colors ${tab === 'general' ? 'bg-slate-200/50 text-slate-800' : 'text-slate-500 hover:bg-slate-200/30'}`}
+          >
+            <Settings2 className={`h-4 w-4 ${tab === 'general' ? 'text-slate-700' : 'text-slate-400'}`} />
+            General
           </li>
-          <li className="flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-500">
-            <Shield className="h-4 w-4 text-slate-400" />
-            Quyen rieng tu
+          <li
+            onClick={() => handleTabChange('security')}
+            className={`flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-semibold cursor-pointer transition-colors ${tab === 'security' ? 'bg-slate-200/50 text-slate-800' : 'text-slate-500 hover:bg-slate-200/30'}`}
+          >
+            <Shield className={`h-4 w-4 ${tab === 'security' ? 'text-slate-700' : 'text-slate-400'}`} />
+            Privacy & Security
           </li>
         </ul>
 
@@ -111,10 +125,10 @@ export default function ProfileSidebar() {
             <DialogTrigger asChild>
               <Button
                 variant="outline"
-                className="mt-3 h-10 w-full rounded-full border-sky-200 bg-sky-50 font-semibold text-sky-700 hover:bg-sky-100"
+                className="mt-6 h-11 w-full rounded-2xl border-sky-200 bg-sky-50 font-semibold text-sky-700 hover:bg-sky-100 shadow-none hover:shadow-sm transition-all"
               >
-                <Rocket className="h-4 w-4" />
-                Tro thanh organizer
+                <Rocket className="h-4 w-4 mr-2" />
+                Become an Organizer
               </Button>
             </DialogTrigger>
             <DialogContent className="max-h-[90vh] overflow-y-auto border-none bg-transparent p-0 shadow-none">
@@ -129,23 +143,22 @@ export default function ProfileSidebar() {
 
         {user?.organizerId && (
           <div
-            className={`mt-3 flex items-center gap-2 rounded-xl border px-3 py-2.5 text-sm font-semibold ${
-              statusConfig?.className || "border-slate-200 bg-slate-50 text-slate-600"
-            }`}
+            className={`mt-6 flex items-center justify-center gap-2 rounded-2xl border px-3 py-3 text-sm font-semibold ${statusConfig?.className || "border-slate-200 bg-white text-slate-600 shadow-sm"
+              }`}
           >
             {isOrganizerLoading ? (
-              <span>Dang tai trang thai...</span>
+              <span>Loading status...</span>
             ) : statusConfig ? (
               <>
                 <statusConfig.icon className="h-4 w-4 shrink-0" />
                 <span>{statusConfig.label}</span>
               </>
             ) : (
-              <span>Dang cap nhat trang thai organizer</span>
+              <span>Status updating...</span>
             )}
           </div>
         )}
-      </Card>
+      </div>
     </div>
   );
 }
@@ -160,12 +173,12 @@ function Metric({
   icon: React.ComponentType<{ className?: string }>;
 }) {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3 text-center">
-      <p className="inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
-        <Icon className="h-3.5 w-3.5 text-sky-600" />
+    <div className="rounded-2xl border border-slate-200/60 bg-white/50 p-3 text-center transition-colors hover:bg-white">
+      <p className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400">
+        <Icon className="h-3 w-3 text-sky-500" />
         {label}
       </p>
-      <p className="mt-1 text-lg font-bold text-slate-900">{value}</p>
+      <p className="mt-1 text-lg font-black text-slate-800">{value}</p>
     </div>
   );
 }

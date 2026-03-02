@@ -13,16 +13,16 @@ export default function CategorySection({ categories }: CategorySectionProps) {
     if (!categories || categories.length === 0) return null;
 
     return (
-        <section className="py-16 bg-white">
+        <section className="pt-24 pb-16 bg-slate-50 relative z-20 -mt-16">
             <div className="container mx-auto px-4">
-                <SectionHeader
-                    title="Browse by Category"
-                    subtitle="Find the perfect event for your interests"
-                    icon={Layers}
-                    variant="primary"
-                />
+                <div className="flex flex-col items-center justify-center text-center">
+                    <span className="text-primary font-black uppercase tracking-[0.2em] text-xs mb-2 flex items-center gap-2">
+                        <Layers className="w-4 h-4" /> Explore
+                    </span>
+                    <h3 className="text-3xl font-black text-slate-900 uppercase">Browse Categories</h3>
+                </div>
 
-                <div className="flex flex-wrap gap-4 mt-8">
+                <div className="flex flex-wrap justify-center gap-4 mt-8">
                     {categories.map((category, idx) => (
                         <motion.div
                             key={category.id}

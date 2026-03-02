@@ -7,7 +7,7 @@ import { useGetTicketTypes } from "@/hooks/useTicketType";
 import HeroSection from "./_components/HeroSection";
 import EventInfor from "./_components/EventInfor";
 import EventLocation from "./_components/EventLocation";
-import ListEvent from "./_components/ListEvent";
+import EventsGrid from "../_components/EventsGrid";
 
 export default function DetailEventPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -32,7 +32,7 @@ export default function DetailEventPage({ params }: { params: Promise<{ id: stri
   if (!detailEvent) {
     return (
       <div className="flex h-screen items-center justify-center bg-slate-50 text-slate-500">
-        <p>Khong tim thay su kien</p>
+        <p className="font-bold tracking-widest uppercase">Event Not Found</p>
       </div>
     );
   }
@@ -47,10 +47,20 @@ export default function DetailEventPage({ params }: { params: Promise<{ id: stri
       <div className="relative z-10">
         <HeroSection event={detailEvent} ticketTypes={ticketTypes} />
 
-        <div className="mx-auto max-w-7xl space-y-14 px-4 pb-20 md:px-6">
-          <EventInfor event={detailEvent} />
-          <EventLocation event={detailEvent} />
-          <ListEvent title="Goi y danh cho ban" eventData={eventRelated} relatedEvent />
+        <div className="mx-auto w-full px-4 md:px-8 lg:px-12 xl:px-16 pb-20 space-y-16">
+          <div className="max-w-7xl mx-auto space-y-16">
+            <EventInfor event={detailEvent} />
+            <EventLocation event={detailEvent} />
+          </div>
+          {eventRelated.length > 0 && (
+            <div className="border-t border-slate-200/60 pt-16">
+              <EventsGrid
+                title="Suggested for you"
+                description="Explore more events similar to this one."
+                eventData={eventRelated}
+              />
+            </div>
+          )}
         </div>
       </div>
     </main>

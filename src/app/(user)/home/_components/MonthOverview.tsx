@@ -4,6 +4,7 @@ import { ArrowUpRight, MapPin, Clock } from "lucide-react";
 import Image from "next/image";
 import { Event } from "@/types/event";
 import Link from "next/link";
+import { motion } from "framer-motion";
 
 // Reusing avatars from api/dicebear or local images
 const AVATARS = [
@@ -24,111 +25,81 @@ export const MonthOverview = ({ events }: MonthOverviewProps) => {
     return (
         <section className="py-20 bg-slate-50">
             <div className="container mx-auto px-6">
-                <div className="mb-12">
-                    <h2 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight leading-[1.1]">
-                        Discover Events <br />
-                        <span className="text-slate-500">Beyond Expectations</span>
+                <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-100px" }}
+                    transition={{ duration: 0.6 }}
+                    className="mb-12"
+                >
+                    <h2 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight leading-[1.1] uppercase">
+                        More to <br />
+                        <span className="text-slate-400">Discover</span>
                     </h2>
-                </div>
+                </motion.div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 auto-rows-[380px]">
-
-                    {/* 1. Explore Events (Large Blue Card) - Span 2 Cols */}
-                    <div className="md:col-span-2 bg-[#bfdbfe] rounded-[2.5rem] p-10 relative overflow-hidden group flex flex-col justify-between hover:shadow-xl transition-all duration-300">
-                        {/* Abstract BG Decoration */}
-                        <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-white/20 rounded-full blur-3xl pointer-events-none" />
-
-                        <div>
-                            <div className="flex justify-between items-start mb-4">
-                                <h3 className="text-3xl font-bold text-slate-900 leading-tight max-w-[80%]">
-                                    Explore Events <br /> with Didoo
-                                </h3>
-                                <button className="w-12 h-12 bg-white rounded-full flex items-center justify-center shrink-0 hover:scale-110 transition-transform shadow-sm">
-                                    <ArrowUpRight className="w-5 h-5 text-slate-900" />
-                                </button>
-                            </div>
-                            <p className="text-slate-700 font-medium max-w-xs leading-relaxed">
-                                Discover a diverse array of events happening around you.
-                            </p>
-                        </div>
-
-                        {/* Avatars */}
-                        <div className="flex -space-x-3 mt-auto">
-                            {AVATARS.map((avatar, i) => (
-                                <div key={i} className="w-12 h-12 rounded-full border-[3px] border-[#bfdbfe] overflow-hidden bg-white shadow-sm">
-                                    <Image src={avatar} alt="User" width={48} height={48} className="object-cover" />
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Small Cards Mapped from Data */}
+                <motion.div
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true, margin: "-50px" }}
+                    variants={{
+                        hidden: {},
+                        visible: {
+                            transition: { staggerChildren: 0.15 }
+                        }
+                    }}
+                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+                >
                     {highlightEvents.map((event) => (
-                        <Link href={`/events/${event.id}`} key={event.id} className="bg-white rounded-[2.5rem] p-4 flex flex-col hover:shadow-xl transition-all duration-300 border border-slate-100 group">
-                            <div className="relative h-48 w-full rounded-[2rem] overflow-hidden mb-4">
+                        <motion.div
+                            key={event.id}
+                            variants={{
+                                hidden: { opacity: 0, scale: 0.95, y: 40 },
+                                visible: { opacity: 1, scale: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } }
+                            }}
+                            className="h-[450px] lg:h-[550px] w-full"
+                        >
+                            <Link href={`/events/${event.id}`} className="block relative w-full h-full rounded-[2.5rem] overflow-hidden group shadow-lg hover:shadow-2xl hover:shadow-primary/20 transition-all duration-500">
                                 <Image
-                                    src={event.thumbnailUrl || event.bannerUrl || 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=2070&auto=format&fit=crop'}
+                                    src={event.thumbnailUrl || event.bannerUrl || 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=2070'}
                                     alt={event.name}
                                     fill
-                                    className="object-cover group-hover:scale-105 transition-transform duration-500"
+                                    className="object-cover transition-transform duration-1000 group-hover:scale-110"
                                 />
-                                <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-[10px] font-bold uppercase text-slate-900 shadow-sm">
-                                    {event.category?.name || "Event"}
-                                </div>
-                            </div>
-                            <div className="px-2 flex-1 flex flex-col">
-                                <h4 className="font-bold text-lg text-slate-900 mb-1 line-clamp-1" title={event.name}>
-                                    {event.name}
-                                </h4>
-                                <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-400 mb-4 line-clamp-1">
-                                    <MapPin className="w-3.5 h-3.5 shrink-0" /> {event.locations?.[0]?.name || "Online/TBA"}
-                                </div>
-                                <div className="mt-auto flex items-center justify-between border-t border-slate-100 pt-4">
-                                    <div className="text-xs font-semibold text-slate-500">
-                                        <div className="flex items-center gap-1">
-                                            <Clock className="w-3 h-3" />
-                                            {new Date(event.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                        </div>
-                                        <div className="text-[10px] opacity-70">
-                                            {new Date(event.startTime).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}
+                                {/* Gradient Overlay */}
+                                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/95 via-slate-900/40 to-transparent opacity-80 group-hover:opacity-100 transition-opacity duration-500" />
+
+                                {/* Content */}
+                                <div className="absolute inset-0 p-8 flex flex-col justify-end">
+                                    <div className="translate-y-8 group-hover:translate-y-0 transition-transform duration-500 ease-out">
+                                        <span className="inline-block px-4 py-1.5 mb-4 rounded-full bg-white/20 backdrop-blur-md text-white text-[10px] font-black uppercase tracking-widest border border-white/20">
+                                            {event.category?.name || "Event"}
+                                        </span>
+                                        <h3 className="text-2xl lg:text-3xl font-black text-white mb-2 leading-[1.1] line-clamp-3">
+                                            {event.name}
+                                        </h3>
+
+                                        {/* Reveal on hover details */}
+                                        <div className="flex flex-col gap-3 mt-6 text-slate-300 text-sm font-medium opacity-0 group-hover:opacity-100 transition-all duration-500 delay-100">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center shrink-0">
+                                                    <Clock className="w-3.5 h-3.5 text-white" />
+                                                </div>
+                                                {new Date(event.startTime).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                            </div>
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center shrink-0">
+                                                    <MapPin className="w-3.5 h-3.5 text-white" />
+                                                </div>
+                                                <span className="line-clamp-1">{event.locations?.[0]?.name || "Online / TBA"}</span>
+                                            </div>
                                         </div>
                                     </div>
-                                    <span className="text-xs font-bold px-3 py-1 bg-zinc-100 rounded-full text-zinc-600 uppercase">Details</span>
                                 </div>
-                            </div>
-                        </Link>
+                            </Link>
+                        </motion.div>
                     ))}
-
-                    {/* 6. Local Events (Large Peach Card) - Span 2 Cols */}
-                    <div className="md:col-span-2 bg-[#ffedd5] rounded-[2.5rem] p-10 relative overflow-hidden group flex flex-col justify-between hover:shadow-xl transition-all duration-300">
-                        {/* Abstract BG Decoration */}
-                        <div className="absolute -bottom-20 -right-20 w-80 h-80 bg-orange-200/50 rounded-full blur-3xl pointer-events-none" />
-
-                        <div>
-                            <div className="flex justify-between items-start mb-4">
-                                <h3 className="text-3xl font-bold text-slate-900 leading-tight max-w-[80%]">
-                                    Local Events <br /> Near You
-                                </h3>
-                                <button className="w-12 h-12 bg-white rounded-full flex items-center justify-center shrink-0 hover:scale-110 transition-transform shadow-sm">
-                                    <ArrowUpRight className="w-5 h-5 text-slate-900" />
-                                </button>
-                            </div>
-                            <p className="text-slate-700 font-medium max-w-xs leading-relaxed">
-                                Stay connected to the buzz around you with our curated list of nearby events.
-                            </p>
-                        </div>
-
-                        {/* Avatars */}
-                        <div className="flex -space-x-3 mt-auto justify-end">
-                            {AVATARS.map((avatar, i) => (
-                                <div key={i} className="w-12 h-12 rounded-full border-[3px] border-[#ffedd5] overflow-hidden bg-white shadow-sm">
-                                    <Image src={avatar} alt="User" width={48} height={48} className="object-cover" />
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-
-                </div>
+                </motion.div>
             </div>
         </section>
     );

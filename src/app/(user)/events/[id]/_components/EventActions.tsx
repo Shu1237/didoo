@@ -12,7 +12,7 @@ interface EventActionsProps {
 }
 
 const baseButtonClass =
-  "inline-flex h-12 items-center justify-center gap-2 rounded-full border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-700 transition hover:border-slate-400 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60";
+  "inline-flex h-12 md:h-14 items-center justify-center gap-2 rounded-2xl border border-slate-300 bg-white/80 backdrop-blur-md px-5 text-sm font-bold uppercase tracking-widest text-slate-700 shadow-sm transition-all hover:border-slate-400 hover:bg-white hover:shadow-md disabled:cursor-not-allowed disabled:opacity-60";
 
 export default function EventActions({ eventId }: EventActionsProps) {
   const { data: userData } = useGetMe();
@@ -42,7 +42,7 @@ export default function EventActions({ eventId }: EventActionsProps) {
   const saveBusy = createInteraction.isPending || removeInteraction.isPending;
 
   const requireLogin = () => {
-    toast.error("Vui long dang nhap de su dung tinh nang nay");
+    toast.error("Please log in to use this feature");
   };
 
   const handleFavorite = () => {
@@ -82,45 +82,45 @@ export default function EventActions({ eventId }: EventActionsProps) {
         });
       } else {
         await navigator.clipboard.writeText(window.location.href);
-        toast.success("Da sao chep lien ket su kien");
+        toast.success("Event link copied to clipboard");
       }
     } catch {
-      toast.info("Da huy chia se");
+      toast.info("Share cancelled");
     }
   };
 
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="flex flex-col sm:flex-row flex-wrap gap-3">
       <button
         type="button"
         onClick={handleFavorite}
         disabled={favoriteBusy}
-        className={`${baseButtonClass} ${isFavorited ? "border-rose-200 bg-rose-50 text-rose-600" : ""}`}
-        title={isFavorited ? "Bo yeu thich" : "Them yeu thich"}
+        className={`${baseButtonClass} w-full sm:w-auto ${isFavorited ? "border-rose-200 bg-rose-50 text-rose-600" : ""}`}
+        title={isFavorited ? "Unfavorite" : "Favorite"}
       >
-        <Heart className={`h-4 w-4 ${isFavorited ? "fill-current" : ""}`} />
-        <span>{isFavorited ? "Da yeu thich" : "Yeu thich"}</span>
+        <Heart className={`h-4 w-4 md:h-5 md:w-5 ${isFavorited ? "fill-current" : ""}`} />
+        <span>{isFavorited ? "Favorited" : "Favorite"}</span>
       </button>
 
       <button
         type="button"
         onClick={handleSave}
         disabled={saveBusy}
-        className={`${baseButtonClass} ${isSaved ? "border-sky-200 bg-sky-50 text-sky-700" : ""}`}
-        title={isSaved ? "Bo luu" : "Luu su kien"}
+        className={`${baseButtonClass} w-full sm:w-auto ${isSaved ? "border-sky-200 bg-sky-50 text-sky-700" : ""}`}
+        title={isSaved ? "Unsave" : "Save Event"}
       >
-        <Bookmark className={`h-4 w-4 ${isSaved ? "fill-current" : ""}`} />
-        <span>{isSaved ? "Da luu" : "Luu"}</span>
+        <Bookmark className={`h-4 w-4 md:h-5 md:w-5 ${isSaved ? "fill-current" : ""}`} />
+        <span>{isSaved ? "Saved" : "Save"}</span>
       </button>
 
       <button
         type="button"
         onClick={handleShare}
-        className={baseButtonClass}
-        title="Chia se su kien"
+        className={`${baseButtonClass} w-full sm:w-auto`}
+        title="Share Event"
       >
-        <Share2 className="h-4 w-4" />
-        <span>Chia se</span>
+        <Share2 className="h-4 w-4 md:h-5 md:w-5" />
+        <span>Share</span>
       </button>
     </div>
   );

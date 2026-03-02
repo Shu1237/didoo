@@ -44,9 +44,9 @@ export default function OrganizerProfilePage({ params }: { params: Promise<{ id:
     return (
       <main className="flex min-h-screen items-center justify-center bg-slate-50 px-4">
         <div className="rounded-3xl border border-slate-200 bg-white p-8 text-center shadow-sm">
-          <p className="text-slate-600">Organizer khong ton tai.</p>
+          <p className="text-slate-600">Organizer not found.</p>
           <Button asChild className="mt-4 rounded-full px-6">
-            <Link href="/events">Quay lai danh sach su kien</Link>
+            <Link href="/events">Back to events</Link>
           </Button>
         </div>
       </main>
@@ -63,175 +63,261 @@ export default function OrganizerProfilePage({ params }: { params: Promise<{ id:
 
   const createdAtLabel = organizer.createdAt
     ? new Date(organizer.createdAt).toLocaleDateString("vi-VN", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-      })
-    : "Dang cap nhat";
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    })
+    : "Updating";
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-slate-50 pb-16 pt-28">
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -top-32 left-[-10%] h-80 w-80 rounded-full bg-sky-200/60 blur-3xl" />
-        <div className="absolute top-1/3 right-[-8%] h-[22rem] w-[22rem] rounded-full bg-amber-200/50 blur-3xl" />
-      </div>
+    <main className="relative min-h-screen bg-slate-50 pb-24">
+      {/* Immersive Header Banner */}
+      <section className="relative w-full h-[350px] md:h-[450px]">
+        <Image
+          src={organizer.bannerUrl || FALLBACK_BANNER}
+          alt={organizer.name}
+          fill
+          className="object-cover"
+          priority
+        />
+        {/* Soft gradient into the page background */}
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-50 via-slate-900/40 to-slate-900/20" />
+      </section>
 
-      <div className="relative mx-auto w-full max-w-7xl space-y-8 px-4 md:px-6">
-        <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
-          <div className="relative h-52 sm:h-64 md:h-72">
-            <Image
-              src={organizer.bannerUrl || FALLBACK_BANNER}
-              alt={organizer.name}
-              fill
-              className="object-cover"
-              priority
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-900/65 via-slate-900/20 to-transparent" />
-          </div>
+      {/* Main Content Container lifted up */}
+      <div className="relative z-10 w-full px-4 md:px-8 lg:px-12 xl:px-16 mx-auto -mt-32 md:-mt-40 space-y-12 pb-24">
+        {/* Profile Card (Glassmorphism) */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+          className="rounded-[2.5rem] bg-white/80 backdrop-blur-xl p-6 md:p-10 shadow-2xl shadow-slate-200/50 border border-white/50 w-full"
+        >
+          <div className="flex flex-col md:flex-row gap-6 md:gap-10 items-start md:items-center justify-between">
+            {/* Logo & Name */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                className="relative h-32 w-32 md:h-40 md:w-40 shrink-0 overflow-hidden rounded-[2rem] border-4 border-white shadow-xl bg-white"
+              >
+                <Image
+                  src={organizer.logoUrl || FALLBACK_LOGO}
+                  alt={organizer.name}
+                  fill
+                  className="object-cover"
+                />
+              </motion.div>
 
-          <div className="relative px-5 pb-6 md:px-8">
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.35 }}
-              className="-mt-14 flex flex-col gap-5 md:-mt-16 md:flex-row md:items-end md:justify-between"
-            >
-              <div className="flex items-end gap-4">
-                <div className="relative h-24 w-24 overflow-hidden rounded-3xl border-4 border-white bg-white shadow-sm md:h-28 md:w-28">
-                  <Image
-                    src={organizer.logoUrl || FALLBACK_LOGO}
-                    alt={organizer.name}
-                    fill
-                    className="object-cover"
-                  />
+              <div className="space-y-2">
+                <div className="flex flex-wrap items-center gap-3">
+                  <h1 className="text-3xl md:text-5xl font-black tracking-tight text-slate-900 leading-none">
+                    {organizer.name}
+                  </h1>
+                  {organizer.isVerified && (
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold uppercase tracking-widest text-emerald-600 border border-emerald-100">
+                      <BadgeCheck className="h-4 w-4" />
+                      Verified
+                    </span>
+                  )}
                 </div>
-                <div className="pb-1">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <h1 className="text-2xl font-extrabold tracking-tight text-white drop-shadow-sm md:text-4xl">
-                      {organizer.name}
-                    </h1>
-                    {organizer.isVerified && (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">
-                        <BadgeCheck className="h-3.5 w-3.5" />
-                        Verified
-                      </span>
-                    )}
-                  </div>
-                  <p className="mt-1 text-sm font-medium text-slate-200">Don vi to chuc su kien</p>
+                <p className="text-sm md:text-base font-medium text-slate-500 uppercase tracking-widest">
+                  Premier Event Curator
+                </p>
+
+                {/* Rapid Info Chips */}
+                <div className="flex flex-wrap gap-2 pt-3">
+                  {organizer.address && <InfoChip icon={MapPin} value={organizer.address} />}
+                  {organizer.email && <InfoChip icon={Mail} value={organizer.email} />}
+                  {organizer.phone && <InfoChip icon={Phone} value={organizer.phone} />}
                 </div>
               </div>
+            </div>
 
-              <div className="flex flex-wrap gap-2 md:justify-end">
-                {organizer.websiteUrl && (
-                  <Button
-                    asChild
-                    variant="outline"
-                    className="h-10 rounded-full border-white/70 bg-white/90 text-slate-700 hover:bg-white"
-                  >
-                    <a href={organizer.websiteUrl} target="_blank" rel="noopener noreferrer">
-                      <Globe className="h-4 w-4" />
-                      Website
-                    </a>
-                  </Button>
-                )}
-                <Button asChild className="h-10 rounded-full px-5">
-                  <Link href="/events">Kham pha su kien</Link>
+            {/* CTAs */}
+            <div className="flex flex-col w-full md:w-auto gap-3 shrink-0">
+              {organizer.websiteUrl && (
+                <Button
+                  asChild
+                  variant="outline"
+                  className="h-12 w-full md:w-auto rounded-xl border-slate-200 bg-white/50 hover:bg-white text-slate-700 font-bold uppercase tracking-widest text-xs"
+                >
+                  <a href={organizer.websiteUrl} target="_blank" rel="noopener noreferrer">
+                    <Globe className="h-4 w-4 mr-2" />
+                    Website
+                  </a>
                 </Button>
-              </div>
-            </motion.div>
-
-            <div className="mt-6 flex flex-wrap gap-2">
-              {organizer.address && (
-                <InfoChip icon={MapPin} value={organizer.address} />
               )}
-              {organizer.email && <InfoChip icon={Mail} value={organizer.email} />}
-              {organizer.phone && <InfoChip icon={Phone} value={organizer.phone} />}
+              <Button asChild className="h-12 w-full md:w-auto rounded-xl px-8 font-black uppercase tracking-widest text-xs shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all">
+                <Link href="/events">Explore Events</Link>
+              </Button>
             </div>
           </div>
-        </section>
+        </motion.div>
 
-        <section className="grid gap-6 lg:grid-cols-12">
-          <div className="space-y-6 lg:col-span-4">
-            <article className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-              <h2 className="text-xl font-bold text-slate-900">Gioi thieu</h2>
-              <p className="mt-3 text-sm leading-relaxed text-slate-600 md:text-base">
+
+        {/* Main Content Split */}
+        <section className="flex flex-col lg:flex-row gap-12 lg:gap-16 w-full">
+
+          {/* LEFT COLUMN: Info & Stats */}
+          <div className="w-full lg:w-[350px] xl:w-[400px] space-y-12 shrink-0">
+            {/* Bio */}
+            <motion.article
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+            >
+              <h2 className="text-sm font-black text-slate-400 tracking-[0.2em] uppercase mb-4">About</h2>
+              <p className="text-base leading-relaxed text-slate-700 font-medium">
                 {organizer.description ||
-                  "Organizer chuyen to chuc cac su kien van hoa, giai tri va cong dong voi trai nghiem thuc te, ro rang va chuyen nghiep."}
+                  "Event organizer specializing in cultural, entertainment, and community events with practical, clear, and professional experiences."}
               </p>
-            </article>
+            </motion.article>
 
-            <article className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-              <h3 className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Ket noi</h3>
+            {/* Socials */}
+            <motion.article
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+            >
+              <h3 className="text-sm font-black text-slate-400 tracking-[0.2em] uppercase mb-4">Connect</h3>
               {socials.length > 0 ? (
-                <div className="mt-4 flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-3">
                   {socials.map((social) => (
                     <a
                       key={social.label}
                       href={social.url || "#"}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex h-10 items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-4 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-white"
+                      className="group flex h-12 w-12 items-center justify-center rounded-full bg-white border border-slate-100 shadow-sm text-slate-400 transition-all hover:border-primary hover:text-primary hover:shadow-md hover:-translate-y-1"
+                      title={social.label}
                     >
-                      <social.icon className="h-4 w-4 text-sky-600" />
-                      {social.label}
+                      <social.icon className="h-5 w-5" />
                     </a>
                   ))}
                 </div>
               ) : (
-                <p className="mt-3 text-sm text-slate-500">Chua co thong tin lien he.</p>
+                <p className="text-sm font-medium text-slate-500">No contact information provided.</p>
               )}
-            </article>
+            </motion.article>
 
-            <article className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
+            {/* Stats */}
+            <motion.article
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.3 }}
+              className="grid grid-cols-2 gap-4"
+            >
               <StatCard
                 icon={Ticket}
-                label="Su kien da tao"
+                label="Events"
                 value={events.length.toString()}
                 tone="sky"
               />
               <StatCard
                 icon={CalendarDays}
-                label="Ngay tham gia"
-                value={createdAtLabel}
+                label="Joined"
+                value={organizer.createdAt ? new Date(organizer.createdAt).getFullYear().toString() : "2024"}
                 tone="amber"
               />
-            </article>
+            </motion.article>
           </div>
 
-          <div className="lg:col-span-8">
-            <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm md:p-6">
-              <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+          {/* RIGHT COLUMN: Events */}
+          <div className="w-full flex-1 min-w-0">
+            <section className="bg-white/50 backdrop-blur-sm rounded-3xl p-6 md:p-8 lg:p-10 border border-slate-200/50 shadow-sm w-full h-full">
+              <div className="mb-8 flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 pb-6 w-full">
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
-                    Event List
-                  </p>
-                  <h2 className="text-2xl font-bold tracking-tight text-slate-900 md:text-3xl">
-                    Su kien da to chuc
+                  <h2 className="text-3xl font-black tracking-tight text-slate-900 leading-none">
+                    Hosted Events
                   </h2>
+                  <p className="mt-2 text-sm font-semibold uppercase tracking-[0.16em] text-slate-400">
+                    Explore Portfolio
+                  </p>
                 </div>
-                <span className="rounded-full bg-sky-100 px-4 py-1.5 text-sm font-semibold text-sky-700">
-                  {events.length} su kien
+                <span className="rounded-full bg-slate-900 px-5 py-2 text-xs font-bold uppercase tracking-widest text-white shadow-md">
+                  {events.length} events
                 </span>
               </div>
 
               {isEventsLoading ? (
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                  {[1, 2, 3, 4].map((item) => (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 min-[1600px]:grid-cols-5 gap-6 w-full">
+                  {[1, 2, 3, 4, 5, 6, 7, 8].map((item) => (
                     <div
                       key={item}
-                      className="h-72 animate-pulse rounded-2xl border border-slate-200 bg-slate-100"
+                      className="h-[400px] animate-pulse rounded-[2rem] bg-slate-100"
                     />
                   ))}
                 </div>
               ) : events.length > 0 ? (
-                <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-                  {events.map((event) => (
-                    <TicketCard key={event.id} {...event} />
+                <motion.div
+                  initial="hidden"
+                  animate="visible"
+                  variants={{
+                    hidden: {},
+                    visible: { transition: { staggerChildren: 0.1 } }
+                  }}
+                  className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 min-[1600px]:grid-cols-5 gap-6 w-full"
+                >
+                  {events.map((event, index) => (
+                    <motion.div
+                      key={event.id}
+                      variants={{
+                        hidden: { opacity: 0, y: 30, scale: 0.95 },
+                        visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.6, ease: "easeOut" } }
+                      }}
+                      className="h-[400px] lg:h-[450px] w-full"
+                    >
+                      <Link href={`/events/${event.id}`} className="block relative w-full h-full rounded-[2rem] overflow-hidden group shadow-lg hover:shadow-2xl hover:shadow-primary/20 transition-all duration-500">
+                        <Image
+                          src={event.thumbnailUrl || event.bannerUrl || 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=2070'}
+                          alt={event.name}
+                          fill
+                          className="object-cover transition-transform duration-1000 group-hover:scale-110"
+                        />
+                        {/* Gradient Overlay */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/95 via-slate-900/40 to-transparent opacity-80 group-hover:opacity-100 transition-opacity duration-500" />
+
+                        {/* Content */}
+                        <div className="absolute inset-0 p-6 flex flex-col justify-end">
+                          <div className="translate-y-6 group-hover:translate-y-0 transition-transform duration-500 ease-out">
+                            <span className="inline-block px-3 py-1 mb-3 rounded-full bg-white/20 backdrop-blur-md text-white text-[10px] font-black uppercase tracking-widest border border-white/20">
+                              {event.category?.name || "Event"}
+                            </span>
+                            <h3 className="text-xl lg:text-2xl font-black text-white mb-2 leading-[1.1] line-clamp-3">
+                              {event.name}
+                            </h3>
+
+                            {/* Reveal on hover details */}
+                            <div className="flex flex-col gap-2 mt-4 text-slate-300 text-xs font-medium opacity-0 group-hover:opacity-100 transition-all duration-500 delay-100">
+                              <div className="flex items-center gap-2">
+                                <div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center shrink-0">
+                                  <CalendarDays className="w-3 h-3 text-white" />
+                                </div>
+                                {new Date(event.startTime).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center shrink-0">
+                                  <MapPin className="w-3 h-3 text-white" />
+                                </div>
+                                <span className="line-clamp-1">{event.locations?.[0]?.name || "Online / TBA"}</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </Link>
+                    </motion.div>
                   ))}
-                </div>
+                </motion.div>
               ) : (
-                <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-10 text-center">
-                  <p className="text-slate-600">Organizer nay chua co su kien duoc cong bo.</p>
+                <div className="rounded-[2rem] border border-dashed border-slate-300 bg-slate-50 p-16 text-center shadow-inner">
+                  <div className="mx-auto w-16 h-16 rounded-full bg-slate-200 flex items-center justify-center mb-4">
+                    <Ticket className="w-8 h-8 text-slate-400" />
+                  </div>
+                  <h3 className="text-xl font-black text-slate-900 mb-2">No events found</h3>
+                  <p className="text-slate-500 font-medium">This organizer has not published any events yet.</p>
                 </div>
               )}
             </section>
@@ -250,8 +336,8 @@ function InfoChip({
   value: string;
 }) {
   return (
-    <span className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-medium text-slate-600 md:text-sm">
-      <Icon className="h-3.5 w-3.5 text-sky-600" />
+    <span className="inline-flex items-center gap-2 rounded-lg bg-slate-100/50 px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider text-slate-600 backdrop-blur-sm">
+      <Icon className="h-3.5 w-3.5 text-slate-400" />
       <span className="line-clamp-1">{value}</span>
     </span>
   );
@@ -270,16 +356,20 @@ function StatCard({
 }) {
   const toneClasses =
     tone === "sky"
-      ? "border-sky-200 bg-sky-50 text-sky-700"
-      : "border-amber-200 bg-amber-50 text-amber-700";
+      ? "text-sky-600"
+      : "text-amber-600";
 
   return (
-    <div className={`rounded-2xl border p-4 ${toneClasses}`}>
-      <p className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.14em]">
-        <Icon className="h-4 w-4" />
-        {label}
-      </p>
-      <p className="mt-2 text-lg font-bold text-slate-900">{value}</p>
+    <div className="rounded-[1.5rem] bg-white border border-slate-100 shadow-sm p-6 flex flex-col items-start gap-4 hover:shadow-md transition-shadow">
+      <div className={`p-3 rounded-2xl bg-slate-50 ${toneClasses}`}>
+        <Icon className="h-5 w-5" />
+      </div>
+      <div>
+        <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">
+          {label}
+        </p>
+        <p className="text-3xl font-black text-slate-900 leading-none">{value}</p>
+      </div>
     </div>
   );
 }

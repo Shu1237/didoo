@@ -1,10 +1,9 @@
 "use client";
 
 import { Suspense, use } from "react";
-import type { ComponentType } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { CalendarDays, CheckCircle2, ChevronLeft, Mail, User2 } from "lucide-react";
+import { CheckCircle2, ChevronLeft, CalendarDays } from "lucide-react";
 import Loading from "@/components/loading";
 import { Button } from "@/components/ui/button";
 import { useGetBooking } from "@/hooks/useBooking";
@@ -20,150 +19,149 @@ function ConfirmContent({ eventId }: { eventId: string }) {
   const booking = bookingRes?.data;
   const event = eventRes?.data;
 
-  if (!bookingId) {
-    return (
-      <main className="flex min-h-screen items-center justify-center bg-slate-50 px-4">
-        <div className="max-w-md rounded-3xl border border-slate-200 bg-white p-8 text-center shadow-sm">
-          <p className="text-slate-600">Thieu ma booking trong duong dan.</p>
-          <Button asChild className="mt-5 rounded-full px-6">
-            <Link href={`/events/${eventId}`}>Quay lai su kien</Link>
-          </Button>
-        </div>
-      </main>
-    );
-  }
+  if (!bookingId)
+    return <ErrorBox message="Thiếu mã booking trong đường dẫn." eventId={eventId} />;
 
   if (isLoading) return <Loading />;
 
-  if (isError || !booking) {
-    return (
-      <main className="flex min-h-screen items-center justify-center bg-slate-50 px-4">
-        <div className="max-w-md rounded-3xl border border-slate-200 bg-white p-8 text-center shadow-sm">
-          <p className="text-slate-600">Khong tim thay thong tin dat ve.</p>
-          <Button asChild className="mt-5 rounded-full px-6">
-            <Link href={`/events/${eventId}`}>Quay lai su kien</Link>
-          </Button>
-        </div>
-      </main>
-    );
-  }
+  if (isError || !booking)
+    return <ErrorBox message="Không tìm thấy thông tin đặt vé." eventId={eventId} />;
 
   return (
-    <main className="min-h-screen bg-slate-50 px-4 pb-12 pt-28">
-      <div className="mx-auto max-w-3xl">
-        <Link
-          href={`/events/${eventId}`}
-          className="mb-6 inline-flex items-center gap-2 rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
-        >
-          <ChevronLeft className="h-4 w-4" />
-          Quay lai su kien
-        </Link>
+    <main className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
+      <div className="w-full max-w-5xl bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row">
 
-        <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
-          <div className="flex flex-col gap-4 border-b border-slate-200 pb-5 md:flex-row md:items-center">
-            <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
-              <CheckCircle2 className="h-7 w-7" />
-            </span>
-            <div>
-              <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 md:text-3xl">
-                Xac nhan dat ve thanh cong
-              </h1>
-              <p className="mt-1 text-sm text-slate-600">
-                {event?.name || "Su kien"} - vui long kiem tra thong tin ben duoi.
+        {/* LEFT SIDE */}
+        <div className="relative md:w-1/2 h-72 md:h-auto bg-slate-900">
+          <img
+            src={
+              event?.bannerUrl ||
+              event?.thumbnailUrl ||
+              "https://images.unsplash.com/photo-1492684223066-81342ee5ff30"
+            }
+            alt="Event"
+            className="w-full h-full object-cover opacity-60"
+          />
+
+          <div className="absolute inset-0 flex flex-col items-center justify-center text-white text-center p-6">
+            <div className="h-16 w-16 flex items-center justify-center rounded-full bg-emerald-500 shadow-xl">
+              <CheckCircle2 className="w-9 h-9" />
+            </div>
+
+            <h1 className="mt-4 text-2xl font-black">
+              Booking Successful
+            </h1>
+
+            <p className="mt-2 text-sm opacity-80 line-clamp-2">
+              {event?.name || "Your Event Booking"}
+            </p>
+          </div>
+        </div>
+
+        {/* RIGHT SIDE */}
+        <div className="md:w-1/2 p-8 flex flex-col justify-between">
+          <div>
+            <Link
+              href={`/events/${eventId}`}
+              className="inline-flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-slate-900 mb-6"
+            >
+              <ChevronLeft size={16} />
+              Back to Event
+            </Link>
+
+            <div className="grid grid-cols-2 gap-6">
+              <Info label="Booking ID" value={booking.id?.slice(0, 12)} />
+              <Info
+                label="Total Payment"
+                value={`${Number(
+                  booking.totalPrice ?? booking.amount ?? 0
+                ).toLocaleString("vi-VN")}đ`}
+                highlight
+              />
+              <Info label="Name" value={booking.fullname} />
+              <Info
+                label="Created At"
+                value={
+                  booking.createdAt
+                    ? new Date(booking.createdAt).toLocaleString("vi-VN")
+                    : "--"
+                }
+              />
+              <div className="col-span-2">
+                <Info label="Email" value={booking.email} />
+              </div>
+            </div>
+
+            <div className="mt-8 bg-amber-50 border border-amber-200 rounded-2xl p-4">
+              <div className="flex items-center gap-2 text-amber-700 font-semibold text-sm">
+                <CalendarDays size={16} />
+                Important Note
+              </div>
+              <p className="mt-2 text-sm text-amber-800">
+                Please arrive 30 minutes before opening time and prepare your QR code.
               </p>
             </div>
           </div>
 
-          <div className="mt-6 grid gap-3 md:grid-cols-2">
-            <InfoRow label="Ma booking" value={booking.id} />
-            <InfoRow
-              label="Tong thanh toan"
-              value={`${Number(booking.totalPrice ?? booking.amount ?? 0).toLocaleString("vi-VN")} VND`}
-              highlight
-            />
-            <InfoRow
-              label="Trang thai"
-              value={booking.status || "Dang xu ly"}
-            />
-            <InfoRow
-              label="Ngay tao"
-              value={
-                booking.createdAt
-                  ? new Date(booking.createdAt).toLocaleString("vi-VN")
-                  : "Dang cap nhat"
-              }
-            />
-          </div>
-
-          <div className="mt-6 grid gap-3 md:grid-cols-2">
-            <InfoCard icon={User2} label="Khach hang" value={booking.fullname || "Dang cap nhat"} />
-            <InfoCard icon={Mail} label="Email" value={booking.email || "Dang cap nhat"} />
-          </div>
-
-          <div className="mt-6 rounded-2xl border border-sky-200 bg-sky-50 p-4 text-sm text-sky-900">
-            <p className="flex items-center gap-2 font-semibold">
-              <CalendarDays className="h-4 w-4" />
-              Luu y
-            </p>
-            <p className="mt-1">
-              Vui long den som truoc gio mo cua de check-in nhanh va mang theo ma QR trong ve cua ban.
-            </p>
-          </div>
-
-          <div className="mt-6 flex flex-wrap gap-3">
-            <Button asChild className="h-11 rounded-full px-6">
-              <Link href="/user/tickets">Xem ve cua toi</Link>
+          <div className="flex gap-4 mt-8">
+            <Button asChild className="flex-1 rounded-xl">
+              <Link href="/user/tickets">View Tickets</Link>
             </Button>
+
             <Button
               asChild
               variant="outline"
-              className="h-11 rounded-full border-slate-300 bg-white px-6 text-slate-700 hover:bg-slate-50"
+              className="flex-1 rounded-xl"
             >
-              <Link href={`/events/${eventId}`}>Quay lai su kien</Link>
+              <Link href={`/events/${eventId}`}>Go Back</Link>
             </Button>
           </div>
-        </section>
+        </div>
       </div>
     </main>
   );
 }
 
-function InfoRow({
+function Info({
   label,
   value,
   highlight,
 }: {
   label: string;
-  value: string;
+  value?: string;
   highlight?: boolean;
 }) {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">{label}</p>
-      <p className={`mt-1 text-sm font-semibold ${highlight ? "text-sky-700" : "text-slate-900"}`}>
-        {value}
-      </p>
+    <div className="flex flex-col">
+      <span className="text-xs font-semibold uppercase text-slate-400">
+        {label}
+      </span>
+      <span
+        className={`text-lg font-bold ${highlight ? "text-emerald-500" : "text-slate-900"
+          }`}
+      >
+        {value || "--"}
+      </span>
     </div>
   );
 }
 
-function InfoCard({
-  icon: Icon,
-  label,
-  value,
+function ErrorBox({
+  message,
+  eventId,
 }: {
-  icon: ComponentType<{ className?: string }>;
-  label: string;
-  value: string;
+  message: string;
+  eventId: string;
 }) {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-4">
-      <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
-        <Icon className="h-4 w-4 text-sky-600" />
-        {label}
-      </p>
-      <p className="mt-1 text-sm font-semibold text-slate-900">{value}</p>
-    </div>
+    <main className="min-h-screen flex items-center justify-center bg-slate-50 p-6">
+      <div className="bg-white p-8 rounded-2xl shadow-lg text-center">
+        <p className="text-slate-600">{message}</p>
+        <Button asChild className="mt-4">
+          <Link href={`/events/${eventId}`}>Quay lại sự kiện</Link>
+        </Button>
+      </div>
+    </main>
   );
 }
 
