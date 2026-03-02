@@ -79,8 +79,8 @@ export default function TransactionsList({
   const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
 
   return (
-    <div className="flex h-full flex-col bg-white">
-      <div className="min-h-0 flex-1 overflow-auto">
+    <div className="bg-white">
+      <div className="max-h-[min(58vh,680px)] overflow-auto">
         <table className="w-full border-collapse text-left">
           <thead className="sticky top-0 z-10 bg-zinc-50">
             <tr className="border-y border-zinc-100 text-[11px] font-semibold uppercase tracking-wide text-zinc-500">

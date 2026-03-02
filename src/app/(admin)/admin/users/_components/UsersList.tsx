@@ -99,26 +99,26 @@ export default function UsersList({ users }: UsersListProps) {
                 </Button>
 
                 <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="outline" size="icon" className="rounded-full w-9 h-9 border-zinc-200">
-                        <MoreVertical className="w-4 h-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="rounded-xl">
-                      {user.isDeleted ? (
-                        <DropdownMenuItem onClick={() => handleRestore(user)} className="gap-2">
-                          <RotateCcw className="w-4 h-4" /> Khôi phục
-                        </DropdownMenuItem>
-                      ) : (
-                        <DropdownMenuItem
-                          onClick={() => setDeleteConfirm(user)}
-                          className="gap-2 text-red-600 focus:text-red-600"
-                        >
-                          <Trash2 className="w-4 h-4" /> Xóa
-                        </DropdownMenuItem>
-                      )}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="icon" className="rounded-full w-9 h-9 border-zinc-200">
+                      <MoreVertical className="w-4 h-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="rounded-xl">
+                    {user.isDeleted ? (
+                      <DropdownMenuItem onClick={() => handleRestore(user)} className="gap-2">
+                        <RotateCcw className="w-4 h-4" /> Khôi phục
+                      </DropdownMenuItem>
+                    ) : (
+                      <DropdownMenuItem
+                        onClick={() => setDeleteConfirm(user)}
+                        className="gap-2 text-red-600 focus:text-red-600"
+                      >
+                        <Trash2 className="w-4 h-4" /> Xóa
+                      </DropdownMenuItem>
+                    )}
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             </div>
           </div>
@@ -142,7 +142,11 @@ export default function UsersList({ users }: UsersListProps) {
         }
         confirmLabel="Xóa"
         variant="danger"
-        onConfirm={() => deleteConfirm && handleDelete(deleteConfirm)}
+        onConfirm={() => {
+          if (deleteConfirm) {
+            return handleDelete(deleteConfirm);
+          }
+        }}
         isLoading={deleteUser.isPending}
       />
     </div>

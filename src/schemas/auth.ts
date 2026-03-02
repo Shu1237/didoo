@@ -3,6 +3,7 @@ import { z } from "zod";
 export const locationSchema = z.object({
     latitude: z.number(),
     longitude: z.number(),
+    address: z.string().optional(),
 });
 
 export const loginSchema = z.object({
