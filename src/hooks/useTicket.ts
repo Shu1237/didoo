@@ -6,10 +6,11 @@ import { TicketGetListQuery } from "@/types/ticket";
 import { toast } from "sonner";
 import { handleErrorApi } from "@/lib/errors";
 
-export const useGetTickets = (params?: TicketGetListQuery) => {
+export const useGetTickets = (params?: TicketGetListQuery, options?: { enabled?: boolean }) => {
     return useQuery({
         queryKey: QUERY_KEY.tickets.list(params),
         queryFn: () => ticketRequest.getList(params || {}),
+        enabled: options?.enabled ?? true,
     });
 };
 
