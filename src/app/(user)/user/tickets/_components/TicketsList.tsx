@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import useEmblaCarousel from "embla-carousel-react";
@@ -98,80 +98,136 @@ function BookingCard({ booking }: { booking: Booking }) {
   const dateStr = eventDate.toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit", year: "2-digit" }).replace(/\//g, ".");
   const timeStr = eventDate.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
 
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [dims, setDims] = useState({ w: 420, h: 620 });
+
+  useEffect(() => {
+    if (!cardRef.current) return;
+    const obs = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        setDims({ w: entry.contentRect.width, h: entry.contentRect.height });
+      }
+    });
+    obs.observe(cardRef.current);
+    return () => obs.disconnect();
+  }, []);
+
+  const { w, h } = dims;
+  const inset = 1; // Slight inset to prevent clipping on edges
+  const r = 48; // Corner radius (rounded-[3rem])
+  const cr = 20; // Cutout radius
+  const cp = 264; // Cutout center position
+
+  const ticketPath = `
+    M ${r + inset},${inset}
+    H ${w - r - inset}
+    A ${r},${r} 0 0 1 ${w - inset}, ${r + inset}
+    V ${cp - cr}
+    A ${cr},${cr} 0 0 0 ${w - inset}, ${cp + cr}
+    V ${h - r - inset}
+    A ${r},${r} 0 0 1 ${w - r - inset}, ${h - inset}
+    H ${r + inset}
+    A ${r},${r} 0 0 1 ${inset}, ${h - r - inset}
+    V ${cp + cr}
+    A ${cr},${cr} 0 0 0 ${inset}, ${cp - cr}
+    V ${r + inset}
+    A ${r},${r} 0 0 1 ${r + inset},${inset}
+    Z
+  `;
+
   return (
-    <article className="relative w-full overflow-hidden rounded-[3rem] bg-white shadow-[0_20px_50px_rgba(0,0,0,0.08)] [mask-image:radial-gradient(circle_20px_at_0_264px,transparent_98%,white),radial-gradient(circle_20px_at_100%_264px,transparent_98%,white)] [mask-composite:intersect]">
-      {/* PHẦN TRÊN: ẢNH */}
-      <div className="relative h-[240px] w-full">
-        <Image
-          src={event?.thumbnailUrl || event?.bannerUrl || FALLBACK_IMAGE}
-          alt="Event"
-          fill
-          className="object-cover"
+    <div className="relative group" ref={cardRef}>
+      {/* SVG Border Overlay */}
+      <svg
+        className="absolute inset-0 w-full h-full pointer-events-none z-10"
+        viewBox={`0 0 ${w} ${h}`}
+        preserveAspectRatio="none"
+      >
+        <path
+          d={ticketPath}
+          fill="none"
+          stroke="#d4d4d8" // zinc-300
+          strokeWidth="2"
+          strokeDasharray="6 4"
+          strokeLinecap="round"
+          vectorEffect="non-scaling-stroke"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/60" />
+      </svg>
 
-        <Badge className={`absolute right-6 top-8 border-0 px-4 py-1.5 rounded-full font-bold shadow-lg ${status.className}`}>
-          {status.label}
-        </Badge>
+      <article className="relative w-full overflow-hidden rounded-[3rem] bg-white shadow-[0_20px_50px_rgba(0,0,0,0.06)] [mask-image:radial-gradient(circle_20px_at_0_264px,transparent_98%,white),radial-gradient(circle_20px_at_100%_264px,transparent_98%,white)] [mask-composite:intersect]">
+        {/* PHẦN TRÊN: ẢNH */}
+        <div className="relative h-[240px] w-full">
+          <Image
+            src={event?.thumbnailUrl || event?.bannerUrl || FALLBACK_IMAGE}
+            alt="Event"
+            fill
+            className="object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/60" />
 
-        <div className="absolute inset-x-0 bottom-8 flex flex-col items-center text-center px-6">
-          <p className="text-[10px] font-bold uppercase tracking-[0.5em] text-white/80">Boarding Pass</p>
-          <h3 className="mt-2 text-2xl font-bold text-white tracking-tight leading-tight uppercase">
-            {event?.name || "Event Ticket"}
-          </h3>
-        </div>
-      </div>
+          <Badge className={`absolute right-6 top-8 border-0 px-4 py-1.5 rounded-full font-bold shadow-lg ${status.className}`}>
+            {status.label}
+          </Badge>
 
-      {/* PHẦN KHOÉT LỖ & ĐƯỜNG CHIA */}
-      <div className="relative h-12 w-full bg-white flex items-center justify-center">
-        {/* Đường đứt đoạn nối giữa */}
-        <div className="w-[85%] border-t-2 border-dashed border-slate-100" />
-      </div>
-
-      {/* PHẦN DƯỚI: THÔNG TIN */}
-      <div className="px-10 pb-12 pt-2 bg-white">
-        {/* Info Grid */}
-        <div className="grid grid-cols-2 gap-y-8 mb-10">
-          <DetailItem label="Booking ID" value={`#${booking.id?.substring(0, 8).toUpperCase()}`} />
-          <DetailItem label="Date" value={dateStr} />
-          <DetailItem label="Start Time" value={timeStr} />
-          <DetailItem label="Total Price" value={`${Number(booking.totalPrice || 0).toLocaleString("vi-VN")}đ`} />
-          <div className="col-span-2">
-            <DetailItem label="Venue" value={event?.locations?.[0]?.name || "Online/TBD"} />
+          <div className="absolute inset-x-0 bottom-8 flex flex-col items-center text-center px-6">
+            <p className="text-[10px] font-bold uppercase tracking-[0.5em] text-white/80">Boarding Pass</p>
+            <h3 className="mt-2 text-2xl font-bold text-white tracking-tight leading-tight uppercase">
+              {event?.name || "Event Ticket"}
+            </h3>
           </div>
         </div>
 
-        {/* Barcode chuẩn ảnh mẫu */}
-        <div className="flex flex-col items-center">
-          <div className="w-full grayscale opacity-90 scale-x-110 mb-2">
-            <Barcode
-              value={booking.id || "000000"}
-              width={1.6}
-              height={55}
-              displayValue={false}
-              background="transparent"
-              lineColor="#000"
-              margin={0}
-            />
-          </div>
-          <p className="text-[10px] font-mono font-bold text-slate-400 tracking-widest break-all text-center">
-            {booking.id}
-          </p>
+        {/* PHẦN KHOÉT LỖ & ĐƯỜNG CHIA */}
+        <div className="relative h-12 w-full bg-white flex items-center justify-center">
+          {/* Đường đứt đoạn nối giữa */}
+          <div className="w-[85%] border-t-2 border-dashed border-zinc-200" />
         </div>
 
-        {/* Buttons */}
-        <div className="mt-10 flex gap-4">
-          <Button asChild variant="outline" className="flex-1 h-14 rounded-3xl border-slate-200 text-[#1d234d] font-bold text-base hover:bg-slate-50">
-            <Link href={`/events/${booking.eventId}`}>Details</Link>
-          </Button>
-          <Button asChild className="flex-1 h-14 rounded-3xl bg-[#1d234d] hover:bg-[#2a3166] text-white font-bold text-base shadow-xl shadow-blue-900/20">
-            <Link href={`/events/${booking.eventId}/booking/confirm?bookingId=${booking.id}`}>
-              View Ticket
-            </Link>
-          </Button>
+        {/* PHẦN DƯỚI: THÔNG TIN */}
+        <div className="px-10 pb-12 pt-2 bg-white">
+          {/* Info Grid */}
+          <div className="grid grid-cols-2 gap-y-8 mb-10">
+            <DetailItem label="Booking ID" value={`#${booking.id?.substring(0, 8).toUpperCase()}`} />
+            <DetailItem label="Date" value={dateStr} />
+            <DetailItem label="Start Time" value={timeStr} />
+            <DetailItem label="Total Price" value={`${Number(booking.totalPrice || 0).toLocaleString("vi-VN")}đ`} />
+            <div className="col-span-2">
+              <DetailItem label="Venue" value={event?.locations?.[0]?.name || "Online/TBD"} />
+            </div>
+          </div>
+
+          {/* Barcode chuẩn ảnh mẫu */}
+          <div className="flex flex-col items-center">
+            <div className="w-full grayscale opacity-90 scale-x-110 mb-2">
+              <Barcode
+                value={booking.id || "000000"}
+                width={1.6}
+                height={55}
+                displayValue={false}
+                background="transparent"
+                lineColor="#000"
+                margin={0}
+              />
+            </div>
+            <p className="text-[10px] font-mono font-bold text-slate-400 tracking-widest break-all text-center">
+              {booking.id}
+            </p>
+          </div>
+
+          {/* Buttons */}
+          <div className="mt-10 flex gap-4">
+            <Button asChild variant="outline" className="flex-1 h-14 rounded-3xl border-slate-200 text-[#1d234d] font-bold text-base hover:bg-slate-50">
+              <Link href={`/events/${booking.eventId}`}>Details</Link>
+            </Button>
+            <Button asChild className="flex-1 h-14 rounded-3xl bg-[#1d234d] hover:bg-[#2a3166] text-white font-bold text-base shadow-xl shadow-blue-900/20">
+              <Link href={`/events/${booking.eventId}/booking/confirm?bookingId=${booking.id}`}>
+                View Ticket
+              </Link>
+            </Button>
+          </div>
         </div>
-      </div>
-    </article>
+      </article>
+    </div>
   );
 }
 
