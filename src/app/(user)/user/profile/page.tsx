@@ -1,30 +1,32 @@
 import { Suspense } from "react";
+import { ShieldCheck, UserRound } from "lucide-react";
 import Loading from "@/components/loading";
 import ProfileForm from "./_components/ProfileForm";
 import ProfileSidebar from "./_components/ProfileHeader";
 
 export default function ProfilePage() {
   return (
-    <div className="min-h-screen pb-20 relative">
-      {/* Background Elements */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10 bg-[#FAFAFA]">
-        <div className="absolute top-0 right-1/4 w-96 h-96 bg-primary/2 rounded-full blur-3xl opacity-20" />
-        <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-accent/2 rounded-full blur-3xl opacity-20" />
+    <div className="relative min-h-screen overflow-hidden bg-slate-50 px-4 pb-16 pt-28">
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute -top-24 left-[-10%] h-80 w-80 rounded-full bg-sky-200/60 blur-3xl" />
+        <div className="absolute bottom-[-8rem] right-[-8%] h-[22rem] w-[22rem] rounded-full bg-amber-200/50 blur-3xl" />
       </div>
 
-      <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-8 max-w-7xl mx-auto">
-          <Suspense fallback={<Loading />}>
-            {/* Left Column: Personality & Stats */}
-            <aside className="animate-slide-up">
+      <div className="relative mx-auto w-full max-w-6xl">
+        <div className="flex flex-col lg:flex-row overflow-hidden rounded-[2.5rem] border border-slate-200 bg-white shadow-xl shadow-slate-200/50">
+          {/* Sidebar Area */}
+          <aside className="w-full lg:w-[320px] shrink-0 border-b border-slate-100 lg:border-b-0 lg:border-r bg-slate-50/50">
+            <Suspense fallback={<Loading />}>
               <ProfileSidebar />
-            </aside>
+            </Suspense>
+          </aside>
 
-            {/* Right Column: Interactive Content */}
-            <main className="animate-slide-up [animation-delay:0.1s]">
+          {/* Main Content Area */}
+          <main className="flex-1">
+            <Suspense fallback={<Loading />}>
               <ProfileForm />
-            </main>
-          </Suspense>
+            </Suspense>
+          </main>
         </div>
       </div>
     </div>

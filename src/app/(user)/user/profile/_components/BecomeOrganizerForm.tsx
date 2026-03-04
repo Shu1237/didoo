@@ -1,208 +1,249 @@
 "use client";
 
-import { useForm } from "react-hook-form";
+import { useRef } from "react";
+import Image from "next/image";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { OrganizerCreateBody, organizerCreateSchema } from "@/schemas/organizer";
-import { OrganizerStatus } from "@/utils/enum";
-import { useOrganizer } from "@/hooks/useOrganizer";
+import { useForm, useWatch } from "react-hook-form";
+import { Facebook, Globe, ImageIcon, Instagram, Loader2, Music2, Plus, SendHorizonal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { useRef } from "react";
-import { Loader2, Send, Plus, Image as ImageIcon, Globe, Facebook, Instagram, Music2 } from "lucide-react";
-import { handleErrorApi } from "@/lib/errors";
 import { useMedia } from "@/hooks/useMedia";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useOrganizer } from "@/hooks/useOrganizer";
+import { OrganizerCreateBody, organizerCreateSchema } from "@/schemas/organizer";
+import { OrganizerStatus } from "@/utils/enum";
+import { handleErrorApi } from "@/lib/errors";
 import { useSessionStore } from "@/stores/sesionStore";
 
 export default function BecomeOrganizerForm({ onSuccess }: { onSuccess?: () => void }) {
-    const { create } = useOrganizer();
-    const { uploadImage } = useMedia();
-    const logoInputRef = useRef<HTMLInputElement>(null);
-    const bannerInputRef = useRef<HTMLInputElement>(null);
-    const userId = useSessionStore((state) => state.user?.UserId ?? "");
+  const { create } = useOrganizer();
+  const { uploadImage } = useMedia();
+  const userId = useSessionStore((state) => state.user?.UserId ?? "");
 
-    const form = useForm<OrganizerCreateBody>({
-        resolver: zodResolver(organizerCreateSchema),
-        mode: "onTouched",
-        defaultValues: {
-            Name: "",
-            Slug: "",
-            Description: "",
-            Email: "",
-            Phone: "",
-            Address: "",
-            WebsiteUrl: "",
-            FacebookUrl: "",
-            InstagramUrl: "",
-            TiktokUrl: "",
-            LogoUrl: "",
-            BannerUrl: "",
-            UserId: userId,
-            IsVerified: false,
-            HasSendEmail: true,
-            Status: OrganizerStatus.PENDING,
-        },
-    });
+  const logoInputRef = useRef<HTMLInputElement>(null);
+  const bannerInputRef = useRef<HTMLInputElement>(null);
 
-    const logoUrl = form.watch("LogoUrl");
-    const bannerUrl = form.watch("BannerUrl");
+  const form = useForm<OrganizerCreateBody>({
+    resolver: zodResolver(organizerCreateSchema),
+    mode: "onTouched",
+    defaultValues: {
+      Name: "",
+      Slug: "",
+      Description: "",
+      Email: "",
+      Phone: "",
+      Address: "",
+      WebsiteUrl: "",
+      FacebookUrl: "",
+      InstagramUrl: "",
+      TiktokUrl: "",
+      LogoUrl: "",
+      BannerUrl: "",
+      UserId: userId,
+      IsVerified: false,
+      HasSendEmail: true,
+      Status: OrganizerStatus.PENDING,
+    },
+  });
 
-    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>, field: "LogoUrl" | "BannerUrl") => {
-        const file = e.target.files?.[0];
-        if (file) {
-            const result = await uploadImage.mutateAsync(file);
-            form.setValue(field, result.secure_url);
-        }
-    };
+  const logoUrl = useWatch({ control: form.control, name: "LogoUrl" });
+  const bannerUrl = useWatch({ control: form.control, name: "BannerUrl" });
 
-    const onSubmit = async (values: OrganizerCreateBody) => {
-        try {
-            await create.mutateAsync(values);
-            if (onSuccess) onSuccess();
-        } catch (error) {
-            handleErrorApi({ error, setError: form.setError });
-        }
-    };
+  const handleFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+    field: "LogoUrl" | "BannerUrl",
+  ) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
 
-    return (
-        <div className="bg-white overflow-hidden rounded-[32px] w-full max-w-4xl mx-auto border border-slate-200 shadow-2xl">
-            <div className="bg-slate-50/80 border-b border-slate-100 px-8 py-4 flex items-center justify-between">
-                <div>
-                    <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-                        Đăng ký Organizer
-                    </h2>
-                    <p className="text-[10px] text-slate-500 font-medium">Bắt đầu hành trình tổ chức sự kiện chuyên nghiệp</p>
-                </div>
-                <div className="flex items-center gap-2">
-                    {/* <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" /> */}
-                    {/* <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider">Trạng thái: Sẵn sàng</span> */}
-                </div>
+    const result = await uploadImage.mutateAsync(file);
+    form.setValue(field, result.secure_url, { shouldValidate: true });
+  };
+
+  const onSubmit = async (values: OrganizerCreateBody) => {
+    try {
+      await create.mutateAsync(values);
+      onSuccess?.();
+    } catch (error) {
+      handleErrorApi({ error, setError: form.setError });
+    }
+  };
+
+  return (
+    <div className="mx-auto w-full max-w-4xl overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-2xl">
+      <div className="border-b border-slate-200 bg-slate-50 px-6 py-5">
+        <h2 className="text-2xl font-bold tracking-tight text-slate-900">Dang ky organizer</h2>
+        <p className="mt-1 text-sm text-slate-600">
+          Dien thong tin de gui ho so xet duyet tai khoan to chuc su kien.
+        </p>
+      </div>
+
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5 p-6">
+        <div className="grid grid-cols-1 gap-5 lg:grid-cols-12">
+          <div className="space-y-4 lg:col-span-4">
+            <div>
+              <p className="mb-1 text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Logo</p>
+              <button
+                type="button"
+                onClick={() => logoInputRef.current?.click()}
+                className="group relative flex aspect-square w-full items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50 transition hover:border-sky-400"
+              >
+                {logoUrl ? (
+                  <Image src={logoUrl} alt="Logo preview" fill className="object-cover" />
+                ) : (
+                  <div className="text-slate-400">
+                    {uploadImage.isPending ? (
+                      <Loader2 className="h-7 w-7 animate-spin" />
+                    ) : (
+                      <Plus className="h-8 w-8" />
+                    )}
+                  </div>
+                )}
+                <span className="absolute inset-x-0 bottom-0 bg-black/45 py-1 text-xs font-semibold text-white opacity-0 transition group-hover:opacity-100">
+                  Upload logo
+                </span>
+              </button>
+              <input
+                ref={logoInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(event) => handleFileChange(event, "LogoUrl")}
+              />
+              <ErrorText message={form.formState.errors.LogoUrl?.message} />
             </div>
 
-            <form onSubmit={form.handleSubmit(onSubmit)} className="p-6 space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-                    {/* Left Column: Media & Core Info */}
-                    <div className="md:col-span-4 space-y-4">
-                        <div className="grid grid-cols-2 md:grid-cols-1 gap-4">
-                            {/* Logo */}
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Logo tổ chức</label>
-                                <div
-                                    onClick={() => logoInputRef.current?.click()}
-                                    className="relative group cursor-pointer aspect-square rounded-2xl overflow-hidden border-2 border-dashed border-slate-200 hover:border-primary/50 transition-all bg-slate-50 flex items-center justify-center"
-                                >
-                                    <Avatar className="w-full h-full rounded-none">
-                                        <AvatarImage src={logoUrl || ""} className="object-cover" />
-                                        <AvatarFallback className="bg-transparent text-slate-300">
-                                            {uploadImage.isPending ? <Loader2 className="w-5 h-5 animate-spin" /> : <Plus className="w-6 h-6" />}
-                                        </AvatarFallback>
-                                    </Avatar>
-                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                        <ImageIcon className="text-white w-5 h-5" />
-                                    </div>
-                                    <input type="file" ref={logoInputRef} className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, "LogoUrl")} />
-                                </div>
-                            </div>
-                            {/* Banner snippet */}
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Ảnh bìa (Banner)</label>
-                                <div
-                                    onClick={() => bannerInputRef.current?.click()}
-                                    className="relative group cursor-pointer aspect-[16/9] md:aspect-[3/1] rounded-2xl overflow-hidden border-2 border-dashed border-slate-200 hover:border-primary/50 transition-all bg-slate-50 flex items-center justify-center"
-                                >
-                                    {bannerUrl ? (
-                                        <img src={bannerUrl} className="w-full h-full object-cover" alt="Banner" />
-                                    ) : (
-                                        <div className="text-slate-300 flex flex-col items-center">
-                                            {uploadImage.isPending ? <Loader2 className="w-5 h-5 animate-spin" /> : <ImageIcon className="w-6 h-6" />}
-                                        </div>
-                                    )}
-                                    <input type="file" ref={bannerInputRef} className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, "BannerUrl")} />
-                                </div>
-                            </div>
-                        </div>
+            <div>
+              <p className="mb-1 text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Banner</p>
+              <button
+                type="button"
+                onClick={() => bannerInputRef.current?.click()}
+                className="group relative flex aspect-[16/9] w-full items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50 transition hover:border-sky-400"
+              >
+                {bannerUrl ? (
+                  <Image src={bannerUrl} alt="Banner preview" fill className="object-cover" />
+                ) : (
+                  <div className="flex flex-col items-center gap-1 text-slate-400">
+                    {uploadImage.isPending ? (
+                      <Loader2 className="h-6 w-6 animate-spin" />
+                    ) : (
+                      <ImageIcon className="h-6 w-6" />
+                    )}
+                    <span className="text-xs font-medium">Upload banner</span>
+                  </div>
+                )}
+              </button>
+              <input
+                ref={bannerInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(event) => handleFileChange(event, "BannerUrl")}
+              />
+              <ErrorText message={form.formState.errors.BannerUrl?.message} />
+            </div>
+          </div>
 
-                        <div className="space-y-3">
-                            <div>
-                                <Input {...form.register("Name")} placeholder="Tên tổ chức *" className="rounded-xl h-10 text-sm border-slate-200 focus:ring-slate-100" />
-                                {form.formState.errors.Name && <p className="text-[10px] text-red-500 mt-1 pl-1">{form.formState.errors.Name.message}</p>}
-                            </div>
-                            <div>
-                                <Input {...form.register("Slug")} placeholder="slug-to-chuc *" className="rounded-xl h-10 text-sm border-slate-200" />
-                                {form.formState.errors.Slug && <p className="text-[10px] text-red-500 mt-1 pl-1">{form.formState.errors.Slug.message}</p>}
-                            </div>
-                        </div>
-                    </div>
+          <div className="space-y-4 lg:col-span-8">
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+              <Field label="Organization name *" error={form.formState.errors.Name?.message}>
+                <Input {...form.register("Name")} placeholder="Enter organization name" className="h-11 rounded-xl" />
+              </Field>
 
-                    {/* Right Column: Detailed Info & Social */}
-                    <div className="md:col-span-8 flex flex-col gap-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                            <div>
-                                <Input {...form.register("Email")} placeholder="Email liên hệ *" className="rounded-xl h-10 text-sm border-slate-200" />
-                                {form.formState.errors.Email && <p className="text-[10px] text-red-500 mt-1 pl-1">{form.formState.errors.Email.message}</p>}
-                            </div>
-                            <div>
-                                <Input {...form.register("Phone")} placeholder="Số điện thoại *" className="rounded-xl h-10 text-sm border-slate-200" />
-                                {form.formState.errors.Phone && <p className="text-[10px] text-red-500 mt-1 pl-1">{form.formState.errors.Phone.message}</p>}
-                            </div>
-                        </div>
+              <Field label="Slug *" error={form.formState.errors.Slug?.message}>
+                <Input {...form.register("Slug")} placeholder="organization-slug" className="h-11 rounded-xl" />
+              </Field>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                            <div>
-                                <div className="relative">
-                                    <Globe className="absolute left-3 top-3 w-4 h-4 text-slate-400" />
-                                    <Input {...form.register("WebsiteUrl")} placeholder="Trang web" className="rounded-xl pl-9 h-10 text-sm bg-slate-50/30 border-slate-200" />
-                                </div>
-                                {form.formState.errors.WebsiteUrl && <p className="text-[10px] text-red-500 mt-1 pl-1">{form.formState.errors.WebsiteUrl.message}</p>}
-                            </div>
-                            <div>
-                                <div className="relative">
-                                    <Facebook className="absolute left-3 top-3 w-4 h-4 text-slate-400" />
-                                    <Input {...form.register("FacebookUrl")} placeholder="Facebook" className="rounded-xl pl-9 h-10 text-sm bg-slate-50/30 border-slate-200" />
-                                </div>
-                                {form.formState.errors.FacebookUrl && <p className="text-[10px] text-red-500 mt-1 pl-1">{form.formState.errors.FacebookUrl.message}</p>}
-                            </div>
-                            <div>
-                                <div className="relative">
-                                    <Instagram className="absolute left-3 top-3 w-4 h-4 text-slate-400" />
-                                    <Input {...form.register("InstagramUrl")} placeholder="Instagram" className="rounded-xl pl-9 h-10 text-sm bg-slate-50/30 border-slate-200" />
-                                </div>
-                                {form.formState.errors.InstagramUrl && <p className="text-[10px] text-red-500 mt-1 pl-1">{form.formState.errors.InstagramUrl.message}</p>}
-                            </div>
-                            <div>
-                                <div className="relative">
-                                    <Music2 className="absolute left-3 top-3 w-4 h-4 text-slate-400" />
-                                    <Input {...form.register("TiktokUrl")} placeholder="TikTok" className="rounded-xl pl-9 h-10 text-sm bg-slate-50/30 border-slate-200" />
-                                </div>
-                                {form.formState.errors.TiktokUrl && <p className="text-[10px] text-red-500 mt-1 pl-1">{form.formState.errors.TiktokUrl.message}</p>}
-                            </div>
-                        </div>
+              <Field label="Email *" error={form.formState.errors.Email?.message}>
+                <Input {...form.register("Email")} placeholder="contact@example.com" className="h-11 rounded-xl" />
+              </Field>
 
-                        <div className="flex-1 flex flex-col min-h-[80px]">
-                            <Textarea {...form.register("Description")} placeholder="Mô tả ngắn gọn về tổ chức của bạn..." className="rounded-xl min-h-[80px] text-sm bg-slate-50/30 border-slate-200 flex-1" />
-                            {form.formState.errors.Description && <p className="text-[10px] text-red-500 mt-1 pl-1">{form.formState.errors.Description.message}</p>}
-                        </div>
+              <Field label="Phone *" error={form.formState.errors.Phone?.message}>
+                <Input {...form.register("Phone")} placeholder="0912345678" className="h-11 rounded-xl" />
+              </Field>
+            </div>
 
-                        <div>
-                            <Input {...form.register("Address")} placeholder="Địa chỉ trụ sở chính" className="rounded-xl h-10 text-sm bg-slate-50/30 border-slate-200" />
-                            {form.formState.errors.Address && <p className="text-[10px] text-red-500 mt-1 pl-1">{form.formState.errors.Address.message}</p>}
-                        </div>
-                    </div>
-                </div>
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+              <Field label="Website" error={form.formState.errors.WebsiteUrl?.message}>
+                <IconInput icon={Globe} placeholder="https://your-site.com" {...form.register("WebsiteUrl")} />
+              </Field>
+              <Field label="Facebook" error={form.formState.errors.FacebookUrl?.message}>
+                <IconInput icon={Facebook} placeholder="https://facebook.com/..." {...form.register("FacebookUrl")} />
+              </Field>
+              <Field label="Instagram" error={form.formState.errors.InstagramUrl?.message}>
+                <IconInput icon={Instagram} placeholder="https://instagram.com/..." {...form.register("InstagramUrl")} />
+              </Field>
+              <Field label="TikTok" error={form.formState.errors.TiktokUrl?.message}>
+                <IconInput icon={Music2} placeholder="https://tiktok.com/..." {...form.register("TiktokUrl")} />
+              </Field>
+            </div>
 
-                <div className="flex items-center justify-between pt-2 border-t border-slate-100">
-                    <p className="text-[10px] text-slate-400">(*) Các thông tin bắt buộc phải điền đầy đủ</p>
-                    <Button
-                        type="submit"
-                        disabled={create.isPending}
-                        className="bg-slate-900 hover:bg-slate-800 text-white rounded-full px-8 font-bold h-10 flex items-center gap-2 transition-all active:scale-95"
-                    >
-                        {create.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-3 h-3" />}
-                        Gửi hồ sơ ngay
-                    </Button>
-                </div>
-            </form>
+            <Field label="Description" error={form.formState.errors.Description?.message}>
+              <Textarea
+                {...form.register("Description")}
+                placeholder="Short description about your organization..."
+                className="min-h-[96px] rounded-xl"
+              />
+            </Field>
+
+            <Field label="Address" error={form.formState.errors.Address?.message}>
+              <Input {...form.register("Address")} placeholder="Office address" className="h-11 rounded-xl" />
+            </Field>
+          </div>
         </div>
-    );
+
+        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 pt-4">
+          <p className="text-xs text-slate-500">Fields marked with * are required.</p>
+          <Button type="submit" disabled={create.isPending} className="h-10 rounded-full px-6 font-semibold">
+            {create.isPending ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Submitting...
+              </>
+            ) : (
+              <>
+                <SendHorizonal className="h-4 w-4" />
+                Submit Request
+              </>
+            )}
+          </Button>
+        </div>
+      </form>
+    </div>
+  );
+}
+
+function Field({
+  label,
+  children,
+  error,
+}: {
+  label: string;
+  children: React.ReactNode;
+  error?: string;
+}) {
+  return (
+    <div className="space-y-1.5">
+      <label className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">{label}</label>
+      {children}
+      <ErrorText message={error} />
+    </div>
+  );
+}
+
+function IconInput({
+  icon: Icon,
+  ...props
+}: React.ComponentProps<typeof Input> & { icon: React.ComponentType<{ className?: string }> }) {
+  return (
+    <div className="relative">
+      <Icon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+      <Input {...props} className={`h-11 rounded-xl pl-10 ${props.className || ""}`} />
+    </div>
+  );
+}
+
+function ErrorText({ message }: { message?: string }) {
+  if (!message) return null;
+  return <p className="text-xs font-medium text-rose-600">{message}</p>;
 }

@@ -6,10 +6,11 @@ import { EventGetListQuery } from "@/types/event";
 import { toast } from "sonner";
 import { handleErrorApi } from "@/lib/errors";
 
-export const useGetEvents = (params?: EventGetListQuery) => {
+export const useGetEvents = (params?: EventGetListQuery, enabled = true) => {
     return useQuery({
         queryKey: QUERY_KEY.events.list(params),
         queryFn: () => eventRequest.getList(params || {}),
+        enabled,
     });
 };
 

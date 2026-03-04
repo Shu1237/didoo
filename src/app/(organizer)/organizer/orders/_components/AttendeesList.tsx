@@ -1,109 +1,132 @@
 "use client";
 
-import React from "react";
 import { Ticket } from "@/types/ticket";
 import { TicketStatus } from "@/utils/enum";
-import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import {
-    User,
-    Mail,
-    Calendar,
-    Ticket as TicketIcon,
-    CheckCircle2,
-    XCircle,
-    Clock
-} from "lucide-react";
 
 interface AttendeesListProps {
-    tickets: Ticket[];
-    isLoading?: boolean;
+  tickets: Ticket[];
+  isLoading?: boolean;
+  emptyMessage?: string;
 }
 
-export default function AttendeesList({ tickets, isLoading }: AttendeesListProps) {
-    if (isLoading) {
-        return (
-            <div className="flex flex-col items-center justify-center py-20 animate-pulse">
-                <div className="w-12 h-12 bg-zinc-100 rounded-2xl mb-4" />
-                <div className="h-4 w-32 bg-zinc-100 rounded-full" />
-            </div>
-        );
-    }
+type BadgeTone = "green" | "amber" | "rose" | "zinc";
 
-    if (tickets.length === 0) {
-        return (
-            <div className="flex flex-col items-center justify-center py-20 text-center">
-                <div className="w-20 h-20 rounded-[32px] bg-zinc-50 flex items-center justify-center text-zinc-300 mb-6">
-                    <TicketIcon className="w-10 h-10" />
-                </div>
-                <h3 className="text-xl font-black tracking-tighter text-zinc-900 uppercase italic">Chưa có người tham gia</h3>
-                <p className="text-zinc-400 text-sm font-medium mt-2 max-w-[280px]">
-                    Khi có người mua vé cho sự kiện này, danh sách sẽ được hiển thị tại đây.
-                </p>
-            </div>
-        );
-    }
+const statusMap: Record<number, { label: string; tone: BadgeTone }> = {
+  [TicketStatus.AVAILABLE]: { label: "Sẵn sàng", tone: "green" },
+  [TicketStatus.FULL]: { label: "Đã sử dụng", tone: "amber" },
+  [TicketStatus.UNAVAILABLE]: { label: "Không khả dụng", tone: "rose" },
+  [TicketStatus.LOCKED]: { label: "Đang khóa", tone: "zinc" },
+};
 
+const toneClasses: Record<BadgeTone, string> = {
+  green: "border-emerald-200 bg-emerald-50 text-emerald-700",
+  amber: "border-amber-200 bg-amber-50 text-amber-700",
+  rose: "border-rose-200 bg-rose-50 text-rose-700",
+  zinc: "border-zinc-200 bg-zinc-100 text-zinc-700",
+};
+
+const dateTimeFormatter = new Intl.DateTimeFormat("vi-VN", {
+  day: "2-digit",
+  month: "2-digit",
+  year: "numeric",
+  hour: "2-digit",
+  minute: "2-digit",
+});
+
+const getStatusInfo = (status: number) => statusMap[status] || { label: "Chưa rõ", tone: "zinc" as const };
+
+const toToken = (id: string) => id.split("-")[0]?.toUpperCase() || id.slice(0, 8).toUpperCase();
+
+export default function AttendeesList({ tickets, isLoading, emptyMessage }: AttendeesListProps) {
+  if (isLoading) {
     return (
-        <div className="w-full overflow-hidden">
-            <table className="w-full text-left border-collapse">
-                <thead>
-                    <tr className="bg-zinc-50/50 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">
-                        <th className="px-8 py-5">Người tham gia</th>
-                        <th className="px-8 py-5">Loại vé</th>
-                        <th className="px-8 py-5">Ngày đặt</th>
-                        <th className="px-8 py-5">Trạng thái</th>
-                        <th className="px-8 py-5 text-right">Mã vé</th>
-                    </tr>
-                </thead>
-                <tbody className="divide-y divide-zinc-100">
-                    {tickets.map((ticket) => (
-                        <tr key={ticket.id} className="hover:bg-zinc-50 transition-colors group">
-                            <td className="px-8 py-6">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-full bg-zinc-100 flex items-center justify-center text-zinc-500 overflow-hidden border border-zinc-200">
-                                        <User className="w-5 h-5" />
-                                    </div>
-                                    <div className="flex flex-col">
-                                        <span className="text-sm font-black text-zinc-900 tracking-tight">Nguyễn Văn A</span>
-                                        <span className="text-[10px] text-zinc-400 font-bold flex items-center gap-1">
-                                            <Mail className="w-3 h-3" /> user@example.com
-                                        </span>
-                                    </div>
-                                </div>
-                            </td>
-                            <td className="px-8 py-6">
-                                <Badge variant="outline" className="rounded-full px-3 py-1 bg-zinc-50 text-zinc-600 border-zinc-200 text-[9px] font-black uppercase tracking-widest">
-                                    {ticket.ticketType?.name || "Standard"}
-                                </Badge>
-                            </td>
-                            <td className="px-8 py-6 text-[11px] text-zinc-500 font-bold">
-                                <div className="flex flex-col gap-1">
-                                    <div className="flex items-center gap-1.5 uppercase tracking-tighter">
-                                        <Calendar className="w-3 h-3" /> 24/02/2026
-                                    </div>
-                                    <div className="flex items-center gap-1.5 text-zinc-400">
-                                        <Clock className="w-3 h-3" /> 14:30
-                                    </div>
-                                </div>
-                            </td>
-                            <td className="px-8 py-6">
-                                <Badge className={cn(
-                                    "rounded-full px-3 py-1 text-[9px] font-black uppercase tracking-widest border-none shadow-sm",
-                                    ticket.status === TicketStatus.FULL ? "bg-emerald-500 text-white" : "bg-zinc-400 text-white"
-                                )}>
-                                    {ticket.status === TicketStatus.FULL ? "Đã thanh toán" : "Chờ xử lý"}
-                                </Badge>
-                            </td>
-                            <td className="px-8 py-6 text-right">
-                                <code className="text-[11px] font-black text-primary bg-primary/5 px-3 py-1.5 rounded-lg border border-primary/10 tracking-widest">
-                                    {ticket.id.split('-')[0].toUpperCase()}
-                                </code>
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-        </div>
+      <div className="space-y-3 p-4 lg:p-5">
+        {Array.from({ length: 6 }).map((_, index) => (
+          <div key={`loading-${index}`} className="h-14 animate-pulse rounded-xl bg-zinc-100" />
+        ))}
+      </div>
     );
+  }
+
+  if (tickets.length === 0) {
+    return (
+      <div className="flex h-full min-h-[240px] items-center justify-center p-6 text-center">
+        <p className="text-sm text-zinc-500">{emptyMessage || "Chưa có vé nào."}</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="h-full">
+      <div className="hidden md:block">
+        <table className="w-full border-collapse">
+          <thead>
+            <tr className="border-b border-zinc-100 bg-zinc-50 text-left">
+              <th className="px-5 py-3 text-[11px] font-semibold uppercase tracking-wide text-zinc-500">Mã vé</th>
+              <th className="px-5 py-3 text-[11px] font-semibold uppercase tracking-wide text-zinc-500">Loại vé</th>
+              <th className="px-5 py-3 text-[11px] font-semibold uppercase tracking-wide text-zinc-500">Khu vực</th>
+              <th className="px-5 py-3 text-[11px] font-semibold uppercase tracking-wide text-zinc-500">Thời gian tạo</th>
+              <th className="px-5 py-3 text-[11px] font-semibold uppercase tracking-wide text-zinc-500">Trạng thái</th>
+              <th className="px-5 py-3 text-right text-[11px] font-semibold uppercase tracking-wide text-zinc-500">Token</th>
+            </tr>
+          </thead>
+
+          <tbody className="divide-y divide-zinc-100">
+            {tickets.map((ticket) => {
+              const statusInfo = getStatusInfo(ticket.status);
+
+              return (
+                <tr key={ticket.id} className="transition-colors hover:bg-zinc-50/70">
+                  <td className="px-5 py-3 text-sm font-medium text-zinc-900">{ticket.id}</td>
+                  <td className="px-5 py-3 text-sm text-zinc-700">{ticket.ticketType?.name || "Standard"}</td>
+                  <td className="px-5 py-3 text-sm text-zinc-600">{ticket.zone || "--"}</td>
+                  <td className="px-5 py-3 text-sm text-zinc-600">{dateTimeFormatter.format(new Date(ticket.createdAt))}</td>
+                  <td className="px-5 py-3">
+                    <span
+                      className={cn(
+                        "inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-medium",
+                        toneClasses[statusInfo.tone]
+                      )}
+                    >
+                      {statusInfo.label}
+                    </span>
+                  </td>
+                  <td className="px-5 py-3 text-right text-xs font-semibold tracking-wide text-primary">#{toToken(ticket.id)}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="space-y-2 p-3 md:hidden">
+        {tickets.map((ticket) => {
+          const statusInfo = getStatusInfo(ticket.status);
+
+          return (
+            <div key={`mobile-${ticket.id}`} className="rounded-xl border border-zinc-200 bg-white p-3">
+              <div className="flex items-start justify-between gap-2">
+                <p className="line-clamp-1 text-sm font-semibold text-zinc-900">{ticket.id}</p>
+                <span
+                  className={cn(
+                    "inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-medium",
+                    toneClasses[statusInfo.tone]
+                  )}
+                >
+                  {statusInfo.label}
+                </span>
+              </div>
+
+              <div className="mt-2 space-y-1 text-xs text-zinc-600">
+                <p>Loại vé: {ticket.ticketType?.name || "Standard"}</p>
+                <p>Khu vực: {ticket.zone || "--"}</p>
+                <p>Thời gian: {dateTimeFormatter.format(new Date(ticket.createdAt))}</p>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
 }

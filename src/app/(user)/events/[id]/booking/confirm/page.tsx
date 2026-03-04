@@ -1,17 +1,17 @@
 "use client";
 
-import { use, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
+import { Suspense, use } from "react";
 import Link from "next/link";
-import { useGetBooking } from "@/hooks/useBooking";
-import { useGetEvent } from "@/hooks/useEvent";
+import { useSearchParams } from "next/navigation";
+import { CheckCircle2, ChevronLeft, CalendarDays } from "lucide-react";
 import Loading from "@/components/loading";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, CheckCircle2 } from "lucide-react";
+import { useGetBooking } from "@/hooks/useBooking";
+import { useGetEvent } from "@/hooks/useEvent";
 
 function ConfirmContent({ eventId }: { eventId: string }) {
   const searchParams = useSearchParams();
-  const bookingId = searchParams.get("bookingId") ?? "";
+  const bookingId = searchParams.get("bookingId") || "";
 
   const { data: bookingRes, isLoading, isError } = useGetBooking(bookingId);
   const { data: eventRes } = useGetEvent(eventId);
@@ -19,90 +19,147 @@ function ConfirmContent({ eventId }: { eventId: string }) {
   const booking = bookingRes?.data;
   const event = eventRes?.data;
 
-  if (!bookingId) {
-    return (
-      <main className="min-h-screen bg-[#050505] text-white flex items-center justify-center">
-        <div className="text-center max-w-md px-6">
-          <p className="text-white/70 mb-6">Thiếu thông tin booking. Vui lòng kiểm tra lại link.</p>
-          <Button asChild className="rounded-full bg-primary text-black">
-            <Link href={`/events/${eventId}`}>Quay lại sự kiện</Link>
-          </Button>
-        </div>
-      </main>
-    );
-  }
+  if (!bookingId)
+    return <ErrorBox message="Thiếu mã booking trong đường dẫn." eventId={eventId} />;
 
   if (isLoading) return <Loading />;
 
-  if (isError || !booking) {
-    return (
-      <main className="min-h-screen bg-[#050505] text-white flex items-center justify-center">
-        <div className="text-center max-w-md px-6">
-          <p className="text-white/70 mb-6">Không tìm thấy thông tin đặt vé.</p>
-          <Button asChild className="rounded-full bg-primary text-black">
-            <Link href={`/events/${eventId}`}>Quay lại sự kiện</Link>
-          </Button>
-        </div>
-      </main>
-    );
-  }
+  if (isError || !booking)
+    return <ErrorBox message="Không tìm thấy thông tin đặt vé." eventId={eventId} />;
 
   return (
-    <main className="min-h-screen bg-[#050505] text-white">
-      <div className="max-w-2xl mx-auto px-6 py-12">
-        <Link
-          href={`/events/${eventId}`}
-          className="inline-flex items-center gap-2 text-white/70 hover:text-white mb-8"
-        >
-          <ChevronLeft className="w-5 h-5" />
-          <span className="font-medium">Quay lại sự kiện</span>
-        </Link>
+    <main className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
+      <div className="w-full max-w-5xl bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row">
 
-        <div className="p-8 rounded-3xl border border-white/10 bg-white/5 space-y-6">
-          <div className="flex items-center gap-3">
-            <CheckCircle2 className="w-12 h-12 text-primary shrink-0" />
-            <div>
-              <h1 className="text-2xl font-black uppercase">Xác nhận đặt vé</h1>
-              <p className="text-white/60 text-sm mt-1">
-                {event?.name || "Sự kiện"}
+        {/* LEFT SIDE */}
+        <div className="relative md:w-1/2 h-72 md:h-auto bg-slate-900">
+          <img
+            src={
+              event?.bannerUrl ||
+              event?.thumbnailUrl ||
+              "https://images.unsplash.com/photo-1492684223066-81342ee5ff30"
+            }
+            alt="Event"
+            className="w-full h-full object-cover opacity-60"
+          />
+
+          <div className="absolute inset-0 flex flex-col items-center justify-center text-white text-center p-6">
+            <div className="h-16 w-16 flex items-center justify-center rounded-full bg-emerald-500 shadow-xl">
+              <CheckCircle2 className="w-9 h-9" />
+            </div>
+
+            <h1 className="mt-4 text-2xl font-black">
+              Booking Successful
+            </h1>
+
+            <p className="mt-2 text-sm opacity-80 line-clamp-2">
+              {event?.name || "Your Event Booking"}
+            </p>
+          </div>
+        </div>
+
+        {/* RIGHT SIDE */}
+        <div className="md:w-1/2 p-8 flex flex-col justify-between">
+          <div>
+            <Link
+              href={`/events/${eventId}`}
+              className="inline-flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-slate-900 mb-6"
+            >
+              <ChevronLeft size={16} />
+              Back to Event
+            </Link>
+
+            <div className="grid grid-cols-2 gap-6">
+              <Info label="Booking ID" value={booking.id?.slice(0, 12)} />
+              <Info
+                label="Total Payment"
+                value={`${Number(
+                  booking.totalPrice ?? booking.amount ?? 0
+                ).toLocaleString("vi-VN")}đ`}
+                highlight
+              />
+              <Info label="Name" value={booking.fullname} />
+              <Info
+                label="Created At"
+                value={
+                  booking.createdAt
+                    ? new Date(booking.createdAt).toLocaleString("vi-VN")
+                    : "--"
+                }
+              />
+              <div className="col-span-2">
+                <Info label="Email" value={booking.email} />
+              </div>
+            </div>
+
+            <div className="mt-8 bg-amber-50 border border-amber-200 rounded-2xl p-4">
+              <div className="flex items-center gap-2 text-amber-700 font-semibold text-sm">
+                <CalendarDays size={16} />
+                Important Note
+              </div>
+              <p className="mt-2 text-sm text-amber-800">
+                Please arrive 30 minutes before opening time and prepare your QR code.
               </p>
             </div>
           </div>
 
-          <div className="space-y-4 pt-4 border-t border-white/10">
-            <div className="flex justify-between text-sm">
-              <span className="text-white/60">Mã đặt vé</span>
-              <span className="font-bold">{booking.id}</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-white/60">Họ tên</span>
-              <span className="font-bold">{booking.fullname}</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-white/60">Email</span>
-              <span className="font-bold">{booking.email}</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-white/60">Tổng tiền</span>
-              <span className="font-black text-primary">
-                {Number(booking.totalPrice ?? booking.amount ?? 0).toLocaleString("vi-VN")}đ
-              </span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-white/60">Trạng thái</span>
-              <span className="font-bold">{booking.status}</span>
-            </div>
-          </div>
-
-          <div className="flex gap-3 pt-4">
-            <Button asChild className="flex-1 rounded-full bg-primary text-black font-bold">
-              <Link href="/user/tickets">Xem vé của tôi</Link>
+          <div className="flex gap-4 mt-8">
+            <Button asChild className="flex-1 rounded-xl">
+              <Link href="/user/tickets">View Tickets</Link>
             </Button>
-            <Button asChild variant="outline" className="rounded-full border-white/20 text-white hover:bg-white/10">
-              <Link href={`/events/${eventId}`}>Quay lại sự kiện</Link>
+
+            <Button
+              asChild
+              variant="outline"
+              className="flex-1 rounded-xl"
+            >
+              <Link href={`/events/${eventId}`}>Go Back</Link>
             </Button>
           </div>
         </div>
+      </div>
+    </main>
+  );
+}
+
+function Info({
+  label,
+  value,
+  highlight,
+}: {
+  label: string;
+  value?: string;
+  highlight?: boolean;
+}) {
+  return (
+    <div className="flex flex-col">
+      <span className="text-xs font-semibold uppercase text-slate-400">
+        {label}
+      </span>
+      <span
+        className={`text-lg font-bold ${highlight ? "text-emerald-500" : "text-slate-900"
+          }`}
+      >
+        {value || "--"}
+      </span>
+    </div>
+  );
+}
+
+function ErrorBox({
+  message,
+  eventId,
+}: {
+  message: string;
+  eventId: string;
+}) {
+  return (
+    <main className="min-h-screen flex items-center justify-center bg-slate-50 p-6">
+      <div className="bg-white p-8 rounded-2xl shadow-lg text-center">
+        <p className="text-slate-600">{message}</p>
+        <Button asChild className="mt-4">
+          <Link href={`/events/${eventId}`}>Quay lại sự kiện</Link>
+        </Button>
       </div>
     </main>
   );

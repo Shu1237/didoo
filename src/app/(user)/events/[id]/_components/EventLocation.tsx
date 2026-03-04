@@ -1,172 +1,255 @@
-'use client';
+"use client";
 
-import React, { useEffect, useState, useMemo } from 'react';
-import MapComponent, { Marker, NavigationControl } from 'react-map-gl/mapbox';
-import 'mapbox-gl/dist/mapbox-gl.css';
-import { MapPin, Navigation, ArrowRight } from 'lucide-react';
-import { Event } from "@/types/event";
-import { getDistanceKm } from '@/utils/helper';
-import envconfig from '../../../../../../config';
+import { useEffect, useState } from "react";
+import Map, { Marker, NavigationControl } from "react-map-gl/mapbox";
+import "mapbox-gl/dist/mapbox-gl.css";
+import { ArrowUpRight, MapPin, Navigation } from "lucide-react";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { motion } from 'framer-motion';
+import { Event } from "@/types/event";
+import { getDistanceKm } from "@/utils/helper";
+import envconfig from "../../../../../../config";
 
 interface EventLocationProps {
-    event: Event;
+  event: Event;
 }
 
+interface ResolvedLocation {
+  name: string;
+  address: string;
+  latitude: number | null;
+  longitude: number | null;
+}
+
+const DEFAULT_CENTER = {
+  latitude: 10.7769,
+  longitude: 106.7009,
+};
+
 export default function EventLocation({ event }: EventLocationProps) {
-    const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [resolvedLocations, setResolvedLocations] = useState<ResolvedLocation[]>([]);
+  const [isGeocoding, setIsGeocoding] = useState(true);
 
-    const locations = event.locations || [];
-    const firstLocation = locations[0];
-    const eventLat = firstLocation?.latitude || 0;
-    const eventLng = firstLocation?.longitude || 0;
+  const rawLocations = event.locations || [];
+  const categoryIcon = event.category?.iconUrl;
 
-    useEffect(() => {
-        if (!navigator.geolocation) {
-            setIsLoading(false);
-            return;
+  // 1. Get User Location
+  useEffect(() => {
+    if (!navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setUserLocation({
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        });
+      },
+      () => { },
+    );
+  }, []);
+
+  // 2. Geocode missing coordinates
+  useEffect(() => {
+    async function resolveCoordinates() {
+      setIsGeocoding(true);
+      const token = envconfig.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
+      const updatedLocations: ResolvedLocation[] = [];
+
+      for (const loc of rawLocations) {
+        let lat = (loc as any).Latitude || loc.latitude;
+        let lng = (loc as any).Longitude || loc.longitude;
+
+        // If coordinates are missing/zero but we have an address, geocode it
+        if ((!lat || !lng || (lat === 0 && lng === 0)) && loc.address && token) {
+          try {
+            const res = await fetch(`https://api.mapbox.com/search/geocode/v6/forward?q=${encodeURIComponent(loc.address)}&access_token=${token}&limit=1`);
+            const data = await res.json();
+            if (data.features && data.features.length > 0) {
+              const [resolvedLng, resolvedLat] = data.features[0].geometry.coordinates;
+              lat = resolvedLat;
+              lng = resolvedLng;
+            }
+          } catch (error) {
+            console.error("Geocoding failed for address:", loc.address, error);
+          }
         }
 
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                setUserLocation({
-                    lat: position.coords.latitude,
-                    lng: position.coords.longitude,
-                });
-                setIsLoading(false);
-            },
-            (error) => {
-                console.error('Error getting location:', error);
-                setIsLoading(false);
-            }
-        );
-    }, []);
+        updatedLocations.push({
+          name: loc.name,
+          address: loc.address,
+          latitude: lat || null,
+          longitude: lng || null
+        });
+      }
 
-    const distance = useMemo(() => {
-        if (!userLocation || !eventLat || !eventLng) return null;
-        return getDistanceKm(userLocation.lat, userLocation.lng, eventLat, eventLng);
-    }, [userLocation, eventLat, eventLng]);
+      setResolvedLocations(updatedLocations);
+      setIsGeocoding(false);
+    }
 
-    return (
-        <section className="relative py-24 bg-[#0a0a0a] overflow-hidden">
-            {/* Ambient background light */}
-            <div className="absolute inset-0 pointer-events-none">
-                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full h-[60%] bg-primary/5 blur-[180px] rounded-full" />
+    if (rawLocations.length > 0) {
+      resolveCoordinates();
+    } else {
+      setIsGeocoding(false);
+    }
+  }, [rawLocations]);
+
+  const firstLocation = resolvedLocations[0];
+  const firstLat = firstLocation?.latitude;
+  const firstLng = firstLocation?.longitude;
+
+  const mapCenter = {
+    latitude: firstLat || DEFAULT_CENTER.latitude,
+    longitude: firstLng || DEFAULT_CENTER.longitude,
+  };
+
+  const distance =
+    userLocation && firstLat && firstLng
+      ? getDistanceKm(
+        userLocation.lat,
+        userLocation.lng,
+        firstLat,
+        firstLng,
+      )
+      : null;
+
+  return (
+    <section className="space-y-6">
+      <div className="space-y-3">
+        <h2 className="text-3xl font-black tracking-tight text-slate-900 md:text-4xl">
+          Event Location
+        </h2>
+        <p className="max-w-xl text-base text-slate-600 font-medium">
+          View the venue location on the map and get Google Maps directions.
+        </p>
+      </div>
+
+      <div className="relative w-full group mb-8 md:mb-12">
+        <div className="relative overflow-hidden rounded-[2.5rem] border border-slate-200 bg-slate-50 shadow-inner h-[500px] md:h-[600px] w-full">
+          {isGeocoding ? (
+            <div className="flex h-full w-full items-center justify-center p-6 text-center">
+              <div className="flex flex-col items-center gap-4">
+                <div className="h-8 w-8 animate-spin rounded-full border-4 border-slate-200 border-t-sky-600" />
+                <span className="text-slate-500 font-bold uppercase tracking-widest text-xs">Locating Venue...</span>
+              </div>
             </div>
-
-            <div className="max-w-[1700px] mx-auto px-6 md:px-12 grid grid-cols-1 lg:grid-cols-12 gap-16 items-start relative z-10">
-
-                {/* LEFT: Mapping Display */}
-                <motion.div
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    viewport={{ once: true }}
-                    className="lg:col-span-8 relative aspect-video md:aspect-[21/9] rounded-[60px] overflow-hidden border border-white/10 bg-white/5 shadow-3xl"
-                >
-                    {isLoading ? (
-                        <div className="w-full h-full flex items-center justify-center">
-                            <div className="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
-                        </div>
-                    ) : (
-                        <MapComponent
-                            mapboxAccessToken={envconfig.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}
-                            initialViewState={{
-                                longitude: eventLng,
-                                latitude: eventLat,
-                                zoom: 14,
-                            }}
-                            style={{ width: '100%', height: '100%' }}
-                            mapStyle="mapbox://styles/mapbox/dark-v11"
-                        >
-                            <NavigationControl position="top-right" />
-
-                            {/* Minimal Event Markers */}
-                            {locations.map((loc, idx) => (
-                                <Marker key={idx} longitude={loc.longitude || 0} latitude={loc.latitude || 0} anchor="bottom">
-                                    <div className="relative group flex items-center justify-center">
-                                        <div className="w-8 h-8 bg-primary rounded-full shadow-[0_0_30px_rgba(var(--primary),0.8)] border-4 border-white transition-transform group-hover:scale-125" />
-                                        <div className="absolute -top-14 bg-white text-black px-5 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-2xl opacity-0 group-hover:opacity-100 transition-all translate-y-2 group-hover:translate-y-0 whitespace-nowrap">
-                                            {loc.name}
-                                        </div>
-                                    </div>
-                                </Marker>
-                            ))}
-
-                            {/* User Marker */}
-                            {userLocation && (
-                                <Marker longitude={userLocation.lng} latitude={userLocation.lat} anchor="bottom">
-                                    <div className="w-5 h-5 bg-white rounded-full border-4 border-primary shadow-2xl animate-pulse" />
-                                </Marker>
-                            )}
-                        </MapComponent>
-                    )}
-                </motion.div>
-
-                {/* RIGHT: Location Details (Premium Integration) */}
-                <motion.div
-                    initial={{ opacity: 0, x: 30 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    className="lg:col-span-4 space-y-12"
-                >
-                    <div className="space-y-8">
-                        <div className="space-y-4">
-                            <span className="text-xs font-black uppercase tracking-[0.4em] text-primary block">Bản đồ & Vị trí</span>
-                            <h2 className="text-5xl md:text-6xl font-black tracking-tighter text-white leading-[0.9] uppercase">
-                                Không gian <br /> <span className="text-primary">Sự kiện.</span>
-                            </h2>
-                        </div>
-
-                        <div className="space-y-6 max-h-[500px] overflow-y-auto pr-4 scrollbar-hide py-2">
-                            {locations.length > 0 ? locations.map((loc, idx) => (
-                                <div key={idx} className="group p-8 rounded-[40px] bg-white/[0.08] border border-white/20 hover:bg-white/[0.12] hover:border-primary transition-all duration-500">
-                                    <div className="flex items-start justify-between gap-4 mb-6">
-                                        <div className="space-y-2">
-                                            <p className="text-white font-black text-2xl tracking-tight uppercase leading-none">{loc.name}</p>
-                                            <p className="text-sm text-white/60 font-bold leading-relaxed">{loc.address}</p>
-                                        </div>
-                                        <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center text-primary border border-white/20 group-hover:bg-primary group-hover:text-black transition-all">
-                                            <MapPin className="w-6 h-6" />
-                                        </div>
-                                    </div>
-
-                                    <Button
-                                        className="h-14 w-full rounded-2xl bg-white/5 border border-white/10 text-white hover:bg-white hover:text-black transition-all duration-500 font-black uppercase text-[10px] tracking-[0.2em]"
-                                        onClick={() => window.open(`https://www.google.com/maps/dir/?api=1&destination=${loc.latitude},${loc.longitude}`, '_blank')}
-                                        disabled={!loc.latitude || !loc.longitude}
-                                    >
-                                        Chỉ đường <ArrowRight className="ml-2 w-4 h-4" />
-                                    </Button>
-                                </div>
-                            )) : (
-                                <div className="p-10 rounded-[40px] bg-white/[0.08] border border-white/20 text-center">
-                                    <p className="text-white/60 text-lg font-bold">
-                                        Địa điểm sắp được cập nhật
-                                    </p>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-
-                    {/* Proximity Card (Premium Dribbble Style) */}
-                    {distance !== null && firstLocation && (
-                        <div className="bg-gradient-to-br from-primary/20 to-transparent border border-primary/20 p-10 rounded-[48px] flex items-center gap-8 relative overflow-hidden group">
-                            <div className="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity" />
-                            <div className="w-20 h-20 rounded-[28px] bg-white text-black flex items-center justify-center shadow-2xl relative z-10 scale-90 group-hover:scale-100 transition-transform duration-500">
-                                <Navigation className="w-10 h-10" />
-                            </div>
-                            <div className="relative z-10">
-                                <p className="text-[10px] font-black text-white/40 uppercase tracking-[0.3em] mb-2 leading-none">Khoảng cách</p>
-                                <div className="text-4xl font-black text-white tracking-widest">
-                                    {distance.toFixed(1)} <span className="text-primary tracking-tighter ml-1 text-2xl">KM</span>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-                </motion.div>
+          ) : resolvedLocations.length === 0 ? (
+            <div className="flex h-full w-full items-center justify-center p-6 text-center text-slate-500 font-bold uppercase tracking-widest text-xs">
+              Location details are updating.
             </div>
-        </section>
-    );
+          ) : (
+            <>
+              {/* The Full Width Map Background */}
+              <Map
+                mapboxAccessToken={envconfig.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}
+                initialViewState={{
+                  latitude: mapCenter.latitude,
+                  longitude: mapCenter.longitude,
+                  zoom: 14,
+                }}
+                mapStyle="mapbox://styles/mapbox/streets-v12"
+                style={{ width: "100%", height: "100%" }}
+              >
+                <NavigationControl position="top-right" />
+
+                {resolvedLocations.map((loc) => {
+                  const lat = loc.latitude;
+                  const lng = loc.longitude;
+
+                  if (!lat || !lng) return null;
+
+                  return (
+                    <Marker
+                      key={`${loc.name}-${lat}-${lng}`}
+                      latitude={lat}
+                      longitude={lng}
+                      anchor="bottom"
+                    >
+                      <div className="relative rounded-full border-2 border-white bg-sky-600 p-1 text-white shadow-lg motion-safe:animate-bounce flex items-center justify-center w-10 h-10 overflow-hidden">
+                        {categoryIcon ? (
+                          <img src={categoryIcon} alt="Marker Icon" className="w-full h-full object-cover" />
+                        ) : (
+                          <MapPin className="h-4 w-4" />
+                        )}
+                      </div>
+                    </Marker>
+                  );
+                })}
+
+                {userLocation && (
+                  <Marker latitude={userLocation.lat} longitude={userLocation.lng} anchor="center">
+                    <div className="h-4 w-4 rounded-full border-[3px] border-white bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.5)]" />
+                  </Marker>
+                )}
+              </Map>
+
+              {/* Clickable Overlay for Map integration */}
+              {firstLat && firstLng && (
+                <div
+                  className="absolute inset-0 z-10 bg-sky-900/0 hover:bg-sky-900/20 transition-colors duration-300 cursor-pointer"
+                  onClick={() => {
+                    router.push(`/map?eventId=${event.id}&lat=${firstLat}&lng=${firstLng}`);
+                  }}
+                >
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white/95 backdrop-blur-md text-sky-700 px-6 py-3 rounded-full font-bold shadow-xl shadow-sky-900/20 flex items-center gap-2 transform translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none">
+                    Open Map
+                    <ArrowUpRight className="h-4 w-4" />
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+
+        {/* Bottom Right Floating Info Card - Breaking out of map */}
+        {!isGeocoding && resolvedLocations.length > 0 && firstLocation && (
+          <div className="absolute -bottom-6 right-4 md:-bottom-8 md:-right-8 z-20 w-[calc(100%-2rem)] max-w-[320px] pointer-events-none">
+            <article className="rounded-[2rem] border border-white/40 bg-white/80 backdrop-blur-xl p-6 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] pointer-events-auto transition-transform hover:-translate-y-1 duration-300">
+              <div className="flex items-start justify-between gap-4 mb-5">
+                <div>
+                  <h3 className="text-lg font-black text-slate-900 line-clamp-1">{firstLocation.name}</h3>
+                  <p className="mt-1 text-xs text-slate-500 font-semibold line-clamp-2">{firstLocation.address || "Address TBA"}</p>
+                </div>
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-sky-100/80 text-sky-600 shadow-inner">
+                  <MapPin className="h-4 w-4" />
+                </span>
+              </div>
+
+              {distance !== null && (
+                <div className="mb-5 flex items-center gap-3 rounded-2xl bg-slate-100/50 p-3">
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white shadow-sm text-emerald-600">
+                    <Navigation className="h-3.5 w-3.5" />
+                  </span>
+                  <div>
+                    <p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-500">
+                      Est. Distance
+                    </p>
+                    <p className="text-sm font-black text-slate-900">{distance.toFixed(1)} km</p>
+                  </div>
+                </div>
+              )}
+
+              <Button
+                onClick={(e) => {
+                  e.stopPropagation(); // Prevent triggering the background map click
+                  if (!firstLat || !firstLng) return;
+                  router.push(`/map?eventId=${event.id}&lat=${firstLat}&lng=${firstLng}`);
+                }}
+                disabled={!firstLat || !firstLng}
+                className="h-12 w-full rounded-2xl bg-slate-900 text-white hover:bg-slate-800 font-black tracking-widest uppercase text-[10px] shadow-lg shadow-slate-900/20 transition-all"
+              >
+                Get Directions
+                <ArrowUpRight className="ml-2 h-4 w-4" />
+              </Button>
+            </article>
+          </div>
+        )}
+      </div>
+
+      {!userLocation && (
+        <p className="text-xs font-medium text-slate-500 text-center md:text-left mt-2 pl-4">Enable location precision tracking to see distance to event.</p>
+      )}
+    </section>
+  );
 }

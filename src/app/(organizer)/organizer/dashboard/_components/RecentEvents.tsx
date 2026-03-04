@@ -1,77 +1,113 @@
-import { Card } from "@/components/ui/card";
+﻿import { Card } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 import Link from "next/link";
-import { Calendar, MoreHorizontal, ArrowUpRight } from "lucide-react";
+import { CalendarClock, MapPin, Ticket, ArrowRight } from "lucide-react";
+
+export type RecentEventTone = "success" | "warning" | "danger" | "neutral";
+
+export interface RecentEventItem {
+  id: string;
+  title: string;
+  date: string;
+  time: string;
+  location: string;
+  sold: number;
+  total: number;
+  fillRate: number;
+  statusLabel: string;
+  statusTone: RecentEventTone;
+}
 
 interface RecentEventsProps {
-  upcomingEvents: {
-    id: number;
-    title: string;
-    date: string;
-    time: string;
-    location: string;
-    sold: number;
-    total: number;
-    status: string;
-    revenue: string;
-  }[]
+  upcomingEvents: RecentEventItem[];
 }
+
+const statusStyles: Record<RecentEventTone, string> = {
+  success: "border-emerald-200 bg-emerald-50 text-emerald-700",
+  warning: "border-amber-200 bg-amber-50 text-amber-700",
+  danger: "border-rose-200 bg-rose-50 text-rose-700",
+  neutral: "border-zinc-200 bg-zinc-100 text-zinc-700",
+};
 
 export default function RecentEvents({ upcomingEvents }: RecentEventsProps) {
   return (
-    <Card className="rounded-[32px] border border-zinc-100 bg-white h-full flex flex-col overflow-hidden shadow-sm">
-      <div className="p-6 border-b border-zinc-100 flex items-center justify-between shrink-0">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-zinc-50 flex items-center justify-center text-primary border border-zinc-100">
-            <Calendar className="w-4 h-4" />
-          </div>
-          <h3 className="text-sm font-black tracking-tighter text-zinc-900 uppercase italic">Events</h3>
+    <Card className="flex h-full flex-col overflow-hidden rounded-3xl border border-zinc-200 bg-white shadow-sm">
+      <div className="flex items-center justify-between border-b border-zinc-100 px-5 py-4">
+        <div>
+          <h3 className="text-sm font-semibold tracking-tight text-zinc-900">Sự kiện gần nhất</h3>
+          <p className="text-xs text-zinc-500">Theo dõi trạng thái bán vé theo từng sự kiện</p>
         </div>
-        <Link href="/organizer/events/create" className="text-[10px] font-black uppercase tracking-widest text-primary hover:underline flex items-center gap-1.5">
-          All <ArrowUpRight className="w-3 h-3" />
+
+        <Link
+          href="/organizer/events"
+          className="inline-flex items-center gap-1 rounded-full border border-zinc-200 px-3 py-1.5 text-xs font-medium text-zinc-700 transition-colors hover:border-zinc-300 hover:bg-zinc-50"
+        >
+          Xem tất cả
+          <ArrowRight className="h-3.5 w-3.5" />
         </Link>
       </div>
 
       {!upcomingEvents || upcomingEvents.length === 0 ? (
-        <div className="flex-1 flex items-center justify-center p-8 text-zinc-400 text-xs font-semibold italic">
-          No events found
+        <div className="flex flex-1 items-center justify-center p-6 text-center">
+          <p className="text-sm text-zinc-500">Chưa có sự kiện nào từ API.</p>
         </div>
       ) : (
-        <div className="divide-y divide-zinc-100 flex-1 overflow-auto scrollbar-thin">
-          {upcomingEvents.map((event) => (
-            <div key={event.id} className="p-6 hover:bg-zinc-50 transition-all duration-500 group">
-              <div className="flex justify-between items-start gap-3 mb-4">
-                <Link href={`/organizer/events/${event.id}`} className="text-sm font-black text-zinc-900 group-hover:text-primary transition-colors line-clamp-1 tracking-tight">
-                  {event.title}
-                </Link>
-                <span className={`shrink-0 text-[8px] font-black uppercase tracking-widest px-2 py-1 rounded-full border ${event.status === 'Sắp diễn ra' ? 'bg-blue-50 text-blue-600 border-blue-100' :
-                    event.status === 'Sắp hết vé' ? 'bg-amber-50 text-amber-600 border-amber-100' :
-                      'bg-emerald-50 text-emerald-600 border-emerald-100'
-                  }`}>
-                  {event.status}
-                </span>
-              </div>
+        <div className="flex-1 overflow-auto">
+          <div className="divide-y divide-zinc-100">
+            {upcomingEvents.map((event) => {
+              const progress = Math.max(0, Math.min(100, event.fillRate));
 
-              <div className="flex items-center gap-3 text-[10px] font-black text-zinc-500 mb-5">
-                <div className="flex items-center gap-2 bg-zinc-100/50 px-3 py-1.5 rounded-lg border border-zinc-100">
-                  <Calendar className="w-3 h-3 text-zinc-400" />
-                  <span>{event.date}</span>
-                </div>
-              </div>
+              return (
+                <div key={event.id} className="space-y-3 px-5 py-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <Link
+                      href={`/organizer/events/${event.id}`}
+                      className="line-clamp-2 text-sm font-semibold text-zinc-900 transition-colors hover:text-primary"
+                    >
+                      {event.title}
+                    </Link>
 
-              <div className="space-y-3">
-                <div className="flex justify-between text-[9px] font-black uppercase tracking-widest">
-                  <span className="text-zinc-400">Sold</span>
-                  <span className="text-zinc-800">{event.sold} / {event.total}</span>
+                    <span
+                      className={cn(
+                        "shrink-0 rounded-full border px-2.5 py-1 text-[11px] font-semibold",
+                        statusStyles[event.statusTone]
+                      )}
+                    >
+                      {event.statusLabel}
+                    </span>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-3 text-xs text-zinc-500">
+                    <span className="inline-flex items-center gap-1.5">
+                      <CalendarClock className="h-3.5 w-3.5" />
+                      {event.date} • {event.time}
+                    </span>
+                    <span className="inline-flex items-center gap-1.5">
+                      <MapPin className="h-3.5 w-3.5" />
+                      {event.location}
+                    </span>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between text-xs text-zinc-600">
+                      <span className="inline-flex items-center gap-1.5">
+                        <Ticket className="h-3.5 w-3.5" />
+                        {event.sold} / {event.total} vé
+                      </span>
+                      <span className="font-medium">{progress.toFixed(1)}%</span>
+                    </div>
+
+                    <div className="h-2 overflow-hidden rounded-full bg-zinc-100">
+                      <div
+                        className="h-full rounded-full bg-gradient-to-r from-sky-500 to-cyan-400 transition-all duration-500"
+                        style={{ width: `${progress}%` }}
+                      />
+                    </div>
+                  </div>
                 </div>
-                <div className="h-1.5 w-full bg-zinc-100 rounded-full overflow-hidden border border-zinc-200/30">
-                  <div
-                    className="h-full bg-linear-to-r from-primary to-primary/80 rounded-full shadow-sm"
-                    style={{ width: `${(event.sold / event.total) * 100}%` }}
-                  ></div>
-                </div>
-              </div>
-            </div>
-          ))}
+              );
+            })}
+          </div>
         </div>
       )}
     </Card>

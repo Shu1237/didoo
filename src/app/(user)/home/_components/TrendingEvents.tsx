@@ -2,17 +2,8 @@
 
 import { Organizer } from "@/types/organizer";
 import Image from "next/image";
-import {
-    Carousel,
-    CarouselContent,
-    CarouselItem,
-    CarouselNext,
-    CarouselPrevious
-} from "@/components/ui/carousel";
 import { Button } from "@/components/ui/button";
-import { Twitter, Linkedin, Instagram, Facebook } from "lucide-react";
-
-import Autoplay from "embla-carousel-autoplay";
+import { motion } from "framer-motion";
 import Link from "next/link";
 
 interface TrendingEventsProps {
@@ -23,92 +14,93 @@ export const TrendingEvents = ({ organizers }: TrendingEventsProps) => {
     // If no organizers, don't show the section
     if (!organizers || organizers.length === 0) return null;
 
+    // Duplicate organizers array to ensure seamless infinite scrolling
+    const duplicatedOrganizers = [...organizers, ...organizers, ...organizers, ...organizers];
+
     return (
-        <section className="py-20 bg-slate-50">
-            <div className="container mx-auto px-4">
-                <div className="flex flex-col md:flex-row justify-between items-end mb-12">
-                    <div className="space-y-4">
-                        <span className="text-primary font-black uppercase tracking-[0.3em] text-sm">Our Network</span>
-                        <h2 className="text-4xl md:text-6xl font-black text-slate-900 uppercase leading-[0.9] tracking-tighter max-w-xl">
-                            Featured <br />
-                            Organizers
-                        </h2>
-                    </div>
-                </div>
-
-                <div className="w-full">
-                    <Carousel
-                        opts={{
-                            align: "start",
-                            loop: true,
-                        }}
-                        plugins={[
-                            Autoplay({
-                                delay: 3000,
-                            }),
-                        ]}
-                        className="w-full"
+        <section className="py-24 bg-white overflow-hidden border-t border-slate-100">
+            <div className="container mx-auto px-4 mb-16">
+                <div className="flex flex-col md:flex-row justify-between items-end">
+                    <motion.div
+                        initial={{ opacity: 0, x: -50 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        viewport={{ once: true, margin: "-100px" }}
+                        transition={{ duration: 0.8, ease: "easeOut" }}
                     >
-                        <CarouselContent className="-ml-4">
-                            {organizers.map((organizer, idx) => (
-                                <CarouselItem key={organizer.id} className="pl-4 basis-full md:basis-1/2 lg:basis-1/4">
-                                    <div className="relative group p-6 bg-white rounded-[32px] border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-500 hover:-translate-y-2">
-                                        {/* Image Container */}
-                                        <div className="aspect-square relative overflow-hidden rounded-2xl bg-slate-50 mb-6 group-hover:shadow-lg transition-all border border-slate-100">
-                                            <Image
-                                                src={organizer.logoUrl || 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=2070&auto=format&fit=crop'}
-                                                alt={organizer.name}
-                                                fill
-                                                className="object-cover transition-transform duration-700 group-hover:scale-110"
-                                            />
+                        <span className="text-primary font-black uppercase tracking-[0.3em] text-sm block mb-4">Curated Network</span>
+                        <h2 className="text-5xl md:text-7xl font-black text-slate-900 uppercase leading-[0.9] tracking-tighter">
+                            Featured <br />
+                            <span className="text-slate-400">Organizers</span>
+                        </h2>
+                    </motion.div>
 
-                                            {/* Social Overlay */}
-                                            <div className="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-3 backdrop-blur-[2px]">
-                                                {organizer.facebookUrl && (
-                                                    <Link href={organizer.facebookUrl} target="_blank">
-                                                        <Button size="icon" variant="ghost" className="text-white hover:bg-white hover:text-primary rounded-full bg-white/20 backdrop-blur-md">
-                                                            <Facebook className="w-5 h-5" />
-                                                        </Button>
-                                                    </Link>
-                                                )}
-                                                {organizer.instagramUrl && (
-                                                    <Link href={organizer.instagramUrl} target="_blank">
-                                                        <Button size="icon" variant="ghost" className="text-white hover:bg-white hover:text-primary rounded-full bg-white/20 backdrop-blur-md">
-                                                            <Instagram className="w-5 h-5" />
-                                                        </Button>
-                                                    </Link>
-                                                )}
-                                            </div>
-                                        </div>
+                    <motion.div
+                        initial={{ opacity: 0, x: 50 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.8, delay: 0.2 }}
+                        className="mt-6 md:mt-0 max-w-sm"
+                    >
+                        <p className="text-slate-500 font-medium">
+                            Meet the visionaries behind the most talked-about events in the industry.
+                        </p>
+                    </motion.div>
+                </div>
+            </div>
 
-                                        {/* Info */}
-                                        <div className="text-center space-y-3">
-                                            <h3 className="text-slate-900 font-black uppercase text-xl tracking-tight truncate leading-none">
-                                                {organizer.name}
-                                            </h3>
-                                            <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest line-clamp-2 min-h-[30px]">
-                                                {organizer.description || "Leading event curator in Vietnam"}
-                                            </p>
+            {/* Infinite CSS Marquee */}
+            <div className="relative w-full flex overflow-x-hidden group">
+                {/* Fade edges */}
+                <div className="absolute top-0 bottom-0 left-0 w-32 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
+                <div className="absolute top-0 bottom-0 right-0 w-32 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
 
-                                            <Link href={`/organizers/${organizer.id}`} className="block w-full">
-                                                <Button variant="outline" className="h-12 w-full rounded-2xl border-slate-200 text-slate-700 hover:bg-primary hover:text-white hover:border-primary uppercase text-[10px] font-black tracking-widest transition-all duration-300">
-                                                    View Profile
-                                                </Button>
-                                            </Link>
-                                        </div>
-                                    </div>
-                                </CarouselItem>
-                            ))}
-                        </CarouselContent>
+                <div className="animate-marquee flex gap-8 py-8 items-center w-max group-hover:[animation-play-state:paused] transition-all duration-300">
+                    {duplicatedOrganizers.map((organizer, idx) => (
+                        <div
+                            key={`${organizer.id}-${idx}`}
+                            className="relative w-[300px] shrink-0 group/card cursor-pointer"
+                        >
+                            <div className="relative aspect-square overflow-hidden rounded-[2.5rem] bg-slate-50 border border-slate-100 shadow-sm transition-all duration-500 group-hover/card:shadow-2xl group-hover/card:border-primary/20 group-hover/card:-translate-y-2">
+                                <Image
+                                    src={organizer.logoUrl || 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=2070&auto=format&fit=crop'}
+                                    alt={organizer.name}
+                                    fill
+                                    className="object-cover transition-transform duration-700 group-hover/card:scale-110 filter grayscale group-hover/card:grayscale-0"
+                                />
 
-                        <div className="flex justify-end gap-3 mt-10">
-                            <CarouselPrevious className="static translate-y-0 h-14 w-14 border-slate-100 bg-white text-slate-900 hover:bg-primary hover:text-white hover:border-primary rounded-full transition-all shadow-sm shadow-slate-200 active:scale-95" />
-                            <CarouselNext className="static translate-y-0 h-14 w-14 border-slate-100 bg-white text-slate-900 hover:bg-primary hover:text-white hover:border-primary rounded-full transition-all shadow-sm shadow-slate-200 active:scale-95" />
+                                {/* Overlay Content */}
+                                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/20 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
+                                    <h3 className="text-white font-black uppercase text-2xl tracking-tight leading-none mb-1">
+                                        {organizer.name}
+                                    </h3>
+                                    <p className="text-slate-300 text-xs font-bold uppercase tracking-widest line-clamp-1 mb-4">
+                                        {organizer.description || "Leading event curator"}
+                                    </p>
+
+                                    <Link href={`/organizers/${organizer.id}`}>
+                                        <Button variant="outline" className="w-full bg-white text-black hover:bg-primary hover:text-white hover:border-primary border-none uppercase text-xs font-black tracking-widest rounded-xl transition-colors">
+                                            View Profile
+                                        </Button>
+                                    </Link>
+                                </div>
+                            </div>
                         </div>
-                    </Carousel>
+                    ))}
                 </div>
 
+                {/* Duplicate for seamless loop if needed, but animate-marquee handles it by moving to -100% and repeating */}
             </div>
+
+            <style jsx global>{`
+                @keyframes marquee {
+                    0% { transform: translateX(0); }
+                    100% { transform: translateX(-50%); } 
+                }
+                .animate-marquee {
+                    animation: marquee 30s linear infinite;
+                }
+            `}</style>
+
         </section>
     );
 };

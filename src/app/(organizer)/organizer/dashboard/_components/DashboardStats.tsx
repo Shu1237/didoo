@@ -1,55 +1,71 @@
-import { Card } from "@/components/ui/card";
-import { Wallet, Ticket, Calendar, Users, TrendingUp, TrendingDown } from "lucide-react";
+﻿import { Card } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
+import { Wallet, Ticket, Calendar, Users, TrendingUp, TrendingDown, Minus } from "lucide-react";
 
 interface DashboardStatsProps {
   reportData: {
     title: string;
     value: string;
     change: string;
-    trend: string
+    trend: "up" | "down" | "neutral";
     icon: string;
     description: string;
-  }[]
+  }[];
 }
 
+const iconMap = {
+  Wallet,
+  Ticket,
+  Calendar,
+  Users,
+};
+
+const trendStyles: Record<"up" | "down" | "neutral", string> = {
+  up: "border-emerald-200 bg-emerald-50 text-emerald-700",
+  down: "border-rose-200 bg-rose-50 text-rose-700",
+  neutral: "border-zinc-200 bg-zinc-100 text-zinc-600",
+};
+
 export default function DashboardStats({ reportData }: DashboardStatsProps) {
-  const iconMap: any = {
-    Wallet,
-    Ticket,
-    Calendar,
-    Users
-  };
+  if (!reportData || reportData.length === 0) {
+    return (
+      <Card className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
+        <p className="text-sm font-medium text-zinc-500">Chưa có dữ liệu dashboard từ API.</p>
+      </Card>
+    );
+  }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
       {reportData.map((stat, index) => {
-        const Icon = iconMap[stat.icon];
-        const isTrendUp = stat.trend === 'up';
+        const Icon = iconMap[stat.icon as keyof typeof iconMap] ?? Calendar;
+        const TrendIcon = stat.trend === "up" ? TrendingUp : stat.trend === "down" ? TrendingDown : Minus;
 
         return (
-          <Card key={index} className="p-4 rounded-[28px] border border-zinc-100 bg-white hover:border-primary/20 transition-all duration-500 group relative overflow-hidden shadow-sm hover:shadow-md">
-            <div className="absolute top-0 right-0 w-16 h-16 bg-primary/5 blur-[24px] rounded-full -mr-8 -mt-8 group-hover:bg-primary/10 transition-colors" />
-
-            <div className="flex justify-between items-start mb-3 relative z-10">
-              <div className="w-10 h-10 rounded-xl bg-zinc-50 border border-zinc-100 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all duration-500">
-                {Icon && <Icon className="w-5 h-5" />}
+          <Card
+            key={`${stat.title}-${index}`}
+            className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
+          >
+            <div className="mb-4 flex items-start justify-between gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-zinc-200 bg-zinc-50 text-zinc-700">
+                <Icon className="h-5 w-5" />
               </div>
-              {isTrendUp ? (
-                <div className="flex items-center gap-1 text-[10px] font-black text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-100">
-                  <TrendingUp className="w-3 h-3" />
-                  {stat.change}
-                </div>
-              ) : (
-                <div className="flex items-center gap-1 text-[10px] font-black text-rose-600 bg-rose-50 px-3 py-1.5 rounded-full border border-rose-100">
-                  <TrendingDown className="w-3 h-3" />
-                  {stat.change}
-                </div>
-              )}
+
+              <span
+                className={cn(
+                  "inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[11px] font-semibold",
+                  trendStyles[stat.trend]
+                )}
+              >
+                <TrendIcon className="h-3.5 w-3.5" />
+                {stat.change}
+              </span>
             </div>
 
-            <div className="space-y-0.5 relative z-10">
-              <h3 className="text-2xl font-black tracking-tighter text-zinc-900 group-hover:text-primary transition-colors">{stat.value}</h3>
-              <p className="text-[9px] font-black uppercase tracking-[0.15em] text-zinc-400 group-hover:text-zinc-500 transition-colors italic truncate">{stat.title}</p>
+            <div className="space-y-1.5">
+              <p className="text-[11px] font-semibold uppercase tracking-wide text-zinc-500">{stat.title}</p>
+              <p className="text-2xl font-semibold tracking-tight text-zinc-900">{stat.value}</p>
+              <p className="text-xs text-zinc-500">{stat.description}</p>
             </div>
           </Card>
         );

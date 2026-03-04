@@ -1,18 +1,20 @@
 "use client";
 
-import OrganizersList from "./_components/OrganizersList";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import AdminPageHeader from "@/components/layout/admin/AdminPageHeader";
-import { useGetOrganizers } from "@/hooks/useOrganizer";
-import Loading from "@/components/loading";
-import { useSearchParams, useRouter, usePathname } from "next/navigation";
+import BaseFilterHeader, { type FilterHeaderConfig } from "@/components/base/BaseFilterHeader";
 import { BasePagination } from "@/components/base/BasePagination";
-import BaseFilterHeader, { FilterHeaderConfig } from "@/components/base/BaseFilterHeader";
+import Loading from "@/components/loading";
+import { Card } from "@/components/ui/card";
+import { useGetOrganizers } from "@/hooks/useOrganizer";
 import { OrganizerStatus } from "@/utils/enum";
+import OrganizersList from "./_components/OrganizersList";
 
 export default function AdminOrganizersPage() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+
   const pageNumber = Number(searchParams.get("pageNumber")) || 1;
   const pageSize = Number(searchParams.get("pageSize")) || 10;
   const name = searchParams.get("name") || "";
@@ -29,21 +31,21 @@ export default function AdminOrganizersPage() {
   const filterConfigs: FilterHeaderConfig[] = [
     {
       key: "name",
-      label: "Tên Organizer",
+      label: "Organizer",
       type: "text",
-      placeholder: "Tìm kiếm...",
-      width: "160px"
+      placeholder: "Tìm tên hoặc email organizer",
+      width: "230px",
     },
     {
       key: "status",
       label: "Trạng thái",
       type: "select",
       options: [
-        { label: "Chờ phê duyệt", value: OrganizerStatus.PENDING },
-        { label: "Đã phê duyệt", value: OrganizerStatus.VERIFIED },
-        { label: "Từ chối", value: OrganizerStatus.BANNED },
-      ]
-    }
+        { label: "Chờ duyệt", value: OrganizerStatus.PENDING },
+        { label: "Đã duyệt", value: OrganizerStatus.VERIFIED },
+        { label: "Bị khóa", value: OrganizerStatus.BANNED },
+      ],
+    },
   ];
 
   const organizers = organizersRes?.data?.items || [];
@@ -59,62 +61,59 @@ export default function AdminOrganizersPage() {
   const handlePageSizeChange = (size: number) => {
     const params = new URLSearchParams(searchParams);
     params.set("pageSize", size.toString());
-    params.set("pageNumber", "1"); // Reset to page 1 when changing size
+    params.set("pageNumber", "1");
     router.push(`${pathname}?${params.toString()}`);
   };
 
   return (
-    <div className="flex-1 flex flex-col min-h-0 w-full h-full">
-      <div className="flex-none pb-6">
-        <AdminPageHeader
-          title="Quản lý Organizer"
-          description="Xem và phê duyệt đơn đăng ký tổ chức sự kiện"
-        >
-          <BaseFilterHeader filters={filterConfigs}>
-            <BasePagination
-              currentPage={pageNumber}
-              totalPages={totalPage}
-              itemsPerPage={pageSize}
-              onPageSizeChange={handlePageSizeChange}
-              pageSizeOptions={[5, 10, 15, 20]}
-              showInfo={false}
-              showNavigation={false}
-              showSizeSelector={true}
-            />
-          </BaseFilterHeader>
-        </AdminPageHeader>
-      </div>
+    <div className="flex h-full flex-col gap-4 overflow-hidden lg:gap-6">
+      <AdminPageHeader
+        title="Quản lý organizer"
+        description="Theo dõi và phê duyệt đơn đăng ký tổ chức sự kiện"
+        badge={`${totalCount} organizer`}
+      >
+        <BaseFilterHeader filters={filterConfigs}>
+          <BasePagination
+            currentPage={pageNumber}
+            totalPages={totalPage}
+            itemsPerPage={pageSize}
+            onPageSizeChange={handlePageSizeChange}
+            pageSizeOptions={[5, 10, 20, 50]}
+            showInfo={false}
+            showNavigation={false}
+            showSizeSelector={true}
+          />
+        </BaseFilterHeader>
+      </AdminPageHeader>
 
-      <div className="flex-1 overflow-y-auto min-h-0 pr-2 -mr-2 scrollbar-thin scrollbar-thumb-zinc-200 scrollbar-track-transparent">
+      <Card className="overflow-hidden rounded-2xl border-zinc-200 bg-white shadow-sm">
         {isLoading ? (
-          <div className="h-40 flex items-center justify-center bg-white/40 backdrop-blur-sm rounded-3xl border border-zinc-100 border-dashed mt-4">
-            <Loading text="Đang tải dữ liệu..." />
+          <div className="flex min-h-[260px] items-center justify-center">
+            <Loading text="Đang tải danh sách organizer" />
           </div>
+        ) : organizers.length === 0 ? (
+          <div className="flex min-h-[260px] items-center justify-center text-sm text-zinc-500">Không có dữ liệu organizer.</div>
         ) : (
           <>
-            <div className="grid gap-4">
+            <div className="max-h-[min(58vh,680px)] overflow-y-auto p-3 lg:p-4">
               <OrganizersList organizers={organizers} />
             </div>
 
-            {(organizers.length > 0) && (
-              <div className="mt-4 mb-4 flex justify-end">
-                <div className="bg-white/80 backdrop-blur-md rounded-2xl p-1.5 border border-zinc-100 shadow-sm">
-                  <BasePagination
-                    currentPage={pageNumber}
-                    totalPages={totalPage}
-                    totalItems={totalCount}
-                    itemsPerPage={pageSize}
-                    onPageChange={handlePageChange}
-                    showInfo={false}
-                    showSizeSelector={false}
-                    showNavigation={true}
-                  />
-                </div>
-              </div>
-            )}
+            <div className="border-t border-zinc-100 px-3 py-2 lg:px-4">
+              <BasePagination
+                currentPage={pageNumber}
+                totalPages={totalPage}
+                totalItems={totalCount}
+                itemsPerPage={pageSize}
+                onPageChange={handlePageChange}
+                showInfo={true}
+                showSizeSelector={false}
+                showNavigation={true}
+              />
+            </div>
           </>
         )}
-      </div>
+      </Card>
     </div>
   );
 }

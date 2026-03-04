@@ -9,6 +9,7 @@ import { useGetMe } from "@/hooks/useUser";
 import Loading from "@/components/loading";
 import { useSearchParams } from "next/navigation";
 import { BasePagination } from "@/components/base/BasePagination";
+import type { Event } from "@/types/event";
 
 export default function OrganizerEventsPage() {
   const { data: userData, isLoading: isUserLoading } = useGetMe();
@@ -31,13 +32,13 @@ export default function OrganizerEventsPage() {
   const [modalState, setModalState] = useState<{
     isOpen: boolean;
     mode: EventModalMode;
-    event?: any;
+    event?: Event;
   }>({
     isOpen: false,
     mode: "CREATE",
   });
 
-  const openModal = (mode: EventModalMode, event?: any) => {
+  const openModal = (mode: EventModalMode, event?: Event) => {
     setModalState({ isOpen: true, mode, event });
   };
 
@@ -53,7 +54,7 @@ export default function OrganizerEventsPage() {
   const isActiveOrganizer = user?.role?.name === "ORGANIZER" && user?.status === 1;
 
   return (
-    <div className="h-full flex flex-col space-y-8">
+    <div className="flex h-full flex-col gap-8 overflow-y-auto pr-1">
       <div className="flex items-center justify-between border-b border-zinc-100 pb-8 shrink-0">
         <div>
           <h1 className="text-4xl font-black tracking-tighter text-zinc-900 uppercase">Quản lý sự kiện</h1>
@@ -75,7 +76,7 @@ export default function OrganizerEventsPage() {
         </div>
       </div>
 
-      <div className="flex-1 min-h-0 overflow-auto scrollbar-thin rounded-3xl">
+      <div className="max-h-[min(60vh,720px)] overflow-auto scrollbar-thin rounded-3xl p-4 -m-4">
         <EventsList
           events={events}
           onViewDetail={(event) => openModal("DETAIL", event)}

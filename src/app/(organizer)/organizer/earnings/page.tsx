@@ -1,184 +1,278 @@
 "use client";
 
-import React, { useState } from "react";
+import { useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { bookingRequest } from "@/apiRequest/booking";
 import { useGetMe } from "@/hooks/useUser";
-import { useOrganizerStats } from "@/hooks/useOrganizerStats";
+import { useGetEvents } from "@/hooks/useEvent";
 import Loading from "@/components/loading";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {
-    Wallet,
-    TrendingUp,
-    ArrowUpRight,
-    History,
-    Download,
-    Plus,
-    CircleDollarSign,
-    ArrowDownLeft,
-    Search,
-    Filter
-} from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import WithdrawModal from "./_components/WithdrawModal";
-import TransactionsList from "./_components/TransactionsList";
-import { cn } from "@/lib/utils";
+import TransactionsList, { type EarningsTransaction, type TransactionStatus } from "./_components/TransactionsList";
+import { Download, Plus, Search, Wallet, Clock3, BadgeDollarSign } from "lucide-react";
+import type { Booking } from "@/types/booking";
+import type { Event } from "@/types/event";
+
+const PAGE_SIZE_OPTIONS = [5, 10, 20, 50] as const;
+
+const formatCurrency = (value: number) => `${new Intl.NumberFormat("vi-VN").format(Math.max(0, Math.round(value)))} VNĐ`;
+
+const toNumber = (value: unknown) => {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : 0;
+};
+
+const normalizeStatus = (value?: string): TransactionStatus => {
+  const status = (value || "").toLowerCase();
+  if (status.includes("paid") || status.includes("success")) return "success";
+  if (status.includes("pending")) return "pending";
+  return "failed";
+};
+
+const toIsoDate = (value?: string | null) => {
+  const date = value ? new Date(value) : null;
+  if (!date || Number.isNaN(date.getTime())) return new Date(0).toISOString();
+  return date.toISOString();
+};
+
+const exportTransactionsCsv = (transactions: EarningsTransaction[]) => {
+  if (!transactions.length) return;
+
+  const headers = ["transaction_id", "type", "title", "subtitle", "status", "created_at", "amount"];
+  const rows = transactions.map((transaction) => [
+    transaction.id,
+    transaction.type,
+    transaction.title,
+    transaction.subtitle || "",
+    transaction.status,
+    transaction.createdAt,
+    transaction.amount,
+  ]);
+
+  const csvContent = [headers, ...rows]
+    .map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(","))
+    .join("\n");
+
+  const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.setAttribute("download", "earnings-transactions.csv");
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+};
+
+const fetchBookingsByEvent = async (eventId: string) => {
+  const collected: Booking[] = [];
+  let pageNumber = 1;
+  let totalPages = 1;
+  const pageSize = 100;
+  const maxPages = 20;
+
+  while (pageNumber <= totalPages && pageNumber <= maxPages) {
+    const response = await bookingRequest.getList({ eventId, pageNumber, pageSize });
+    const page = response.data;
+
+    collected.push(...(page.items || []));
+    totalPages = page.totalPages || 1;
+    pageNumber += 1;
+  }
+
+  return collected;
+};
 
 export default function OrganizerEarningsPage() {
-    const { data: userData, isLoading: isUserLoading } = useGetMe();
-    const user = userData?.data;
-    const { stats, isLoading: isStatsLoading } = useOrganizerStats(user?.organizerId || undefined);
+  const { data: userData, isLoading: isUserLoading } = useGetMe();
+  const organizerId = userData?.data?.organizerId;
 
-    // Pagination & Filter States
-    const [currentPage, setCurrentPage] = useState(1);
-    const [pageSize, setPageSize] = useState(10);
-    const [searchQuery, setSearchQuery] = useState("");
-    const [isWithdrawOpen, setIsWithdrawOpen] = useState(false);
+  const { data: eventsRes, isLoading: isEventsLoading } = useGetEvents(
+    {
+      organizerId: organizerId || undefined,
+      pageSize: 100,
+      hasCategory: true,
+    },
+    Boolean(organizerId)
+  );
 
-    if (isUserLoading || isStatsLoading) return <Loading />;
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState<number>(PAGE_SIZE_OPTIONS[1]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isWithdrawOpen, setIsWithdrawOpen] = useState(false);
 
-    const walletBalance = stats?.find(s => s.title === "Doanh thu ước tính")?.value || "0 VNĐ";
+  const events = useMemo(() => (eventsRes?.data?.items || []) as Event[], [eventsRes]);
+  const eventIds = useMemo(() => events.map((event) => event.id), [events]);
 
-    // Mock transactions
-    const allTransactions = [
-        { id: "TRX-12345", type: "Payout", amount: "- 5.000.000 VNĐ", status: "Success", date: "24/02/2026", method: "Bank Transfer" },
-        { id: "TRX-12346", type: "Ticket Sale", amount: "+ 250.000 VNĐ", status: "Success", date: "23/02/2026", event: "Đêm Nhạc Lofi: Chạm Vào Ký Ức" },
-        { id: "TRX-12347", type: "Ticket Sale", amount: "+ 500.000 VNĐ", status: "Success", date: "23/02/2026", event: "Workshop: Art & Mind" },
-        { id: "TRX-12348", type: "Payout", amount: "- 2.000.000 VNĐ", status: "Pending", date: "22/02/2026", method: "Momo" },
-        { id: "TRX-12349", type: "Ticket Sale", amount: "+ 1.250.000 VNĐ", status: "Success", date: "21/02/2026", event: "Music Festival 2026" },
-        { id: "TRX-12350", type: "Ticket Sale", amount: "+ 150.000 VNĐ", status: "Success", date: "20/02/2026", event: "Đêm Nhạc Lofi" },
-        { id: "TRX-12351", type: "Payout", amount: "- 1.000.000 VNĐ", status: "Success", date: "19/02/2026", method: "Vietcombank" },
-    ];
+  const eventNameMap = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const event of events) {
+      map.set(event.id, event.name);
+    }
+    return map;
+  }, [events]);
 
-    // Filter logic
-    const filteredTransactions = allTransactions.filter(trx =>
-        trx.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (trx.event || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (trx.method || "").toLowerCase().includes(searchQuery.toLowerCase())
+  const { data: bookings = [], isLoading: isBookingsLoading } = useQuery({
+    queryKey: ["organizer-earnings-bookings", organizerId, eventIds.join("|")],
+    enabled: Boolean(organizerId && eventIds.length > 0),
+    queryFn: async () => {
+      const bookingGroups = await Promise.all(eventIds.map((eventId) => fetchBookingsByEvent(eventId)));
+      return bookingGroups.flat();
+    },
+  });
+
+  const allTransactions = useMemo<EarningsTransaction[]>(() => {
+    const uniqueBookings = new Map<string, Booking>();
+
+    for (const booking of bookings) {
+      if (!uniqueBookings.has(booking.id)) {
+        uniqueBookings.set(booking.id, booking);
+      }
+    }
+
+    return Array.from(uniqueBookings.values())
+      .map((booking) => ({
+        id: booking.id,
+        type: "income" as const,
+        title: "Bán vé sự kiện",
+        subtitle: eventNameMap.get(booking.eventId) || booking.fullname || booking.email || "Không rõ sự kiện",
+        createdAt: toIsoDate(booking.paidAt || booking.createdAt),
+        status: normalizeStatus(booking.status),
+        amount: toNumber(booking.totalPrice || booking.amount),
+      }))
+      .sort((left, right) => new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime());
+  }, [bookings, eventNameMap]);
+
+  const filteredTransactions = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return allTransactions;
+
+    return allTransactions.filter((transaction) =>
+      [transaction.id, transaction.title, transaction.subtitle || "", transaction.status]
+        .join(" ")
+        .toLowerCase()
+        .includes(q)
     );
+  }, [allTransactions, searchQuery]);
 
-    // Pagination logic
-    const paginatedTransactions = filteredTransactions.slice(
-        (currentPage - 1) * pageSize,
-        currentPage * pageSize
-    );
+  const totalPages = Math.max(1, Math.ceil(filteredTransactions.length / pageSize));
+  const safeCurrentPage = Math.min(currentPage, totalPages);
 
-    return (
-        <div className="h-full flex flex-col space-y-8">
-            {/* Header */}
-            <div className="flex items-center justify-between border-b border-zinc-100 pb-8 shrink-0">
-                <div>
-                    <h1 className="text-4xl font-black tracking-tighter text-zinc-900 uppercase">Ví & Doanh thu</h1>
-                    <div className="text-zinc-500 mt-2 font-semibold flex items-center gap-2 text-sm">
-                        Quản lý dòng tiền và các yêu cầu rút tiền của bạn
-                        <Badge variant="outline" className="bg-emerald-50 text-emerald-600 border-emerald-100 rounded-full text-[10px] font-black uppercase tracking-widest px-3">
-                            Đang hoạt động
-                        </Badge>
-                    </div>
-                </div>
-                <div className="flex gap-4">
-                    <Button variant="outline" className="rounded-full px-6 h-12 border-zinc-200 font-black uppercase tracking-widest text-[10px] gap-2">
-                        <Download className="w-4 h-4" /> Xuất báo cáo
-                    </Button>
-                    <Button
-                        onClick={() => setIsWithdrawOpen(true)}
-                        className="rounded-full px-8 h-12 bg-primary hover:bg-primary/90 text-white font-black uppercase tracking-widest text-[10px] shadow-xl shadow-primary/20 gap-2"
-                    >
-                        <Plus className="w-4 h-4" /> Rút tiền ngay
-                    </Button>
-                </div>
-            </div>
+  const paginatedTransactions = filteredTransactions.slice(
+    (safeCurrentPage - 1) * pageSize,
+    safeCurrentPage * pageSize
+  );
 
-            <WithdrawModal
-                isOpen={isWithdrawOpen}
-                onClose={() => setIsWithdrawOpen(false)}
-                balance={walletBalance}
-            />
+  const successfulTransactions = allTransactions.filter((transaction) => transaction.status === "success");
+  const pendingTransactions = allTransactions.filter((transaction) => transaction.status === "pending");
 
-            {/* Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 shrink-0">
-                <Card className="p-8 rounded-[40px] border border-zinc-100 bg-zinc-900 text-white relative overflow-hidden group shadow-2xl">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 blur-[60px] rounded-full -mr-16 -mt-16 group-hover:bg-primary/30 transition-colors" />
-                    <div className="relative z-10">
-                        <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center text-primary mb-6 border border-white/10">
-                            <Wallet className="w-6 h-6" />
-                        </div>
-                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 mb-2 italic">Số dư khả dụng</p>
-                        <h3 className="text-4xl font-black tracking-tighter mb-4">{walletBalance}</h3>
-                        <div className="flex items-center gap-2 text-emerald-400 text-[10px] font-black uppercase tracking-widest">
-                            <TrendingUp className="w-3.5 h-3.5" /> +12.5% so với tháng trước
-                        </div>
-                    </div>
-                </Card>
+  const totalRevenue = successfulTransactions.reduce((sum, transaction) => sum + transaction.amount, 0);
+  const pendingAmount = pendingTransactions.reduce((sum, transaction) => sum + transaction.amount, 0);
+  const averageOrderValue =
+    successfulTransactions.length > 0 ? totalRevenue / successfulTransactions.length : 0;
 
-                <Card className="p-8 rounded-[40px] border border-zinc-100 bg-white relative overflow-hidden group shadow-sm hover:shadow-md transition-all">
-                    <div className="relative z-10">
-                        <div className="w-12 h-12 rounded-2xl bg-zinc-50 flex items-center justify-center text-primary mb-6 border border-zinc-100">
-                            <CircleDollarSign className="w-6 h-6" />
-                        </div>
-                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 mb-2 italic">Tổng doanh thu (Lifetime)</p>
-                        <h3 className="text-3xl font-black tracking-tighter text-zinc-900 mb-4">124.500.000 VNĐ</h3>
-                        <div className="flex items-center gap-2 text-zinc-500 text-[10px] font-black uppercase tracking-widest">
-                            Từ 12 sự kiện đã tổ chức
-                        </div>
-                    </div>
-                </Card>
+  if (isUserLoading || isEventsLoading) return <Loading />;
 
-                <Card className="p-8 rounded-[40px] border border-zinc-100 bg-white relative overflow-hidden group shadow-sm hover:shadow-md transition-all">
-                    <div className="relative z-10">
-                        <div className="w-12 h-12 rounded-2xl bg-zinc-50 flex items-center justify-center text-rose-500 mb-6 border border-zinc-100">
-                            <ArrowUpRight className="w-6 h-6" />
-                        </div>
-                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 mb-2 italic">Đang chờ xử lý</p>
-                        <h3 className="text-3xl font-black tracking-tighter text-zinc-900 mb-4">2.000.000 VNĐ</h3>
-                        <div className="flex items-center gap-2 text-zinc-500 text-[10px] font-black uppercase tracking-widest">
-                            1 yêu cầu rút tiền đang duyệt
-                        </div>
-                    </div>
-                </Card>
-            </div>
+  return (
+    <div className="flex h-full flex-col gap-4 overflow-hidden lg:gap-6">
+      <section className="rounded-3xl border border-zinc-200 bg-white px-5 py-4 shadow-sm lg:px-6 lg:py-5">
+        <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 lg:text-3xl">Ví và doanh thu</h1>
+            <p className="mt-1 text-sm text-zinc-500">
+              Tổng hợp doanh thu từ các booking theo sự kiện và theo dõi lịch sử giao dịch từ API.
+            </p>
+          </div>
 
-            {/* Transactions Section */}
-            <div className="flex-1 min-h-0 flex flex-col space-y-4">
-                <div className="flex items-center justify-between px-4">
-                    <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-2xl bg-primary/5 flex items-center justify-center text-primary border border-primary/10">
-                            <History className="w-5 h-5" />
-                        </div>
-                        <h3 className="text-lg font-black tracking-tighter text-zinc-900 uppercase italic">Lịch sử giao dịch</h3>
-                    </div>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              className="h-10 rounded-xl border-zinc-200 px-4"
+              disabled={filteredTransactions.length === 0}
+              onClick={() => exportTransactionsCsv(filteredTransactions)}
+            >
+              <Download className="mr-2 h-4 w-4" />
+              Xuất CSV
+            </Button>
 
-                    <div className="flex gap-3">
-                        <div className="relative">
-                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
-                            <Input
-                                placeholder="Tìm kiếm giao dịch..."
-                                value={searchQuery}
-                                onChange={(e) => {
-                                    setSearchQuery(e.target.value);
-                                    setCurrentPage(1);
-                                }}
-                                className="pl-11 h-11 w-64 rounded-full border-zinc-100 bg-white text-xs font-bold"
-                            />
-                        </div>
-                        <Button variant="outline" className="rounded-full w-11 h-11 border-zinc-100 p-0 text-zinc-500">
-                            <Filter className="w-4 h-4" />
-                        </Button>
-                    </div>
-                </div>
-
-                <TransactionsList
-                    transactions={paginatedTransactions}
-                    totalCount={filteredTransactions.length}
-                    currentPage={currentPage}
-                    pageSize={pageSize}
-                    onPageChange={setCurrentPage}
-                    onPageSizeChange={(size: number) => {
-                        setPageSize(size);
-                        setCurrentPage(1);
-                    }}
-                />
-            </div>
+            <Button className="h-10 rounded-xl px-4" onClick={() => setIsWithdrawOpen(true)}>
+              <Plus className="mr-2 h-4 w-4" />
+              Rút tiền
+            </Button>
+          </div>
         </div>
-    );
+
+        <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-3">
+          <div className="rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2">
+            <p className="inline-flex items-center gap-1.5 text-[11px] text-zinc-500">
+              <Wallet className="h-3.5 w-3.5" />
+              Số dư khả dụng
+            </p>
+            <p className="text-lg font-semibold text-zinc-900">{formatCurrency(totalRevenue)}</p>
+          </div>
+
+          <div className="rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2">
+            <p className="inline-flex items-center gap-1.5 text-[11px] text-zinc-500">
+              <Clock3 className="h-3.5 w-3.5" />
+              Chờ xử lý
+            </p>
+            <p className="text-lg font-semibold text-zinc-900">{formatCurrency(pendingAmount)}</p>
+          </div>
+
+          <div className="rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2">
+            <p className="inline-flex items-center gap-1.5 text-[11px] text-zinc-500">
+              <BadgeDollarSign className="h-3.5 w-3.5" />
+              Giá trị đơn trung bình
+            </p>
+            <p className="text-lg font-semibold text-zinc-900">{formatCurrency(averageOrderValue)}</p>
+          </div>
+        </div>
+      </section>
+
+      <Card className="min-h-0 overflow-hidden rounded-3xl border border-zinc-200 bg-white shadow-sm">
+        <div className="border-b border-zinc-100 px-4 py-3 lg:px-5">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h2 className="text-base font-semibold text-zinc-900">Lịch sử giao dịch</h2>
+              <p className="text-xs text-zinc-500">{events.length} sự kiện • {allTransactions.length} giao dịch</p>
+            </div>
+
+            <div className="relative w-full sm:w-72">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
+              <Input
+                value={searchQuery}
+                onChange={(event) => {
+                  setSearchQuery(event.target.value);
+                  setCurrentPage(1);
+                }}
+                placeholder="Tìm mã giao dịch, sự kiện..."
+                className="h-10 rounded-xl border-zinc-200 pl-9"
+              />
+            </div>
+          </div>
+        </div>
+
+        <TransactionsList
+          transactions={paginatedTransactions}
+          totalCount={filteredTransactions.length}
+          currentPage={safeCurrentPage}
+          pageSize={pageSize}
+          isLoading={isBookingsLoading && allTransactions.length === 0}
+          onPageChange={setCurrentPage}
+          onPageSizeChange={(size) => {
+            setPageSize(size);
+            setCurrentPage(1);
+          }}
+        />
+      </Card>
+
+      <WithdrawModal
+        isOpen={isWithdrawOpen}
+        onClose={() => setIsWithdrawOpen(false)}
+        balance={totalRevenue}
+      />
+    </div>
+  );
 }

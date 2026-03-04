@@ -76,9 +76,8 @@ export default function CategoriesList({ categories, onEdit }: CategoriesListPro
             </div>
             <div className="flex items-center gap-2 shrink-0">
               <Badge
-                className={`rounded-full px-2.5 py-0.5 border-none pointer-events-none uppercase text-[8px] tracking-widest font-bold ${
-                  cat.status === CategoryStatus.ACTIVE ? "bg-emerald-500 text-white" : "bg-zinc-400 text-white"
-                }`}
+                className={`rounded-full px-2.5 py-0.5 border-none pointer-events-none uppercase text-[8px] tracking-widest font-bold ${cat.status === CategoryStatus.ACTIVE ? "bg-emerald-500 text-white" : "bg-zinc-400 text-white"
+                  }`}
               >
                 {cat.status === CategoryStatus.ACTIVE ? "Hoạt động" : "Ẩn"}
               </Badge>
@@ -120,7 +119,11 @@ export default function CategoriesList({ categories, onEdit }: CategoriesListPro
         description={deleteConfirm ? `Bạn có chắc chắn muốn xóa danh mục "${deleteConfirm.name}"?` : ""}
         confirmLabel="Xóa"
         variant="danger"
-        onConfirm={() => deleteConfirm && handleDelete(deleteConfirm)}
+        onConfirm={() => {
+          if (deleteConfirm) {
+            return handleDelete(deleteConfirm);
+          }
+        }}
         isLoading={deleteCategory.isPending}
       />
     </div>

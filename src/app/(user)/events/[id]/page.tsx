@@ -1,14 +1,13 @@
-'use client';
+"use client";
 
+import { use } from "react";
+import Loading from "@/components/loading";
 import { useGetEvent, useGetEvents } from "@/hooks/useEvent";
 import { useGetTicketTypes } from "@/hooks/useTicketType";
 import HeroSection from "./_components/HeroSection";
 import EventInfor from "./_components/EventInfor";
 import EventLocation from "./_components/EventLocation";
-import ListEvent from "@/app/(user)/events/[id]/_components/ListEvent";
-import ImmersiveBackground from "./_components/ImmersiveBackground";
-import Loading from "@/components/loading";
-import { use } from "react";
+import EventsGrid from "../_components/EventsGrid";
 
 export default function DetailEventPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -18,9 +17,12 @@ export default function DetailEventPage({ params }: { params: Promise<{ id: stri
 
   const { data: relatedEventsResponse } = useGetEvents({
     categoryId: detailEvent?.category?.id,
-    pageSize: 4,
+    pageSize: 6,
   });
-  const eventRelated = (relatedEventsResponse?.data.items || []).filter(e => e.id !== id);
+
+  const eventRelated = (relatedEventsResponse?.data.items || []).filter(
+    (event) => event.id !== id,
+  );
 
   const { data: ticketTypesResponse } = useGetTicketTypes({ eventId: id });
   const ticketTypes = ticketTypesResponse?.data.items || [];
@@ -29,23 +31,36 @@ export default function DetailEventPage({ params }: { params: Promise<{ id: stri
 
   if (!detailEvent) {
     return (
-      <div className="flex items-center justify-center h-screen text-gray-500 bg-[#050505]">
-        <p>Sự kiện không tồn tại</p>
+      <div className="flex h-screen items-center justify-center bg-slate-50 text-slate-500">
+        <p className="font-bold tracking-widest uppercase">Event Not Found</p>
       </div>
     );
   }
 
   return (
-    <main className="min-h-screen bg-[#050505] text-white overflow-hidden relative">
-      <ImmersiveBackground />
+    <main className="relative min-h-screen overflow-hidden bg-slate-50 text-slate-900">
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute -top-28 left-[-8%] h-80 w-80 rounded-full bg-sky-200/60 blur-3xl" />
+        <div className="absolute top-1/4 right-[-8%] h-[24rem] w-[24rem] rounded-full bg-amber-200/50 blur-3xl" />
+      </div>
 
       <div className="relative z-10">
         <HeroSection event={detailEvent} ticketTypes={ticketTypes} />
 
-        <div className="max-w-[1920px] mx-auto px-6 md:px-12 space-y-32 pb-32">
-          <EventInfor event={detailEvent} />
-          <EventLocation event={detailEvent} />
-          <ListEvent title="Có thể bạn sẽ thích" eventData={eventRelated} relatedEvent={true} />
+        <div className="mx-auto w-full px-4 md:px-8 lg:px-12 xl:px-16 pb-20 space-y-16">
+          <div className="max-w-7xl mx-auto space-y-16">
+            <EventInfor event={detailEvent} />
+            <EventLocation event={detailEvent} />
+          </div>
+          {eventRelated.length > 0 && (
+            <div className="border-t border-slate-200/60 pt-16">
+              <EventsGrid
+                title="Suggested for you"
+                description="Explore more events similar to this one."
+                eventData={eventRelated}
+              />
+            </div>
+          )}
         </div>
       </div>
     </main>

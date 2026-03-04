@@ -1,26 +1,33 @@
 "use client";
 
-import { use, useState } from "react";
-import { useRouter } from "next/navigation";
+import { use, useMemo, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { ChevronLeft, Minus, Plus, ShieldCheck, Ticket } from "lucide-react";
+import Loading from "@/components/loading";
+import { Button } from "@/components/ui/button";
 import { useGetEvent } from "@/hooks/useEvent";
 import { useGetTicketTypes } from "@/hooks/useTicketType";
 import { useBooking } from "@/hooks/useBooking";
 import { useGetMe } from "@/hooks/useUser";
-import Loading from "@/components/loading";
-import { Button } from "@/components/ui/button";
-import { Ticket, ChevronLeft, Minus, Plus } from "lucide-react";
 import { TicketType } from "@/types/ticketType";
 import { toast } from "sonner";
 
-type SelectedItem = { ticketType: TicketType; quantity: number };
+type SelectedItem = {
+  ticketType: TicketType;
+  quantity: number;
+};
 
 export default function BookingPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const router = useRouter();
-  const { data: eventRes } = useGetEvent(id);
-  const { data: ticketTypesRes } = useGetTicketTypes({ eventId: id, pageNumber: 1, pageSize: 100 }, { enabled: !!id });
-  const { data: userRes } = useGetMe();
+
+  const { data: eventRes, isLoading: isEventLoading } = useGetEvent(id);
+  const { data: ticketTypesRes, isLoading: isTicketTypesLoading } = useGetTicketTypes(
+    { eventId: id, pageNumber: 1, pageSize: 100 },
+    { enabled: !!id },
+  );
+  const { data: userRes, isLoading: isUserLoading } = useGetMe();
   const { create } = useBooking();
 
   const event = eventRes?.data;
@@ -29,42 +36,60 @@ export default function BookingPage({ params }: { params: Promise<{ id: string }
 
   const [selected, setSelected] = useState<SelectedItem[]>([]);
 
-  const handleSelectTicketType = (tt: TicketType) => {
+  const selectedMap = useMemo(() => {
+    return new Map(selected.map((item) => [item.ticketType.id, item]));
+  }, [selected]);
+
+  const handleToggleTicketType = (ticketType: TicketType) => {
     setSelected((prev) => {
-      const exists = prev.find((s) => s.ticketType.id === tt.id);
-      if (exists) return prev;
-      return [...prev, { ticketType: tt, quantity: 1 }];
+      const existing = prev.find((item) => item.ticketType.id === ticketType.id);
+      if (existing) {
+        return prev.filter((item) => item.ticketType.id !== ticketType.id);
+      }
+
+      if ((ticketType.availableQuantity ?? 0) <= 0) return prev;
+      return [...prev, { ticketType, quantity: 1 }];
     });
   };
 
-  const handleRemoveTicketType = (ttId: string) => {
-    setSelected((prev) => prev.filter((s) => s.ticketType.id !== ttId));
-  };
-
-  const handleQuantityChange = (ttId: string, delta: number) => {
+  const handleQuantityChange = (ticketTypeId: string, delta: number) => {
     setSelected((prev) =>
-      prev.map((s) => {
-        if (s.ticketType.id !== ttId) return s;
-        const next = Math.max(0, s.quantity + delta);
-        if (next === 0) return null;
-        return { ...s, quantity: next };
-      }).filter(Boolean) as SelectedItem[]
+      prev
+        .map((item) => {
+          if (item.ticketType.id !== ticketTypeId) return item;
+
+          const maxQuantity = Math.max(item.ticketType.availableQuantity ?? 0, 0);
+          const nextQuantity = Math.min(maxQuantity, Math.max(0, item.quantity + delta));
+
+          if (nextQuantity === 0) return null;
+          return { ...item, quantity: nextQuantity };
+        })
+        .filter(Boolean) as SelectedItem[],
     );
   };
 
-  const totalQuantity = selected.reduce((sum, s) => sum + s.quantity, 0);
-  const totalPrice = selected.reduce((sum, s) => sum + s.quantity * (s.ticketType.price || 0), 0);
+  const handleRemoveTicketType = (ticketTypeId: string) => {
+    setSelected((prev) => prev.filter((item) => item.ticketType.id !== ticketTypeId));
+  };
+
+  const totalQuantity = selected.reduce((sum, item) => sum + item.quantity, 0);
+  const totalPrice = selected.reduce(
+    (sum, item) => sum + item.quantity * (item.ticketType.price || 0),
+    0,
+  );
 
   const handleSubmit = async () => {
     if (!user?.id || !event?.id || selected.length === 0) {
-      toast.error("Vui lòng đăng nhập để đặt vé.");
+      toast.error("Vui long dang nhap va chon it nhat 1 loai ve");
       return;
     }
-    const validSelected = selected.filter((s) => s.quantity > 0);
+
+    const validSelected = selected.filter((item) => item.quantity > 0);
     if (validSelected.length === 0) {
-      toast.error("Vui lòng chọn số lượng vé.");
+      toast.error("Vui long chon so luong ve hop le");
       return;
     }
+
     try {
       const basePayload = {
         userId: user.id,
@@ -73,36 +98,55 @@ export default function BookingPage({ params }: { params: Promise<{ id: string }
         email: user.email || "",
         phone: user.phone || "",
       };
+
       const results = await Promise.all(
-        validSelected.map((s) =>
+        validSelected.map((item) =>
           create.mutateAsync({
             ...basePayload,
-            ticketTypeId: s.ticketType.id,
-            quantity: s.quantity,
-          })
-        )
+            ticketTypeId: item.ticketType.id,
+            quantity: item.quantity,
+          }),
+        ),
       );
-      const firstWithPayment = results.find((r) => r?.paymentUrl);
+
+      const firstWithPayment = results.find((result) => result?.paymentUrl);
       if (firstWithPayment?.paymentUrl) {
         window.location.href = firstWithPayment.paymentUrl;
-      } else {
-        toast.success("Đặt vé thành công!");
-        router.push("/user/tickets");
+        return;
       }
-    } catch (e) {
-      // handleErrorApi in useBooking
+
+      toast.success("Dat ve thanh cong");
+      router.push("/user/tickets");
+    } catch {
+      // Errors are handled centrally in useBooking.
     }
   };
 
-  if (!event) return <Loading />;
+  if (isEventLoading || isTicketTypesLoading || isUserLoading) return <Loading />;
+
+  if (!event) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-slate-50 px-4">
+        <div className="rounded-3xl border border-slate-200 bg-white p-8 text-center shadow-sm">
+          <p className="text-slate-600">Khong tim thay su kien de dat ve.</p>
+          <Button asChild className="mt-4 rounded-full px-6">
+            <Link href="/events">Quay lai danh sach su kien</Link>
+          </Button>
+        </div>
+      </main>
+    );
+  }
 
   if (!user) {
     return (
-      <main className="min-h-screen bg-[#050505] text-white flex items-center justify-center">
-        <div className="text-center">
-          <p className="mb-4">Vui lòng đăng nhập để đặt vé</p>
-          <Button asChild className="rounded-full bg-primary text-black">
-            <Link href={`/login?redirect=/events/${id}/booking`}>Đăng nhập</Link>
+      <main className="flex min-h-screen items-center justify-center bg-slate-50 px-4">
+        <div className="max-w-md rounded-3xl border border-slate-200 bg-white p-8 text-center shadow-sm">
+          <h1 className="text-2xl font-bold text-slate-900">Dang nhap de dat ve</h1>
+          <p className="mt-2 text-slate-600">
+            Ban can dang nhap tai khoan truoc khi tiep tuc thanh toan.
+          </p>
+          <Button asChild className="mt-5 rounded-full px-6">
+            <Link href={`/login?redirect=/events/${id}/booking`}>Dang nhap</Link>
           </Button>
         </div>
       </main>
@@ -110,137 +154,170 @@ export default function BookingPage({ params }: { params: Promise<{ id: string }
   }
 
   return (
-    <main className="min-h-screen bg-[#050505] text-white">
-      <div className="max-w-6xl mx-auto px-6 py-12">
-        <Link href={`/events/${id}`} className="inline-flex items-center gap-2 text-white/70 hover:text-white mb-8">
-          <ChevronLeft className="w-5 h-5" />
-          <span className="font-medium">Quay lại sự kiện</span>
+    <main className="min-h-screen bg-slate-50 px-4 pb-16 pt-28">
+      <div className="mx-auto max-w-7xl">
+        <Link
+          href={`/events/${id}`}
+          className="mb-6 inline-flex items-center gap-2 rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+        >
+          <ChevronLeft className="h-4 w-4" />
+          Quay lai su kien
         </Link>
 
-        <h1 className="text-3xl md:text-4xl font-black uppercase mb-2">{event.name}</h1>
-        <p className="text-white/60 mb-12">Chọn loại vé và số lượng</p>
+        <div className="space-y-2">
+          <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 md:text-4xl">
+            Dat ve su kien
+          </h1>
+          <p className="text-slate-600">{event.name}</p>
+        </div>
 
-        <div className="grid lg:grid-cols-12 gap-8">
-          {/* LEFT: Ticket types */}
-          <div className="lg:col-span-7 space-y-4">
-            <h2 className="text-sm font-bold uppercase tracking-widest text-white/60 flex items-center gap-2">
-              <Ticket className="w-4 h-4" />
-              Các loại vé
+        <div className="mt-8 grid gap-6 lg:grid-cols-12">
+          <section className="space-y-4 lg:col-span-7">
+            <h2 className="inline-flex items-center gap-2 rounded-full bg-sky-100 px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-sky-700">
+              <Ticket className="h-4 w-4" />
+              Chon loai ve
             </h2>
-            <div className="space-y-3">
-              {ticketTypes.length === 0 ? (
-                <div className="p-8 rounded-2xl border border-white/10 bg-white/5 text-center text-white/50">
-                  Chưa có loại vé nào
-                </div>
-              ) : (
-                ticketTypes.map((tt) => {
-                  const sel = selected.find((s) => s.ticketType.id === tt.id);
-                  const isSelected = !!sel;
-                  return (
-                    <div
-                      key={tt.id}
-                      onClick={() => handleSelectTicketType(tt)}
-                      className={`p-5 rounded-2xl border cursor-pointer transition-all ${
-                        isSelected
-                          ? "border-primary bg-primary/20"
-                          : "border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/10"
-                      }`}
-                    >
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <p className="font-bold text-lg">{tt.name}</p>
-                          {tt.description && <p className="text-sm text-white/60 mt-1">{tt.description}</p>}
-                          <p className="text-primary font-black mt-2">{Number(tt.price).toLocaleString("vi-VN")}đ / vé</p>
-                        </div>
-                        <div className="text-right text-sm text-white/60">
-                          <p>Còn lại: {tt.availableQuantity ?? 0} vé</p>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })
-              )}
-            </div>
-          </div>
 
-          {/* RIGHT: Selected + quantity */}
-          <div className="lg:col-span-5">
-            <div className="sticky top-24 p-6 rounded-3xl border border-white/10 bg-white/5 space-y-6">
-              <h2 className="text-sm font-bold uppercase tracking-widest text-white/60">Đơn hàng của bạn</h2>
+            {ticketTypes.length === 0 ? (
+              <div className="rounded-3xl border border-dashed border-slate-300 bg-white p-8 text-center text-slate-500">
+                Su kien hien chua mo ban ve.
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {ticketTypes.map((ticketType) => {
+                  const selectedItem = selectedMap.get(ticketType.id);
+                  const isSelected = Boolean(selectedItem);
+                  const isSoldOut = (ticketType.availableQuantity ?? 0) <= 0;
+
+                  return (
+                    <article
+                      key={ticketType.id}
+                      className={`rounded-2xl border p-5 transition ${
+                        isSelected
+                          ? "border-sky-300 bg-sky-50"
+                          : "border-slate-200 bg-white hover:border-slate-300"
+                      } ${isSoldOut ? "opacity-60" : ""}`}
+                    >
+                      <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                        <div className="space-y-2">
+                          <h3 className="text-lg font-bold text-slate-900">{ticketType.name}</h3>
+                          {ticketType.description && (
+                            <p className="text-sm text-slate-600">{ticketType.description}</p>
+                          )}
+                          <p className="text-xl font-bold text-slate-900">
+                            {Number(ticketType.price || 0).toLocaleString("vi-VN")} VND
+                          </p>
+                          <p className="text-sm text-slate-500">
+                            Con lai: {ticketType.availableQuantity ?? 0} ve
+                          </p>
+                        </div>
+
+                        <Button
+                          type="button"
+                          variant={isSelected ? "secondary" : "outline"}
+                          onClick={() => handleToggleTicketType(ticketType)}
+                          disabled={isSoldOut}
+                          className="h-10 rounded-full px-5"
+                        >
+                          {isSoldOut ? "Het ve" : isSelected ? "Bo chon" : "Chon ve"}
+                        </Button>
+                      </div>
+
+                      {selectedItem && (
+                        <div className="mt-4 flex items-center gap-3 border-t border-slate-200 pt-4">
+                          <Button
+                            type="button"
+                            size="icon"
+                            variant="outline"
+                            onClick={() => handleQuantityChange(ticketType.id, -1)}
+                            className="h-9 w-9 rounded-full border-slate-300"
+                          >
+                            <Minus className="h-4 w-4" />
+                          </Button>
+                          <span className="w-8 text-center text-lg font-bold text-slate-900">
+                            {selectedItem.quantity}
+                          </span>
+                          <Button
+                            type="button"
+                            size="icon"
+                            variant="outline"
+                            onClick={() => handleQuantityChange(ticketType.id, 1)}
+                            disabled={
+                              selectedItem.quantity >= (selectedItem.ticketType.availableQuantity ?? 0)
+                            }
+                            className="h-9 w-9 rounded-full border-slate-300"
+                          >
+                            <Plus className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            onClick={() => handleRemoveTicketType(ticketType.id)}
+                            className="ml-auto h-9 rounded-full px-4 text-slate-500 hover:text-slate-700"
+                          >
+                            Xoa
+                          </Button>
+                        </div>
+                      )}
+                    </article>
+                  );
+                })}
+              </div>
+            )}
+          </section>
+
+          <aside className="lg:col-span-5">
+            <div className="sticky top-24 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+              <h2 className="text-xl font-bold text-slate-900">Don hang cua ban</h2>
 
               {selected.length === 0 ? (
-                <p className="text-white/50 text-sm">Nhấn vào loại vé bên trái để chọn</p>
+                <p className="mt-4 text-sm text-slate-600">
+                  Chon loai ve o ben trai de xem tong thanh toan.
+                </p>
               ) : (
-                <>
-                  <div className="space-y-4">
-                    {selected.map((s) => (
-                      <div key={s.ticketType.id} className="flex items-center justify-between gap-4 p-3 rounded-xl bg-white/5">
-                        <div className="flex-1 min-w-0">
-                          <p className="font-bold truncate">{s.ticketType.name}</p>
-                          <p className="text-sm text-primary">{Number(s.ticketType.price).toLocaleString("vi-VN")}đ</p>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleQuantityChange(s.ticketType.id, -1);
-                            }}
-                            className="w-9 h-9 rounded-full border border-white/20 flex items-center justify-center hover:bg-white/10"
-                          >
-                            <Minus className="w-4 h-4" />
-                          </button>
-                          <span className="w-10 text-center font-bold">{s.quantity}</span>
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              if (s.quantity < (s.ticketType.availableQuantity ?? 0)) {
-                                handleQuantityChange(s.ticketType.id, 1);
-                              }
-                            }}
-                            className="w-9 h-9 rounded-full border border-white/20 flex items-center justify-center hover:bg-white/10 disabled:opacity-50"
-                            disabled={s.quantity >= (s.ticketType.availableQuantity ?? 0)}
-                          >
-                            <Plus className="w-4 h-4" />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleRemoveTicketType(s.ticketType.id);
-                            }}
-                            className="text-white/50 hover:text-red-400 text-xs ml-1"
-                          >
-                            Xóa
-                          </button>
-                        </div>
-                      </div>
-                    ))}
+                <div className="mt-5 space-y-4">
+                  {selected.map((item) => (
+                    <div
+                      key={item.ticketType.id}
+                      className="rounded-2xl border border-slate-200 bg-slate-50 p-4"
+                    >
+                      <p className="font-semibold text-slate-900">{item.ticketType.name}</p>
+                      <p className="mt-1 text-sm text-slate-600">
+                        {item.quantity} x {Number(item.ticketType.price || 0).toLocaleString("vi-VN")} VND
+                      </p>
+                    </div>
+                  ))}
+
+                  <div className="space-y-2 border-t border-slate-200 pt-4">
+                    <div className="flex items-center justify-between text-sm text-slate-600">
+                      <span>Tong so ve</span>
+                      <span className="font-semibold text-slate-900">{totalQuantity}</span>
+                    </div>
+                    <div className="flex items-center justify-between text-lg font-bold text-slate-900">
+                      <span>Tong thanh toan</span>
+                      <span>{totalPrice.toLocaleString("vi-VN")} VND</span>
+                    </div>
                   </div>
 
-                  <div className="pt-4 border-t border-white/10 space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-white/60">Tổng số vé</span>
-                      <span className="font-bold">{totalQuantity}</span>
-                    </div>
-                    <div className="flex justify-between text-lg">
-                      <span className="text-white/80">Tổng thanh toán</span>
-                      <span className="font-black text-primary">{totalPrice.toLocaleString("vi-VN")}đ</span>
-                    </div>
+                  <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800">
+                    <p className="flex items-center gap-2 font-semibold">
+                      <ShieldCheck className="h-4 w-4" />
+                      Thanh toan an toan
+                    </p>
+                    <p className="mt-1">Thong tin cua ban duoc bao mat trong qua trinh thanh toan.</p>
                   </div>
 
                   <Button
                     onClick={handleSubmit}
                     disabled={create.isPending || totalQuantity === 0}
-                    className="w-full h-14 rounded-full bg-primary text-black font-bold text-lg hover:bg-primary/90"
+                    className="h-12 w-full rounded-full text-base font-semibold"
                   >
-                    {create.isPending ? "Đang xử lý..." : "Tiếp tục thanh toán"}
+                    {create.isPending ? "Dang xu ly..." : "Tiep tuc thanh toan"}
                   </Button>
-                </>
+                </div>
               )}
             </div>
-          </div>
+          </aside>
         </div>
       </div>
     </main>

@@ -1,169 +1,204 @@
-'use client';
+"use client";
 
-import React from "react";
-import { motion } from "framer-motion";
-import { ShieldCheck, Ticket, Clock, Zap, Globe, Cpu, Music, Wind, MapPin, Calendar } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { CalendarDays, Clock3, Globe2, ShieldCheck, Tag } from "lucide-react";
 import { Event } from "@/types/event";
 import { EventStatus } from "@/utils/enum";
-import Image from "next/image";
+import { useGetOrganizer } from "@/hooks/useOrganizer";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
 
 interface EventInforProps {
-    event: Event;
+  event: Event;
+}
+
+const FALLBACK_ORGANIZER_IMAGE = "https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=2070&auto=format&fit=crop";
+
+function getStatusLabel(status: EventStatus) {
+  if (status === EventStatus.PUBLISHED || status === EventStatus.OPENED) {
+    return "Open";
+  }
+
+  if (status === EventStatus.CLOSED) {
+    return "Closed";
+  }
+
+  if (status === EventStatus.CANCELLED) {
+    return "Cancelled";
+  }
+
+  return "Coming Soon";
 }
 
 export default function EventInfor({ event }: EventInforProps) {
+  const infoItems = [
+    { label: "Category", value: event.category?.name || "General Event", icon: Tag },
+    {
+      label: "Age",
+      value: event.ageRestriction > 0 ? `${event.ageRestriction}+` : "All Ages",
+      icon: ShieldCheck,
+    },
+    { label: "Status", value: getStatusLabel(event.status), icon: Globe2 },
+    { label: "Timeframe", value: `${event.openTime || "TBA"} - ${event.closedTime || "TBA"}`, icon: Clock3 },
+  ];
 
-    return (
-        <section className="relative py-24 bg-[#050505] overflow-hidden">
-            {/* Ambient Background - Brighter and more dynamic */}
-            <div className="absolute inset-0 pointer-events-none">
-                <div className="absolute top-0 left-1/4 w-[60%] h-[60%] bg-primary/10 blur-[180px] rounded-full" />
-                <div className="absolute bottom-0 right-1/4 w-[50%] h-[50%] bg-purple-600/10 blur-[160px] rounded-full" />
-                <div className="absolute top-1/2 left-0 w-[40%] h-[40%] bg-blue-500/5 blur-[140px] rounded-full" />
+  const timelineItems = [
+    {
+      label: "Start Date",
+      value: event.startTime
+        ? new Date(event.startTime).toLocaleDateString("en-US", {
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+        })
+        : "Updating",
+    },
+    {
+      label: "End Date",
+      value: event.endTime
+        ? new Date(event.endTime).toLocaleDateString("en-US", {
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+        })
+        : "Updating",
+    },
+  ];
+
+  const orgId = event.organizer?.id;
+  const { data: orgDataResponse } = useGetOrganizer(orgId || "");
+  const organizerDetails = orgDataResponse?.data;
+
+  const orgImage = organizerDetails?.bannerUrl || organizerDetails?.logoUrl || event.organizer?.logoUrl || FALLBACK_ORGANIZER_IMAGE;
+
+  return (
+    <section className="grid gap-12 lg:grid-cols-12">
+      <div className="space-y-12 lg:col-span-8">
+        <article className="space-y-6">
+          <h2 className="text-3xl font-black tracking-tight text-slate-900 md:text-4xl">
+            Event Information
+          </h2>
+          <p className="mt-4 whitespace-pre-line text-base leading-relaxed text-slate-700">
+            {event.description}
+          </p>
+          {event.subtitle && (
+            <p className="mt-4 rounded-2xl border border-sky-100 bg-sky-50 px-4 py-3 text-sm font-medium text-sky-900">
+              {event.subtitle}
+            </p>
+          )}
+          {event.tags && event.tags.length > 0 && (
+            <div className="mt-6 flex flex-wrap gap-2">
+              {event.tags.map((tag, index) => (
+                <span
+                  key={`${tag.tagName}-${index}`}
+                  className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-semibold text-slate-600"
+                >
+                  #{tag.tagName}
+                </span>
+              ))}
             </div>
+          )}
+        </article>
 
-            <div className="max-w-[1400px] mx-auto px-6 relative z-10">
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 xl:gap-20">
-
-                    {/* LEFT: MAIN CONTENT (8 columns) */}
-                    <div className="lg:col-span-8 space-y-24">
-
-                        {/* Story & Description */}
-                        <div className="space-y-12">
-                            <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                className="space-y-8"
-                            >
-                                <div className="flex flex-wrap gap-3">
-                                    {event.tags && event.tags.map((tag, idx) => (
-                                        <div key={idx} className="px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 backdrop-blur-md">
-                                            <span className="text-[10px] font-black text-primary uppercase tracking-widest">{tag.tagName}</span>
-                                        </div>
-                                    ))}
-                                </div>
-
-                                <h2 className="text-6xl md:text-8xl font-black text-white leading-[0.85] tracking-tighter uppercase">
-                                    Thông tin <span className="text-primary">sự kiện.</span>
-                                </h2>
-
-                                <div className="space-y-6">
-                                    <p className="text-2xl md:text-3xl font-bold text-white leading-tight whitespace-pre-line">
-                                        {event.description}
-                                    </p>
-                                    {event.subtitle && (
-                                        <p className="text-lg text-white/70 leading-relaxed font-bold border-l-4 border-primary pl-6">
-                                            {event.subtitle}
-                                        </p>
-                                    )}
-                                </div>
-                            </motion.div>
-                        </div>
-
-                        {/* Premium Stats Grid */}
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                            {[
-                                { label: "Danh mục", value: event.category?.name || "Sự kiện", icon: Cpu, color: "text-blue-400" },
-                                { label: "Độ tuổi", value: event.ageRestriction > 0 ? `${event.ageRestriction}+` : "Mọi lứa tuổi", icon: ShieldCheck, color: "text-emerald-400" },
-                                { label: "Trạng thái", value: event.status === EventStatus.PUBLISHED ? "Đang diễn ra" : "Sắp tới", icon: Globe, color: "text-amber-400" },
-                                { label: "Địa điểm", value: `${event.locations?.length || 0} điểm`, icon: MapPin, color: "text-rose-400" }
-                            ].map((spec, i) => (
-                                <motion.div
-                                    key={i}
-                                    whileHover={{ y: -5 }}
-                                    className="bg-white/[0.08] border border-white/20 p-8 rounded-[32px] flex flex-col gap-6 hover:bg-white/[0.12] transition-all hover:border-white/30"
-                                >
-                                    <spec.icon className={`w-8 h-8 ${spec.color}`} />
-                                    <div>
-                                        <p className="text-[10px] uppercase tracking-widest text-white/50 font-black mb-1">{spec.label}</p>
-                                        <p className="text-lg font-black text-white">{spec.value}</p>
-                                    </div>
-                                </motion.div>
-                            ))}
-                        </div>
-
-                        {/* Timeline Protocol */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {[
-                                { icon: Clock, label: "Giờ mở cửa", val: event.openTime || "TBA", desc: "Check-in & Đón khách" },
-                                { icon: Clock, label: "Giờ đóng cửa", val: event.closedTime || "TBA", desc: "Kết thúc hoạt động" },
-                                { icon: Calendar, label: "Ngày bắt đầu", val: event.startTime ? new Date(event.startTime).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' }) : "TBA", desc: "Khởi động sự kiện" },
-                                { icon: Calendar, label: "Ngày kết thúc", val: event.endTime ? new Date(event.endTime).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' }) : "TBA", desc: "Kết thúc sự kiện" }
-                            ].map((item, idx) => (
-                                <div
-                                    key={idx}
-                                    className="p-10 rounded-[40px] bg-gradient-to-br from-white/[0.1] to-white/[0.02] border border-white/20 flex gap-8 items-center group hover:border-primary transition-all duration-500"
-                                >
-                                    <div className="shrink-0 w-20 h-20 rounded-2xl bg-white/10 flex items-center justify-center text-primary border border-white/20 group-hover:scale-110 transition-transform">
-                                        <item.icon className="w-10 h-10" />
-                                    </div>
-                                    <div className="space-y-1">
-                                        <p className="text-[10px] uppercase tracking-widest text-white/50 font-black">{item.label}</p>
-                                        <h4 className="text-3xl font-black text-white tracking-tight">{item.val}</h4>
-                                        <p className="text-xs text-white/60 font-bold">{item.desc}</p>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* RIGHT: SIDEBAR */}
-                    <aside className="lg:col-span-4">
-                        <div className="sticky top-24 space-y-8">
-                            <div className="bg-[#121212] border border-white/20 rounded-[48px] p-10 space-y-10 shadow-[0_0_50px_rgba(0,0,0,0.5)] relative overflow-hidden group">
-                                <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-
-                                <div className="text-center space-y-8 relative z-10">
-                                    <Link href={`/organizers/${event.organizer?.id}`} className="block group/org">
-                                        <div className="relative w-32 h-32 mx-auto mb-8">
-                                            <div className="absolute inset-0 bg-primary/30 rounded-full blur-2xl animate-pulse" />
-                                            <div className="relative w-full h-full rounded-[40px] overflow-hidden border-2 border-white/20 transition-all duration-500 group-hover/org:border-primary">
-                                                <Image
-                                                    src={event.organizer?.logoUrl || "https://i.pravatar.cc/150?u=org"}
-                                                    alt="Organizer"
-                                                    fill
-                                                    className="object-cover"
-                                                />
-                                            </div>
-                                        </div>
-
-                                        <div>
-                                            <p className="text-[10px] font-black text-primary uppercase tracking-[0.4em] mb-4 leading-none text-center">Nhà tổ chức</p>
-                                            <h3 className="text-4xl font-black text-white tracking-tighter uppercase transition-colors text-center group-hover/org:text-primary">
-                                                {event.organizer?.name || "Organizer"}
-                                            </h3>
-                                        </div>
-                                    </Link>
-
-                                    <p className="text-sm text-white/60 leading-relaxed font-bold px-6">
-                                        "Mang đến những trải nghiệm không bao giờ quên cho cộng đồng."
-                                    </p>
-                                </div>
-
-                                <div className="space-y-4 relative z-10 pt-4">
-                                    <Button className="w-full h-16 rounded-3xl bg-primary text-black hover:bg-white transition-all duration-500 font-black uppercase text-xs tracking-widest shadow-xl shadow-primary/10">
-                                        Theo dõi ngay
-                                    </Button>
-                                    <Button variant="outline" className="w-full h-16 rounded-3xl border-white/10 bg-white/5 text-white hover:bg-white hover:text-black transition-all duration-500 font-black uppercase text-xs tracking-widest">
-                                        Liên hệ
-                                    </Button>
-                                </div>
-                            </div>
-
-                            {/* Trust Badge */}
-                            <div className="px-8 py-6 rounded-3xl border border-white/5 bg-white/[0.02] flex items-center justify-center gap-4 group hover:bg-white/[0.04] transition-all">
-                                <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
-                                <span className="text-[11px] font-black text-white/40 uppercase tracking-[0.2em] group-hover:text-white/60 transition-colors">
-                                    Giao dịch an toàn 100%
-                                </span>
-                            </div>
-                        </div>
-                    </aside>
-
+        <article className="space-y-6">
+          <h3 className="text-xl font-bold text-slate-900 uppercase tracking-widest text-slate-400">Quick Facts</h3>
+          <div className="mt-5 grid gap-3 sm:grid-cols-2">
+            {infoItems.map((item) => (
+              <div
+                key={item.label}
+                className="rounded-2xl border border-slate-200 bg-slate-50 p-4"
+              >
+                <div className="flex items-center gap-2 text-sm font-semibold text-slate-500">
+                  <item.icon className="h-4 w-4 text-sky-600" />
+                  <span>{item.label}</span>
                 </div>
+                <p className="mt-2 text-base font-semibold text-slate-900">{item.value}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-6 grid gap-3 sm:grid-cols-2">
+            {timelineItems.map((item) => (
+              <div
+                key={item.label}
+                className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4"
+              >
+                <span className="rounded-full bg-sky-100 p-2 text-sky-700">
+                  <CalendarDays className="h-4 w-4" />
+                </span>
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
+                    {item.label}
+                  </p>
+                  <p className="text-sm font-semibold text-slate-800">{item.value}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </article>
+      </div>
+
+      <aside className="lg:col-span-4 pl-0 lg:pl-10">
+        <div className="sticky top-24 pt-6 space-y-6">
+          <p className="text-xs font-black uppercase tracking-[0.25em] text-slate-400">Organizer</p>
+
+          <div className="group relative overflow-hidden rounded-[2.5rem] bg-white shadow-xl shadow-slate-200/50 border border-slate-100 transition-all hover:shadow-2xl hover:-translate-y-1">
+            {/* Banner Area */}
+            <div className="relative h-32 w-full overflow-hidden">
+              <Image
+                src={orgImage}
+                alt={organizerDetails?.name || event.organizer?.name || "Organizer"}
+                fill
+                className="object-cover transition-transform duration-700 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
             </div>
-        </section>
-    );
+
+            {/* Content Area */}
+            <div className="relative px-6 pb-6 pt-4">
+              {/* Floating Logo if available, else just title */}
+              {organizerDetails?.logoUrl && organizerDetails.logoUrl !== orgImage && (
+                <div className="absolute -top-10 left-6 h-16 w-16 overflow-hidden rounded-2xl border-4 border-white bg-white shadow-md">
+                  <Image
+                    src={organizerDetails.logoUrl}
+                    alt="Logo"
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+              )}
+
+              <div className={organizerDetails?.logoUrl && organizerDetails.logoUrl !== orgImage ? "mt-4" : ""}>
+                <h3 className="text-xl font-black text-slate-900 line-clamp-1">
+                  {organizerDetails?.name || event.organizer?.name || "Organizer"}
+                </h3>
+                {organizerDetails?.isVerified && (
+                  <div className="mt-1 inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-emerald-600">
+                    <ShieldCheck className="h-3 w-3" />
+                    Verified
+                  </div>
+                )}
+              </div>
+
+              <p className="mt-4 text-sm font-medium leading-relaxed text-slate-600 line-clamp-3">
+                {organizerDetails?.description || "The organizer provides schedule, location and check-in instructions. Follow them to receive updates sooner."}
+              </p>
+
+              <div className="mt-6 flex flex-col gap-3">
+                <Button asChild className="h-12 w-full rounded-2xl font-black tracking-widest uppercase text-[10px] shadow-md shadow-slate-900/10">
+                  <Link href={`/organizers/${event.organizer?.id || ""}`}>View Profile</Link>
+                </Button>
+                <Button
+                  variant="outline"
+                  className="h-12 w-full rounded-2xl border-slate-200 bg-slate-50 text-slate-700 hover:bg-white font-black tracking-widest uppercase text-[10px]"
+                >
+                  Follow
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </section>
+  );
 }
