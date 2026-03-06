@@ -5,13 +5,13 @@ import { KEY, QUERY_KEY } from "@/utils/constant";
 import { CategoryGetListQuery } from "@/types/category";
 import { toast } from "sonner";
 import { handleErrorApi } from "@/lib/errors";
-import { useSessionStore } from "@/stores/sesionStore";
+
 
 
 export const useGetCategories = (params?: CategoryGetListQuery) => {
     return useQuery({
         queryKey: QUERY_KEY.categories.list(params),
-        queryFn: () => categoryRequest.getList(params || {}),// chỉ khi có params
+        queryFn: () => categoryRequest.getList(params || {}),
         enabled: !!params,
     });
 };

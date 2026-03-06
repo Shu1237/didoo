@@ -56,8 +56,5 @@ export interface Event {
     category?: Category;
     organizer?: Organizer;
     locations?: EventLocation[];
-    /** BE chưa có - dùng khi có từ ticket/booking */
-    sold?: number;
-    total?: number;
-    isDeleted?: boolean;
+
 }
