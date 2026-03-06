@@ -6,9 +6,9 @@ import { Organizer, OrganizerGetListQuery } from "@/types/organizer";
 
 export const organizerRequest = {
     getList: (params: OrganizerGetListQuery) =>
-        http.get<PaginatedData<Organizer>>(ENDPOINT_CLIENT.ORGANIZERS, { query: params }),
+        http.get<PaginatedData<Organizer>>(ENDPOINT_CLIENT.ORGANIZERS, { query: params, skipAuth: true }),
     getById: (id: string) =>
-        http.get<Organizer>(ENDPOINT_CLIENT.ORGANIZER_DETAIL(id)),
+        http.get<Organizer>(ENDPOINT_CLIENT.ORGANIZER_DETAIL(id), { skipAuth: true }),
     create: (body: OrganizerCreateBody) =>
         http.post<Organizer>(ENDPOINT_CLIENT.ORGANIZERS, body),
     update: (id: string, body: OrganizerUpdateBody) =>
