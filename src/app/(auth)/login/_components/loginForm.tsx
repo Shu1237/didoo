@@ -15,7 +15,6 @@ import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { handleErrorApi } from '@/lib/errors';
 import { toast } from 'sonner';
-// Sử dụng GoogleLogin để lấy ID Token (JWT) chuẩn xác
 
 export default function LoginForm() {
   const maskStyle = {
@@ -137,9 +136,16 @@ export default function LoginForm() {
           </button>
         </form>
 
-        <div className="mt-8 flex flex-col items-center gap-3">
-          <div className="flex justify-center items-center gap-5">
-            <div className="bg-white rounded-full overflow-hidden w-14 h-14 flex items-center justify-center hover:scale-110 transition-all shadow-xl shadow-black/10">
+        <div className="mt-8 flex flex-col items-center gap-4">
+          <div className="flex items-center gap-3 w-full">
+            <div className="h-[1px] bg-white/10 flex-1"></div>
+            <span className="text-white/40 text-sm font-medium">or</span>
+            <div className="h-[1px] bg-white/10 flex-1"></div>
+          </div>
+
+          <div className="flex flex-col items-center gap-2 w-full">
+            <span className="text-white/60 text-sm">Sign in with Google</span>
+            <div className="flex justify-center w-full transition-transform hover:scale-[1.02]">
               <GoogleLogin
                 onSuccess={async (credentialResponse) => {
                   if (loginGoogle.isPending) return;
@@ -163,9 +169,12 @@ export default function LoginForm() {
                 onError={() => {
                   toast.error("Đăng nhập Google thất bại");
                 }}
-                type="icon"
-                shape="circle"
+                type="standard"
                 theme="outline"
+                size="large"
+                shape="pill"
+                text="signin_with"
+                width="280"
               />
             </div>
           </div>
@@ -179,7 +188,6 @@ export default function LoginForm() {
         </p>
       </div>
 
-      {/* SECTION BÊN PHẢI: DECORATION */}
       <div className="hidden lg:block p-4 relative">
         <div
           className="h-full bg-black rounded-[45px] p-16 pt-12 pb-24 flex flex-col justify-center relative"
