@@ -5,6 +5,7 @@ import type { NextRequest } from 'next/server';
 import { Roles } from '@/utils/enum';
 import { cookies } from 'next/headers'
 import { decodeJWT } from '@/lib/utils';
+import { JWTUserType } from '@/types/user';
 
 // Define public routes that don't require authentication
 const publicPaths = ['/login', '/register', '/forgot-password', '/api/login', '/api/logout', '/api/refresh_token'];
@@ -46,7 +47,7 @@ export async function proxy(request: NextRequest) {
   // 3. Validate Access Token if it exists
   if (accessToken) {
     try {
-      const user = decodeJWT<{ role: string; exp: number }>(accessToken);
+      const user = decodeJWT<JWTUserType>(accessToken);
 
       // Check Token Expiration
       const currentTime = Math.floor(Date.now() / 1000);
@@ -64,7 +65,7 @@ export async function proxy(request: NextRequest) {
       const matchedPath = Object.keys(rolePermissions).find(path => pathname.startsWith(path));
       if (matchedPath) {
         const allowedRoles = rolePermissions[matchedPath];
-        const userRole = user.role as Roles;
+        const userRole = user.Role as Roles;
 
         if (!allowedRoles.includes(userRole)) {
           // Unauthorized Access

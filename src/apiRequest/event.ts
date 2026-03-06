@@ -6,9 +6,9 @@ import { Event, EventGetListQuery } from "@/types/event";
 
 export const eventRequest = {
     getList: (params: EventGetListQuery) =>
-        http.get<PaginatedData<Event>>(ENDPOINT_CLIENT.EVENTS, { query: params }),
+        http.get<PaginatedData<Event>>(ENDPOINT_CLIENT.EVENTS, { query: params,skipAuth: true }),
     getById: (id: string) =>
-        http.get<Event>(ENDPOINT_CLIENT.EVENT_DETAIL(id)),
+        http.get<Event>(ENDPOINT_CLIENT.EVENT_DETAIL(id), { skipAuth: true }),
     create: (body: EventCreateBody) =>
         http.post<Event>(ENDPOINT_CLIENT.EVENTS, body),
     update: (id: string, body: EventUpdateBody) =>
