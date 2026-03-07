@@ -5,6 +5,7 @@ import { ThemeProvider } from "next-themes";
 import QueryClientProviderWrapper from "@/components/QueryClientProviderWrapper";
 import { cookies } from "next/headers";
 import { AuthProvider } from "@/contexts/authContext";
+import { LocationProvider } from "@/contexts/locationContext";
 import { Toaster } from "sonner";
 import GoogleAuthProvider from "@/components/GoogleAuthProvider";
 
@@ -42,17 +43,19 @@ export default async function RootLayout({
       >
         <GoogleAuthProvider>
           <AuthProvider initialAccessToken={accessToken?.value || null} initialRefreshToken={refreshToken?.value || null}>
-            <QueryClientProviderWrapper>
-              <ThemeProvider
-                attribute="class"
-                defaultTheme="system"
-                enableSystem
-                disableTransitionOnChange
-              >
-                {children}
-                <Toaster richColors position="top-center" />
-              </ThemeProvider>
-            </QueryClientProviderWrapper>
+            <LocationProvider>
+              <QueryClientProviderWrapper>
+                <ThemeProvider
+                  attribute="class"
+                  defaultTheme="system"
+                  enableSystem
+                  disableTransitionOnChange
+                >
+                  {children}
+                  <Toaster richColors position="top-center" />
+                </ThemeProvider>
+              </QueryClientProviderWrapper>
+            </LocationProvider>
           </AuthProvider>
         </GoogleAuthProvider>
       </body>

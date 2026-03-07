@@ -115,8 +115,8 @@ export default function BookingPage({ params }: { params: Promise<{ id: string }
         return;
       }
 
-      toast.success("Dat ve thanh cong");
-      router.push("/user/tickets");
+      toast.success("Đặt vé thành công");
+      router.push("/user/dashboard/tickets");
     } catch {
       // Errors are handled centrally in useBooking.
     }
@@ -126,11 +126,11 @@ export default function BookingPage({ params }: { params: Promise<{ id: string }
 
   if (!event) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-slate-50 px-4">
-        <div className="rounded-3xl border border-slate-200 bg-white p-8 text-center shadow-sm">
-          <p className="text-slate-600">Khong tim thay su kien de dat ve.</p>
-          <Button asChild className="mt-4 rounded-full px-6">
-            <Link href="/events">Quay lai danh sach su kien</Link>
+      <main className="flex min-h-screen items-center justify-center bg-zinc-50 px-4">
+        <div className="rounded-2xl border border-zinc-200 bg-white p-8 text-center shadow-sm">
+          <p className="text-zinc-600">Không tìm thấy sự kiện để đặt vé.</p>
+          <Button asChild className="mt-4 rounded-xl">
+            <Link href="/events">Quay lại danh sách sự kiện</Link>
           </Button>
         </div>
       </main>
@@ -139,14 +139,14 @@ export default function BookingPage({ params }: { params: Promise<{ id: string }
 
   if (!user) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-slate-50 px-4">
-        <div className="max-w-md rounded-3xl border border-slate-200 bg-white p-8 text-center shadow-sm">
-          <h1 className="text-2xl font-bold text-slate-900">Dang nhap de dat ve</h1>
-          <p className="mt-2 text-slate-600">
-            Ban can dang nhap tai khoan truoc khi tiep tuc thanh toan.
+      <main className="flex min-h-screen items-center justify-center bg-zinc-50 px-4">
+        <div className="max-w-md rounded-2xl border border-zinc-200 bg-white p-8 text-center shadow-sm">
+          <h1 className="text-2xl font-bold text-zinc-900">Đăng nhập để đặt vé</h1>
+          <p className="mt-2 text-zinc-600">
+            Bạn cần đăng nhập tài khoản trước khi tiếp tục thanh toán.
           </p>
-          <Button asChild className="mt-5 rounded-full px-6">
-            <Link href={`/login?redirect=/events/${id}/booking`}>Dang nhap</Link>
+          <Button asChild className="mt-5 rounded-xl">
+            <Link href={`/login?redirect=/events/${id}/booking`}>Đăng nhập</Link>
           </Button>
         </div>
       </main>
@@ -154,33 +154,37 @@ export default function BookingPage({ params }: { params: Promise<{ id: string }
   }
 
   return (
-    <main className="min-h-screen bg-slate-50 px-4 pb-16 pt-28">
-      <div className="mx-auto max-w-7xl">
+    <main className="min-h-screen bg-zinc-50 px-4 pb-16 pt-28">
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="absolute -top-20 right-0 w-80 h-80 rounded-full bg-primary/5 blur-[80px]" />
+      </div>
+
+      <div className="relative mx-auto max-w-7xl">
         <Link
           href={`/events/${id}`}
-          className="mb-6 inline-flex items-center gap-2 rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+          className="mb-6 inline-flex items-center gap-2 rounded-xl border border-zinc-200 bg-white px-4 py-2 text-sm font-medium text-zinc-700 transition hover:bg-zinc-50"
         >
           <ChevronLeft className="h-4 w-4" />
-          Quay lai su kien
+          Quay lại sự kiện
         </Link>
 
         <div className="space-y-2">
-          <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 md:text-4xl">
-            Dat ve su kien
+          <h1 className="text-3xl font-extrabold tracking-tight text-zinc-900 md:text-4xl">
+            Đặt vé sự kiện
           </h1>
-          <p className="text-slate-600">{event.name}</p>
+          <p className="text-zinc-600">{event.name}</p>
         </div>
 
         <div className="mt-8 grid gap-6 lg:grid-cols-12">
           <section className="space-y-4 lg:col-span-7">
-            <h2 className="inline-flex items-center gap-2 rounded-full bg-sky-100 px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-sky-700">
+            <h2 className="inline-flex items-center gap-2 rounded-xl bg-primary/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-primary">
               <Ticket className="h-4 w-4" />
-              Chon loai ve
+              Chọn loại vé
             </h2>
 
             {ticketTypes.length === 0 ? (
-              <div className="rounded-3xl border border-dashed border-slate-300 bg-white p-8 text-center text-slate-500">
-                Su kien hien chua mo ban ve.
+              <div className="rounded-2xl border border-dashed border-zinc-300 bg-white p-8 text-center text-zinc-500">
+                Sự kiện hiện chưa mở bán vé.
               </div>
             ) : (
               <div className="space-y-3">
@@ -194,21 +198,21 @@ export default function BookingPage({ params }: { params: Promise<{ id: string }
                       key={ticketType.id}
                       className={`rounded-2xl border p-5 transition ${
                         isSelected
-                          ? "border-sky-300 bg-sky-50"
-                          : "border-slate-200 bg-white hover:border-slate-300"
+                          ? "border-primary/40 bg-primary/5"
+                          : "border-zinc-200 bg-white hover:border-zinc-300"
                       } ${isSoldOut ? "opacity-60" : ""}`}
                     >
                       <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                         <div className="space-y-2">
-                          <h3 className="text-lg font-bold text-slate-900">{ticketType.name}</h3>
+                          <h3 className="text-lg font-bold text-zinc-900">{ticketType.name}</h3>
                           {ticketType.description && (
-                            <p className="text-sm text-slate-600">{ticketType.description}</p>
+                            <p className="text-sm text-zinc-600">{ticketType.description}</p>
                           )}
-                          <p className="text-xl font-bold text-slate-900">
-                            {Number(ticketType.price || 0).toLocaleString("vi-VN")} VND
+                          <p className="text-xl font-bold text-zinc-900">
+                            {Number(ticketType.price || 0).toLocaleString("vi-VN")}đ
                           </p>
-                          <p className="text-sm text-slate-500">
-                            Con lai: {ticketType.availableQuantity ?? 0} ve
+                          <p className="text-sm text-zinc-500">
+                            Còn lại: {ticketType.availableQuantity ?? 0} vé
                           </p>
                         </div>
 
@@ -217,24 +221,24 @@ export default function BookingPage({ params }: { params: Promise<{ id: string }
                           variant={isSelected ? "secondary" : "outline"}
                           onClick={() => handleToggleTicketType(ticketType)}
                           disabled={isSoldOut}
-                          className="h-10 rounded-full px-5"
+                          className="h-10 rounded-xl px-5"
                         >
-                          {isSoldOut ? "Het ve" : isSelected ? "Bo chon" : "Chon ve"}
+                          {isSoldOut ? "Hết vé" : isSelected ? "Bỏ chọn" : "Chọn vé"}
                         </Button>
                       </div>
 
                       {selectedItem && (
-                        <div className="mt-4 flex items-center gap-3 border-t border-slate-200 pt-4">
+                        <div className="mt-4 flex items-center gap-3 border-t border-zinc-200 pt-4">
                           <Button
                             type="button"
                             size="icon"
                             variant="outline"
                             onClick={() => handleQuantityChange(ticketType.id, -1)}
-                            className="h-9 w-9 rounded-full border-slate-300"
+                            className="h-9 w-9 rounded-xl border-zinc-200"
                           >
                             <Minus className="h-4 w-4" />
                           </Button>
-                          <span className="w-8 text-center text-lg font-bold text-slate-900">
+                          <span className="w-8 text-center text-lg font-bold text-zinc-900">
                             {selectedItem.quantity}
                           </span>
                           <Button
@@ -245,7 +249,7 @@ export default function BookingPage({ params }: { params: Promise<{ id: string }
                             disabled={
                               selectedItem.quantity >= (selectedItem.ticketType.availableQuantity ?? 0)
                             }
-                            className="h-9 w-9 rounded-full border-slate-300"
+                            className="h-9 w-9 rounded-xl border-zinc-200"
                           >
                             <Plus className="h-4 w-4" />
                           </Button>
@@ -253,9 +257,9 @@ export default function BookingPage({ params }: { params: Promise<{ id: string }
                             type="button"
                             variant="ghost"
                             onClick={() => handleRemoveTicketType(ticketType.id)}
-                            className="ml-auto h-9 rounded-full px-4 text-slate-500 hover:text-slate-700"
+                            className="ml-auto h-9 rounded-xl px-4 text-zinc-500 hover:text-zinc-700"
                           >
-                            Xoa
+                            Xóa
                           </Button>
                         </div>
                       )}
@@ -267,52 +271,52 @@ export default function BookingPage({ params }: { params: Promise<{ id: string }
           </section>
 
           <aside className="lg:col-span-5">
-            <div className="sticky top-24 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-              <h2 className="text-xl font-bold text-slate-900">Don hang cua ban</h2>
+            <div className="sticky top-24 rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
+              <h2 className="text-xl font-bold text-zinc-900">Đơn hàng của bạn</h2>
 
               {selected.length === 0 ? (
-                <p className="mt-4 text-sm text-slate-600">
-                  Chon loai ve o ben trai de xem tong thanh toan.
+                <p className="mt-4 text-sm text-zinc-600">
+                  Chọn loại vé ở bên trái để xem tổng thanh toán.
                 </p>
               ) : (
                 <div className="mt-5 space-y-4">
                   {selected.map((item) => (
                     <div
                       key={item.ticketType.id}
-                      className="rounded-2xl border border-slate-200 bg-slate-50 p-4"
+                      className="rounded-2xl border border-zinc-200 bg-zinc-50 p-4"
                     >
-                      <p className="font-semibold text-slate-900">{item.ticketType.name}</p>
-                      <p className="mt-1 text-sm text-slate-600">
-                        {item.quantity} x {Number(item.ticketType.price || 0).toLocaleString("vi-VN")} VND
+                      <p className="font-semibold text-zinc-900">{item.ticketType.name}</p>
+                      <p className="mt-1 text-sm text-zinc-600">
+                        {item.quantity} x {Number(item.ticketType.price || 0).toLocaleString("vi-VN")}đ
                       </p>
                     </div>
                   ))}
 
-                  <div className="space-y-2 border-t border-slate-200 pt-4">
-                    <div className="flex items-center justify-between text-sm text-slate-600">
-                      <span>Tong so ve</span>
-                      <span className="font-semibold text-slate-900">{totalQuantity}</span>
+                  <div className="space-y-2 border-t border-zinc-200 pt-4">
+                    <div className="flex items-center justify-between text-sm text-zinc-600">
+                      <span>Tổng số vé</span>
+                      <span className="font-semibold text-zinc-900">{totalQuantity}</span>
                     </div>
-                    <div className="flex items-center justify-between text-lg font-bold text-slate-900">
-                      <span>Tong thanh toan</span>
-                      <span>{totalPrice.toLocaleString("vi-VN")} VND</span>
+                    <div className="flex items-center justify-between text-lg font-bold text-zinc-900">
+                      <span>Tổng thanh toán</span>
+                      <span>{totalPrice.toLocaleString("vi-VN")}đ</span>
                     </div>
                   </div>
 
-                  <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800">
+                  <div className="rounded-2xl border border-primary/20 bg-primary/5 p-4 text-sm text-primary">
                     <p className="flex items-center gap-2 font-semibold">
                       <ShieldCheck className="h-4 w-4" />
-                      Thanh toan an toan
+                      Thanh toán an toàn
                     </p>
-                    <p className="mt-1">Thong tin cua ban duoc bao mat trong qua trinh thanh toan.</p>
+                    <p className="mt-1 text-zinc-600">Thông tin của bạn được bảo mật trong quá trình thanh toán.</p>
                   </div>
 
                   <Button
                     onClick={handleSubmit}
                     disabled={create.isPending || totalQuantity === 0}
-                    className="h-12 w-full rounded-full text-base font-semibold"
+                    className="h-12 w-full rounded-xl text-base font-semibold"
                   >
-                    {create.isPending ? "Dang xu ly..." : "Tiep tuc thanh toan"}
+                    {create.isPending ? "Đang xử lý..." : "Tiếp tục thanh toán"}
                   </Button>
                 </div>
               )}

@@ -2,6 +2,17 @@
 
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 import { useCallback, useState, useEffect } from 'react'
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { Label } from '@/components/ui/label'
+import { cn } from '@/lib/utils'
 
 export type FilterType = 'text' | 'select' | 'date' | 'number'
 
@@ -110,48 +121,54 @@ export default function BaseFilter({ filters, onFilterChange }: BaseFilterProps)
     }
 
     return (
-        <div className="bg-white p-4 rounded-lg shadow-sm mb-6 border border-gray-100 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="bg-card p-4 rounded-xl shadow-sm mb-6 border border-border grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {filters.map((filter) => {
                 const paramValue = searchParams.get(filter.key)
                 const value = filter.type === 'text'
                     ? (localState[filter.key] !== undefined ? localState[filter.key] : (paramValue || ''))
-                    : (paramValue || filter.defaultValue || '')
+                    : (paramValue ?? filter.defaultValue ?? '')
 
                 return (
-                    <div key={filter.key} className={filter.className || ""}>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">{filter.label}</label>
+                    <div key={filter.key} className={cn("space-y-2", filter.className)}>
+                        <Label className="text-sm font-medium text-foreground">{filter.label}</Label>
 
                         {filter.type === 'text' && (
-                            <input
+                            <Input
                                 type="text"
                                 placeholder={filter.placeholder}
                                 value={value}
                                 onChange={(e) => handleValuesChange(filter.key, e.target.value)}
-                                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                className="w-full"
                             />
                         )}
 
                         {filter.type === 'select' && (
-                            <select
-                                value={value}
-                                onChange={(e) => handleValuesChange(filter.key, e.target.value)}
-                                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            <Select
+                                value={value === '' || value === undefined ? '__all__' : String(value)}
+                                onValueChange={(v) => handleValuesChange(filter.key, v === '__all__' ? '' : v)}
                             >
-                                <option value="">All</option>
-                                {filter.options?.map((opt) => (
-                                    <option key={opt.value} value={opt.value}>
-                                        {opt.label}
-                                    </option>
-                                ))}
-                            </select>
+                                <SelectTrigger className="w-full">
+                                    <SelectValue placeholder="Tất cả" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {filter.options?.map((opt) => (
+                                        <SelectItem
+                                            key={String(opt.value)}
+                                            value={opt.value === '' || opt.value === undefined ? '__all__' : String(opt.value)}
+                                        >
+                                            {opt.label}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
                         )}
 
                         {filter.type === 'date' && (
-                            <input
+                            <Input
                                 type="date"
                                 value={value}
                                 onChange={(e) => handleValuesChange(filter.key, e.target.value)}
-                                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                className="w-full"
                             />
                         )}
                     </div>
@@ -159,12 +176,13 @@ export default function BaseFilter({ filters, onFilterChange }: BaseFilterProps)
             })}
 
             <div className="flex items-end">
-                <button
+                <Button
+                    variant="secondary"
                     onClick={clearFilters}
-                    className="w-full rounded-md bg-gray-100 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                    className="w-full"
                 >
-                    Clear Filters
-                </button>
+                    Xóa bộ lọc
+                </Button>
             </div>
         </div>
     )

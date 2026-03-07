@@ -2,7 +2,15 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { CalendarDays, Clock3, Globe2, ShieldCheck, Tag } from "lucide-react";
+import { motion } from "framer-motion";
+import {
+  CalendarDays,
+  Clock3,
+  ShieldCheck,
+  Tag,
+  Users,
+  Zap,
+} from "lucide-react";
 import { Event } from "@/types/event";
 import { EventStatus } from "@/utils/enum";
 import { useGetOrganizer } from "@/hooks/useOrganizer";
@@ -12,192 +20,215 @@ interface EventInforProps {
   event: Event;
 }
 
-const FALLBACK_ORGANIZER_IMAGE = "https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=2070&auto=format&fit=crop";
+const FALLBACK_ORGANIZER_IMAGE =
+  "https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=2070&auto=format&fit=crop";
 
 function getStatusLabel(status: EventStatus) {
-  if (status === EventStatus.PUBLISHED || status === EventStatus.OPENED) {
-    return "Open";
-  }
+  if (status === EventStatus.PUBLISHED || status === EventStatus.OPENED) return "Đang mở";
+  if (status === EventStatus.CLOSED) return "Đã đóng";
+  if (status === EventStatus.CANCELLED) return "Đã hủy";
+  return "Sắp diễn ra";
+}
 
-  if (status === EventStatus.CLOSED) {
-    return "Closed";
-  }
-
-  if (status === EventStatus.CANCELLED) {
-    return "Cancelled";
-  }
-
-  return "Coming Soon";
+function formatDate(s: string | undefined) {
+  if (!s) return "Đang cập nhật";
+  return new Date(s).toLocaleDateString("vi-VN", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
 }
 
 export default function EventInfor({ event }: EventInforProps) {
-  const infoItems = [
-    { label: "Category", value: event.category?.name || "General Event", icon: Tag },
+  const quickInfoItems = [
     {
-      label: "Age",
-      value: event.ageRestriction > 0 ? `${event.ageRestriction}+` : "All Ages",
-      icon: ShieldCheck,
-    },
-    { label: "Status", value: getStatusLabel(event.status), icon: Globe2 },
-    { label: "Timeframe", value: `${event.openTime || "TBA"} - ${event.closedTime || "TBA"}`, icon: Clock3 },
-  ];
-
-  const timelineItems = [
-    {
-      label: "Start Date",
-      value: event.startTime
-        ? new Date(event.startTime).toLocaleDateString("en-US", {
-          day: "2-digit",
-          month: "short",
-          year: "numeric",
-        })
-        : "Updating",
+      label: "Danh mục",
+      value: event.category?.name || "Sự kiện chung",
+      icon: Tag,
     },
     {
-      label: "End Date",
-      value: event.endTime
-        ? new Date(event.endTime).toLocaleDateString("en-US", {
-          day: "2-digit",
-          month: "short",
-          year: "numeric",
-        })
-        : "Updating",
+      label: "Độ tuổi",
+      value: event.ageRestriction > 0 ? `${event.ageRestriction}+` : "Mọi lứa tuổi",
+      icon: Users,
+    },
+    {
+      label: "Trạng thái",
+      value: getStatusLabel(event.status),
+      icon: Zap,
+    },
+    {
+      label: "Thời gian",
+      value: `${event.openTime || "TBA"} - ${event.closedTime || "TBA"}`,
+      icon: Clock3,
+    },
+    {
+      label: "Ngày bắt đầu",
+      value: formatDate(event.startTime),
+      icon: CalendarDays,
+    },
+    {
+      label: "Ngày kết thúc",
+      value: formatDate(event.endTime),
+      icon: CalendarDays,
     },
   ];
 
   const orgId = event.organizer?.id;
   const { data: orgDataResponse } = useGetOrganizer(orgId || "");
   const organizerDetails = orgDataResponse?.data;
-
-  const orgImage = organizerDetails?.bannerUrl || organizerDetails?.logoUrl || event.organizer?.logoUrl || FALLBACK_ORGANIZER_IMAGE;
+  const orgImage =
+    organizerDetails?.bannerUrl ||
+    organizerDetails?.logoUrl ||
+    event.organizer?.logoUrl ||
+    FALLBACK_ORGANIZER_IMAGE;
 
   return (
     <section className="grid gap-12 lg:grid-cols-12">
       <div className="space-y-12 lg:col-span-8">
-        <article className="space-y-6">
-          <h2 className="text-3xl font-black tracking-tight text-slate-900 md:text-4xl">
-            Event Information
-          </h2>
-          <p className="mt-4 whitespace-pre-line text-base leading-relaxed text-slate-700">
-            {event.description}
-          </p>
-          {event.subtitle && (
-            <p className="mt-4 rounded-2xl border border-sky-100 bg-sky-50 px-4 py-3 text-sm font-medium text-sky-900">
-              {event.subtitle}
+        <motion.article
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="relative overflow-hidden rounded-2xl border border-zinc-200 bg-white p-8 shadow-sm"
+        >
+          <div className="absolute top-0 right-0 w-64 h-64 -translate-y-1/2 translate-x-1/2 rounded-full bg-primary/5 blur-3xl" />
+          <div className="relative">
+            <h2 className="text-2xl font-bold tracking-tight text-zinc-900 md:text-3xl">
+              Thông tin sự kiện
+            </h2>
+            <p className="mt-6 whitespace-pre-line text-base leading-relaxed text-zinc-600">
+              {event.description}
             </p>
-          )}
-          {event.tags && event.tags.length > 0 && (
-            <div className="mt-6 flex flex-wrap gap-2">
-              {event.tags.map((tag, index) => (
-                <span
-                  key={`${tag.tagName}-${index}`}
-                  className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-semibold text-slate-600"
-                >
-                  #{tag.tagName}
-                </span>
-              ))}
-            </div>
-          )}
-        </article>
-
-        <article className="space-y-6">
-          <h3 className="text-xl font-bold text-slate-900 uppercase tracking-widest text-slate-400">Quick Facts</h3>
-          <div className="mt-5 grid gap-3 sm:grid-cols-2">
-            {infoItems.map((item) => (
-              <div
-                key={item.label}
-                className="rounded-2xl border border-slate-200 bg-slate-50 p-4"
-              >
-                <div className="flex items-center gap-2 text-sm font-semibold text-slate-500">
-                  <item.icon className="h-4 w-4 text-sky-600" />
-                  <span>{item.label}</span>
-                </div>
-                <p className="mt-2 text-base font-semibold text-slate-900">{item.value}</p>
+            {event.subtitle && (
+              <div className="mt-6 rounded-xl border border-primary/20 bg-primary/5 px-5 py-4">
+                <p className="text-sm font-medium text-zinc-800">{event.subtitle}</p>
               </div>
+            )}
+            {event.tags && event.tags.length > 0 && (
+              <div className="mt-6 flex flex-wrap gap-2">
+                {event.tags.map((tag, index) => (
+                  <span
+                    key={`${tag.tagName}-${index}`}
+                    className="rounded-full border border-zinc-200 bg-zinc-50 px-4 py-1.5 text-sm font-medium text-zinc-600 transition-colors hover:border-primary/30 hover:bg-primary/5"
+                  >
+                    #{tag.tagName}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+        </motion.article>
+
+        <motion.article
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.1 }}
+        >
+          <h3 className="mb-6 text-xs font-bold uppercase tracking-[0.2em] text-zinc-400">
+            Thông tin nhanh
+          </h3>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {quickInfoItems.map((item, i) => (
+              <motion.div
+                key={item.label}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: 0.15 + i * 0.03 }}
+                className="group relative overflow-hidden rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm transition-all duration-300 hover:border-primary/20 hover:shadow-md"
+              >
+                <div className="flex items-start gap-4">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary/15">
+                    <item.icon className="h-5 w-5" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
+                      {item.label}
+                    </p>
+                    <p className="mt-1.5 text-base font-semibold text-zinc-900 leading-snug">
+                      {item.value}
+                    </p>
+                  </div>
+                </div>
+              </motion.div>
             ))}
           </div>
-
-          <div className="mt-6 grid gap-3 sm:grid-cols-2">
-            {timelineItems.map((item) => (
-              <div
-                key={item.label}
-                className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4"
-              >
-                <span className="rounded-full bg-sky-100 p-2 text-sky-700">
-                  <CalendarDays className="h-4 w-4" />
-                </span>
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
-                    {item.label}
-                  </p>
-                  <p className="text-sm font-semibold text-slate-800">{item.value}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </article>
+        </motion.article>
       </div>
 
       <aside className="lg:col-span-4 pl-0 lg:pl-10">
-        <div className="sticky top-24 pt-6 space-y-6">
-          <p className="text-xs font-black uppercase tracking-[0.25em] text-slate-400">Organizer</p>
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.4, delay: 0.2 }}
+          className="sticky top-24"
+        >
+          <p className="mb-4 text-xs font-bold uppercase tracking-[0.2em] text-zinc-400">
+            Nhà tổ chức
+          </p>
 
-          <div className="group relative overflow-hidden rounded-[2.5rem] bg-white shadow-xl shadow-slate-200/50 border border-slate-100 transition-all hover:shadow-2xl hover:-translate-y-1">
-            {/* Banner Area */}
-            <div className="relative h-32 w-full overflow-hidden">
+          <div className="group relative overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-lg transition-all duration-300 hover:shadow-xl hover:border-zinc-300">
+            <div className="relative h-36 w-full overflow-hidden">
               <Image
                 src={orgImage}
                 alt={organizerDetails?.name || event.organizer?.name || "Organizer"}
                 fill
-                className="object-cover transition-transform duration-700 group-hover:scale-105"
+                className="object-cover transition-transform duration-500 group-hover:scale-105"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-zinc-900/80 via-zinc-900/20 to-transparent" />
             </div>
 
-            {/* Content Area */}
-            <div className="relative px-6 pb-6 pt-4">
-              {/* Floating Logo if available, else just title */}
+            <div className="relative px-6 pb-6 pt-6">
               {organizerDetails?.logoUrl && organizerDetails.logoUrl !== orgImage && (
-                <div className="absolute -top-10 left-6 h-16 w-16 overflow-hidden rounded-2xl border-4 border-white bg-white shadow-md">
-                  <Image
-                    src={organizerDetails.logoUrl}
-                    alt="Logo"
-                    fill
-                    className="object-cover"
-                  />
+                <div className="absolute -top-12 left-6">
+                  <div className="relative h-20 w-20 overflow-hidden rounded-2xl border-4 border-white bg-white shadow-lg">
+                    <Image
+                      src={organizerDetails.logoUrl}
+                      alt="Logo"
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
                 </div>
               )}
 
-              <div className={organizerDetails?.logoUrl && organizerDetails.logoUrl !== orgImage ? "mt-4" : ""}>
-                <h3 className="text-xl font-black text-slate-900 line-clamp-1">
+              <div
+                className={
+                  organizerDetails?.logoUrl && organizerDetails.logoUrl !== orgImage ? "mt-6" : ""
+                }
+              >
+                <h3 className="text-xl font-bold text-zinc-900 line-clamp-1">
                   {organizerDetails?.name || event.organizer?.name || "Organizer"}
                 </h3>
                 {organizerDetails?.isVerified && (
-                  <div className="mt-1 inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-emerald-600">
-                    <ShieldCheck className="h-3 w-3" />
-                    Verified
+                  <div className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-primary">
+                    <ShieldCheck className="h-3.5 w-3.5" />
+                    Đã xác minh
                   </div>
                 )}
               </div>
 
-              <p className="mt-4 text-sm font-medium leading-relaxed text-slate-600 line-clamp-3">
-                {organizerDetails?.description || "The organizer provides schedule, location and check-in instructions. Follow them to receive updates sooner."}
+              <p className="mt-4 line-clamp-3 text-sm leading-relaxed text-zinc-600">
+                {organizerDetails?.description ||
+                  "Nhà tổ chức cung cấp lịch trình, địa điểm và hướng dẫn check-in. Theo dõi để nhận cập nhật sớm nhất."}
               </p>
 
               <div className="mt-6 flex flex-col gap-3">
-                <Button asChild className="h-12 w-full rounded-2xl font-black tracking-widest uppercase text-[10px] shadow-md shadow-slate-900/10">
-                  <Link href={`/organizers/${event.organizer?.id || ""}`}>View Profile</Link>
+                <Button
+                  asChild
+                  className="h-12 w-full rounded-xl font-semibold shadow-md shadow-primary/20"
+                >
+                  <Link href={`/organizers/${event.organizer?.id || ""}`}>Xem trang</Link>
                 </Button>
                 <Button
                   variant="outline"
-                  className="h-12 w-full rounded-2xl border-slate-200 bg-slate-50 text-slate-700 hover:bg-white font-black tracking-widest uppercase text-[10px]"
+                  className="h-12 w-full rounded-xl border-zinc-200 font-medium hover:bg-zinc-50"
                 >
-                  Follow
+                  Theo dõi
                 </Button>
               </div>
             </div>
           </div>
-        </div>
+        </motion.div>
       </aside>
     </section>
   );

@@ -52,6 +52,7 @@ export interface Event {
     status: EventStatus;
     thumbnailUrl?: string;
     bannerUrl?: string;
+    ticketMapUrl?: string;
     ageRestriction: number;
     category?: Category;
     organizer?: Organizer;

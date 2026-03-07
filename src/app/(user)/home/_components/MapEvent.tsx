@@ -9,6 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Spinner } from "@/components/ui/spinner";
 import { getDistanceKm } from "@/utils/helper";
 import { Event } from "@/types/event";
+import { useLocationContext } from "@/contexts/locationContext";
 import envconfig from "../../../../../config";
 
 interface MapEventProps {
@@ -21,12 +22,10 @@ const RADIUS_KM = 25;
 
 // ================== COMPONENT ==================
 export default function MapEvent({ eventData }: MapEventProps) {
-  const [userLocation, setUserLocation] =
-    useState<{ lat: number; lng: number } | null>(null);
+  const { location, isLoading: isLocationLoading } = useLocationContext();
+  const userLocation = location ? { lat: location.latitude, lng: location.longitude } : null;
 
-  const [selectedEvent, setSelectedEvent] =
-    useState<Event | null>(null);
-
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [mapVisible, setMapVisible] = useState(false);
   const [visibleEvents, setVisibleEvents] = useState<number[]>([]);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -34,26 +33,13 @@ export default function MapEvent({ eventData }: MapEventProps) {
 
   const sectionRef = useRef<HTMLDivElement | null>(null);
 
-  // ================== 1️⃣ GET USER GPS ==================
+  // Sync loading state with location context (with slight delay for UX)
   useEffect(() => {
-    //  default to HCMC if geolocation not available
-    if (!navigator.geolocation) {
-      setUserLocation({ lat: 10.776889, lng: 106.700806 });
-      setTimeout(() => setIsLoading(false), 800);
-      return;
+    if (!isLocationLoading) {
+      const t = setTimeout(() => setIsLoading(false), 400);
+      return () => clearTimeout(t);
     }
-    navigator.geolocation.getCurrentPosition((position) => {
-      setUserLocation({
-        lat: position.coords.latitude,
-        lng: position.coords.longitude,
-      });
-      setTimeout(() => setIsLoading(false), 800);
-    }, () => {
-      // Fallback if permission denied
-      setUserLocation({ lat: 10.776889, lng: 106.700806 });
-      setTimeout(() => setIsLoading(false), 800);
-    });
-  }, []);
+  }, [isLocationLoading]);
 
   // ================== 2️⃣ INTERSECTION ==================
   useEffect(() => {

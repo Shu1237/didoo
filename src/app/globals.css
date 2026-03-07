@@ -86,122 +86,107 @@
 :root {
   --radius: 1rem;
 
-  /* Deep Twilight Design System (Light Mode) */
-  --background: #FFFFFF;
-  /* White Background */
-  --foreground: #0A014F;
-  /* Deep Twilight Text */
+  /* Ticket Event Booking — Light Mode */
+  --background: #FAFAFA;
+  --foreground: #0F172A;
 
-  --card: #FAE8EB;
-  /* Lavender Blush Cards */
-  --card-foreground: #0A014F;
+  --card: #FFFFFF;
+  --card-foreground: #0F172A;
 
-  --popover: #FAE8EB;
-  --popover-foreground: #0A014F;
+  --popover: #FFFFFF;
+  --popover-foreground: #0F172A;
 
-  /* Primary - Deep Twilight/Lilac */
-  --primary: #0A014F;
-  /* Deep Twilight */
+  /* Primary — Coral Orange (Get tickets, CTA) */
+  --primary: #EA580C;
   --primary-foreground: #FFFFFF;
 
-  /* Secondary - Lilac */
-  --secondary: #CD9FCC;
-  --secondary-foreground: #0A014F;
+  /* Secondary — Slate */
+  --secondary: #F1F5F9;
+  --secondary-foreground: #0F172A;
 
-  /* Muted - Lavender Blush */
-  --muted: #FAE8EB;
+  /* Muted */
+  --muted: #F8FAFC;
   --muted-foreground: #64748B;
 
-  /* Accent - Cotton Rose (Warm Warning/Accent) */
-  --accent: #F6CACA;
-  --accent-foreground: #0A014F;
+  /* Accent — Amber (highlights, badges) */
+  --accent: #FFF7ED;
+  --accent-foreground: #C2410C;
 
-  --destructive: #EF4444;
-  /* Pending/Error Red */
+  --destructive: #DC2626;
   --destructive-foreground: #FFFFFF;
 
-  --success: #10B981;
-  /* Success Emerald */
+  --success: #059669;
 
-  --border: #CD9FCC;
-  /* Lilac border for subtle separation */
-  --input: #CD9FCC;
-  --ring: #0A014F;
+  --border: #E2E8F0;
+  --input: #E2E8F0;
+  --ring: #EA580C;
 
-  /* Charts */
-  --chart-1: #0A014F;
-  /* Deep Twilight */
-  --chart-2: #CD9FCC;
-  /* Lilac */
-  --chart-3: #F6CACA;
-  /* Cotton Rose */
-  --chart-4: #10B981;
-  /* Success */
-  --chart-5: #EF4444;
+  /* Charts — event categories */
+  --chart-1: #EA580C;
+  --chart-2: #0D9488;
+  --chart-3: #7C3AED;
+  --chart-4: #059669;
+  --chart-5: #DC2626;
 
   --sidebar: #FFFFFF;
-  --sidebar-foreground: #0A014F;
-  --sidebar-primary: #0A014F;
+  --sidebar-foreground: #0F172A;
+  --sidebar-primary: #EA580C;
   --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: #FAE8EB;
-  --sidebar-accent-foreground: #0A014F;
-  --sidebar-border: #FAE8EB;
-  --sidebar-ring: #0A014F;
+  --sidebar-accent: #FFF7ED;
+  --sidebar-accent-foreground: #C2410C;
+  --sidebar-border: #E2E8F0;
+  --sidebar-ring: #EA580C;
 }
 
 .dark {
-  /* Deep Twilight Design System (Dark Mode) */
-  --background: #0A014F;
-  /* Deep Twilight BG */
-  --foreground: #FAE8EB;
-  /* Lavender Blush Text */
+  /* Ticket Event Booking — Dark Mode */
+  --background: #0F172A;
+  --foreground: #F8FAFC;
 
-  --card: #13135C;
-  /* Slightly lighter Deep Twilight */
-  --card-foreground: #FAE8EB;
+  --card: #1E293B;
+  --card-foreground: #F8FAFC;
 
-  --popover: #13135C;
-  --popover-foreground: #FAE8EB;
+  --popover: #1E293B;
+  --popover-foreground: #F8FAFC;
 
-  /* Primary - Lilac for contrast on dark */
-  --primary: #CD9FCC;
-  --primary-foreground: #0A014F;
+  /* Primary — Coral Orange */
+  --primary: #F97316;
+  --primary-foreground: #FFFFFF;
 
-  /* Secondary - Cotton Rose */
-  --secondary: #F6CACA;
-  --secondary-foreground: #0A014F;
+  /* Secondary */
+  --secondary: #334155;
+  --secondary-foreground: #F8FAFC;
 
-  --muted: #13135C;
-  --muted-foreground: #CD9FCC;
+  --muted: #1E293B;
+  --muted-foreground: #94A3B8;
 
-  /* Accent - Cotton Rose */
-  --accent: #F6CACA;
-  --accent-foreground: #0A014F;
+  /* Accent */
+  --accent: #431407;
+  --accent-foreground: #FDBA74;
 
-  --destructive: #EF4444;
+  --destructive: #DC2626;
   --destructive-foreground: #FFFFFF;
 
   --success: #10B981;
 
-  --border: #2E2E80;
-  /* Darker border */
-  --input: #2E2E80;
-  --ring: #CD9FCC;
+  --border: #334155;
+  --input: #334155;
+  --ring: #F97316;
 
-  --chart-1: #CD9FCC;
-  --chart-2: #F6CACA;
-  --chart-3: #FAE8EB;
+  --chart-1: #F97316;
+  --chart-2: #14B8A6;
+  --chart-3: #A78BFA;
   --chart-4: #10B981;
-  --chart-5: #EF4444;
+  --chart-5: #DC2626;
 
-  --sidebar: #0A014F;
-  --sidebar-foreground: #FAE8EB;
-  --sidebar-primary: #CD9FCC;
-  --sidebar-primary-foreground: #0A014F;
-  --sidebar-accent: #13135C;
-  --sidebar-accent-foreground: #FAE8EB;
-  --sidebar-border: #2E2E80;
-  --sidebar-ring: #CD9FCC;
+  --sidebar: #0F172A;
+  --sidebar-foreground: #F8FAFC;
+  --sidebar-primary: #F97316;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #431407;
+  --sidebar-accent-foreground: #FDBA74;
+  --sidebar-border: #334155;
+  --sidebar-ring: #F97316;
 }
 
 @layer base {
@@ -244,7 +229,7 @@
   }
 
   .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary via-purple-500 to-accent;
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary via-orange-400 to-amber-500;
   }
 
   .no-scrollbar::-webkit-scrollbar,
@@ -260,10 +245,10 @@
     /* Firefox */
   }
 
-  /* Global scrollbar - phù hợp giao diện Deep Twilight (Lilac) */
+  /* Global scrollbar — Ticket Event theme */
   * {
     scrollbar-width: thin;
-    scrollbar-color: #CD9FCC80 transparent;
+    scrollbar-color: #EA580C80 transparent;
   }
 
   ::-webkit-scrollbar {
@@ -277,24 +262,24 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    background: #CD9FCC80;
+    background: #EA580C80;
     border-radius: 10px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: #CD9FCC;
+    background: #EA580C;
   }
 
   ::-webkit-scrollbar-thumb:active {
-    background: #B88AB7;
+    background: #C2410C;
   }
 
   .dark ::-webkit-scrollbar-thumb {
-    background: #CD9FCC70;
+    background: #F9731670;
   }
 
   .dark ::-webkit-scrollbar-thumb:hover {
-    background: #CD9FCC;
+    background: #F97316;
   }
 
   /* Custom thin scrollbar for list components */
@@ -309,17 +294,17 @@
   }
 
   .scrollbar-thin::-webkit-scrollbar-thumb {
-    background: #CD9FCC80;
+    background: #EA580C80;
     border-radius: 10px;
   }
 
   .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-    background: #CD9FCC;
+    background: #EA580C;
   }
 
   .scrollbar-thin {
     scrollbar-width: thin;
-    scrollbar-color: #CD9FCC80 transparent;
+    scrollbar-color: #EA580C80 transparent;
   }
 
   /* Theme toggle animation */

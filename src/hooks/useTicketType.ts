@@ -31,6 +31,7 @@ export const useTicketType = () => {
             return res.data;
         },
         onSuccess: () => {
+            toast.success("Thêm loại vé thành công");
             queryClient.invalidateQueries({ queryKey: KEY.ticketTypes });
         },
     });
@@ -41,7 +42,7 @@ export const useTicketType = () => {
             return res.data;
         },
         onSuccess: () => {
-            toast.success('Ticket type updated successfully');
+            toast.success('Cập nhật loại vé thành công');
             queryClient.invalidateQueries({ queryKey: KEY.ticketTypes });
         },
     });

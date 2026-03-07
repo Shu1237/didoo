@@ -1,0 +1,166 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useGetOrganizer, useOrganizer } from "@/hooks/useOrganizer";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { ConfirmModal } from "@/components/ui/confirm-modal";
+import { Loader2, Pencil, CheckCircle, Trash2 } from "lucide-react";
+import Link from "next/link";
+import { OrganizerStatus } from "@/utils/enum";
+
+const statusLabels: Record<OrganizerStatus, string> = {
+  [OrganizerStatus.PENDING]: "Chờ duyệt",
+  [OrganizerStatus.VERIFIED]: "Đã xác minh",
+  [OrganizerStatus.BANNED]: "Bị cấm",
+};
+
+export function OrganizerDetailContent({ id }: { id: string }) {
+  const router = useRouter();
+  const { data, isLoading } = useGetOrganizer(id);
+  const { verify, deleteOrganizer } = useOrganizer();
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+  const handleDelete = async () => {
+    await deleteOrganizer.mutateAsync(id);
+    router.push("/admin/organizers");
+  };
+
+  if (isLoading || !data?.data) {
+    return (
+      <Card className="border-zinc-200">
+        <CardContent className="pt-6">
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin text-zinc-400" />
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  const organizer = data.data;
+  const isPending = organizer.status === OrganizerStatus.PENDING;
+
+  return (
+    <div className="space-y-6">
+      {isPending && (
+        <Card className="border-amber-200 bg-amber-50/50">
+          <CardHeader className="pb-2">
+            <h2 className="text-lg font-semibold text-amber-900">Duyệt organizer</h2>
+            <p className="text-sm text-amber-700">
+              Organizer đang chờ admin xác minh. Bấm nút bên dưới để duyệt.
+            </p>
+          </CardHeader>
+          <CardContent>
+            <div className="flex justify-end gap-2">
+              <Button
+                variant="destructive"
+                onClick={() => setShowDeleteModal(true)}
+                disabled={deleteOrganizer.isPending}
+              >
+                <Trash2 className="mr-2 h-4 w-4" />
+                Xóa
+              </Button>
+              <Button
+                className="bg-emerald-600 hover:bg-emerald-700"
+                onClick={() => verify.mutate(id)}
+                disabled={verify.isPending}
+              >
+                {verify.isPending ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <CheckCircle className="mr-2 h-4 w-4" />
+                )}
+                Duyệt organizer
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      <Card className="border-zinc-200">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <h2 className="text-lg font-semibold text-zinc-900">Thông tin</h2>
+        <div className="flex justify-end gap-2">
+          {!isPending && (
+            <Button size="sm" variant="destructive" className="rounded-xl" onClick={() => setShowDeleteModal(true)} disabled={deleteOrganizer.isPending}>
+              <Trash2 className="mr-2 h-4 w-4" />
+              Xóa
+            </Button>
+          )}
+          <Button size="sm" variant="outline" className="rounded-xl" asChild>
+            <Link href={`/admin/organizers/${id}/edit`}>
+              <Pencil className="mr-2 h-4 w-4" />
+              Chỉnh sửa
+            </Link>
+          </Button>
+        </div>
+      </CardHeader>
+      <CardContent className="flex flex-col gap-6 sm:flex-row sm:items-start">
+        <Avatar className="h-20 w-20 shrink-0">
+          <AvatarImage src={organizer.logoUrl} />
+          <AvatarFallback className="bg-zinc-100 text-lg">{organizer.name?.[0]}</AvatarFallback>
+        </Avatar>
+        <div className="grid min-w-0 flex-1 gap-4 sm:grid-cols-2">
+          <div>
+            <p className="text-sm font-medium text-zinc-500">Tên</p>
+            <p className="text-zinc-900">{organizer.name}</p>
+          </div>
+          <div>
+            <p className="text-sm font-medium text-zinc-500">Slug</p>
+            <p className="text-zinc-900">{organizer.slug}</p>
+          </div>
+          <div>
+            <p className="text-sm font-medium text-zinc-500">Email</p>
+            <p className="text-zinc-900">{organizer.email}</p>
+          </div>
+          <div>
+            <p className="text-sm font-medium text-zinc-500">Số điện thoại</p>
+            <p className="text-zinc-900">{organizer.phone ?? "—"}</p>
+          </div>
+          <div>
+            <p className="text-sm font-medium text-zinc-500">Trạng thái</p>
+            <Badge
+              variant={
+                organizer.status === OrganizerStatus.VERIFIED
+                  ? "default"
+                  : organizer.status === OrganizerStatus.BANNED
+                    ? "destructive"
+                    : "secondary"
+              }
+            >
+              {statusLabels[organizer.status as OrganizerStatus] ?? organizer.status}
+            </Badge>
+          </div>
+          {organizer.address && (
+            <div className="sm:col-span-2">
+              <p className="text-sm font-medium text-zinc-500">Địa chỉ</p>
+              <p className="text-zinc-900">{organizer.address}</p>
+            </div>
+          )}
+          {organizer.description && (
+            <div className="sm:col-span-2">
+              <p className="text-sm font-medium text-zinc-500">Mô tả</p>
+              <p className="text-zinc-700 whitespace-pre-wrap">{organizer.description}</p>
+            </div>
+          )}
+        </div>
+      </CardContent>
+    </Card>
+
+      <ConfirmModal
+        open={showDeleteModal}
+        onOpenChange={setShowDeleteModal}
+        title="Xóa organizer"
+        description={`Bạn có chắc muốn xóa "${organizer.name}"?`}
+        confirmLabel="Xóa"
+        onConfirm={handleDelete}
+        isLoading={deleteOrganizer.isPending}
+        variant="danger"
+      />
+    </div>
+  );
+}
