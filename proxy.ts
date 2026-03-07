@@ -8,16 +8,27 @@ import { decodeJWT } from '@/lib/utils';
 import { JWTUserType } from '@/types/user';
 
 // Define public routes that don't require authentication
-const publicPaths = ['/login', '/register', '/forgot-password', '/api/login', '/api/logout', '/api/refresh_token'];
+const publicPaths = [
+  '/login',
+  '/register',
+  '/forgot-password',
+  '/reset-password',
+  '/confirm',
+  '/api/login',
+  '/api/logout',
+  '/api/refresh_token',
+];
 
-// Define role-based route access
-// Map URL prefixes to allowed roles
+// Define role-based route access - Map URL prefixes to allowed roles
+// Token chỉ có USER và ADMIN. Organizer = User có organizerId (verified) - dùng role USER để vào /organizer
 const rolePermissions: Record<string, Roles[]> = {
   '/admin': [Roles.ADMIN],
-  '/organizer': [Roles.ORGANIZER],
+  '/organizer': [Roles.USER, Roles.ORGANIZER], // USER: user upgrade lên organizer (check organizerId + status ở layout/page)
   '/home': [Roles.USER, Roles.GUEST],
-
-
+  '/user': [Roles.USER, Roles.GUEST],
+  '/events': [Roles.USER, Roles.GUEST],
+  '/organizers': [Roles.USER, Roles.GUEST],
+  '/map': [Roles.USER, Roles.GUEST],
 };
 
 export async function proxy(request: NextRequest) {
@@ -49,16 +60,10 @@ export async function proxy(request: NextRequest) {
     try {
       const user = decodeJWT<JWTUserType>(accessToken);
 
-      // Check Token Expiration
+      // Token hết hạn: giữ cookie để AuthContext gọi refresh (BE chỉ chấp nhận khi token ĐÃ hết hạn)
       const currentTime = Math.floor(Date.now() / 1000);
       if (user.exp < currentTime) {
-        // Token Expired but Refresh Token exists (checked above).
-        // Action: Redirect to same URL but delete access_token cookie.
-        // This forces the browser to retry effectively as "Missing Access Token".
-        // Result: AuthContext will see [No Access, Valid Refresh] -> Trigger Case 3 (Refresh Logic).
-        const response = NextResponse.redirect(request.url);
-        response.cookies.delete('accessToken');
-        return response;
+        return NextResponse.next();
       }
 
       // Valid Token -> Check Role-based Access (RBAC)
@@ -68,26 +73,25 @@ export async function proxy(request: NextRequest) {
         const userRole = user.Role as Roles;
 
         if (!allowedRoles.includes(userRole)) {
-          // Unauthorized Access
-          // You might want to redirect to            // Invalid token -> redirect to login
-          return NextResponse.redirect(new URL('/login', request.url)); // Ensure /unauthorized exists or use a generic error page
+          // Sai quyền truy cập -> redirect về login
+          const url = new URL('/login', request.url);
+          url.searchParams.set('redirect', pathname);
+          return NextResponse.redirect(url);
         }
       }
 
     } catch (error) {
       console.error("Token decoding failed:", error);
-      // Invalid token structure -> Treat as expired/missing.
-      // Force refresh flow by stripping the bad cookie.
-      const response = NextResponse.redirect(request.url);
-      response.cookies.delete('accessToken');
-      return response;
+      // Invalid token structure -> redirect về login
+      const url = new URL('/login', request.url);
+      url.searchParams.set('redirect', pathname);
+      return NextResponse.redirect(url);
     }
   }
 
-  // Case 3: No Access Token (or stripped above), but has Refresh Token.
-  // Allow request to proceed. 
-  // Layout will receive [null, refreshToken].
-  // AuthContext will trigger Case 3 logic to fetch new access token.
+  // Case 3: No Access Token, có Refresh Token.
+  // Cho request đi qua → Layout nhận [null, refreshToken].
+  // AuthContext không refresh được (thiếu UserId từ access token) → redirect /login.
   return NextResponse.next();
 }
 

@@ -36,7 +36,8 @@ export const useSessionStore = create<SessionState>((set) => ({
 
     updateSession: ({ accessToken, refreshToken }) => {
         try {
-            set({ accessToken, refreshToken });
+            const user = decodeJWT<JWTUserType>(accessToken);
+            set({ accessToken, refreshToken, user });
         } catch (error) {
             console.error("Invalid access token", error);
             set({ accessToken: null, refreshToken: null, user: null });

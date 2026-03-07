@@ -3,7 +3,7 @@ import { useSessionStore } from "@/stores/sesionStore";
 import envconfig from "../../config";
 import { ResponseData, ResponseError } from "../types/base";
 import { toast } from "sonner";
-import { EntityError, HttpError } from "@/lib/errors";
+import { EntityError, HttpError, validateCommonResponse } from "@/lib/errors";
 import { HttpErrorCode } from "@/utils/enum";
 
 interface CustomOptions extends RequestInit {
@@ -35,10 +35,9 @@ class TokenRefreshInterceptor {
                 console.error("Error getting token from cookies:", error);
                 return null;
             }
-        } else {
-            // Client: lấy token từ store
-            return useSessionStore.getState().accessToken || null;
         }
+        // Client: lấy token từ store (BE chỉ refresh khi token ĐÃ hết hạn -> xử lý 401)
+        return useSessionStore.getState().accessToken || null;
     }
 
     async refreshToken(): Promise<string> {
@@ -84,9 +83,9 @@ class TokenRefreshInterceptor {
                 refreshToken: refreshToken
             });
 
-            if (!result.data?.accessToken || !result.data?.refreshToken) {
-                throw new Error("INVALID_REFRESH_RESPONSE");
-            }
+            validateCommonResponse(result, {
+                requiredDataKeys: ["accessToken", "refreshToken"],
+            });
 
             const newAccessToken = result.data.accessToken;
             const newRefreshToken = result.data.refreshToken;
@@ -205,9 +204,9 @@ async function httpRequest<T>(
 
     const payload: ResponseData<T> = await res.json();
 
-    // Handle 401 - Token expired
-    if (res.status === HttpErrorCode.UNAUTHORIZED && payload.message === isExpired && !options?.skipAuth) {
-        console.log(payload.message);
+    // Handle 401 - Token expired (message từ BE OnChallenge/JwtBearerEvents)
+    if (res.status === HttpErrorCode.UNAUTHORIZED && payload?.message === isExpired && !options?.skipAuth) {
+     
         // Server: không thể refresh, throw error
         if (isServerRuntime()) {
             tokenInterceptor.handleAuthError();

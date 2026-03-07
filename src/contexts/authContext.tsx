@@ -3,40 +3,14 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { useSessionStore } from "@/stores/sesionStore";
 import { authRequest } from "@/apiRequest/auth";
-import { userRequest } from "@/apiRequest/user";
-import { organizerRequest } from "@/apiRequest/organizer";
 import { handleErrorApi } from "@/lib/errors";
 import { AuthContextType } from "@/types/base";
 import { decodeJWT } from "@/lib/utils";
-import { JWTUserType, User } from "@/types/user";
-import { Organizer } from "@/types/organizer";
+import { JWTUserType } from "@/types/user";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-async function fetchProfileAndOrganizer(
-    userId: string,
-    setProfile: (p: User) => void,
-    setOrganizer: (o: Organizer | null) => void,
-) {
-    try {
-        const profileRes = await userRequest.getById(userId);
-        const profile = profileRes.data;
-        setProfile(profile);
-
-        if (profile?.organizerId) {
-            try {
-                const orgRes = await organizerRequest.getById(profile.organizerId);
-                setOrganizer(orgRes.data ?? null);
-            } catch {
-                setOrganizer(null);
-            }
-        } else {
-            setOrganizer(null);
-        }
-    } catch (error) {
-        console.error("Failed to fetch profile", error);
-    }
-}
+/** Profile + Organizer: dùng useProfileWithOrganizer (TanStack Query) thay vì fetch trong AuthContext */
 
 export const AuthProvider = ({
     children,
@@ -47,7 +21,7 @@ export const AuthProvider = ({
     initialAccessToken?: string | null;
     initialRefreshToken?: string | null;
 }) => {
-    const { setSession, setProfile, setOrganizer } = useSessionStore((state) => state);
+    const { setSession } = useSessionStore((state) => state);
     const [isHydrated, setIsHydrated] = useState(false);
     const [isRefreshing, setIsRefreshing] = useState(false);
 
@@ -58,10 +32,50 @@ export const AuthProvider = ({
     useEffect(() => {
         const initializeAuth = async () => {
             if (initialAccessToken && initialRefreshToken) {
-                setSession({ accessToken: initialAccessToken, refreshToken: initialRefreshToken });
                 const decoded = decodeJWT<JWTUserType>(initialAccessToken);
-                if (decoded?.UserId) {
-                    await fetchProfileAndOrganizer(decoded.UserId, setProfile, setOrganizer);
+                const isExpired = decoded?.exp && decoded.exp < Math.floor(Date.now() / 1000);
+
+                // BE chỉ refresh khi token ĐÃ hết hạn
+                if (isExpired && decoded?.UserId) {
+                    setIsRefreshing(true);
+                    try {
+                        const result = await authRequest.refreshTokenClient({
+                            id: decoded.UserId,
+                            accessToken: initialAccessToken,
+                            refreshToken: initialRefreshToken,
+                        });
+                        if (!result.isSuccess || !result.data?.accessToken || !result.data?.refreshToken) {
+                            throw new Error(result.message || "Invalid refresh response");
+                        }
+                        const { accessToken: newAccessToken, refreshToken: newRefreshToken } = result.data;
+                        setSession({ accessToken: newAccessToken, refreshToken: newRefreshToken });
+                        await authRequest.refreshTokenServer({
+                            accessToken: newAccessToken,
+                            refreshToken: newRefreshToken,
+                        });
+                    } catch (error) {
+                        handleErrorApi({ error });
+                        try {
+                            await authRequest.logoutServer();
+                        } catch {
+                            /* ignore */
+                        }
+                        window.location.href = "/login?redirect=" + encodeURIComponent(window.location.pathname);
+                        return;
+                    } finally {
+                        setIsRefreshing(false);
+                    }
+                } else if (!isExpired) {
+                    setSession({ accessToken: initialAccessToken, refreshToken: initialRefreshToken });
+                } else {
+                    // Token hết hạn nhưng không decode được UserId -> redirect login
+                    try {
+                        await authRequest.logoutServer();
+                    } catch {
+                        /* ignore */
+                    }
+                    window.location.href = "/login";
+                    return;
                 }
                 setIsHydrated(true);
                 return;
@@ -72,46 +86,15 @@ export const AuthProvider = ({
                 return;
             }
 
+            // Chỉ có refresh token: BE RefreshCommand cần id (từ access token) - không decode được từ refresh token
             if (!initialAccessToken && initialRefreshToken) {
-                setIsRefreshing(true);
                 try {
-                    const decodedRefresh = decodeJWT<JWTUserType>(initialRefreshToken);
-                    if (!decodedRefresh?.UserId) throw new Error("Invalid refresh token payload");
-
-                    const result = await authRequest.refreshTokenClient({
-                        id: decodedRefresh.UserId,
-                        accessToken: initialAccessToken || "",
-                        refreshToken: initialRefreshToken,
-                    });
-
-                    if (!result.data?.accessToken || !result.data?.refreshToken) {
-                        throw new Error("Invalid refresh token response");
-                    }
-
-                    const { accessToken: newAccessToken, refreshToken: newRefreshToken } = result.data;
-                    setSession({ accessToken: newAccessToken, refreshToken: newRefreshToken });
-
-                    await authRequest.refreshTokenServer({
-                        accessToken: newAccessToken,
-                        refreshToken: newRefreshToken,
-                    });
-
-                    const decoded = decodeJWT<JWTUserType>(newAccessToken);
-                    if (decoded?.UserId) {
-                        await fetchProfileAndOrganizer(decoded.UserId, setProfile, setOrganizer);
-                    }
-                } catch (error) {
-                    handleErrorApi({ error });
-                    try {
-                        await authRequest.logoutServer();
-                    } catch (logoutError) {
-                        console.error("Failed to clear cookies:", logoutError);
-                    }
-                    window.location.href = "/login";
-                    return;
-                } finally {
-                    setIsRefreshing(false);
+                    await authRequest.logoutServer();
+                } catch {
+                    /* ignore */
                 }
+                window.location.href = "/login";
+                return;
             }
 
             setIsHydrated(true);
