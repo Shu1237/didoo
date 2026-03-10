@@ -21,7 +21,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { handleErrorApi } from "@/lib/errors";
-import { EventStatus } from "@/utils/enum";
+import { EventStatus, TicketListingStatus } from "@/utils/enum";
 
 const FALLBACK_IMAGE =
   "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=2000&auto=format&fit=crop";
@@ -90,7 +90,7 @@ export default function CreateResalePage() {
     const set = new Set<string>();
     for (const listing of listings) {
       const status = Number(listing.status ?? 0);
-      if (status !== 2 && status !== 3 && listing.ticketId) set.add(listing.ticketId);
+      if (status !== TicketListingStatus.PENDING && status !== TicketListingStatus.SOLD && listing.ticketId) set.add(listing.ticketId);
     }
     return set;
   }, [listingsRes?.data.items]);

@@ -65,6 +65,12 @@ export enum OrganizerStatus {
     BANNED = 3,
 }
 
+export enum TicketListingStatus {
+    ACTIVE = 1,
+    PENDING = 2,
+    SOLD = 3,
+    CANCELLED = 4,
+}
 /** api.md: 1=Active, 2=Inactive */
 export enum CategoryStatus {
     ACTIVE = 1,

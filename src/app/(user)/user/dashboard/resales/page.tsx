@@ -23,12 +23,13 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import type { TicketListing } from "@/types/ticket";
 import type { ResaleTransaction } from "@/types/booking";
+import { TicketListingStatus } from "@/utils/enum";
 
 function getListingStatusLabel(status?: number | string | null) {
-  const s = String(status || "").toLowerCase();
-  if (s.includes("1") || s === "active") return { label: "Đang bán", className: "bg-emerald-500/10 text-emerald-700 border-emerald-200" };
-  if (s.includes("3") || s.includes("sold")) return { label: "Đã bán", className: "bg-blue-500/10 text-blue-700 border-blue-200" };
-  if (s.includes("4") || s.includes("cancel")) return { label: "Đã hủy", className: "bg-rose-500/10 text-rose-700 border-rose-200" };
+  const s = Number(status ?? 0);
+  if (s === TicketListingStatus.ACTIVE) return { label: "Đang bán", className: "bg-emerald-500/10 text-emerald-700 border-emerald-200" };
+  if (s === TicketListingStatus.SOLD) return { label: "Đã bán", className: "bg-blue-500/10 text-blue-700 border-blue-200" };
+  if (s === TicketListingStatus.CANCELLED) return { label: "Đã hủy", className: "bg-rose-500/10 text-rose-700 border-rose-200" };
   return { label: "Chờ duyệt", className: "bg-amber-500/10 text-amber-700 border-amber-200" };
 }
 
@@ -69,7 +70,7 @@ function ListingCard({
     }
   };
 
-  const isActive = listing.status === 1;
+  const isActive = listing.status === TicketListingStatus.ACTIVE;
 
   return (
     <Card className="border-zinc-200">

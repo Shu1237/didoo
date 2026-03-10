@@ -7,6 +7,7 @@ import Loading from "@/components/loading";
 import { Button } from "@/components/ui/button";
 import { useGetEvent } from "@/hooks/useEvent";
 import { useGetTicketListings } from "@/hooks/useTicket";
+import { TicketListingStatus } from "@/utils/enum";
 import { ResaleEventListingsContent } from "./_components/ResaleEventListingsContent";
 
 export default function ResaleEventListingsPage({
@@ -21,7 +22,7 @@ export default function ResaleEventListingsPage({
       eventId: id,
       pageNumber: 1,
       pageSize: 500,
-      status: 1, // TicketListingStatusEnum.Active - chỉ hiện vé đang bán
+      status: TicketListingStatus.ACTIVE,
       isDeleted: false,
       isDescending: true,
     }),
