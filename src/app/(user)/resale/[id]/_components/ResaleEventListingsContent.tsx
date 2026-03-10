@@ -157,9 +157,9 @@ export function ResaleEventListingsContent({
                   </div>
 
                   <Button asChild className="h-11 rounded-xl">
-                    <Link href={`/resale/${eventId}/trade-booking/${listing.id}/confirm`}>
+                    <Link href={`/resale/${eventId}/trade-booking/${listing.id}`}>
                       <Ticket className="mr-2 h-4 w-4" />
-                      Xem vé & mua ngay
+                      Xem chi tiết & mua
                     </Link>
                   </Button>
                 </CardContent>

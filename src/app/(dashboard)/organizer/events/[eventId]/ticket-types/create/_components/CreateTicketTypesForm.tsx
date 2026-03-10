@@ -168,7 +168,7 @@ export function CreateTicketTypesForm({ eventId }: { eventId: string }) {
                     )}
                   </div>
                   <div className="space-y-2">
-                    <Label>Mô tả (optional)</Label>
+                    <Label>Mô tả </Label>
                     <Input
                       placeholder="Mô tả ngắn"
                       {...register(`items.${i}.description`)}

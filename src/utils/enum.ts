@@ -49,15 +49,13 @@ export enum TicketStatus {
     LOCKED = 4,
 }
 
-/** api.md: 1=Draft, 2=Published, 3=Cancelled, 4=Opened, 5=Closed, 6=PendingApproval */
+/** api.md: 1=Draft, 2=Published, 3=Cancelled, 4=Opened, 5=Closed */
 export enum EventStatus {
     DRAFT = 1,
     PUBLISHED = 2,
     CANCELLED = 3,
     OPENED = 4,
     CLOSED = 5,
-    /** Organizer tạo/gửi event → chờ admin duyệt → mới publish */
-    PENDING_APPROVAL = 6,
 }
 
 /** api.md: 1=Pending, 2=Verified, 3=Banned */

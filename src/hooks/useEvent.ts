@@ -130,6 +130,7 @@ export const useOrganizer = () => {
         onSuccess: () => {
             toast.success("Organizer created successfully");
             queryClient.invalidateQueries({ queryKey: KEY.organizers });
+            queryClient.invalidateQueries({ queryKey: KEY.users });
         },
     });
     const update = useMutation({

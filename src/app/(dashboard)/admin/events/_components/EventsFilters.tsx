@@ -7,9 +7,8 @@ import { EventStatus } from "@/utils/enum";
 
 const statusOptions = [
   { label: "Tất cả", value: "" },
-  { label: "Chờ duyệt", value: String(EventStatus.PENDING_APPROVAL) },
-  { label: "Nháp", value: String(EventStatus.DRAFT) },
-  { label: "Đã xuất bản", value: String(EventStatus.PUBLISHED) },
+  { label: "Nháp (chờ duyệt)", value: String(EventStatus.DRAFT) },
+  { label: "Đã duyệt", value: String(EventStatus.PUBLISHED) },
   { label: "Đã hủy", value: String(EventStatus.CANCELLED) },
   { label: "Đang mở", value: String(EventStatus.OPENED) },
   { label: "Đã đóng", value: String(EventStatus.CLOSED) },

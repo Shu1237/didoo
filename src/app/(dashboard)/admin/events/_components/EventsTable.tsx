@@ -48,11 +48,10 @@ function toQuery(params: Record<string, string | string[] | undefined>) {
 
 const statusLabels: Record<EventStatus, string> = {
   [EventStatus.DRAFT]: "Nháp",
-  [EventStatus.PUBLISHED]: "Đã xuất bản",
+  [EventStatus.PUBLISHED]: "Đã duyệt",
   [EventStatus.CANCELLED]: "Đã hủy",
   [EventStatus.OPENED]: "Đang mở",
   [EventStatus.CLOSED]: "Đã đóng",
-  [EventStatus.PENDING_APPROVAL]: "Chờ duyệt",
 };
 
 function formatDate(s: string | undefined) {
@@ -135,11 +134,8 @@ export function EventsTable({ params, onDelete, onApprove, onReject, onRestore, 
                         ? "default"
                         : e.status === EventStatus.CANCELLED
                           ? "destructive"
-                          : e.status === EventStatus.PENDING_APPROVAL
-                            ? "outline"
-                            : "secondary"
+                          : "secondary"
                     }
-                    className={e.status === EventStatus.PENDING_APPROVAL ? "border-amber-500 text-amber-700" : ""}
                   >
                     {statusLabels[e.status as EventStatus] ?? e.status}
                   </Badge>
@@ -158,17 +154,17 @@ export function EventsTable({ params, onDelete, onApprove, onReject, onRestore, 
                       <DropdownMenuItem asChild>
                         <Link href={`/admin/events/${e.id}/edit`}>Chỉnh sửa</Link>
                       </DropdownMenuItem>
-                      {e.status === EventStatus.PENDING_APPROVAL && onApprove && (
+                      {e.status === EventStatus.DRAFT && onApprove && (
                         <DropdownMenuItem
                           onClick={() => onApprove(e)}
                           disabled={isUpdatingStatus}
                           className="text-emerald-600 focus:text-emerald-600"
                         >
                           <CheckCircle className="mr-2 h-4 w-4" />
-                          Duyệt xuất bản
+                          Duyệt 
                         </DropdownMenuItem>
                       )}
-                      {e.status === EventStatus.PENDING_APPROVAL && onReject && (
+                      {e.status === EventStatus.DRAFT && onReject && (
                         <DropdownMenuItem
                           onClick={() => onReject(e)}
                           disabled={isUpdatingStatus}

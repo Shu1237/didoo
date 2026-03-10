@@ -61,7 +61,7 @@ export function AdminDashboardContent() {
   const { data: eventsRes } = useGetEvents({ pageSize: 1 });
   const { data: openedRes } = useGetEvents({ pageSize: 1, status: EventStatus.OPENED });
   const { data: publishedRes } = useGetEvents({ pageSize: 1, status: EventStatus.PUBLISHED });
-  const { data: pendingEventsRes } = useGetEvents({ pageSize: 1, status: EventStatus.PENDING_APPROVAL });
+  const { data: pendingEventsRes } = useGetEvents({ pageSize: 1, status: EventStatus.DRAFT });
   const { data: bookingsRes } = useQuery({
     queryKey: ["admin-dashboard-bookings"],
     queryFn: async () => {

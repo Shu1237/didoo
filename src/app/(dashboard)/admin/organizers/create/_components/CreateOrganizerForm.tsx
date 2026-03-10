@@ -141,7 +141,7 @@ export function CreateOrganizerForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="Description">Mô tả (optional)</Label>
+            <Label htmlFor="Description">Mô tả </Label>
             <Textarea
               id="Description"
               {...register("Description")}

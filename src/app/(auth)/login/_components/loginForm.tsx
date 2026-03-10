@@ -147,8 +147,7 @@ export default function LoginForm() {
             <GoogleLogin
               onSuccess={async (credentialResponse) => {
                 if (loginGoogle.isPending) return;
-                const googleToken = credentialResponse.credential;
-                console.log(googleToken);
+                const googleToken = credentialResponse.credential
                 if (!googleToken) {
                   toast.error("Không nhận được token từ Google");
                   return;

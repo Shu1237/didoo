@@ -33,11 +33,10 @@ import {
 
 const statusLabels: Record<EventStatus, string> = {
   [EventStatus.DRAFT]: "Nháp",
-  [EventStatus.PUBLISHED]: "Đã xuất bản",
+  [EventStatus.PUBLISHED]: "Đã duyệt",
   [EventStatus.CANCELLED]: "Đã hủy",
   [EventStatus.OPENED]: "Đang mở",
   [EventStatus.CLOSED]: "Đã đóng",
-  [EventStatus.PENDING_APPROVAL]: "Chờ duyệt",
 };
 
 const formatNumber = (n: number) => new Intl.NumberFormat("vi-VN").format(n);

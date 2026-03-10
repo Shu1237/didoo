@@ -18,12 +18,10 @@ export const authRequest = {
   logoutServer: () => http.post(ENDPOINT_SERVER.LOGOUT, undefined, { baseURL: "" }),
   refreshTokenClient: (body: RefreshInput) =>
     http.post<{ accessToken: string; refreshToken: string }>(ENDPOINT_CLIENT.REFRESH, body, {
-      skipAuth: true,
     }),
   refreshTokenServer: (body: { accessToken: string; refreshToken: string }) =>
     http.post<{ accessToken: string; refreshToken: string }>(ENDPOINT_SERVER.REFRESH, body, {
       baseURL: "",
-      skipAuth: true,
     }),
   forgotPassword: (data: ForgotPasswordInput) => http.post(ENDPOINT_CLIENT.FORGOT_PASSWORD, data),
   verifyForgotPassword: (data: { key: string; newPassword: string }) =>

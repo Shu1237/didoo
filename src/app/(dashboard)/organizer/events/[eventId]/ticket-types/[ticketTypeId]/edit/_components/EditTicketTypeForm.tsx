@@ -164,7 +164,7 @@ export function EditTicketTypeForm({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">Mô tả (optional)</Label>
+            <Label htmlFor="description">Mô tả </Label>
             <Input
               id="description"
               placeholder="Mô tả ngắn về loại vé"

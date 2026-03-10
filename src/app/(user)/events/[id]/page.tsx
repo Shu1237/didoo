@@ -6,7 +6,6 @@ import Loading from "@/components/loading";
 import { useGetTicketTypes } from "@/hooks/useTicket";
 import HeroSection from "./_components/HeroSection";
 import EventDetailContent from "./_components/EventDetailContent";
-import EventsGrid from "../_components/EventsGrid";
 import { useGetEvent, useGetEvents } from "@/hooks/useEvent";
 
 export default function DetailEventPage({ params }: { params: Promise<{ id: string }> }) {
@@ -56,19 +55,11 @@ export default function DetailEventPage({ params }: { params: Promise<{ id: stri
       <div className="relative z-10">
         <HeroSection event={detailEvent} />
 
-        <EventDetailContent event={detailEvent} ticketTypes={ticketTypes} />
-
-        {eventRelated.length > 0 && (
-          <div className="border-t border-zinc-200 bg-white">
-            <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-              <EventsGrid
-                title="Sự kiện tương tự"
-                description="Khám phá thêm sự kiện cùng danh mục."
-                eventData={eventRelated}
-              />
-            </div>
-          </div>
-        )}
+        <EventDetailContent
+          event={detailEvent}
+          ticketTypes={ticketTypes}
+          eventRelated={eventRelated}
+        />
       </div>
     </main>
   );

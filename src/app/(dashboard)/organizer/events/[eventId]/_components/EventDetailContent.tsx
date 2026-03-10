@@ -29,11 +29,10 @@ import type { TicketType } from "@/types/ticket";
 
 const statusLabels: Record<EventStatus, string> = {
   [EventStatus.DRAFT]: "Nháp",
-  [EventStatus.PUBLISHED]: "Đã xuất bản",
+  [EventStatus.PUBLISHED]: "Đã duyệt",
   [EventStatus.CANCELLED]: "Đã hủy",
   [EventStatus.OPENED]: "Đang mở",
   [EventStatus.CLOSED]: "Đã đóng",
-  [EventStatus.PENDING_APPROVAL]: "Chờ duyệt",
 };
 
 function formatDate(s: string | undefined) {
@@ -127,11 +126,8 @@ export function EventDetailContent({ eventId }: { eventId: string }) {
                         ? "default"
                         : event.status === EventStatus.CANCELLED
                           ? "destructive"
-                          : event.status === EventStatus.PENDING_APPROVAL
-                            ? "outline"
-                            : "secondary"
+                          : "secondary"
                     }
-                    className={event.status === EventStatus.PENDING_APPROVAL ? "border-amber-500 text-amber-700" : ""}
                   >
                     {statusLabels[event.status as EventStatus] ?? event.status}
                   </Badge>

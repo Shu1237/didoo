@@ -7,11 +7,18 @@ import Loading from "@/components/loading";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
+import { useEffect } from "react";
 
 export default function CreateOrganizerPage() {
   const router = useRouter();
   const { data: meRes, isLoading } = useGetMe();
   const user = meRes?.data;
+
+  useEffect(() => {
+    if (user?.organizerId) {
+      router.replace("/user/dashboard/profile");
+    }
+  }, [user?.organizerId, router]);
 
   if (isLoading) return <Loading />;
 
@@ -32,7 +39,6 @@ export default function CreateOrganizerPage() {
   }
 
   if (user.organizerId) {
-    router.replace("/user/dashboard/profile");
     return <Loading />;
   }
 

@@ -22,18 +22,16 @@ const publicPaths = [
 // Token chỉ có USER và ADMIN. Organizer = User có organizerId (verified) - dùng role USER để vào /organizer
 const rolePermissions: Record<string, Roles[]> = {
   '/admin': [Roles.ADMIN],
-  '/organizer': [Roles.USER, Roles.ORGANIZER], // USER: user upgrade lên organizer (check organizerId + status ở layout/page)
-  '/home': [Roles.USER, Roles.GUEST],
-  '/user': [Roles.USER, Roles.GUEST],
-  '/events': [Roles.USER, Roles.GUEST],
-  '/organizers': [Roles.USER, Roles.GUEST],
-  '/map': [Roles.USER, Roles.GUEST],
+  '/organizer': [Roles.USER], // USER: user upgrade lên organizer (check organizerId + status ở layout/page)
+  '/user': [Roles.USER],
 };
 export async function proxy(request: NextRequest) {
     const { pathname } = request.nextUrl;
     const cookieStore = await cookies()
     const accessToken = cookieStore.get('accessToken')?.value;
     const refreshToken = cookieStore.get('refreshToken')?.value;
+    console.log('accessToken', accessToken);
+    console.log('refreshToken', refreshToken);
 
     const isPublic =
         publicPaths.some(path => pathname.startsWith(path)) ||

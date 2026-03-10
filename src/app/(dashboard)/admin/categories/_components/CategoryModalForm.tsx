@@ -114,7 +114,7 @@ export function CategoryModalForm({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="Description">Mô tả (optional)</Label>
+          <Label htmlFor="Description">Mô tả </Label>
           <Textarea
             id="Description"
             placeholder="Mô tả ngắn về danh mục"
@@ -126,7 +126,7 @@ export function CategoryModalForm({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="IconUrl">Link icon (optional)</Label>
+          <Label htmlFor="IconUrl">Link icon </Label>
           <Input
             id="IconUrl"
             type="url"

@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { useGetCategories, useGetEvents } from "@/hooks/useEvent";
 import Loading from "@/components/loading";
 import { ResalePageContent } from "./_components/ResalePageContent";
+import { EventStatus } from "@/utils/enum";
 
 export default function ResalePage() {
   const searchParams = useSearchParams();
@@ -27,6 +28,7 @@ export default function ResalePage() {
       hasCategory: true,
       hasOrganizer: true,
       hasLocations: true,
+      status: EventStatus.PUBLISHED, // EventStatus.PUBLISHED - chỉ hiện sự kiện đang publish
       isDeleted: false,
       ...(name && { name }),
       ...(categoryId !== "all" && { categoryId }),

@@ -21,6 +21,8 @@ export default function ResaleEventListingsPage({
       eventId: id,
       pageNumber: 1,
       pageSize: 500,
+      status: 1, // TicketListingStatusEnum.Active - chỉ hiện vé đang bán
+      isDeleted: false,
       isDescending: true,
     }),
     [id]

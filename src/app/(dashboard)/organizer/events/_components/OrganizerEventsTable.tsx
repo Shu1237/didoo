@@ -47,11 +47,10 @@ function toQuery(
 
 const statusLabels: Record<EventStatus, string> = {
   [EventStatus.DRAFT]: "Nháp",
-  [EventStatus.PUBLISHED]: "Đã xuất bản",
+  [EventStatus.PUBLISHED]: "Đã duyệt",
   [EventStatus.CANCELLED]: "Đã hủy",
   [EventStatus.OPENED]: "Đang mở",
   [EventStatus.CLOSED]: "Đã đóng",
-  [EventStatus.PENDING_APPROVAL]: "Chờ duyệt",
 };
 
 function formatDate(s: string | undefined) {
@@ -129,11 +128,8 @@ export function OrganizerEventsTable({
                         ? "default"
                         : (e.status as EventStatus) === EventStatus.CANCELLED
                           ? "destructive"
-                          : (e.status as EventStatus) === EventStatus.PENDING_APPROVAL
-                            ? "outline"
-                            : "secondary"
+                          : "secondary"
                     }
-                    className={(e.status as EventStatus) === EventStatus.PENDING_APPROVAL ? "border-amber-500 text-amber-700" : ""}
                   >
                     {statusLabels[(e.status as EventStatus) ?? 0] ?? e.status}
                   </Badge>

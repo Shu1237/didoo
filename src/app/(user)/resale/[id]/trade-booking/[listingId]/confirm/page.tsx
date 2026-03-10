@@ -110,11 +110,11 @@ export default function TradeBookingConfirmPage({
     <main className="min-h-screen bg-zinc-50 px-4 pb-16 pt-28">
       <div className="mx-auto max-w-5xl">
         <Link
-          href={`/resale/${id}`}
+          href={`/resale/${id}/trade-booking/${listingId}`}
           className="mb-6 inline-flex items-center gap-2 rounded-xl border border-zinc-200 bg-white px-4 py-2 text-sm font-medium text-zinc-700 transition hover:bg-zinc-50"
         >
           <ChevronLeft className="h-4 w-4" />
-          Quay lại listing resale
+          Quay lại chi tiết vé
         </Link>
 
         {isUnavailable && (

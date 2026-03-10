@@ -157,7 +157,7 @@ export function AdminCreateEventForm() {
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-[3fr_7fr]">
         <div className="space-y-2">
-          <Label>Banner (optional)</Label>
+          <Label>Banner</Label>
           <div
             onClick={() => !isUploading && bannerInputRef.current?.click()}
             className={`relative flex h-[200px] w-full cursor-pointer items-center justify-center overflow-hidden rounded-xl border-2 border-dashed border-zinc-200 bg-zinc-50 transition-colors ${
@@ -192,7 +192,7 @@ export function AdminCreateEventForm() {
           </div>
         </div>
         <div className="space-y-2">
-          <Label>Thumbnail (optional)</Label>
+          <Label>Thumbnail</Label>
           <div
             onClick={() => !isUploading && thumbnailInputRef.current?.click()}
             className={`relative flex h-[200px] w-full cursor-pointer items-center justify-center overflow-hidden rounded-xl border-2 border-dashed border-zinc-200 bg-zinc-50 transition-colors ${
@@ -257,7 +257,7 @@ export function AdminCreateEventForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="Subtitle">Phụ đề (optional)</Label>
+            <Label htmlFor="Subtitle">Phụ đề</Label>
             <Input
               id="Subtitle"
               placeholder="Mô tả ngắn hiển thị bên dưới tên"
@@ -306,7 +306,7 @@ export function AdminCreateEventForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="AgeRestriction">Độ tuổi tối thiểu (optional)</Label>
+            <Label htmlFor="AgeRestriction">Độ tuổi tối thiểu </Label>
             <Input
               id="AgeRestriction"
               type="number"
@@ -344,11 +344,11 @@ export function AdminCreateEventForm() {
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="OpenTime">Giờ mở cửa (optional)</Label>
+              <Label htmlFor="OpenTime">Giờ mở cửa </Label>
               <Input id="OpenTime" type="time" {...register("OpenTime")} />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="ClosedTime">Giờ đóng cửa (optional)</Label>
+              <Label htmlFor="ClosedTime">Giờ đóng cửa </Label>
               <Input id="ClosedTime" type="time" {...register("ClosedTime")} />
             </div>
           </div>

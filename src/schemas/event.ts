@@ -11,11 +11,14 @@ export const locationSchema = z.object({
     Province: z.string().min(1, "Tỉnh/Thành phố là bắt buộc"),
     District: z.string().min(1, "Quận/Huyện là bắt buộc"),
     Ward: z.string().min(1, "Phường/Xã là bắt buộc"),
-    Zipcode: z.string().min(1, "Mã bưu điện là bắt buộc").nullable().optional(),
-    Latitude: z.number().min(0, "Vĩ độ phải >= 0").nullable().optional(),
-    Longitude: z.number().min(0, "Kinh độ phải >= 0").nullable().optional(),
-    ContactEmail: z.string().email("Email không hợp lệ").nullable().optional(),
-    ContactPhone: z.string().min(10, "Số điện thoại phải có ít nhất 10 số").regex(/^0\d{9,10}$/, "Số điện thoại không hợp lệ").nullable().optional(),
+    Zipcode: z.union([z.string().min(1), z.literal("")]).optional(),
+    Latitude: z.number().nullable().optional(),
+    Longitude: z.number().nullable().optional(),
+    ContactEmail: z.union([z.string().email("Email không hợp lệ"), z.literal("")]).optional(),
+    ContactPhone: z.union([
+        z.string().min(10, "Số điện thoại phải có ít nhất 10 số").regex(/^0\d{9,10}$/, "Số điện thoại không hợp lệ"),
+        z.literal(""),
+    ]).optional(),
 });
 
 export const eventCreateSchema = z.object({

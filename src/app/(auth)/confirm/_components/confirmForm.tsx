@@ -44,7 +44,6 @@ export default function ConfirmForm({ resetKey }: { resetKey?: string }) {
     try {
       await verifyForgotPassword.mutateAsync(data);
       setSuccess(true);
-      toast.success("Đặt lại mật khẩu thành công!");
       setTimeout(() => router.replace("/login?reset=success"), 3000);
     } catch (error) {
       handleErrorApi({ error, setError });

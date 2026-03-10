@@ -27,7 +27,7 @@ const FALLBACK_IMAGE =
   "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=2000&auto=format&fit=crop";
 
 const createListingFormSchema = ticketListingCreateSchema.pick({
-  ticketId: true,
+  ticketIds: true,
   askingPrice: true,
   description: true,
 });
@@ -79,7 +79,7 @@ export default function CreateResalePage() {
   const form = useForm<FormValues>({
     resolver: zodResolver(createListingFormSchema),
     defaultValues: {
-      ticketId: [],
+      ticketIds: [],
       askingPrice: 0,
       description: "",
     },
@@ -115,7 +115,7 @@ export default function CreateResalePage() {
     return all.filter((e) => (ownedCountByEvent.get(e.id) || 0) > 0);
   }, [eventsRes?.data.items, ownedCountByEvent]);
   const selectedEvent = currentEvents.find((e) => e.id === selectedEventId);
-  const selectedTicketIds = form.watch("ticketId") || [];
+  const selectedTicketIds = form.watch("ticketIds") || [];
 
   const ticketsOfSelectedEvent = useMemo(() => {
     if (!selectedEventId) return [];
@@ -125,17 +125,17 @@ export default function CreateResalePage() {
   const hasOwnedTicketsForSelectedEvent = ticketsOfSelectedEvent.length > 0;
 
   const toggleTicket = (ticketId: string) => {
-    const current = form.getValues("ticketId") || [];
+    const current = form.getValues("ticketIds") || [];
     const exists = current.includes(ticketId);
     if (exists) {
       form.setValue(
-        "ticketId",
+        "ticketIds",
         current.filter((id) => id !== ticketId),
         { shouldDirty: true, shouldValidate: true }
       );
       return;
     }
-    form.setValue("ticketId", [...current, ticketId], { shouldDirty: true, shouldValidate: true });
+    form.setValue("ticketIds", [...current, ticketId], { shouldDirty: true, shouldValidate: true });
   };
 
   const chooseMany = () => {
@@ -144,14 +144,14 @@ export default function CreateResalePage() {
       return;
     }
     form.setValue(
-      "ticketId",
+      "ticketIds",
       ticketsOfSelectedEvent.map((t) => t.id),
       { shouldDirty: true, shouldValidate: true }
     );
   };
 
   const clearAll = () => {
-    form.setValue("ticketId", [], { shouldDirty: true, shouldValidate: true });
+    form.setValue("ticketIds", [], { shouldDirty: true, shouldValidate: true });
   };
 
   const onSubmit = async (values: FormValues) => {
@@ -165,14 +165,14 @@ export default function CreateResalePage() {
       return;
     }
     try {
-      const selectedTickets = ticketsOfSelectedEvent.filter((ticket) => values.ticketId.includes(ticket.id));
+      const selectedTickets = ticketsOfSelectedEvent.filter((ticket) => values.ticketIds.includes(ticket.id));
       if (selectedTickets.length === 0) {
-        form.setError("ticketId", { message: "Vui lòng chọn ít nhất một vé." });
+        form.setError("ticketIds", { message: "Vui lòng chọn ít nhất một vé." });
         return;
       }
 
       const payload = ticketListingCreateSchema.parse({
-        ticketId: values.ticketId,
+        ticketId: values.ticketIds,
         sellerUserId: user.id,
         askingPrice: Number(values.askingPrice),
         description: values.description?.trim() || undefined,
@@ -232,7 +232,7 @@ export default function CreateResalePage() {
                           variant={isActive ? "default" : "outline"}
                           onClick={() => {
                             setSelectedEventId(event.id);
-                            form.setValue("ticketId", [], { shouldDirty: true, shouldValidate: true });
+                            form.setValue("ticketIds", [], { shouldDirty: true, shouldValidate: true });
                           }}
                         >
                           Chọn sự kiện
@@ -309,8 +309,8 @@ export default function CreateResalePage() {
             </>
           )}
 
-          {form.formState.errors.ticketId?.message ? (
-            <p className="text-sm text-rose-600">{String(form.formState.errors.ticketId.message)}</p>
+          {form.formState.errors.ticketIds?.message ? (
+            <p className="text-sm text-rose-600">{String(form.formState.errors.ticketIds.message)}</p>
           ) : null}
         </CardContent>
       </Card>

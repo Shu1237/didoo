@@ -27,7 +27,6 @@ function getStatusLabel(status: EventStatus) {
   if (status === EventStatus.PUBLISHED || status === EventStatus.OPENED) return "Đang mở";
   if (status === EventStatus.CLOSED) return "Đã đóng";
   if (status === EventStatus.CANCELLED) return "Đã hủy";
-  if (status === EventStatus.PENDING_APPROVAL) return "Chờ duyệt";
   return "Sắp diễn ra";
 }
 

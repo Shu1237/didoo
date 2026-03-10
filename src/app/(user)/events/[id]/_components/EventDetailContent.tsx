@@ -3,18 +3,17 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import {
   ArrowUpRight,
+  Building2,
   CalendarDays,
+  ChevronRight,
   Clock3,
   Heart,
   MapPin,
-  Minus,
-  Plus,
   Share2,
-  ShieldCheck,
+  ShoppingCart,
   Tag,
   Users,
   Zap,
@@ -26,20 +25,25 @@ import { EventStatus } from "@/utils/enum";
 import { useGetOrganizer } from "@/hooks/useEvent";
 import { toast } from "sonner";
 import EventLocation from "./EventLocation";
+import { format } from "date-fns";
+import { vi } from "date-fns/locale";
 
 interface EventDetailContentProps {
   event: Event;
   ticketTypes: TicketType[];
+  eventRelated?: Event[];
 }
 
 const FALLBACK_ORGANIZER_IMAGE =
   "https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=2070&auto=format&fit=crop";
 
+const FALLBACK_EVENT_IMAGE =
+  "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=800";
+
 function getStatusLabel(status: EventStatus) {
-  if (status === EventStatus.PUBLISHED || status === EventStatus.OPENED) return "Đang mở";
+  if (status === EventStatus.PUBLISHED || status === EventStatus.OPENED) return "Đang mở bán";
   if (status === EventStatus.CLOSED) return "Đã đóng";
   if (status === EventStatus.CANCELLED) return "Đã hủy";
-  if (status === EventStatus.PENDING_APPROVAL) return "Chờ duyệt";
   return "Sắp diễn ra";
 }
 
@@ -54,19 +58,25 @@ function formatDate(s: string | undefined) {
 
 type TabId = "details" | "venue";
 
-export default function EventDetailContent({ event, ticketTypes }: EventDetailContentProps) {
-  const router = useRouter();
+export default function EventDetailContent({
+  event,
+  ticketTypes,
+  eventRelated = [],
+}: EventDetailContentProps) {
   const [activeTab, setActiveTab] = useState<TabId>("details");
-  const [selectedTickets, setSelectedTickets] = useState<{ ticketType: TicketType; quantity: number }[]>([]);
 
   const { data: orgData } = useGetOrganizer(event.organizer?.id || "");
   const organizer = orgData?.data;
   const orgImage =
     organizer?.bannerUrl || organizer?.logoUrl || event.organizer?.logoUrl || FALLBACK_ORGANIZER_IMAGE;
 
-  const totalQuantity = selectedTickets.reduce((s, i) => s + i.quantity, 0);
-  const totalPrice = selectedTickets.reduce(
-    (s, i) => s + i.quantity * (i.ticketType.price || 0),
+  const minPrice =
+    ticketTypes.length > 0
+      ? Math.min(...ticketTypes.map((t) => Number(t.price || 0)))
+      : 0;
+  const totalTickets = ticketTypes.reduce((s, t) => s + (t.totalQuantity ?? 0), 0);
+  const soldTickets = ticketTypes.reduce(
+    (s, t) => s + ((t.totalQuantity ?? 0) - (t.availableQuantity ?? 0)),
     0
   );
 
@@ -84,24 +94,8 @@ export default function EventDetailContent({ event, ticketTypes }: EventDetailCo
     }
   };
 
-  const handleQuantity = (ticketType: TicketType, delta: number) => {
-    setSelectedTickets((prev) => {
-      const existing = prev.find((i) => i.ticketType.id === ticketType.id);
-      const avail = ticketType.availableQuantity ?? 0;
-      if (!existing) {
-        if (delta <= 0 || avail <= 0) return prev;
-        return [...prev, { ticketType, quantity: 1 }];
-      }
-      const next = Math.max(0, Math.min(avail, existing.quantity + delta));
-      if (next === 0) return prev.filter((i) => i.ticketType.id !== ticketType.id);
-      return prev.map((i) =>
-        i.ticketType.id === ticketType.id ? { ...i, quantity: next } : i
-      );
-    });
-  };
-
   const quickInfoItems = [
-    { label: "Danh mục", value: event.category?.name || "Sự kiện chung", icon: Tag },
+    { label: "Thể loại", value: event.category?.name || "Sự kiện chung", icon: Tag },
     {
       label: "Độ tuổi",
       value: event.ageRestriction > 0 ? `${event.ageRestriction}+` : "Mọi lứa tuổi",
@@ -113,8 +107,6 @@ export default function EventDetailContent({ event, ticketTypes }: EventDetailCo
       value: `${event.openTime || "TBA"} - ${event.closedTime || "TBA"}`,
       icon: Clock3,
     },
-    { label: "Ngày bắt đầu", value: formatDate(event.startTime), icon: CalendarDays },
-    { label: "Ngày kết thúc", value: formatDate(event.endTime), icon: CalendarDays },
   ];
 
   const tabs: { id: TabId; label: string }[] = [
@@ -131,23 +123,31 @@ export default function EventDetailContent({ event, ticketTypes }: EventDetailCo
     }
   };
 
-  const handleGoToConfirm = () => {
-    if (totalQuantity <= 0) {
-      toast.error("Vui lòng chọn ít nhất 1 vé");
-      return;
-    }
-    const draft = selectedTickets
-      .filter((item) => item.quantity > 0)
-      .map((item) => ({
-        ticketTypeId: item.ticketType.id,
-        quantity: item.quantity,
-      }));
-    sessionStorage.setItem(`booking-draft:${event.id}`, JSON.stringify(draft));
-    router.push(`/events/${event.id}/booking`);
-  };
+  const SectionHeading = ({ children }: { children: React.ReactNode }) => (
+    <h2 className="flex items-center gap-2 text-xl font-bold text-zinc-900">
+      <span className="h-6 w-1 rounded-full bg-primary" />
+      {children}
+    </h2>
+  );
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      {/* Breadcrumbs */}
+      <nav className="mb-8 flex items-center gap-2 text-sm text-zinc-500">
+        <Link href="/" className="hover:text-primary transition-colors">
+          Trang chủ
+        </Link>
+        <ChevronRight className="h-4 w-4" />
+        <Link
+          href={`/events?categoryId=${event.category?.id || ""}`}
+          className="hover:text-primary transition-colors"
+        >
+          {event.category?.name || "Sự kiện"}
+        </Link>
+        <ChevronRight className="h-4 w-4" />
+        <span className="text-zinc-900 font-medium truncate max-w-[200px]">{event.name}</span>
+      </nav>
+
       <div className="grid gap-8 lg:grid-cols-12 lg:gap-10">
         {/* Left: Tabs + Content */}
         <div className="lg:col-span-7 xl:col-span-8">
@@ -176,9 +176,41 @@ export default function EventDetailContent({ event, ticketTypes }: EventDetailCo
               animate={{ opacity: 1, y: 0 }}
               className="space-y-8 pt-8"
             >
-              {/* About */}
+              {/* Quick info - 4 cards */}
+              <div className="grid grid-cols-2 gap-4">
+                {quickInfoItems.map((item) => (
+                  <div
+                    key={item.label}
+                    className="flex items-center gap-4 rounded-xl border border-zinc-200 bg-white p-4"
+                  >
+                    <div
+                      className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${
+                        item.label === "Trạng thái"
+                          ? "bg-primary/10 text-primary"
+                          : "bg-zinc-100 text-zinc-600"
+                      }`}
+                    >
+                      <item.icon className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-bold uppercase tracking-wider text-zinc-500">
+                        {item.label}
+                      </p>
+                      <p
+                        className={`font-semibold ${
+                          item.label === "Trạng thái" ? "text-primary" : "text-zinc-900"
+                        }`}
+                      >
+                        {item.value}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Về sự kiện */}
               <div>
-                <h2 className="text-xl font-bold text-zinc-900">Về sự kiện</h2>
+                <SectionHeading>Về sự kiện</SectionHeading>
                 <p className="mt-4 whitespace-pre-line text-base leading-relaxed text-zinc-600">
                   {event.description}
                 </p>
@@ -199,60 +231,17 @@ export default function EventDetailContent({ event, ticketTypes }: EventDetailCo
                     ))}
                   </div>
                 )}
-
-                <div className="mt-6 flex flex-wrap gap-3">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleShare}
-                    className="rounded-xl"
-                  >
-                    <Share2 className="mr-2 h-4 w-4" />
-                    Chia sẻ
-                  </Button>
-                  <Button variant="outline" size="sm" className="rounded-xl">
-                    <Heart className="mr-2 h-4 w-4" />
-                    Lưu sự kiện
-                  </Button>
-                </div>
               </div>
 
-              {/* Quick info grid */}
+              {/* Nhà tổ chức */}
               <div>
-                <h2 className="text-xl font-bold text-zinc-900">Thông tin nhanh</h2>
-                <div className="mt-4 grid gap-4 sm:grid-cols-2">
-                  {quickInfoItems.map((item) => (
-                    <div
-                      key={item.label}
-                      className="flex items-center gap-4 rounded-xl border border-zinc-200 bg-white p-4"
-                    >
-                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                        <item.icon className="h-5 w-5" />
-                      </div>
-                      <div>
-                        <p className="text-xs font-medium text-zinc-500">{item.label}</p>
-                        <p className="font-semibold text-zinc-900">{item.value}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Organizer */}
-              <div>
-                <h2 className="text-xl font-bold text-zinc-900">Nhà tổ chức</h2>
+                <SectionHeading>Nhà tổ chức</SectionHeading>
                 <Link
                   href={`/organizers/${event.organizer?.id || ""}`}
                   className="mt-4 flex items-center gap-4 rounded-2xl border border-zinc-200 bg-white p-5 transition hover:border-primary/30 hover:shadow-md"
                 >
-                  <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-zinc-100">
-                    <Image
-                      src={orgImage}
-                      alt={organizer?.name || "Organizer"}
-                      fill
-                      className="object-cover"
-                      sizes="64px"
-                    />
+                  <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                    <Building2 className="h-7 w-7" />
                   </div>
                   <div className="min-w-0 flex-1">
                     <h3 className="font-bold text-zinc-900">
@@ -261,6 +250,10 @@ export default function EventDetailContent({ event, ticketTypes }: EventDetailCo
                     <p className="mt-1 line-clamp-2 text-sm text-zinc-600">
                       {organizer?.description || "Nhà tổ chức sự kiện"}
                     </p>
+                    <span className="mt-2 inline-flex items-center gap-1 text-sm font-medium text-primary">
+                      Xem trang cá nhân
+                      <ChevronRight className="h-4 w-4" />
+                    </span>
                   </div>
                   <ArrowUpRight className="h-5 w-5 shrink-0 text-zinc-400" />
                 </Link>
@@ -290,118 +283,134 @@ export default function EventDetailContent({ event, ticketTypes }: EventDetailCo
           )}
         </div>
 
-        {/* Right: Ticket sidebar */}
-        <aside className="lg:col-span-5 xl:col-span-4">
-          <div className="sticky top-24 rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
-            <h2 className="text-lg font-bold text-zinc-900">Chọn vé</h2>
-
-            {ticketTypes.length === 0 ? (
-              <p className="mt-4 text-sm text-zinc-500">Sự kiện chưa mở bán vé.</p>
-            ) : (
-              <div className="mt-4 space-y-4">
-                {ticketTypes.map((tt) => {
-                  const item = selectedTickets.find((i) => i.ticketType.id === tt.id);
-                  const qty = item?.quantity ?? 0;
-                  const availableQuantity = Math.max(0, Number(tt.availableQuantity ?? 0));
-                  const soldOut = availableQuantity <= 0;
-
-                  return (
-                    <div
-                      key={tt.id}
-                      className={`rounded-xl border p-4 ${
-                        soldOut ? "border-zinc-200 bg-zinc-50 opacity-60" : "border-zinc-200 bg-white"
-                      }`}
-                    >
-                      <div className="flex items-start justify-between gap-3">
-                        <div>
-                          <h3 className="font-semibold text-zinc-900">{tt.name}</h3>
-                          {tt.description && (
-                            <p className="mt-1 text-sm text-zinc-500">{tt.description}</p>
-                          )}
-                          <p className="mt-2 text-lg font-bold text-zinc-900">
-                            {Number(tt.price || 0).toLocaleString("vi-VN")}đ
-                          </p>
-                          {soldOut && (
-                            <span className="mt-2 inline-block text-xs font-medium text-rose-600">
-                              Hết vé
-                            </span>
-                          )}
-                        </div>
-                        {!soldOut && (
-                          <div className="flex flex-col items-end gap-2">
-                            <span className="text-xs font-medium text-zinc-600">
-                              Còn {availableQuantity} vé
-                            </span>
-                            <div className="flex items-center gap-2">
-                              <button
-                                type="button"
-                                onClick={() => handleQuantity(tt, -1)}
-                                className="flex h-9 w-9 items-center justify-center rounded-full border border-zinc-200 text-zinc-600 transition hover:bg-zinc-100"
-                              >
-                                <Minus className="h-4 w-4" />
-                              </button>
-                              <span className="min-w-[2rem] text-center font-semibold text-zinc-900">
-                                {qty}
-                              </span>
-                              <button
-                                type="button"
-                                onClick={() => handleQuantity(tt, 1)}
-                                disabled={qty >= (tt.availableQuantity ?? 0)}
-                                className="flex h-9 w-9 items-center justify-center rounded-full border border-zinc-200 text-zinc-600 transition hover:bg-zinc-100 disabled:opacity-50"
-                              >
-                                <Plus className="h-4 w-4" />
-                              </button>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-
-            {ticketTypes.length > 0 && (
-              <>
-                <div className="mt-6 border-t border-zinc-200 pt-4">
-                  <div className="flex items-center justify-between">
-                    <span className="font-semibold text-zinc-900">Tổng</span>
-                    <span className="text-xl font-bold text-zinc-900">
-                      {totalPrice.toLocaleString("vi-VN")}đ
-                    </span>
-                  </div>
-                </div>
-
+        {/* Right: Sidebar */}
+        <aside className="lg:col-span-5 xl:col-span-4 space-y-6">
+          {/* Ticket card */}
+          <div className="sticky top-24 space-y-6">
+            <div className="relative rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm overflow-hidden">
+              {ticketTypes.length > 0 && minPrice > 0 && (
+                <span className="absolute right-4 top-4 rounded-lg bg-primary px-3 py-1 text-[10px] font-bold uppercase text-white">
+                  Sale off
+                </span>
+              )}
+              <p className="text-[10px] font-bold uppercase tracking-wider text-zinc-500">
+                Giá vé từ
+              </p>
+              <p className="mt-1 text-3xl font-black text-zinc-900">
+                {ticketTypes.length > 0
+                  ? `${minPrice.toLocaleString("vi-VN")}₫`
+                  : "Liên hệ"}
+              </p>
+              {totalTickets > 0 && (
+                <p className="mt-2 text-sm text-zinc-600">
+                  Đã bán: {soldTickets.toLocaleString("vi-VN")}/{totalTickets.toLocaleString("vi-VN")} vé
+                </p>
+              )}
+              {ticketTypes.length > 0 ? (
                 <Button
-                  type="button"
-                  onClick={handleGoToConfirm}
-                  disabled={totalQuantity <= 0}
+                  asChild
                   className="mt-6 h-14 w-full rounded-xl text-base font-semibold shadow-lg shadow-primary/20"
                 >
-                  Mua vé ngay
-                  <ArrowUpRight className="ml-2 h-5 w-5" />
+                  <Link href={`/events/${event.id}/booking`}>
+                    <ShoppingCart className="mr-2 h-5 w-5" />
+                    Chọn vé ngay
+                  </Link>
                 </Button>
+              ) : (
+                <p className="mt-6 text-sm text-zinc-500">Sự kiện chưa mở bán vé.</p>
+              )}
+              <div className="mt-4 flex gap-3">
+                <Button variant="outline" size="sm" className="flex-1 rounded-xl">
+                  <Heart className="mr-2 h-4 w-4" />
+                  Lưu
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex-1 rounded-xl"
+                  onClick={handleShare}
+                >
+                  <Share2 className="mr-2 h-4 w-4" />
+                  Chia sẻ
+                </Button>
+              </div>
+            </div>
 
-                <p className="mt-4 text-center text-xs text-zinc-500">
-                  Bằng việc mua vé, bạn đồng ý với Điều khoản sử dụng của chúng tôi.
+            {/* Địa điểm tổ chức */}
+            <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
+              <SectionHeading>Địa điểm tổ chức</SectionHeading>
+              <div className="mt-4">
+                <button
+                  type="button"
+                  onClick={() =>
+                    document.getElementById("event-map")?.scrollIntoView({ behavior: "smooth" })
+                  }
+                  className="relative block w-full aspect-video overflow-hidden rounded-xl border border-zinc-200 bg-zinc-100 group"
+                >
+                  <div className="absolute inset-0 flex items-center justify-center bg-zinc-200/80">
+                    <MapPin className="h-12 w-12 text-zinc-400" />
+                  </div>
+                  <div className="absolute inset-0 flex items-center justify-center bg-zinc-900/40 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <span className="rounded-lg bg-white px-4 py-2 text-sm font-semibold text-zinc-900">
+                      Xem bản đồ
+                    </span>
+                  </div>
+                </button>
+                <p className="mt-3 text-sm text-zinc-600 line-clamp-2">
+                  {event.locations?.[0]?.address || "Đang cập nhật địa chỉ"}
                 </p>
+              </div>
+            </div>
 
-                <div className="mt-6 flex items-center gap-3 rounded-xl border border-zinc-200 bg-zinc-50 p-4">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-                    <ShieldCheck className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-zinc-900">Cần hỗ trợ?</p>
-                    <p className="text-xs text-zinc-600">Liên hệ bộ phận chăm sóc khách hàng</p>
-                  </div>
+            {/* Sự kiện tương tự */}
+            {eventRelated.length > 0 && (
+              <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
+                <SectionHeading>Sự kiện tương tự</SectionHeading>
+                <div className="mt-4 space-y-4">
+                  {eventRelated.slice(0, 3).map((ev) => (
+                    <Link
+                      key={ev.id}
+                      href={`/events/${ev.id}`}
+                      className="flex gap-4 rounded-xl border border-zinc-200 p-3 transition hover:border-primary/30 hover:shadow-sm"
+                    >
+                      <div className="relative h-16 w-20 shrink-0 overflow-hidden rounded-lg bg-zinc-100">
+                        <Image
+                          src={
+                            ev.thumbnailUrl ||
+                            ev.bannerUrl ||
+                            FALLBACK_EVENT_IMAGE
+                          }
+                          alt={ev.name}
+                          fill
+                          className="object-cover"
+                          sizes="80px"
+                        />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <h4 className="font-semibold text-zinc-900 line-clamp-2 text-sm">
+                          {ev.name}
+                        </h4>
+                        <div className="mt-1 flex items-center gap-2 text-xs text-zinc-500">
+                          <CalendarDays className="h-3.5 w-3.5" />
+                          {format(new Date(ev.startTime), "dd MMM yyyy", { locale: vi })}
+                        </div>
+                        <div className="mt-0.5 flex items-center gap-2 text-xs text-zinc-500">
+                          <MapPin className="h-3.5 w-3.5" />
+                          <span className="line-clamp-1">
+                            {ev.locations?.[0]?.name || ev.locations?.[0]?.address || "TBA"}
+                          </span>
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
                 </div>
-              </>
+              </div>
             )}
           </div>
         </aside>
       </div>
 
-      {/* Map section - always visible */}
+      {/* Map section */}
       <div id="event-map" className="mt-16">
         <EventLocation event={event} />
       </div>

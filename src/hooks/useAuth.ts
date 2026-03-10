@@ -114,6 +114,7 @@ export const useRole = () => {
 export const useAuth = () => {
     const { user, setSession, clearSession } = useSessionStore((state) => state);
     const router = useRouter();
+    const queryClient = useQueryClient();
 
     const login = useMutation({
         mutationFn: async (data: LoginInput) => (await authRequest.loginClient(data)).data,
@@ -160,6 +161,7 @@ export const useAuth = () => {
         onSuccess: async () => {
             await authRequest.logoutServer();
             clearSession();
+            queryClient.clear();
             toast.success("Logout successfully");
             router.replace("/login");
         },

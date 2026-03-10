@@ -26,7 +26,7 @@ export function EventsSection({
   };
 
   const handleReject = (e: Event) => {
-    updateStatus.mutate({ id: e.id, status: EventStatus.DRAFT });
+    updateStatus.mutate({ id: e.id, status: EventStatus.CANCELLED });
   };
 
   const handleRestore = (e: Event) => {

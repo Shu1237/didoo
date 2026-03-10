@@ -3,8 +3,9 @@
 import Image from "next/image";
 import { format, isValid } from "date-fns";
 import { vi } from "date-fns/locale";
-import { Share2 } from "lucide-react";
+import { Share2, CalendarDays, MapPin } from "lucide-react";
 import { Event } from "@/types/event";
+import { EventStatus } from "@/utils/enum";
 import { toast } from "sonner";
 
 interface HeroSectionProps {
@@ -21,12 +22,15 @@ export default function HeroSection({ event }: HeroSectionProps) {
   const dateLabel =
     startDate && isValid(startDate)
       ? endDate && isValid(endDate) && startDate.getTime() !== endDate.getTime()
-        ? `${format(startDate, "dd MMM", { locale: vi })} - ${format(endDate, "dd MMM yyyy", { locale: vi })}`
-        : format(startDate, "dd MMM yyyy", { locale: vi })
+        ? `${format(startDate, "d", { locale: vi })} - ${format(endDate, "d 'Tháng' M, yyyy", { locale: vi })}`
+        : format(startDate, "d 'Tháng' M, yyyy", { locale: vi })
       : "Đang cập nhật";
 
   const locationLabel =
     event.locations?.[0]?.name || event.locations?.[0]?.address || "Địa điểm TBA";
+
+  const isHot =
+    event.status === EventStatus.PUBLISHED || event.status === EventStatus.OPENED;
 
   const handleShare = async () => {
     try {
@@ -63,21 +67,33 @@ export default function HeroSection({ event }: HeroSectionProps) {
         <Share2 className="h-5 w-5" />
       </button>
 
-      {/* Badge top-left */}
-      <div className="absolute left-6 top-6 md:left-10 md:top-10">
-        <span className="inline-flex items-center rounded-lg bg-primary px-4 py-2 text-xs font-bold uppercase tracking-wider text-white">
+      {/* Badges top-left */}
+      <div className="absolute left-6 top-6 md:left-10 md:top-10 flex flex-col gap-2">
+        {isHot && (
+          <span className="inline-flex w-fit rounded-lg bg-primary px-4 py-2 text-xs font-bold uppercase tracking-wider text-white">
+            Hot event
+          </span>
+        )}
+        <span className="inline-flex w-fit rounded-lg bg-white/20 backdrop-blur-sm px-4 py-2 text-xs font-bold uppercase tracking-wider text-white">
           {event.category?.name || "Sự kiện"}
         </span>
       </div>
 
-      {/* Centered content */}
-      <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center">
-        <h1 className="max-w-4xl text-3xl font-bold leading-tight text-white md:text-4xl lg:text-5xl xl:text-6xl">
+      {/* Content - left aligned like reference */}
+      <div className="absolute inset-0 flex flex-col justify-center px-6 md:px-10 lg:px-16 text-left">
+        <h1 className="max-w-3xl text-3xl font-bold leading-tight text-white md:text-4xl lg:text-5xl">
           {event.name}
         </h1>
-        <p className="mt-4 text-base text-white/90 md:text-lg">
-          {dateLabel} • {locationLabel}
-        </p>
+        <div className="mt-6 flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-8 text-white/90">
+          <div className="flex items-center gap-2">
+            <CalendarDays className="h-5 w-5 shrink-0 text-primary" />
+            <span className="text-base md:text-lg">{dateLabel}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <MapPin className="h-5 w-5 shrink-0 text-primary" />
+            <span className="text-base md:text-lg">{locationLabel}</span>
+          </div>
+        </div>
       </div>
     </section>
   );

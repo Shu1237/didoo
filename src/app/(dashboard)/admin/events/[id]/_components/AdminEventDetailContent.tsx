@@ -21,11 +21,10 @@ import { TicketType } from "@/types/ticket";
 
 const statusLabels: Record<EventStatus, string> = {
   [EventStatus.DRAFT]: "Nháp",
-  [EventStatus.PUBLISHED]: "Đã xuất bản",
+  [EventStatus.PUBLISHED]: "Đã duyệt ",
   [EventStatus.CANCELLED]: "Đã hủy",
   [EventStatus.OPENED]: "Đang mở",
   [EventStatus.CLOSED]: "Đã đóng",
-  [EventStatus.PENDING_APPROVAL]: "Chờ duyệt",
 };
 
 function formatDate(s: string | undefined) {
@@ -64,11 +63,11 @@ export function AdminEventDetailContent({ eventId }: { eventId: string }) {
     );
   }
 
-  const isPendingApproval = event.status === EventStatus.PENDING_APPROVAL;
+  const isDraft = event.status === EventStatus.DRAFT;
 
   return (
     <div className="space-y-6">
-      {isPendingApproval && (
+      {isDraft && (
         <Card className="border-amber-200 bg-amber-50/50">
           <CardHeader className="pb-2">
             <h2 className="text-lg font-semibold text-amber-900">Duyệt sự kiện</h2>
@@ -81,7 +80,7 @@ export function AdminEventDetailContent({ eventId }: { eventId: string }) {
               <Button
                 variant="outline"
                 className="border-amber-600 text-amber-700 hover:bg-amber-100"
-                onClick={() => updateStatus.mutate({ id: eventId, status: EventStatus.DRAFT })}
+                onClick={() => updateStatus.mutate({ id: eventId, status: EventStatus.CANCELLED })}
                 disabled={updateStatus.isPending}
               >
                 {updateStatus.isPending ? (
@@ -101,7 +100,7 @@ export function AdminEventDetailContent({ eventId }: { eventId: string }) {
                 ) : (
                   <CheckCircle className="mr-2 h-4 w-4" />
                 )}
-                Duyệt xuất bản
+                Duyệt 
               </Button>
             </div>
           </CardContent>
@@ -153,11 +152,8 @@ export function AdminEventDetailContent({ eventId }: { eventId: string }) {
                         ? "default"
                         : event.status === EventStatus.CANCELLED
                           ? "destructive"
-                          : event.status === EventStatus.PENDING_APPROVAL
-                            ? "outline"
-                            : "secondary"
+                          : "secondary"
                     }
-                    className={event.status === EventStatus.PENDING_APPROVAL ? "border-amber-500 text-amber-700" : ""}
                   >
                     {statusLabels[event.status as EventStatus] ?? event.status}
                   </Badge>

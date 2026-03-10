@@ -74,7 +74,7 @@ export type TicketUpdateBody = z.input<typeof ticketUpdateSchema>;
 
 
 export const ticketListingCreateSchema = z.object({
-    ticketId: z.array(z.string().uuid()).min(1, "Vui lòng chọn ít nhất 1 vé"),
+    ticketIds: z.array(z.string().uuid()).min(1, "Vui lòng chọn ít nhất 1 vé"),
     sellerUserId: z.string().uuid(),
     askingPrice: z.number().min(0),
     description: z.string().optional(),
