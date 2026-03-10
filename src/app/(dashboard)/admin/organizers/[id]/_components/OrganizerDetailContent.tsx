@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useGetOrganizer, useOrganizer } from "@/hooks/useOrganizer";
+import { useGetOrganizer, useOrganizer } from "@/hooks/useEvent";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -82,74 +82,142 @@ export function OrganizerDetailContent({ id }: { id: string }) {
       )}
 
       <Card className="border-zinc-200">
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <h2 className="text-lg font-semibold text-zinc-900">Thông tin</h2>
-        <div className="flex justify-end gap-2">
-          {!isPending && (
-            <Button size="sm" variant="destructive" className="rounded-xl" onClick={() => setShowDeleteModal(true)} disabled={deleteOrganizer.isPending}>
-              <Trash2 className="mr-2 h-4 w-4" />
-              Xóa
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <h2 className="text-lg font-semibold text-zinc-900">Thông tin</h2>
+          <div className="flex justify-end gap-2">
+            {!isPending && (
+              <Button size="sm" variant="destructive" className="rounded-xl" onClick={() => setShowDeleteModal(true)} disabled={deleteOrganizer.isPending}>
+                <Trash2 className="mr-2 h-4 w-4" />
+                Xóa
+              </Button>
+            )}
+            <Button size="sm" variant="outline" className="rounded-xl" asChild>
+              <Link href={`/admin/organizers/${id}/edit`}>
+                <Pencil className="mr-2 h-4 w-4" />
+                Chỉnh sửa
+              </Link>
             </Button>
-          )}
-          <Button size="sm" variant="outline" className="rounded-xl" asChild>
-            <Link href={`/admin/organizers/${id}/edit`}>
-              <Pencil className="mr-2 h-4 w-4" />
-              Chỉnh sửa
-            </Link>
-          </Button>
-        </div>
-      </CardHeader>
-      <CardContent className="flex flex-col gap-6 sm:flex-row sm:items-start">
-        <Avatar className="h-20 w-20 shrink-0">
-          <AvatarImage src={organizer.logoUrl} />
-          <AvatarFallback className="bg-zinc-100 text-lg">{organizer.name?.[0]}</AvatarFallback>
-        </Avatar>
-        <div className="grid min-w-0 flex-1 gap-4 sm:grid-cols-2">
-          <div>
-            <p className="text-sm font-medium text-zinc-500">Tên</p>
-            <p className="text-zinc-900">{organizer.name}</p>
           </div>
-          <div>
-            <p className="text-sm font-medium text-zinc-500">Slug</p>
-            <p className="text-zinc-900">{organizer.slug}</p>
-          </div>
-          <div>
-            <p className="text-sm font-medium text-zinc-500">Email</p>
-            <p className="text-zinc-900">{organizer.email}</p>
-          </div>
-          <div>
-            <p className="text-sm font-medium text-zinc-500">Số điện thoại</p>
-            <p className="text-zinc-900">{organizer.phone ?? "—"}</p>
-          </div>
-          <div>
-            <p className="text-sm font-medium text-zinc-500">Trạng thái</p>
-            <Badge
-              variant={
-                organizer.status === OrganizerStatus.VERIFIED
-                  ? "default"
-                  : organizer.status === OrganizerStatus.BANNED
-                    ? "destructive"
-                    : "secondary"
-              }
-            >
-              {statusLabels[organizer.status as OrganizerStatus] ?? organizer.status}
-            </Badge>
-          </div>
-          {organizer.address && (
-            <div className="sm:col-span-2">
-              <p className="text-sm font-medium text-zinc-500">Địa chỉ</p>
-              <p className="text-zinc-900">{organizer.address}</p>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {organizer.bannerUrl && (
+            <div className="relative h-36 w-full overflow-hidden rounded-xl bg-zinc-100">
+              <img src={organizer.bannerUrl} alt="" className="h-full w-full object-cover" />
             </div>
           )}
-          {organizer.description && (
-            <div className="sm:col-span-2">
-              <p className="text-sm font-medium text-zinc-500">Mô tả</p>
-              <p className="text-zinc-700 whitespace-pre-wrap">{organizer.description}</p>
+
+          <div className="flex flex-col gap-6 sm:flex-row sm:items-start">
+            <div className="flex shrink-0 flex-col gap-3">
+              <Avatar className="h-24 w-24">
+                <AvatarImage src={organizer.logoUrl} />
+                <AvatarFallback className="bg-zinc-100 text-xl">{organizer.name?.[0]}</AvatarFallback>
+              </Avatar>
             </div>
-          )}
-        </div>
-      </CardContent>
-    </Card>
+            <div className="min-w-0 flex-1 space-y-4">
+              <div>
+                <h3 className="text-xl font-semibold text-zinc-900">{organizer.name}</h3>
+                <p className="font-mono text-sm text-zinc-500">{organizer.slug}</p>
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <p className="text-sm font-medium text-zinc-500">Email</p>
+                  <a href={`mailto:${organizer.email}`} className="text-zinc-900 hover:underline">
+                    {organizer.email}
+                  </a>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-zinc-500">Số điện thoại</p>
+                  <a href={`tel:${organizer.phone}`} className="text-zinc-900 hover:underline">
+                    {organizer.phone ?? "—"}
+                  </a>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-zinc-500">Trạng thái</p>
+                  <Badge
+                    variant={
+                      organizer.status === OrganizerStatus.VERIFIED
+                        ? "default"
+                        : organizer.status === OrganizerStatus.BANNED
+                          ? "destructive"
+                          : "secondary"
+                    }
+                  >
+                    {statusLabels[organizer.status as OrganizerStatus] ?? organizer.status}
+                  </Badge>
+                </div>
+                {organizer.address && (
+                  <div className="sm:col-span-2">
+                    <p className="text-sm font-medium text-zinc-500">Địa chỉ</p>
+                    <p className="text-zinc-900">{organizer.address}</p>
+                  </div>
+                )}
+              </div>
+
+              {(organizer.websiteUrl || organizer.facebookUrl || organizer.instagramUrl || organizer.tiktokUrl) && (
+                <div>
+                  <p className="mb-2 text-sm font-medium text-zinc-500">Liên kết</p>
+                  <div className="flex flex-wrap gap-2">
+                    {organizer.websiteUrl && (
+                      <a
+                        href={organizer.websiteUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center rounded-lg border border-zinc-200 px-3 py-1.5 text-sm text-zinc-700 hover:bg-zinc-50"
+                      >
+                        Website
+                      </a>
+                    )}
+                    {organizer.facebookUrl && (
+                      <a
+                        href={organizer.facebookUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center rounded-lg border border-zinc-200 px-3 py-1.5 text-sm text-zinc-700 hover:bg-zinc-50"
+                      >
+                        Facebook
+                      </a>
+                    )}
+                    {organizer.instagramUrl && (
+                      <a
+                        href={organizer.instagramUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center rounded-lg border border-zinc-200 px-3 py-1.5 text-sm text-zinc-700 hover:bg-zinc-50"
+                      >
+                        Instagram
+                      </a>
+                    )}
+                    {organizer.tiktokUrl && (
+                      <a
+                        href={organizer.tiktokUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center rounded-lg border border-zinc-200 px-3 py-1.5 text-sm text-zinc-700 hover:bg-zinc-50"
+                      >
+                        TikTok
+                      </a>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {organizer.description && (
+                <div>
+                  <p className="mb-2 text-sm font-medium text-zinc-500">Mô tả</p>
+                  <p className="whitespace-pre-wrap text-zinc-700">{organizer.description}</p>
+                </div>
+              )}
+
+              {(organizer.createdAt || organizer.updatedAt) && (
+                <div className="flex gap-4 text-xs text-zinc-500">
+                  {organizer.createdAt && <span>Tạo: {new Date(organizer.createdAt).toLocaleDateString("vi-VN")}</span>}
+                  {organizer.updatedAt && <span>Cập nhật: {new Date(organizer.updatedAt).toLocaleDateString("vi-VN")}</span>}
+                </div>
+              )}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       <ConfirmModal
         open={showDeleteModal}

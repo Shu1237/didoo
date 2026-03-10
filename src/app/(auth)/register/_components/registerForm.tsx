@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { Eye, EyeOff } from "lucide-react";
+import { CalendarDays, Eye, EyeOff } from "lucide-react";
 import {
   InputOTP,
   InputOTPGroup,
@@ -14,12 +14,34 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAuth } from "@/hooks/useAuth";
 import { RegisterInput, registerSchema } from "@/schemas/auth";
+import { z } from "zod";
 import { useState } from "react";
 import { handleErrorApi } from "@/lib/errors";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useAuthContext } from "@/contexts/authContext";
-type FormValues = RegisterInput & { otp?: string };
+import { format } from "date-fns";
+import { vi } from "date-fns/locale";
+
+const registerFormSchema = registerSchema.extend({
+  otp: z.string().optional(),
+});
+
+type FormValues = z.input<typeof registerFormSchema>;
+
+function parseDateValue(value: unknown): Date | undefined {
+  if (value instanceof Date && !Number.isNaN(value.getTime())) return value;
+  if (typeof value === "string" && value) {
+    const parsed = new Date(value);
+    if (!Number.isNaN(parsed.getTime())) return parsed;
+  }
+  return undefined;
+}
+
+
+
 
 export default function RegisterForm() {
   const { register: registerUser, verifyRegister } = useAuth();
@@ -35,7 +57,7 @@ export default function RegisterForm() {
     setError: setErrorForm,
     formState: { errors },
   } = useForm<FormValues>({
-    resolver: zodResolver(registerSchema) as any,
+    resolver: zodResolver(registerFormSchema),
     defaultValues: {
       fullName: "",
       email: "",
@@ -44,7 +66,7 @@ export default function RegisterForm() {
       confirmPassword: "",
       otp: "",
       avatarUrl: "",
-      dateOfBirth: undefined as any,
+      dateOfBirth: undefined,
     },
     mode: "onChange",
   });
@@ -56,11 +78,17 @@ export default function RegisterForm() {
   const currentPassword = watch("password");
 
   const onSubmit = async (data: FormValues) => {
+    const registerPayload: RegisterInput = registerSchema.parse({
+      ...data,
+      gender: 0,
+      phone: data.phone?.trim() || "",
+    });
+
     if (step === 1) {
       if (registerUser.isPending) return;
       setError(null);
       try {
-        await registerUser.mutateAsync(data);
+        await registerUser.mutateAsync(registerPayload);
         setStep(2);
       } catch (err: any) {
         handleErrorApi({ error: err, setError: setErrorForm });
@@ -124,7 +152,7 @@ export default function RegisterForm() {
           >
             {step === 1 && (
               <>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4">
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-zinc-700">Họ tên</label>
                     <Input
@@ -146,25 +174,41 @@ export default function RegisterForm() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-zinc-700">Giới tính</label>
-                    <select
-                      {...registerField("gender", { valueAsNumber: true })}
-                      className="h-11 w-full rounded-xl border border-zinc-200 bg-zinc-50 px-4 text-sm text-zinc-900"
-                    >
-                      <option value={0}>Nam</option>
-                      <option value={1}>Nữ</option>
-                      <option value={2}>Khác</option>
-                    </select>
-                  </div>
+                <div className="grid grid-cols-1 gap-4">
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-zinc-700">Ngày sinh</label>
-                    <Input
-                      type="date"
-                      {...registerField("dateOfBirth")}
-                      className={`h-11 rounded-xl border-zinc-200 bg-zinc-50 [color-scheme:light] ${errors.dateOfBirth ? "border-rose-300" : ""}`}
-                    />
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className={`h-11 w-full justify-start rounded-xl border-zinc-200 bg-zinc-50 px-3 text-left font-normal ${
+                            errors.dateOfBirth ? "border-rose-300" : ""
+                          }`}
+                        >
+                          <CalendarDays className="mr-2 h-4 w-4" />
+                          {(() => {
+                            const selectedDate = parseDateValue(watch("dateOfBirth"));
+                            return selectedDate
+                              ? format(selectedDate, "dd/MM/yyyy", { locale: vi })
+                              : "Chọn ngày sinh";
+                          })()}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={parseDateValue(watch("dateOfBirth"))}
+                          onSelect={(date) =>
+                            setValue("dateOfBirth", date, {
+                              shouldValidate: true,
+                              shouldDirty: true,
+                            })
+                          }
+                          captionLayout="dropdown"
+                        />
+                      </PopoverContent>
+                    </Popover>
                     {errors.dateOfBirth && <p className="text-xs text-rose-600">{errors.dateOfBirth.message}</p>}
                   </div>
                 </div>
@@ -227,7 +271,7 @@ export default function RegisterForm() {
             )}
 
             {step === 2 && (
-              <div className="space-y-6">
+              <div className="flex flex-col items-center space-y-6 text-center">
                 <div className="flex justify-center">
                   <InputOTP
                     maxLength={6}
@@ -252,7 +296,7 @@ export default function RegisterForm() {
                 <Button
                   type="submit"
                   disabled={verifyRegister.isPending || (currentOtp?.length || 0) !== 6}
-                  className="w-full h-12 rounded-xl font-semibold"
+                  className="h-12 w-full max-w-md rounded-xl font-semibold"
                 >
                   {verifyRegister.isPending ? (
                     <span className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -261,14 +305,23 @@ export default function RegisterForm() {
                   )}
                 </Button>
 
-                <p className="text-center text-sm text-zinc-600">
+                <p className="text-sm text-zinc-600">
                   Không nhận được mã?{" "}
                   <button
                     type="button"
                     disabled={registerUser.isPending}
                     onClick={() => {
-                      const { confirmPassword, otp, ...rest } = watch() as any;
-                      registerUser.mutate({ ...rest, gender: rest.gender ?? 0 });
+                      const { otp, ...rest } = watch();
+                      const parsed = registerSchema.safeParse({
+                        ...rest,
+                        gender: 0,
+                        phone: rest.phone?.trim() || "",
+                      });
+                      if (!parsed.success) {
+                        setError(parsed.error.issues[0]?.message || "Thông tin đăng ký không hợp lệ.");
+                        return;
+                      }
+                      registerUser.mutate(parsed.data);
                     }}
                     className="font-semibold text-primary hover:underline"
                   >

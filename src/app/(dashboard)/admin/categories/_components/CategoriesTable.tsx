@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
-import { useGetCategories } from "@/hooks/useCategory";
+import { useGetCategories } from "@/hooks/useEvent";
 import {
   Table,
   TableBody,
@@ -19,7 +19,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
-import type { Category } from "@/types/category";
+import type { Category } from "@/types/event";
 
 function toQuery(params: Record<string, string | string[] | undefined>) {
   const q: Record<string, string | number | boolean> = {};

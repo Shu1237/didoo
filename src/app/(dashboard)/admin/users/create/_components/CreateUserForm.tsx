@@ -2,8 +2,9 @@
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { userCreateSchema, type UserCreateBody } from "@/schemas/user";
-import { useUser } from "@/hooks/useUser";
+import { z } from "zod";
+import { userCreateSchema, type UserCreateBody } from "@/schemas/auth";
+import { useUser } from "@/hooks/useAuth";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,13 +24,15 @@ export function CreateUserForm() {
   const router = useRouter();
   const { create } = useUser();
 
+  type UserCreateFormValues = z.input<typeof userCreateSchema>;
   const {
     register,
     handleSubmit,
     setValue,
+    setError,
     watch,
     formState: { errors },
-  } = useForm<UserCreateBody>({
+  } = useForm<UserCreateFormValues>({
     resolver: zodResolver(userCreateSchema),
     defaultValues: {
       FullName: "",
@@ -38,7 +41,7 @@ export function CreateUserForm() {
       Password: "",
       AvatarUrl: "",
       Gender: Gender.OTHER,
-      DateOfBirth: undefined as unknown as Date,
+      DateOfBirth: "",
       Address: "",
       Status: 1,
       RoleName: 2,
@@ -46,16 +49,18 @@ export function CreateUserForm() {
     },
   });
 
-  const onSubmit = async (data: UserCreateBody) => {
+  const onSubmit = async (data: UserCreateFormValues) => {
     try {
-      await create.mutateAsync(data);
+      const body: UserCreateBody = userCreateSchema.parse(data);
+      await create.mutateAsync(body);
       router.push("/admin/users");
     } catch (err) {
-      handleErrorApi({ error: err });
+      handleErrorApi({ error: err, setError });
     }
   };
 
   const roleId = watch("RoleName");
+  const gender = watch("Gender");
 
   return (
     <Card className="border-zinc-200">
@@ -73,7 +78,7 @@ export function CreateUserForm() {
                 className={errors.FullName ? "border-destructive" : ""}
               />
               {errors.FullName && (
-                <p className="text-sm text-destructive">{errors.FullName.message}</p>
+                <p className="text-sm text-destructive">{String(errors.FullName.message ?? "")}</p>
               )}
             </div>
             <div className="space-y-2">
@@ -85,7 +90,7 @@ export function CreateUserForm() {
                 className={errors.Email ? "border-destructive" : ""}
               />
               {errors.Email && (
-                <p className="text-sm text-destructive">{errors.Email.message}</p>
+                <p className="text-sm text-destructive">{String(errors.Email.message ?? "")}</p>
               )}
             </div>
           </div>
@@ -100,7 +105,7 @@ export function CreateUserForm() {
                 className={errors.Password ? "border-destructive" : ""}
               />
               {errors.Password && (
-                <p className="text-sm text-destructive">{errors.Password.message}</p>
+                <p className="text-sm text-destructive">{String(errors.Password.message ?? "")}</p>
               )}
             </div>
             <div className="space-y-2">
@@ -111,6 +116,25 @@ export function CreateUserForm() {
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
+              <Label>Giới tính</Label>
+              <Select
+                value={String(gender ?? Gender.OTHER)}
+                onValueChange={(v) => setValue("Gender", Number(v), { shouldValidate: true })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={String(Gender.MALE)}>Nam</SelectItem>
+                  <SelectItem value={String(Gender.FEMALE)}>Nữ</SelectItem>
+                  <SelectItem value={String(Gender.OTHER)}>Khác</SelectItem>
+                </SelectContent>
+              </Select>
+              {errors.Gender && (
+                <p className="text-sm text-destructive">{String(errors.Gender.message ?? "")}</p>
+              )}
+            </div>
+            <div className="space-y-2">
               <Label htmlFor="DateOfBirth">Ngày sinh *</Label>
               <Input
                 id="DateOfBirth"
@@ -119,7 +143,7 @@ export function CreateUserForm() {
                 className={errors.DateOfBirth ? "border-destructive" : ""}
               />
               {errors.DateOfBirth && (
-                <p className="text-sm text-destructive">{errors.DateOfBirth.message}</p>
+                <p className="text-sm text-destructive">{String(errors.DateOfBirth.message ?? "")}</p>
               )}
             </div>
             <div className="space-y-2">

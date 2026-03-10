@@ -1,6 +1,6 @@
 "use client";
 
-import { Category } from "@/types/category";
+import { Category } from "@/types/event";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";

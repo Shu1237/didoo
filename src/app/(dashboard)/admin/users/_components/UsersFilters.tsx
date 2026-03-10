@@ -2,7 +2,7 @@
 
 import BaseFilter from "@/components/base/BaseFilter";
 import type { FilterConfig } from "@/components/base/BaseFilter";
-import { useGetRoles } from "@/hooks/useRole";
+import { useGetRoles } from "@/hooks/useAuth";
 
 const statusOptions = [
   { label: "Tất cả", value: "" },

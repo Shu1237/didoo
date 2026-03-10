@@ -3,9 +3,8 @@
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { organizerUpdateSchema, type OrganizerUpdateBody } from "@/schemas/organizer";
-import { useOrganizer } from "@/hooks/useOrganizer";
-import { useGetOrganizer } from "@/hooks/useOrganizer";
+import { organizerUpdateSchema, type OrganizerUpdateBody } from "@/schemas/event";
+import { useOrganizer, useGetOrganizer } from "@/hooks/useEvent";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,6 +25,7 @@ export function EditOrganizerForm({ id }: { id: string }) {
     register,
     handleSubmit,
     reset,
+    setError,
     formState: { errors },
   } = useForm<OrganizerUpdateBody>({
     resolver: zodResolver(organizerUpdateSchema),
@@ -57,7 +57,7 @@ export function EditOrganizerForm({ id }: { id: string }) {
       await update.mutateAsync({ id, body: data });
       router.push("/admin/organizers");
     } catch (err) {
-      handleErrorApi({ error: err });
+      handleErrorApi({ error: err, setError });
     }
   };
 

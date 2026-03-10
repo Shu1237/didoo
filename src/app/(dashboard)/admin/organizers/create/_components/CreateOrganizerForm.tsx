@@ -2,9 +2,9 @@
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { organizerCreateSchema, type OrganizerCreateBody } from "@/schemas/organizer";
-import { useOrganizer } from "@/hooks/useOrganizer";
-import { useGetUsers } from "@/hooks/useUser";
+import { organizerCreateSchema, type OrganizerCreateBody } from "@/schemas/event";
+import { useOrganizer } from "@/hooks/useEvent";
+import { useGetUsers } from "@/hooks/useAuth";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,6 +30,7 @@ export function CreateOrganizerForm() {
     register,
     handleSubmit,
     setValue,
+    setError,
     watch,
     formState: { errors },
   } = useForm<OrganizerCreateBody>({
@@ -54,10 +55,11 @@ export function CreateOrganizerForm() {
 
   const onSubmit = async (data: OrganizerCreateBody) => {
     try {
-      await create.mutateAsync(data);
+      // Admin tạo organizer → không gửi email thông báo (user become organizer mới cần)
+      await create.mutateAsync({ ...data, HasSendEmail: false });
       router.push("/admin/organizers");
     } catch (err) {
-      handleErrorApi({ error: err });
+      handleErrorApi({ error: err, setError });
     }
   };
 

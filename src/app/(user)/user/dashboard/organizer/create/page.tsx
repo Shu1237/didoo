@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useGetMe } from "@/hooks/useUser";
+import { useGetMe } from "@/hooks/useAuth";
 import BecomeOrganizerForm from "./_components/BecomeOrganizerForm";
 import Loading from "@/components/loading";
 import Link from "next/link";

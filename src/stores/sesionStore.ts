@@ -1,6 +1,6 @@
 import { decodeJWT } from "@/lib/utils";
-import { JWTUserType, User } from "@/types/user";
-import { Organizer } from "@/types/organizer";
+import { JWTUserType, User } from "@/types/auth";
+import { Organizer } from "@/types/event";
 import { create } from "zustand";
 
 interface SessionState {

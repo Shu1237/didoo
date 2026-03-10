@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
-import { useGetMe } from "@/hooks/useUser";
+import { useGetMe } from "@/hooks/useAuth";
 import { useGetEvents } from "@/hooks/useEvent";
 import { useGetBookings } from "@/hooks/useBooking";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";

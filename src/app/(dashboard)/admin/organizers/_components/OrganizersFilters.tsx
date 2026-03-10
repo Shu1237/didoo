@@ -11,6 +11,11 @@ const statusOptions = [
   { label: "Bị cấm", value: String(OrganizerStatus.BANNED) },
 ];
 
+const isDeletedOptions = [
+  { label: "Chưa xóa", value: "false" },
+  { label: "Đã xóa", value: "true" },
+];
+
 const sortOptions = [
   { label: "Mới nhất", value: "true" },
   { label: "Cũ nhất", value: "false" },
@@ -21,6 +26,7 @@ export function OrganizersFilters() {
     { key: "name", label: "Tên", type: "text", placeholder: "Tìm theo tên" },
     { key: "slug", label: "Slug", type: "text", placeholder: "Tìm theo slug" },
     { key: "status", label: "Trạng thái", type: "select", options: statusOptions },
+    { key: "isDeleted", label: "Trạng thái xóa", type: "select", options: isDeletedOptions, defaultValue: "false" },
     { key: "isDescending", label: "Sắp xếp", type: "select", options: sortOptions, defaultValue: "true" },
   ];
 

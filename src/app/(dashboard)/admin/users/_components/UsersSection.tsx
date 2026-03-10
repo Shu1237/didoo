@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { UsersTable } from "./UsersTable";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
-import { useUser } from "@/hooks/useUser";
-import type { User } from "@/types/user";
+import { useUser } from "@/hooks/useAuth";
+import type { User } from "@/types/auth";
 
 export function UsersSection({
   params,

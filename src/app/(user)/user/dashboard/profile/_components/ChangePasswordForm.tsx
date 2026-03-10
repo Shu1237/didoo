@@ -55,7 +55,7 @@ export default function ChangePasswordForm() {
       <PasswordField
         fieldName="oldPassword"
         label="Current Password"
-        placeholder="Nhap mat khau hien tai"
+        placeholder="Nhập mật khẩu hiện tại"
         typeVisible={showOldPassword}
         onToggleVisible={() => setShowOldPassword((value) => !value)}
         register={form.register}
@@ -65,7 +65,7 @@ export default function ChangePasswordForm() {
       <PasswordField
         fieldName="password"
         label="New Password"
-        placeholder="Nhap mat khau moi"
+        placeholder="Nhập mật khẩu mới"
         typeVisible={showPassword}
         onToggleVisible={() => setShowPassword((value) => !value)}
         register={form.register}
@@ -86,7 +86,7 @@ export default function ChangePasswordForm() {
       <PasswordField
         fieldName="confirmPassword"
         label="Confirm Password"
-        placeholder="Nhap lai mat khau moi"
+        placeholder="Nhập lại mật khẩu mới"
         typeVisible={showConfirmPassword}
         onToggleVisible={() => setShowConfirmPassword((value) => !value)}
         register={form.register}
@@ -98,7 +98,7 @@ export default function ChangePasswordForm() {
           {changePassword.isPending ? (
             <>
               <Loader2 className="h-4 w-4 animate-spin" />
-              Dang cap nhat...
+              Đang cập nhật...
             </>
           ) : (
             <>

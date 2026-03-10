@@ -19,7 +19,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, Trash2 } from "lucide-react";
+import { MoreHorizontal, Trash2, CheckCircle, XCircle, RotateCcw } from "lucide-react";
 import Link from "next/link";
 import { EventStatus } from "@/utils/enum";
 import type { Event } from "@/types/event";
@@ -33,6 +33,11 @@ function toQuery(params: Record<string, string | string[] | undefined>) {
   q.pageSize = pageSize;
   q.hasCategory = true;
   q.hasOrganizer = true;
+  if (params.isDeleted !== undefined && params.isDeleted !== "") {
+    q.isDeleted = params.isDeleted === "true";
+  } else {
+    q.isDeleted = false;
+  }
   if (params.name && typeof params.name === "string") q.name = params.name;
   if (params.categoryId && typeof params.categoryId === "string") q.categoryId = params.categoryId;
   if (params.organizerId && typeof params.organizerId === "string") q.organizerId = params.organizerId;
@@ -47,6 +52,7 @@ const statusLabels: Record<EventStatus, string> = {
   [EventStatus.CANCELLED]: "Đã hủy",
   [EventStatus.OPENED]: "Đang mở",
   [EventStatus.CLOSED]: "Đã đóng",
+  [EventStatus.PENDING_APPROVAL]: "Chờ duyệt",
 };
 
 function formatDate(s: string | undefined) {
@@ -61,13 +67,19 @@ function formatDate(s: string | undefined) {
 interface EventsTableProps {
   params: Record<string, string | string[] | undefined>;
   onDelete?: (event: Event) => void;
+  onApprove?: (event: Event) => void;
+  onReject?: (event: Event) => void;
+  onRestore?: (event: Event) => void;
+  isUpdatingStatus?: boolean;
+  isRestoring?: boolean;
 }
 
-export function EventsTable({ params, onDelete }: EventsTableProps) {
+export function EventsTable({ params, onDelete, onApprove, onReject, onRestore, isUpdatingStatus, isRestoring }: EventsTableProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const query = toQuery(params);
+  const showDeleted = query.isDeleted === true;
   const { data, isLoading } = useGetEvents(query);
 
   if (isLoading || !data) return null;
@@ -123,8 +135,11 @@ export function EventsTable({ params, onDelete }: EventsTableProps) {
                         ? "default"
                         : e.status === EventStatus.CANCELLED
                           ? "destructive"
-                          : "secondary"
+                          : e.status === EventStatus.PENDING_APPROVAL
+                            ? "outline"
+                            : "secondary"
                     }
+                    className={e.status === EventStatus.PENDING_APPROVAL ? "border-amber-500 text-amber-700" : ""}
                   >
                     {statusLabels[e.status as EventStatus] ?? e.status}
                   </Badge>
@@ -143,7 +158,40 @@ export function EventsTable({ params, onDelete }: EventsTableProps) {
                       <DropdownMenuItem asChild>
                         <Link href={`/admin/events/${e.id}/edit`}>Chỉnh sửa</Link>
                       </DropdownMenuItem>
-                      {onDelete && (
+                      {e.status === EventStatus.PENDING_APPROVAL && onApprove && (
+                        <DropdownMenuItem
+                          onClick={() => onApprove(e)}
+                          disabled={isUpdatingStatus}
+                          className="text-emerald-600 focus:text-emerald-600"
+                        >
+                          <CheckCircle className="mr-2 h-4 w-4" />
+                          Duyệt xuất bản
+                        </DropdownMenuItem>
+                      )}
+                      {e.status === EventStatus.PENDING_APPROVAL && onReject && (
+                        <DropdownMenuItem
+                          onClick={() => onReject(e)}
+                          disabled={isUpdatingStatus}
+                          className="text-amber-600 focus:text-amber-600"
+                        >
+                          <XCircle className="mr-2 h-4 w-4" />
+                          Từ chối
+                        </DropdownMenuItem>
+                      )}
+                      {showDeleted &&
+                        e.status === EventStatus.CANCELLED &&
+                        onRestore &&
+                        new Date(e.startTime) > new Date() && (
+                          <DropdownMenuItem
+                            onClick={() => onRestore(e)}
+                            disabled={isRestoring}
+                            className="text-emerald-600 focus:text-emerald-600"
+                          >
+                            <RotateCcw className="mr-2 h-4 w-4" />
+                            Khôi phục
+                          </DropdownMenuItem>
+                        )}
+                      {onDelete && !showDeleted && (
                         <DropdownMenuItem
                           onClick={() => onDelete(e)}
                           className="text-destructive focus:text-destructive"

@@ -1,9 +1,9 @@
-import { authRequest } from "@/apiRequest/auth";
+import { authRequest } from "@/apiRequest/authService";
 import { useSessionStore } from "@/stores/sesionStore";
-import envconfig from "../../config";
-import { ResponseData, ResponseError } from "../types/base";
+import { envconfig } from "../../config";
+import { ResponseData, ResponseError } from "@/types/base";
 import { toast } from "sonner";
-import { EntityError, HttpError, validateCommonResponse } from "@/lib/errors";
+import { EntityError, HttpError } from "@/lib/errors";
 import { HttpErrorCode } from "@/utils/enum";
 
 interface CustomOptions extends RequestInit {
@@ -12,10 +12,7 @@ interface CustomOptions extends RequestInit {
     skipAuth?: boolean;
 }
 
-const isExpired = "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại hoặc làm mới Token.";
-
-
-
+const isExpired = "Phiên đăng nhập đã hết hạn";
 
 // Helper: Check runtime
 const isServerRuntime = () => typeof window === "undefined";
@@ -35,9 +32,10 @@ class TokenRefreshInterceptor {
                 console.error("Error getting token from cookies:", error);
                 return null;
             }
+        } else {
+            // Client: lấy token từ store
+            return useSessionStore.getState().accessToken || null;
         }
-        // Client: lấy token từ store (BE chỉ refresh khi token ĐÃ hết hạn -> xử lý 401)
-        return useSessionStore.getState().accessToken || null;
     }
 
     async refreshToken(): Promise<string> {
@@ -66,26 +64,20 @@ class TokenRefreshInterceptor {
 
     private async performRefresh(): Promise<string> {
         const refreshToken = useSessionStore.getState().refreshToken;
-        const accessToken = useSessionStore.getState().accessToken;
-        const user = useSessionStore.getState().user;
 
         if (!refreshToken) {
             throw new Error("NO_REFRESH_TOKEN");
         }
-        if (!user || !user.UserId) {
-            throw new Error("NO_USER_ID");
-        }
+
         try {
             // Gọi API refresh token
             const result = await authRequest.refreshTokenClient({
-                id: user.UserId,
-                accessToken: accessToken || "",
                 refreshToken: refreshToken
             });
 
-            validateCommonResponse(result, {
-                requiredDataKeys: ["accessToken", "refreshToken"],
-            });
+            if (!result.data?.accessToken) {
+                throw new Error("INVALID_REFRESH_RESPONSE");
+            }
 
             const newAccessToken = result.data.accessToken;
             const newRefreshToken = result.data.refreshToken;
@@ -124,7 +116,7 @@ class TokenRefreshInterceptor {
             // Client: clear store + toast + redirect
             useSessionStore.getState().clearSession();
             toast.error("Phiên đăng nhập đã hết hạn");
-            if (!isServerRuntime()) {
+            if (typeof window !== "undefined") {
                 window.location.href = `/login`;
             }
         }
@@ -152,8 +144,6 @@ async function httpRequest<T>(
             : JSON.stringify(options.body)
         : undefined;
 
-
-
     // Get auth token
     const authToken = options?.skipAuth
         ? null
@@ -169,8 +159,6 @@ async function httpRequest<T>(
     if (authToken) {
         baseHeaders["Authorization"] = `Bearer ${authToken}`;
     }
-
-    baseHeaders["ngrok-skip-browser-warning"] = "true";
 
     // Prepare URL
     const baseUrl = options?.baseURL === undefined
@@ -196,7 +184,6 @@ async function httpRequest<T>(
         headers: {
             ...baseHeaders,
             ...options?.headers,
-            "ngrok-skip-browser-warning": "true"
         } as HeadersInit,
         body,
         method,
@@ -204,9 +191,8 @@ async function httpRequest<T>(
 
     const payload: ResponseData<T> = await res.json();
 
-    // Handle 401 - Token expired (message từ BE OnChallenge/JwtBearerEvents)
-    if (res.status === HttpErrorCode.UNAUTHORIZED && payload?.message === isExpired && !options?.skipAuth) {
-     
+    // Handle 401 - Token expired
+    if (res.status === HttpErrorCode.UNAUTHORIZED && payload.message === isExpired && !options?.skipAuth) {
         // Server: không thể refresh, throw error
         if (isServerRuntime()) {
             tokenInterceptor.handleAuthError();
@@ -238,13 +224,12 @@ async function httpRequest<T>(
 
     // Handle other errors
     if (!res.ok) {
-        if (res.status === HttpErrorCode.UNPROCESSABLE_ENTITY) {
-            throw new EntityError(
-                payload as unknown as ResponseError
-            );
-        } else {
-            throw new HttpError(payload as unknown as ResponseError);
+        const errorPayload = payload as unknown as ResponseError;
+        const hasValidationErrors = Array.isArray(errorPayload?.listErrors) && errorPayload.listErrors.length > 0;
+        if (res.status === HttpErrorCode.UNPROCESSABLE_ENTITY || (res.status === HttpErrorCode.BAD_REQUEST && hasValidationErrors)) {
+            throw new EntityError(errorPayload);
         }
+        throw new HttpError(errorPayload);
     }
 
     return payload;

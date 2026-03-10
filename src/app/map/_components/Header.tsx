@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { useGetCategories } from "@/hooks/useCategory";
+import { useGetCategories } from "@/hooks/useEvent";
 
 const sortOptions = [
   { label: "Ngày diễn ra", value: "date" as const },

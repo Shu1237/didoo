@@ -4,6 +4,7 @@ import { useState } from "react";
 import { EventsTable } from "./EventsTable";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { useEvent } from "@/hooks/useEvent";
+import { EventStatus } from "@/utils/enum";
 import type { Event } from "@/types/event";
 
 export function EventsSection({
@@ -12,7 +13,7 @@ export function EventsSection({
   params: Record<string, string | string[] | undefined>;
 }) {
   const [eventToDelete, setEventToDelete] = useState<Event | null>(null);
-  const { deleteEvent } = useEvent();
+  const { deleteEvent, updateStatus, restore } = useEvent();
 
   const handleDelete = async () => {
     if (!eventToDelete) return;
@@ -20,11 +21,28 @@ export function EventsSection({
     setEventToDelete(null);
   };
 
+  const handleApprove = (e: Event) => {
+    updateStatus.mutate({ id: e.id, status: EventStatus.PUBLISHED });
+  };
+
+  const handleReject = (e: Event) => {
+    updateStatus.mutate({ id: e.id, status: EventStatus.DRAFT });
+  };
+
+  const handleRestore = (e: Event) => {
+    restore.mutate(e.id);
+  };
+
   return (
     <>
       <EventsTable
         params={params}
         onDelete={(e) => setEventToDelete(e)}
+        onApprove={handleApprove}
+        onReject={handleReject}
+        onRestore={handleRestore}
+        isUpdatingStatus={updateStatus.isPending}
+        isRestoring={restore.isPending}
       />
 
       <ConfirmModal

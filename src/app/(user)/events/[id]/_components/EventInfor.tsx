@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { Event } from "@/types/event";
 import { EventStatus } from "@/utils/enum";
-import { useGetOrganizer } from "@/hooks/useOrganizer";
+import { useGetOrganizer } from "@/hooks/useEvent";
 import { Button } from "@/components/ui/button";
 
 interface EventInforProps {
@@ -27,6 +27,7 @@ function getStatusLabel(status: EventStatus) {
   if (status === EventStatus.PUBLISHED || status === EventStatus.OPENED) return "Đang mở";
   if (status === EventStatus.CLOSED) return "Đã đóng";
   if (status === EventStatus.CANCELLED) return "Đã hủy";
+  if (status === EventStatus.PENDING_APPROVAL) return "Chờ duyệt";
   return "Sắp diễn ra";
 }
 

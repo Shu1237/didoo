@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
-import { useGetOrganizers, useOrganizer } from "@/hooks/useOrganizer";
+import { useGetOrganizers, useOrganizer } from "@/hooks/useEvent";
 import {
   Table,
   TableBody,
@@ -20,10 +20,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, Trash2, CheckCircle } from "lucide-react";
+import { MoreHorizontal, Trash2, CheckCircle, RotateCcw } from "lucide-react";
 import Link from "next/link";
 import { OrganizerStatus } from "@/utils/enum";
-import type { Organizer } from "@/types/organizer";
+import type { Organizer } from "@/types/event";
 
 function toQuery(params: Record<string, string | string[] | undefined>) {
   const q: Record<string, string | number | boolean> = {};
@@ -31,6 +31,11 @@ function toQuery(params: Record<string, string | string[] | undefined>) {
   const pageSize = Number(params.pageSize) || 10;
   q.pageNumber = pageNumber;
   q.pageSize = pageSize;
+  if (params.isDeleted !== undefined && params.isDeleted !== "") {
+    q.isDeleted = params.isDeleted === "true";
+  } else {
+    q.isDeleted = false;
+  }
   if (params.name && typeof params.name === "string") q.name = params.name;
   if (params.slug && typeof params.slug === "string") q.slug = params.slug;
   if (params.status && params.status !== "") q.status = Number(params.status);
@@ -47,16 +52,19 @@ const statusLabels: Record<OrganizerStatus, string> = {
 export function OrganizersTable({
   params,
   onDelete,
+  onRestore,
 }: {
   params: Record<string, string | string[] | undefined>;
   onDelete?: (organizer: Organizer) => void;
+  onRestore?: (organizer: Organizer) => void;
 }) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const query = toQuery(params);
+  const showDeleted = query.isDeleted === true;
   const { data, isLoading } = useGetOrganizers(query);
-  const { verify } = useOrganizer();
+  const { verify, restore } = useOrganizer();
 
   if (isLoading || !data) return null;
 
@@ -126,7 +134,7 @@ export function OrganizersTable({
                       <DropdownMenuItem asChild>
                         <Link href={`/admin/organizers/${o.id}/edit`}>Chỉnh sửa</Link>
                       </DropdownMenuItem>
-                      {o.status === OrganizerStatus.PENDING && (
+                      {o.status === OrganizerStatus.PENDING && !showDeleted && (
                         <DropdownMenuItem
                           onClick={() => verify.mutate(o.id)}
                           disabled={verify.isPending}
@@ -136,7 +144,17 @@ export function OrganizersTable({
                           Duyệt
                         </DropdownMenuItem>
                       )}
-                      {onDelete && (
+                      {showDeleted && onRestore && (
+                        <DropdownMenuItem
+                          onClick={() => onRestore(o)}
+                          disabled={restore.isPending}
+                          className="text-emerald-600 focus:text-emerald-600"
+                        >
+                          <RotateCcw className="mr-2 h-4 w-4" />
+                          Khôi phục
+                        </DropdownMenuItem>
+                      )}
+                      {onDelete && !showDeleted && (
                         <DropdownMenuItem
                           onClick={() => onDelete(o)}
                           className="text-destructive focus:text-destructive"

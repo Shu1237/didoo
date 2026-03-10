@@ -125,10 +125,10 @@ export default function ChangeEmailForm() {
       <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
         <p className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-700">
           <CheckCircle2 className="h-4 w-4" />
-          OTP da duoc gui
+          OTP đã được gửi
         </p>
         <p className="mt-1 text-xs text-emerald-700">
-          Vui long kiem tra hop thu cua <span className="font-semibold">{pendingEmail}</span>.
+          Vui lòng kiểm tra hộp thư của <span className="font-semibold">{pendingEmail}</span>.
         </p>
       </div>
 

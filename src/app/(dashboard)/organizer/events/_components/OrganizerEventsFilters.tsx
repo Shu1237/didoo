@@ -2,11 +2,12 @@
 
 import BaseFilter from "@/components/base/BaseFilter";
 import type { FilterConfig } from "@/components/base/BaseFilter";
-import { useGetCategories } from "@/hooks/useCategory";
+import { useGetCategories } from "@/hooks/useEvent";
 import { EventStatus } from "@/utils/enum";
 
 const statusOptions = [
   { label: "Tất cả", value: "" },
+  { label: "Chờ duyệt", value: String(EventStatus.PENDING_APPROVAL) },
   { label: "Nháp", value: String(EventStatus.DRAFT) },
   { label: "Đã xuất bản", value: String(EventStatus.PUBLISHED) },
   { label: "Đã hủy", value: String(EventStatus.CANCELLED) },

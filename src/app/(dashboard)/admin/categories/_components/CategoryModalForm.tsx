@@ -3,8 +3,8 @@
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { categoryCreateSchema, type CategoryCreateBody } from "@/schemas/category";
-import { useCategory } from "@/hooks/useCategory";
+import { categoryCreateSchema, type CategoryCreateBody } from "@/schemas/event";
+import { useCategory } from "@/hooks/useEvent";
 import {
   DialogHeader,
   DialogTitle,
@@ -37,6 +37,7 @@ export function CategoryModalForm({
     register,
     handleSubmit,
     reset,
+    setError,
     formState: { errors },
   } = useForm<CategoryCreateBody>({
     resolver: zodResolver(categoryCreateSchema),
@@ -74,7 +75,7 @@ export function CategoryModalForm({
       onOpenChange(false);
       reset();
     } catch (err) {
-      handleErrorApi({ error: err });
+      handleErrorApi({ error: err, setError });
     }
   };
 

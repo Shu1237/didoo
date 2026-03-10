@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
-import { useGetUsers } from "@/hooks/useUser";
+import { useGetUsers } from "@/hooks/useAuth";
 import {
   Table,
   TableBody,
@@ -22,7 +22,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal, Trash2 } from "lucide-react";
 import Link from "next/link";
-import type { User } from "@/types/user";
+import type { User } from "@/types/auth";
+import { Roles } from "@/utils/enum";
 
 function toQuery(params: Record<string, string | string[] | undefined>) {
   const q: Record<string, string | number | boolean> = {};
@@ -50,7 +51,7 @@ export function UsersTable({
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const query = toQuery(params);
-  const { data, isLoading } = useGetUsers(query);
+  const { data, isLoading } = useGetUsers({...query, role: Roles.USER});
 
   if (isLoading || !data) {
     return null;

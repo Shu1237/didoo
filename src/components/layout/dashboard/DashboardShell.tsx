@@ -42,7 +42,7 @@ export default function DashboardShell({ userRole, children }: DashboardShellPro
       </div>
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-3xl border border-zinc-200 bg-white shadow-sm">
         <DashboardHeader />
-        <main className="min-h-0 flex-1 overflow-y-auto bg-zinc-50/70 p-6 lg:p-8">
+        <main className="min-h-0 flex-1 overflow-auto bg-zinc-50/70 p-6 lg:p-8">
           {children}
         </main>
       </div>

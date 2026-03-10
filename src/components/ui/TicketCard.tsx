@@ -23,9 +23,9 @@ const TicketCard = ({
   const dateLabel =
     startTime && isValid(new Date(startTime))
       ? format(new Date(startTime), "dd MMM yyyy", { locale: vi })
-      : "Dang cap nhat";
+      : "Đang cập nhật";
 
-  const locationLabel = locations?.[0]?.name || "Dia diem sap cap nhat";
+  const locationLabel = locations?.[0]?.name || "Địa điểm sắp cập nhật";
 
   return (
     <Link href={`/events/${id}`} className="group block h-full">
@@ -64,7 +64,7 @@ const TicketCard = ({
           </div>
 
           <div className="mt-auto flex items-center justify-between border-t border-slate-100 pt-4">
-            <span className="text-sm font-semibold text-slate-500">Xem chi tiet</span>
+            <span className="text-sm font-semibold text-slate-500">Xem chi tiết</span>
             <span className="rounded-full bg-sky-50 p-2 text-sky-700 transition-colors group-hover:bg-sky-100">
               <ArrowUpRight className="h-4 w-4" />
             </span>

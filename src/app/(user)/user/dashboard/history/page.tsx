@@ -2,13 +2,13 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useGetMe } from "@/hooks/useUser";
-import { useGetBookings } from "@/hooks/useBooking";
-import { useGetEvent } from "@/hooks/useEvent";
+import { useGetMe } from "@/hooks/useAuth";
+import { useGetBookings, useGetResaleTransactions } from "@/hooks/useBooking";
 import Loading from "@/components/loading";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Booking } from "@/types/booking";
+import { useGetEvent } from "@/hooks/useEvent";
 
 const FALLBACK_IMAGE =
   "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=2070&auto=format&fit=crop";
@@ -74,9 +74,14 @@ export default function DashboardHistoryPage() {
     { userId: user?.id, pageNumber: 1, pageSize: 50, isDescending: true },
     { enabled: !!user?.id }
   );
+  const { data: resaleTransactionsRes, isLoading: isResaleTransactionsLoading } = useGetResaleTransactions(
+    { buyerUserId: user?.id, pageNumber: 1, pageSize: 20, isDescending: true },
+    { enabled: !!user?.id }
+  );
   const bookings = bookingsRes?.data.items || [];
+  const resaleTransactions = resaleTransactionsRes?.data.items || [];
 
-  if (isUserLoading || isBookingsLoading) return <Loading />;
+  if (isUserLoading || isBookingsLoading || isResaleTransactionsLoading) return <Loading />;
 
   return (
     <div className="space-y-6">
@@ -102,6 +107,26 @@ export default function DashboardHistoryPage() {
         <div className="space-y-4">
           {bookings.map((booking) => (
             <HistoryRow key={booking.id} booking={booking} />
+          ))}
+        </div>
+      )}
+
+      {resaleTransactions.length > 0 && (
+        <div className="space-y-3">
+          <h2 className="text-xl font-semibold text-zinc-900">Giao dịch resale</h2>
+          {resaleTransactions.map((transaction) => (
+            <div
+              key={transaction.id}
+              className="flex items-center justify-between rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm"
+            >
+              <div>
+                <p className="font-semibold text-zinc-900">#{transaction.id.substring(0, 8).toUpperCase()}</p>
+                <p className="text-sm text-zinc-500">{transaction.status}</p>
+              </div>
+              <p className="font-semibold text-zinc-900">
+                {Number(transaction.cost || 0).toLocaleString("vi-VN")}đ
+              </p>
+            </div>
           ))}
         </div>
       )}

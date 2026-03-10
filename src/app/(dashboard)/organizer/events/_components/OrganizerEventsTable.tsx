@@ -32,6 +32,7 @@ function toQuery(
   const q: Record<string, string | number | boolean> = {
     organizerId,
     hasCategory: true,
+    isDeleted: false, // BE: mặc định chỉ lấy event chưa xóa
   };
   const pageNumber = Number(params.pageNumber ?? params.page ?? 1) || 1;
   const pageSize = Number(params.pageSize) || 10;
@@ -50,6 +51,7 @@ const statusLabels: Record<EventStatus, string> = {
   [EventStatus.CANCELLED]: "Đã hủy",
   [EventStatus.OPENED]: "Đang mở",
   [EventStatus.CLOSED]: "Đã đóng",
+  [EventStatus.PENDING_APPROVAL]: "Chờ duyệt",
 };
 
 function formatDate(s: string | undefined) {
@@ -127,8 +129,11 @@ export function OrganizerEventsTable({
                         ? "default"
                         : (e.status as EventStatus) === EventStatus.CANCELLED
                           ? "destructive"
-                          : "secondary"
+                          : (e.status as EventStatus) === EventStatus.PENDING_APPROVAL
+                            ? "outline"
+                            : "secondary"
                     }
+                    className={(e.status as EventStatus) === EventStatus.PENDING_APPROVAL ? "border-amber-500 text-amber-700" : ""}
                   >
                     {statusLabels[(e.status as EventStatus) ?? 0] ?? e.status}
                   </Badge>

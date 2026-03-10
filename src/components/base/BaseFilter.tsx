@@ -66,8 +66,9 @@ export default function BaseFilter({ filters, onFilterChange }: BaseFilterProps)
             })
 
             // Reset page on filter change
-            if (params.page === undefined) {
-                newSearchParams.set('page', '1')
+            if (params.page === undefined && params.pageNumber === undefined) {
+                newSearchParams.delete('page')
+                newSearchParams.set('pageNumber', '1')
             }
 
             return newSearchParams.toString()
@@ -166,6 +167,16 @@ export default function BaseFilter({ filters, onFilterChange }: BaseFilterProps)
                         {filter.type === 'date' && (
                             <Input
                                 type="date"
+                                value={value}
+                                onChange={(e) => handleValuesChange(filter.key, e.target.value)}
+                                className="w-full"
+                            />
+                        )}
+
+                        {filter.type === 'number' && (
+                            <Input
+                                type="number"
+                                placeholder={filter.placeholder}
                                 value={value}
                                 onChange={(e) => handleValuesChange(filter.key, e.target.value)}
                                 className="w-full"

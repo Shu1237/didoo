@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import {
   ArrowUpRight,
@@ -20,9 +21,9 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Event } from "@/types/event";
-import { TicketType } from "@/types/ticketType";
+import { TicketType } from "@/types/ticket";
 import { EventStatus } from "@/utils/enum";
-import { useGetOrganizer } from "@/hooks/useOrganizer";
+import { useGetOrganizer } from "@/hooks/useEvent";
 import { toast } from "sonner";
 import EventLocation from "./EventLocation";
 
@@ -38,6 +39,7 @@ function getStatusLabel(status: EventStatus) {
   if (status === EventStatus.PUBLISHED || status === EventStatus.OPENED) return "Đang mở";
   if (status === EventStatus.CLOSED) return "Đã đóng";
   if (status === EventStatus.CANCELLED) return "Đã hủy";
+  if (status === EventStatus.PENDING_APPROVAL) return "Chờ duyệt";
   return "Sắp diễn ra";
 }
 
@@ -53,6 +55,7 @@ function formatDate(s: string | undefined) {
 type TabId = "details" | "venue";
 
 export default function EventDetailContent({ event, ticketTypes }: EventDetailContentProps) {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<TabId>("details");
   const [selectedTickets, setSelectedTickets] = useState<{ ticketType: TicketType; quantity: number }[]>([]);
 
@@ -126,6 +129,21 @@ export default function EventDetailContent({ event, ticketTypes }: EventDetailCo
         document.getElementById("event-map")?.scrollIntoView({ behavior: "smooth" });
       }, 100);
     }
+  };
+
+  const handleGoToConfirm = () => {
+    if (totalQuantity <= 0) {
+      toast.error("Vui lòng chọn ít nhất 1 vé");
+      return;
+    }
+    const draft = selectedTickets
+      .filter((item) => item.quantity > 0)
+      .map((item) => ({
+        ticketTypeId: item.ticketType.id,
+        quantity: item.quantity,
+      }));
+    sessionStorage.setItem(`booking-draft:${event.id}`, JSON.stringify(draft));
+    router.push(`/events/${event.id}/booking`);
   };
 
   return (
@@ -284,7 +302,8 @@ export default function EventDetailContent({ event, ticketTypes }: EventDetailCo
                 {ticketTypes.map((tt) => {
                   const item = selectedTickets.find((i) => i.ticketType.id === tt.id);
                   const qty = item?.quantity ?? 0;
-                  const soldOut = (tt.availableQuantity ?? 0) <= 0;
+                  const availableQuantity = Math.max(0, Number(tt.availableQuantity ?? 0));
+                  const soldOut = availableQuantity <= 0;
 
                   return (
                     <div
@@ -309,25 +328,30 @@ export default function EventDetailContent({ event, ticketTypes }: EventDetailCo
                           )}
                         </div>
                         {!soldOut && (
-                          <div className="flex items-center gap-2">
-                            <button
-                              type="button"
-                              onClick={() => handleQuantity(tt, -1)}
-                              className="flex h-9 w-9 items-center justify-center rounded-full border border-zinc-200 text-zinc-600 transition hover:bg-zinc-100"
-                            >
-                              <Minus className="h-4 w-4" />
-                            </button>
-                            <span className="min-w-[2rem] text-center font-semibold text-zinc-900">
-                              {qty}
+                          <div className="flex flex-col items-end gap-2">
+                            <span className="text-xs font-medium text-zinc-600">
+                              Còn {availableQuantity} vé
                             </span>
-                            <button
-                              type="button"
-                              onClick={() => handleQuantity(tt, 1)}
-                              disabled={qty >= (tt.availableQuantity ?? 0)}
-                              className="flex h-9 w-9 items-center justify-center rounded-full border border-zinc-200 text-zinc-600 transition hover:bg-zinc-100 disabled:opacity-50"
-                            >
-                              <Plus className="h-4 w-4" />
-                            </button>
+                            <div className="flex items-center gap-2">
+                              <button
+                                type="button"
+                                onClick={() => handleQuantity(tt, -1)}
+                                className="flex h-9 w-9 items-center justify-center rounded-full border border-zinc-200 text-zinc-600 transition hover:bg-zinc-100"
+                              >
+                                <Minus className="h-4 w-4" />
+                              </button>
+                              <span className="min-w-[2rem] text-center font-semibold text-zinc-900">
+                                {qty}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => handleQuantity(tt, 1)}
+                                disabled={qty >= (tt.availableQuantity ?? 0)}
+                                className="flex h-9 w-9 items-center justify-center rounded-full border border-zinc-200 text-zinc-600 transition hover:bg-zinc-100 disabled:opacity-50"
+                              >
+                                <Plus className="h-4 w-4" />
+                              </button>
+                            </div>
                           </div>
                         )}
                       </div>
@@ -349,13 +373,13 @@ export default function EventDetailContent({ event, ticketTypes }: EventDetailCo
                 </div>
 
                 <Button
-                  asChild
+                  type="button"
+                  onClick={handleGoToConfirm}
+                  disabled={totalQuantity <= 0}
                   className="mt-6 h-14 w-full rounded-xl text-base font-semibold shadow-lg shadow-primary/20"
                 >
-                  <Link href={`/events/${event.id}/booking`}>
-                    Mua vé ngay
-                    <ArrowUpRight className="ml-2 h-5 w-5" />
-                  </Link>
+                  Mua vé ngay
+                  <ArrowUpRight className="ml-2 h-5 w-5" />
                 </Button>
 
                 <p className="mt-4 text-center text-xs text-zinc-500">

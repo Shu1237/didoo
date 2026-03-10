@@ -4,9 +4,9 @@ import { useState } from "react";
 import { CategoriesTable } from "./CategoriesTable";
 import { CategoryModalForm } from "./CategoryModalForm";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
-import { useCategory } from "@/hooks/useCategory";
+import { useCategory } from "@/hooks/useEvent";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import type { Category } from "@/types/category";
+import type { Category } from "@/types/event";
 
 export function CategoriesSection({
   params,

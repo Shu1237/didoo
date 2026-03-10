@@ -4,8 +4,8 @@ import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { eventCreateSchema, type EventCreateBody } from "@/schemas/event";
 import { useEvent } from "@/hooks/useEvent";
-import { useGetMe } from "@/hooks/useUser";
-import { useGetCategories } from "@/hooks/useCategory";
+import { useGetMe } from "@/hooks/useAuth";
+import { useGetCategories } from "@/hooks/useEvent";
 import { useMedia } from "@/hooks/useMedia";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -20,6 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { handleErrorApi } from "@/lib/errors";
+import { AddressAutocompleteInput } from "@/components/AddressAutocompleteInput";
 import { ImagePlus, Upload, Plus, Trash2, Loader2 } from "lucide-react";
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -46,6 +47,7 @@ export function CreateEventForm() {
     register,
     handleSubmit,
     setValue,
+    setError,
     watch,
     control,
     formState: { errors },
@@ -67,7 +69,19 @@ export function CreateEventForm() {
       AgeRestriction: 0,
       CategoryId: "",
       OrganizerId: organizerId ?? "",
-      Locations: [{ Name: "", Address: "" }],
+      Locations: [
+        {
+          Address: "",
+          Province: "",
+          District: "",
+          Ward: "",
+          Zipcode: "",
+          Latitude: 0,
+          Longitude: 0,
+          ContactEmail: "",
+          ContactPhone: "",
+        },
+      ],
     },
   });
 
@@ -138,7 +152,7 @@ export function CreateEventForm() {
         router.push("/organizer/events");
       }
     } catch (err) {
-      handleErrorApi({ error: err });
+      handleErrorApi({ error: err, setError });
     }
   };
   if (!organizerId) {
@@ -252,7 +266,7 @@ export function CreateEventForm() {
                 {...register("Name")}
                 className={errors.Name ? "border-destructive" : ""}
               />
-              {errors.Name && <p className="text-sm text-destructive">{errors.Name.message}</p>}
+              {errors.Name && <p className="text-sm text-destructive">{String(errors.Name.message ?? "")}</p>}
             </div>
             <div className="space-y-2">
               <Label htmlFor="Slug">Slug *</Label>
@@ -262,7 +276,7 @@ export function CreateEventForm() {
                 {...register("Slug")}
                 className={errors.Slug ? "border-destructive" : ""}
               />
-              {errors.Slug && <p className="text-sm text-destructive">{errors.Slug.message}</p>}
+              {errors.Slug && <p className="text-sm text-destructive">{String(errors.Slug.message ?? "")}</p>}
             </div>
           </div>
 
@@ -292,7 +306,7 @@ export function CreateEventForm() {
                 </SelectContent>
               </Select>
               {errors.CategoryId && (
-                <p className="text-sm text-destructive">{errors.CategoryId.message}</p>
+                <p className="text-sm text-destructive">{String(errors.CategoryId.message ?? "")}</p>
               )}
             </div>
             <div className="space-y-2">
@@ -316,7 +330,7 @@ export function CreateEventForm() {
                 className={errors.StartTime ? "border-destructive" : ""}
               />
               {errors.StartTime && (
-                <p className="text-sm text-destructive">{errors.StartTime.message}</p>
+                <p className="text-sm text-destructive">{String(errors.StartTime.message ?? "")}</p>
               )}
             </div>
             <div className="space-y-2">
@@ -328,7 +342,7 @@ export function CreateEventForm() {
                 className={errors.EndTime ? "border-destructive" : ""}
               />
               {errors.EndTime && (
-                <p className="text-sm text-destructive">{errors.EndTime.message}</p>
+                <p className="text-sm text-destructive">{String(errors.EndTime.message ?? "")}</p>
               )}
             </div>
           </div>
@@ -372,12 +386,12 @@ export function CreateEventForm() {
               className={errors.Description ? "border-destructive" : ""}
             />
             {errors.Description && (
-              <p className="text-sm text-destructive">{errors.Description.message}</p>
+              <p className="text-sm text-destructive">{String(errors.Description.message ?? "")}</p>
             )}
           </div>
 
           <div className="space-y-2">
-            <Label>Ảnh sơ đồ ghế / chỗ ngồi (optional)</Label>
+            <Label>Ảnh sơ đồ ghế </Label>
             <div
               onClick={() => !isUploading && ticketMapInputRef.current?.click()}
               className={`relative flex aspect-video w-full max-w-lg cursor-pointer items-center justify-center overflow-hidden rounded-xl border-2 border-dashed border-zinc-200 bg-zinc-50 transition-colors ${
@@ -442,24 +456,46 @@ export function CreateEventForm() {
                 )}
               </div>
               <div className="space-y-2">
-                <Label>Tên địa điểm *</Label>
-                <Input
-                  placeholder="Ví dụ: Trung tâm Hội nghị"
-                  {...register(`Locations.${i}.Name`)}
-                />
-                {errors.Locations?.[i]?.Name && (
-                  <p className="text-sm text-destructive">{errors.Locations[i]?.Name?.message}</p>
-                )}
-              </div>
-              <div className="space-y-2">
                 <Label>Địa chỉ *</Label>
-                <Input
-                  placeholder="Số nhà, đường, quận, thành phố"
-                  {...register(`Locations.${i}.Address`)}
+                <AddressAutocompleteInput
+                  value={watch(`Locations.${i}.Address`)}
+                  onChange={(result) => {
+                    setValue(`Locations.${i}.Address`, result.address);
+                    setValue(`Locations.${i}.Latitude`, result.latitude);
+                    setValue(`Locations.${i}.Longitude`, result.longitude);
+                  }}
+                  placeholder="Tìm địa chỉ (gõ để gợi ý)"
+                  error={!!errors.Locations?.[i]?.Address}
                 />
                 {errors.Locations?.[i]?.Address && (
-                  <p className="text-sm text-destructive">{errors.Locations[i]?.Address?.message}</p>
+                  <p className="text-sm text-destructive">{String(errors.Locations[i]?.Address?.message ?? "")}</p>
                 )}
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label>Tỉnh/Thành phố *</Label>
+                  <Input placeholder="Ví dụ: Hồ Chí Minh" {...register(`Locations.${i}.Province`)} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Quận/Huyện *</Label>
+                  <Input placeholder="Ví dụ: Quận 1" {...register(`Locations.${i}.District`)} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Phường/Xã *</Label>
+                  <Input placeholder="Ví dụ: Bến Nghé" {...register(`Locations.${i}.Ward`)} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Mã bưu điện</Label>
+                  <Input placeholder="Ví dụ: 700000" {...register(`Locations.${i}.Zipcode`)} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Email liên hệ</Label>
+                  <Input placeholder="contact@example.com" {...register(`Locations.${i}.ContactEmail`)} />
+                </div>
+                <div className="space-y-2">
+                  <Label>SĐT liên hệ</Label>
+                  <Input placeholder="0912345678" {...register(`Locations.${i}.ContactPhone`)} />
+                </div>
               </div>
             </div>
           ))}

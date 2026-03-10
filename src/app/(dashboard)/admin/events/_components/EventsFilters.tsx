@@ -2,17 +2,22 @@
 
 import BaseFilter from "@/components/base/BaseFilter";
 import type { FilterConfig } from "@/components/base/BaseFilter";
-import { useGetCategories } from "@/hooks/useCategory";
-import { useGetOrganizers } from "@/hooks/useOrganizer";
+import { useGetCategories, useGetOrganizers } from "@/hooks/useEvent";
 import { EventStatus } from "@/utils/enum";
 
 const statusOptions = [
   { label: "Tất cả", value: "" },
+  { label: "Chờ duyệt", value: String(EventStatus.PENDING_APPROVAL) },
   { label: "Nháp", value: String(EventStatus.DRAFT) },
   { label: "Đã xuất bản", value: String(EventStatus.PUBLISHED) },
   { label: "Đã hủy", value: String(EventStatus.CANCELLED) },
   { label: "Đang mở", value: String(EventStatus.OPENED) },
   { label: "Đã đóng", value: String(EventStatus.CLOSED) },
+];
+
+const isDeletedOptions = [
+  { label: "Chưa xóa", value: "false" },
+  { label: "Đã xóa", value: "true" },
 ];
 
 const sortOptions = [
@@ -41,6 +46,7 @@ export function EventsFilters() {
       options: [{ label: "Tất cả", value: "" }, ...organizers.map((o) => ({ label: o.name, value: o.id }))],
     },
     { key: "status", label: "Trạng thái", type: "select", options: statusOptions },
+    { key: "isDeleted", label: "Trạng thái xóa", type: "select", options: isDeletedOptions, defaultValue: "false" },
     { key: "isDescending", label: "Sắp xếp", type: "select", options: sortOptions, defaultValue: "true" },
   ];
 

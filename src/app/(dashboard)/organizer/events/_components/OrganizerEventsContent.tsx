@@ -1,7 +1,7 @@
 "use client";
 
-import { useGetMe } from "@/hooks/useUser";
-import { useGetEvents } from "@/hooks/useEvent";
+import { useGetMe } from "@/hooks/useAuth";
+
 import { OrganizerEventsFilters } from "./OrganizerEventsFilters";
 import { OrganizerEventsSection } from "./OrganizerEventsSection";
 

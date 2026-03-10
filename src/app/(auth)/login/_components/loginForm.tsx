@@ -35,7 +35,7 @@ export default function LoginForm() {
     setError: setErrorForm,
     formState: { errors },
   } = useForm<LoginInput>({
-    resolver: zodResolver(loginSchema) as any,
+    resolver: zodResolver(loginSchema),
     defaultValues: {
       email: "",
       password: "",
@@ -148,6 +148,7 @@ export default function LoginForm() {
               onSuccess={async (credentialResponse) => {
                 if (loginGoogle.isPending) return;
                 const googleToken = credentialResponse.credential;
+                console.log(googleToken);
                 if (!googleToken) {
                   toast.error("Không nhận được token từ Google");
                   return;
@@ -161,7 +162,8 @@ export default function LoginForm() {
                     setTokenFromContext(result.accessToken, result.refreshToken);
                   }
                 } catch (err: any) {
-                  console.error("Login BE error:", err);
+                  handleErrorApi({ error: err, setError: setErrorForm });
+                  setError(err?.message || "Đăng nhập Google thất bại.");
                 }
               }}
               onError={() => toast.error("Đăng nhập Google thất bại")}

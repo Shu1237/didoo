@@ -1,6 +1,6 @@
 "use client";
 
-import { useGetMe } from "@/hooks/useUser";
+import { useGetMe } from "@/hooks/useAuth";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";

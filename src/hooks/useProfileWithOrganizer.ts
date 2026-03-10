@@ -1,7 +1,7 @@
 "use client";
 
-import { useGetMe } from "@/hooks/useUser";
-import { useGetOrganizer } from "@/hooks/useOrganizer";
+import { useGetMe } from "@/hooks/useAuth";
+import { useGetOrganizer } from "@/hooks/useEvent";
 import { OrganizerStatus } from "@/utils/enum";
 
 /**

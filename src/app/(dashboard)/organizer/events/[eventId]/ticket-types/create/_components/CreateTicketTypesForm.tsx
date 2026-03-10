@@ -2,10 +2,10 @@
 
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ticketTypesBatchSchema, type TicketTypesBatchBody } from "@/schemas/ticketType";
-import { useTicketType } from "@/hooks/useTicketType";
+import { ticketTypesBatchSchema, type TicketTypesBatchBody } from "@/schemas/ticket";
+import { useTicketType } from "@/hooks/useTicket";
 import { useGetEvent } from "@/hooks/useEvent";
-import { useGetTicketTypes } from "@/hooks/useTicketType";
+import { useGetTicketTypes } from "@/hooks/useTicket";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,7 +20,7 @@ import { ConfirmModal } from "@/components/ui/confirm-modal";
 export function CreateTicketTypesForm({ eventId }: { eventId: string }) {
   const router = useRouter();
   const [ticketTypeToDelete, setTicketTypeToDelete] = useState<{ id: string; name: string } | null>(null);
-  const { create, deleteTicketType } = useTicketType();
+  const { createArray, deleteTicketType } = useTicketType();
   const { data: eventRes } = useGetEvent(eventId);
   const { data: ticketTypesRes } = useGetTicketTypes({ eventId });
 
@@ -32,6 +32,7 @@ export function CreateTicketTypesForm({ eventId }: { eventId: string }) {
     handleSubmit,
     reset,
     control,
+    setError,
     formState: { errors },
   } = useForm<TicketTypesBatchBody>({
     resolver: zodResolver(ticketTypesBatchSchema),
@@ -44,22 +45,21 @@ export function CreateTicketTypesForm({ eventId }: { eventId: string }) {
 
   const onSubmit = async (data: TicketTypesBatchBody) => {
     try {
-      for (let i = 0; i < data.items.length; i++) {
-        const item = data.items[i];
-        const payload = {
+      const payload = {
+        ticketTypes: data.items.map((item) => ({
           eventId,
           name: item.name,
           price: item.price,
           totalQuantity: item.totalQuantity,
           availableQuantity: item.totalQuantity,
           description: item.description,
-        };
-        await create.mutateAsync(payload);
-      }
+        })),
+      };
+      await createArray.mutateAsync(payload);
       reset({ items: [{ name: "", price: 0, totalQuantity: 0, description: "" }] });
       router.push(`/organizer/events/${eventId}`);
     } catch (err) {
-      handleErrorApi({ error: err });
+      handleErrorApi({ error: err, setError });
     }
   };
 
@@ -256,9 +256,9 @@ export function CreateTicketTypesForm({ eventId }: { eventId: string }) {
         <Button
           type="submit"
           form="ticket-types-form"
-          disabled={create.isPending}
+          disabled={createArray.isPending}
         >
-          {create.isPending ? (
+          {createArray.isPending ? (
             <Loader2 className="h-4 w-4 animate-spin" />
           ) : (
             <Check className="h-4 w-4" />

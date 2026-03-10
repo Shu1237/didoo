@@ -2,11 +2,12 @@
 
 import { use } from "react";
 import Loading from "@/components/loading";
-import { useGetEvent, useGetEvents } from "@/hooks/useEvent";
-import { useGetTicketTypes } from "@/hooks/useTicketType";
+
+import { useGetTicketTypes } from "@/hooks/useTicket";
 import HeroSection from "./_components/HeroSection";
 import EventDetailContent from "./_components/EventDetailContent";
 import EventsGrid from "../_components/EventsGrid";
+import { useGetEvent, useGetEvents } from "@/hooks/useEvent";
 
 export default function DetailEventPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);

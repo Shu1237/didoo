@@ -5,9 +5,7 @@ import { SpecialEvents } from "@/app/(user)/home/_components/SpecialEvents";
 import { AboutSection } from "@/app/(user)/home/_components/AboutSection";
 import { TrendingEvents } from "@/app/(user)/home/_components/TrendingEvents";
 import { MonthOverview } from "@/app/(user)/home/_components/MonthOverview";
-import { useGetEvents } from "@/hooks/useEvent";
-import { useGetCategories } from "@/hooks/useCategory";
-import { useGetOrganizers } from "@/hooks/useOrganizer";
+import { useGetEvents, useGetCategories, useGetOrganizers } from "@/hooks/useEvent";
 import Loading from "@/components/loading";
 import CategorySection from "./_components/CategorySection";
 import BecomeOrganizerSection from "./_components/BecomeOrganizerSection";
@@ -17,6 +15,7 @@ export default function Home() {
     pageSize: 12,
     hasCategory: true,
     hasOrganizer: true,
+    isDeleted: false,
   });
 
   const { data: categoriesResponse, isLoading: isCategoriesLoading } = useGetCategories({

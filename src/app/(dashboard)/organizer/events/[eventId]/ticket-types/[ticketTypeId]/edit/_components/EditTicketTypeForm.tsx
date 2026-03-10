@@ -3,10 +3,10 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ticketTypeUpdateSchema, type TicketTypeUpdateBody } from "@/schemas/ticketType";
-import { useTicketType } from "@/hooks/useTicketType";
+import { ticketTypeUpdateSchema, type TicketTypeUpdateBody } from "@/schemas/ticket";
+import { useTicketType } from "@/hooks/useTicket";
 import { useGetEvent } from "@/hooks/useEvent";
-import { useGetTicketType } from "@/hooks/useTicketType";
+import { useGetTicketType } from "@/hooks/useTicket";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -37,6 +37,7 @@ export function EditTicketTypeForm({
     register,
     handleSubmit,
     reset,
+    setError,
     formState: { errors },
   } = useForm<TicketTypeUpdateBody>({
     resolver: zodResolver(ticketTypeUpdateSchema),
@@ -66,7 +67,7 @@ export function EditTicketTypeForm({
       await update.mutateAsync({ id: ticketTypeId, body: data });
       router.push(`/organizer/events/${eventId}`);
     } catch (err) {
-      handleErrorApi({ error: err });
+      handleErrorApi({ error: err, setError });
     }
   };
 

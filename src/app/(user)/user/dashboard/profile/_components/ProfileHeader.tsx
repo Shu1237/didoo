@@ -4,8 +4,8 @@ import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { useGetOrganizer } from "@/hooks/useOrganizer";
-import { useGetMe } from "@/hooks/useUser";
+import { useGetOrganizer } from "@/hooks/useEvent";
+import { useGetMe } from "@/hooks/useAuth";
 import { OrganizerStatus } from "@/utils/enum";
 import {
   CheckCircle2,
@@ -21,17 +21,17 @@ import {
 
 const STATUS_CONFIG = {
   [OrganizerStatus.PENDING]: {
-    label: "Dang cho xet duyet",
+    label: "Đang chờ xét duyệt",
     icon: Clock3,
     className: "border-amber-200 bg-amber-50 text-amber-700",
   },
   [OrganizerStatus.VERIFIED]: {
-    label: "Organizer da xac minh",
+    label: "Organizer đã xác minh",
     icon: CheckCircle2,
     className: "border-emerald-200 bg-emerald-50 text-emerald-700",
   },
   [OrganizerStatus.BANNED]: {
-    label: "Organizer bi khoa",
+    label: "Organizer bị khóa",
     icon: XCircle,
     className: "border-rose-200 bg-rose-50 text-rose-700",
   },
@@ -79,10 +79,10 @@ export default function ProfileSidebar() {
               </AvatarFallback>
             </Avatar>
             <div className="pb-1">
-              <p className="text-xl font-bold text-slate-900">{user?.fullName || "Nguoi dung"}</p>
+              <p className="text-xl font-bold text-slate-900">{user?.fullName || "Người dùng"}</p>
               <p className="inline-flex items-center gap-1 text-xs text-slate-500">
                 <Mail className="h-3.5 w-3.5" />
-                {user?.email || "Chua dang nhap"}
+                {user?.email || "Chưa đăng nhập"}
               </p>
             </div>
           </div>

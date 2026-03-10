@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { OrganizersTable } from "./OrganizersTable";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
-import { useOrganizer } from "@/hooks/useOrganizer";
-import type { Organizer } from "@/types/organizer";
+import { useOrganizer } from "@/hooks/useEvent";
+import type { Organizer } from "@/types/event";
 
 export function OrganizersSection({
   params,
@@ -12,7 +12,7 @@ export function OrganizersSection({
   params: Record<string, string | string[] | undefined>;
 }) {
   const [organizerToDelete, setOrganizerToDelete] = useState<Organizer | null>(null);
-  const { deleteOrganizer } = useOrganizer();
+  const { deleteOrganizer, restore } = useOrganizer();
 
   const handleDelete = async () => {
     if (!organizerToDelete) return;
@@ -20,11 +20,16 @@ export function OrganizersSection({
     setOrganizerToDelete(null);
   };
 
+  const handleRestore = (o: Organizer) => {
+    restore.mutate(o.id);
+  };
+
   return (
     <>
       <OrganizersTable
         params={params}
         onDelete={(o) => setOrganizerToDelete(o)}
+        onRestore={handleRestore}
       />
 
       <ConfirmModal

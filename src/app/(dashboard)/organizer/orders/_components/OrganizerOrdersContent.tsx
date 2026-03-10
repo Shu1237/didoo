@@ -1,8 +1,6 @@
 "use client";
 
-import { useGetMe } from "@/hooks/useUser";
-import { useGetEvents } from "@/hooks/useEvent";
-import { useGetBookings } from "@/hooks/useBooking";
+import { useGetMe } from "@/hooks/useAuth";
 import { OrganizerOrdersFilters } from "./OrganizerOrdersFilters";
 import { OrganizerOrdersTable } from "./OrganizerOrdersTable";
 

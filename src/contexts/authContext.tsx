@@ -1,27 +1,30 @@
 "use client";
 
+
+
+
+
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+
 import { useSessionStore } from "@/stores/sesionStore";
-import { authRequest } from "@/apiRequest/auth";
+
+import { authRequest } from "@/apiRequest/authService";
 import { handleErrorApi } from "@/lib/errors";
-import { AuthContextType } from "@/types/base";
-import { decodeJWT } from "@/lib/utils";
-import { JWTUserType } from "@/types/user";
-
+interface AuthContextType {
+    setTokenFromContext: (accessToken: string, refreshToken: string) => void;
+}
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-/** Profile + Organizer: dùng useProfileWithOrganizer (TanStack Query) thay vì fetch trong AuthContext */
 
 export const AuthProvider = ({
     children,
     initialAccessToken,
-    initialRefreshToken,
+    initialRefreshToken
 }: {
     children: ReactNode;
     initialAccessToken?: string | null;
     initialRefreshToken?: string | null;
 }) => {
-    const { setSession } = useSessionStore((state) => state);
+    const setSession = useSessionStore((state) => state.setSession);
     const [isHydrated, setIsHydrated] = useState(false);
     const [isRefreshing, setIsRefreshing] = useState(false);
 
@@ -31,70 +34,71 @@ export const AuthProvider = ({
 
     useEffect(() => {
         const initializeAuth = async () => {
+            // Case 1: Có cả access_token và refresh_token → OK, hydrate bình thường
             if (initialAccessToken && initialRefreshToken) {
-                const decoded = decodeJWT<JWTUserType>(initialAccessToken);
-                const isExpired = decoded?.exp && decoded.exp < Math.floor(Date.now() / 1000);
-
-                // BE chỉ refresh khi token ĐÃ hết hạn
-                if (isExpired && decoded?.UserId) {
-                    setIsRefreshing(true);
-                    try {
-                        const result = await authRequest.refreshTokenClient({
-                            id: decoded.UserId,
-                            accessToken: initialAccessToken,
-                            refreshToken: initialRefreshToken,
-                        });
-                        if (!result.isSuccess || !result.data?.accessToken || !result.data?.refreshToken) {
-                            throw new Error(result.message || "Invalid refresh response");
-                        }
-                        const { accessToken: newAccessToken, refreshToken: newRefreshToken } = result.data;
-                        setSession({ accessToken: newAccessToken, refreshToken: newRefreshToken });
-                        await authRequest.refreshTokenServer({
-                            accessToken: newAccessToken,
-                            refreshToken: newRefreshToken,
-                        });
-                    } catch (error) {
-                        handleErrorApi({ error });
-                        try {
-                            await authRequest.logoutServer();
-                        } catch {
-                            /* ignore */
-                        }
-                        window.location.href = "/login?redirect=" + encodeURIComponent(window.location.pathname);
-                        return;
-                    } finally {
-                        setIsRefreshing(false);
-                    }
-                } else if (!isExpired) {
-                    setSession({ accessToken: initialAccessToken, refreshToken: initialRefreshToken });
-                } else {
-                    // Token hết hạn nhưng không decode được UserId -> redirect login
-                    try {
-                        await authRequest.logoutServer();
-                    } catch {
-                        /* ignore */
-                    }
-                    window.location.href = "/login";
-                    return;
-                }
+                setSession({ accessToken: initialAccessToken, refreshToken: initialRefreshToken });
                 setIsHydrated(true);
                 return;
             }
 
+            // Case 2: Không có refresh_token → Middleware đã xử lý redirect
+            // Trường hợp này không xảy ra ở đây vì middleware đã chặn
             if (!initialRefreshToken) {
                 setIsHydrated(true);
                 return;
             }
 
-            // Chỉ có refresh token: BE RefreshCommand cần id (từ access token) - không decode được từ refresh token
+            // Case 3: Có refresh_token nhưng KHÔNG có access_token
+            // → Call API để lấy access_token mới
             if (!initialAccessToken && initialRefreshToken) {
+                console.log("Access token missing, refreshing from cookies...");
+                setIsRefreshing(true);
+
                 try {
-                    await authRequest.logoutServer();
-                } catch {
-                    /* ignore */
+                    // Gọi API backend để refresh access_token
+                    const result = await authRequest.refreshTokenClient({
+                        refreshToken: initialRefreshToken
+                    });
+
+                    if (!result.data?.accessToken) {
+                        throw new Error("Invalid refresh token response");
+                    }
+
+                    const newAccessToken = result.data.accessToken;
+
+
+
+                    // Step 1: Set vào Zustand store
+                    setSession({ accessToken: newAccessToken, refreshToken: initialRefreshToken });
+
+                    // Step 2: Đồng bộ access_token mới vào cookies thông qua API route
+                    await authRequest.refreshTokenServer({
+                        accessToken: newAccessToken,
+                        refreshToken: initialRefreshToken
+                    });
+
+
+
+
+                } catch (error) {
+                    handleErrorApi({ error })
+
+                    // Refresh thất bại → Clear hết và redirect
+
+
+                    try {
+                        // Xóa cookies
+                        await authRequest.logoutServer();
+                    } catch (logoutError) {
+                        console.error("Failed to clear cookies:", logoutError);
+                    }
+
+                    // Redirect về login
+                    window.location.href = "/login";
+                    return;
+                } finally {
+                    setIsRefreshing(false);
                 }
-                window.location.href = "/login";
-                return;
             }
 
             setIsHydrated(true);
@@ -103,12 +107,11 @@ export const AuthProvider = ({
         initializeAuth();
     }, []);
 
+    // Show loading khi đang hydrate hoặc đang refresh
     if (!isHydrated || isRefreshing) {
-        return (
-            <div className="loader">
-                <div className="justify-content-center jimu-primary-loading"></div>
-            </div>
-        );
+        return <div className="loader">
+            <div className="justify-content-center jimu-primary-loading"></div>
+        </div>
     }
 
     return (

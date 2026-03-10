@@ -71,7 +71,9 @@ export default function MapPage() {
       hasCategory: true,
       hasOrganizer: true,
       hasLocations: true,
+      isDeleted: false,
       isDescending: false,
+      status: EventStatus.PUBLISHED,
     };
     if (name) q.name = name;
     if (categoryId) q.categoryId = categoryId;
@@ -89,10 +91,7 @@ export default function MapPage() {
 
   const filteredEvents = useMemo(() => {
     let result = events.filter((e) => {
-      const isVisible =
-        e.status === EventStatus.OPENED ||
-        e.status === EventStatus.PUBLISHED ||
-        e.status === EventStatus.CLOSED;
+      const isVisible =e.status === EventStatus.PUBLISHED 
       const hasLocation =
         e.locations?.[0]?.latitude != null && e.locations?.[0]?.longitude != null;
       return isVisible && hasLocation;

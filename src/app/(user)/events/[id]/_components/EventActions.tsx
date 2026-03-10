@@ -2,9 +2,8 @@
 
 import { Bookmark, Heart, Share2 } from "lucide-react";
 import { toast } from "sonner";
-import { useGetMe } from "@/hooks/useUser";
-import { useFavorite, useGetFavorites } from "@/hooks/useFavorite";
-import { useGetInteractions, useInteraction } from "@/hooks/useInteraction";
+import { useGetMe } from "@/hooks/useAuth";
+import { useFavorite, useGetFavorites, useGetInteractions, useInteraction } from "@/hooks/useEvent";
 import { InteractionType } from "@/utils/enum";
 
 interface EventActionsProps {

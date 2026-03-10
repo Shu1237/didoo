@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { decodeJWT } from "@/lib/utils";
-import { JWTUserType } from "@/types/user";
+import { JWTUserType } from "@/types/auth";
 import { Roles } from "@/utils/enum";
 import { redirect } from "next/navigation";
 import DashboardShell from "@/components/layout/dashboard/DashboardShell";

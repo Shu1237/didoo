@@ -3,8 +3,9 @@
 import { motion } from "framer-motion";
 import { Sparkles } from "lucide-react";
 import Image from "next/image";
-import { Category } from "@/types/category";
+
 import Link from "next/link";
+import { Category } from "@/types/event";
 
 interface AboutSectionProps {
   categories: Category[];

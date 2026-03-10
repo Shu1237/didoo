@@ -1,6 +1,6 @@
 "use client";
 
-import { Organizer } from "@/types/organizer";
+import { Organizer } from "@/types/event";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
