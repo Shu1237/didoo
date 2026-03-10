@@ -1,27 +1,138 @@
 "use client";
 
-import { useEffect, use } from "react";
+import { Suspense, useEffect, use } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { AlertTriangle, ChevronLeft, ShieldCheck } from "lucide-react";
+import { AlertTriangle, AlertCircle, CheckCircle2, ChevronLeft, RotateCw, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import Loading from "@/components/loading";
 import { useGetMe } from "@/hooks/useAuth";
 import { useGetEvent } from "@/hooks/useEvent";
 import { useGetTicketListing, useValidateTicketListing } from "@/hooks/useTicket";
-import { useTradeBooking } from "@/hooks/useBooking";
+import { useGetBooking, useTradeBooking } from "@/hooks/useBooking";
 import { tradeBookingCreateSchema, TradeBookingCreateBody } from "@/schemas/booking";
 import { handleErrorApi } from "@/lib/errors";
 
-export default function TradeBookingConfirmPage({
-  params,
+const reasonMap: Record<string, string> = {
+  "listing-unavailable": "Listing không còn khả dụng hoặc đã được bán.",
+  payment_failed: "Thanh toán thất bại hoặc đã bị hủy.",
+};
+
+/** Callback từ payment gateway: fetch bookingId → hiển thị success hoặc fail */
+function TradeBookingCallbackResult({
+  id,
+  listingId,
+  bookingId,
 }: {
-  params: Promise<{ id: string; listingId: string }>;
+  id: string;
+  listingId: string;
+  bookingId: string;
 }) {
-  const { id, listingId } = use(params);
+  const { data: bookingRes, isLoading, isError } = useGetBooking(bookingId);
+  const booking = bookingRes?.data;
+
+  const isSuccess = booking?.status?.toLowerCase() === "paid" || !!booking?.paidAt;
+
+  if (isLoading) return <Loading />;
+
+  if (isError || !booking) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-zinc-50 px-4">
+        <div className="w-full max-w-lg rounded-2xl border border-zinc-200 bg-white p-8 text-center shadow-sm">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-rose-100">
+            <AlertCircle className="h-8 w-8 text-rose-600" />
+          </div>
+          <h1 className="text-2xl font-bold text-zinc-900">Không tìm thấy thông tin giao dịch</h1>
+          <p className="mt-2 text-sm text-zinc-600">
+            Mã booking không hợp lệ hoặc đã hết hạn. Vui lòng kiểm tra lại.
+          </p>
+          <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <Button asChild className="rounded-xl">
+              <Link href={`/resale/${id}/trade-booking/${listingId}/confirm`}>
+                <RotateCw className="mr-1 h-4 w-4" />
+                Thử lại
+              </Link>
+            </Button>
+            <Button asChild variant="outline" className="rounded-xl">
+              <Link href={`/resale/${id}`}>
+                <ChevronLeft className="mr-1 h-4 w-4" />
+                Quay lại resale
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
+  if (isSuccess) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-zinc-50 px-4">
+        <div className="w-full max-w-lg rounded-2xl border border-zinc-200 bg-white p-8 text-center shadow-sm">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100">
+            <CheckCircle2 className="h-8 w-8 text-emerald-600" />
+          </div>
+          <h1 className="text-2xl font-bold text-zinc-900">Mua vé resale thành công</h1>
+          <p className="mt-2 text-sm text-zinc-600">
+            Giao dịch của bạn đã hoàn tất. Vé sẽ được cập nhật trong khu vực vé của tôi.
+          </p>
+          <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <Button asChild className="rounded-xl">
+              <Link href="/user/dashboard/tickets">Xem vé của tôi</Link>
+            </Button>
+            <Button asChild variant="outline" className="rounded-xl">
+              <Link href={`/resale/${id}`}>
+                <ChevronLeft className="mr-1 h-4 w-4" />
+                Quay lại resale
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
+  const reasonKey = "payment_failed";
+  const reasonMessage = reasonMap[reasonKey] || "Không thể hoàn tất giao dịch resale. Vui lòng thử lại.";
+
+  return (
+    <main className="flex min-h-screen items-center justify-center bg-zinc-50 px-4">
+      <div className="w-full max-w-lg rounded-2xl border border-zinc-200 bg-white p-8 text-center shadow-sm">
+        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-rose-100">
+          <AlertCircle className="h-8 w-8 text-rose-600" />
+        </div>
+        <h1 className="text-2xl font-bold text-zinc-900">Trade-booking thất bại</h1>
+        <p className="mt-2 text-sm text-zinc-600">{reasonMessage}</p>
+        <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <Button asChild className="rounded-xl">
+            <Link href={`/resale/${id}/trade-booking/${listingId}/confirm`}>
+              <RotateCw className="mr-1 h-4 w-4" />
+              Thử lại
+            </Link>
+          </Button>
+          <Button asChild variant="outline" className="rounded-xl">
+            <Link href={`/resale/${id}`}>
+              <ChevronLeft className="mr-1 h-4 w-4" />
+              Quay lại resale
+            </Link>
+            </Button>
+          </div>
+        </div>
+      </main>
+    );
+}
+
+/** Form tạo trade-booking (khi chưa có bookingId) */
+function TradeBookingConfirmForm({
+  id,
+  listingId,
+}: {
+  id: string;
+  listingId: string;
+}) {
   const router = useRouter();
   const { data: userRes, isLoading: isUserLoading } = useGetMe();
   const { data: eventRes, isLoading: isEventLoading } = useGetEvent(id);
@@ -218,5 +329,35 @@ export default function TradeBookingConfirmPage({
         </form>
       </div>
     </main>
+  );
+}
+
+function ConfirmPageContent({
+  id,
+  listingId,
+}: {
+  id: string;
+  listingId: string;
+}) {
+  const searchParams = useSearchParams();
+  const bookingId = searchParams.get("bookingId") || "";
+
+  if (bookingId) {
+    return <TradeBookingCallbackResult id={id} listingId={listingId} bookingId={bookingId} />;
+  }
+  return <TradeBookingConfirmForm id={id} listingId={listingId} />;
+}
+
+export default function TradeBookingConfirmPage({
+  params,
+}: {
+  params: Promise<{ id: string; listingId: string }>;
+}) {
+  const { id, listingId } = use(params);
+
+  return (
+    <Suspense fallback={<Loading />}>
+      <ConfirmPageContent id={id} listingId={listingId} />
+    </Suspense>
   );
 }

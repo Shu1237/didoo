@@ -12,7 +12,7 @@ interface CustomOptions extends RequestInit {
     skipAuth?: boolean;
 }
 
-const isExpired = "Phiên đăng nhập đã hết hạn";
+const isExpired = "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại hoặc làm mới Token.";
 
 // Helper: Check runtime
 const isServerRuntime = () => typeof window === "undefined";
@@ -159,6 +159,7 @@ async function httpRequest<T>(
     if (authToken) {
         baseHeaders["Authorization"] = `Bearer ${authToken}`;
     }
+    baseHeaders["ngrok-skip-browser-warning"] = "1";
 
     // Prepare URL
     const baseUrl = options?.baseURL === undefined

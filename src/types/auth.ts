@@ -22,6 +22,7 @@ export interface Role {
     description: string;
 }
 
+
 /** Match BE UserGetListQuery */
 export interface UserGetListQuery extends BasePaginationQuery {
     fullName?: string;
@@ -34,6 +35,7 @@ export interface UserGetListQuery extends BasePaginationQuery {
     organizerId?: string;
     hasLocation?: boolean;
 }
+
 
 /** Match BE UserDTO */
 export interface User {

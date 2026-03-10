@@ -1,10 +1,12 @@
+import { BookingTypeStatus,BookingStatus } from "@/utils/enum";
 import { BasePaginationQuery } from "./base";
 
 /** Match BE BookingGetListQuery */
 export interface BookingGetListQuery extends BasePaginationQuery {
     userId?: string;
     eventId?: string;
-    status?: number;
+    status?: BookingStatus;
+    bookingType?: BookingTypeStatus;
     fields?: string;
 }
 
