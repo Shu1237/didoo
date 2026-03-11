@@ -217,14 +217,14 @@ export function EventDetailContent({ eventId }: { eventId: string }) {
                     key={loc.id ?? i}
                     className="rounded-xl border border-zinc-200 bg-zinc-50/50 p-4"
                   >
-                    <p className="font-medium text-zinc-900">{loc.name || `Địa điểm ${i + 1}`}</p>
-                    <p className="text-sm text-zinc-600">{loc.address}</p>
-                    {loc.province && (
-                      <p className="text-sm text-zinc-500">{loc.province}</p>
+                    <p className="font-medium text-zinc-900">{(loc as any).name || (loc as any).Name || `Địa điểm ${i + 1}`}</p>
+                    <p className="text-sm text-zinc-600">{(loc as any).address || (loc as any).Address}</p>
+                    {((loc as any).province || (loc as any).Province) && (
+                      <p className="text-sm text-zinc-500">{(loc as any).province || (loc as any).Province}</p>
                     )}
-                    {loc.latitude != null && loc.longitude != null && (
+                    {((loc as any).latitude ?? (loc as any).Latitude) != null && ((loc as any).longitude ?? (loc as any).Longitude) != null && (
                       <a
-                        href={`https://maps.google.com/?q=${loc.latitude},${loc.longitude}`}
+                        href={`https://maps.google.com/?q=${(loc as any).latitude ?? (loc as any).Latitude},${(loc as any).longitude ?? (loc as any).Longitude}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="mt-2 inline-block text-sm text-primary hover:underline"

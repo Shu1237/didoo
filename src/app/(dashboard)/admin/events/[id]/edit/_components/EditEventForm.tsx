@@ -114,15 +114,15 @@ export function EditEventForm({ eventId }: { eventId: string }) {
     if (event) {
       const locations: EventLocationForm[] = event.locations?.length
         ? event.locations.map((loc) => ({
-            Address: loc.address,
+            Address: loc.address ?? "",
             Province: loc.province ?? "",
-            District: "",
-            Ward: "",
-            Zipcode: "",
+            District: loc.district ?? "",
+            Ward: loc.ward ?? "",
+            Zipcode: loc.zipcode ?? "",
             Latitude: loc.latitude ?? 0,
             Longitude: loc.longitude ?? 0,
-            ContactEmail: "",
-            ContactPhone: "",
+            ContactEmail: loc.contactEmail ?? "",
+            ContactPhone: loc.contactPhone ?? "",
           }))
         : [
             {
@@ -195,13 +195,53 @@ export function EditEventForm({ eventId }: { eventId: string }) {
       return time.length === 5 ? `${time}:00` : time;
     };
     try {
-      const { Locations: _locations, ...rest } = data;
-      const payload: EventUpdateBody = {
-        ...rest,
+      // Get OrganizerId from event
+      const organizerId = event?.organizer?.id;
+      const payload = {
+        Name: data.Name,
+        Slug: data.Slug,
+        Subtitle: data.Subtitle,
+        Description: data.Description,
         StartTime: data.StartTime instanceof Date ? data.StartTime : data.StartTime ? new Date(data.StartTime as string) : undefined,
         EndTime: data.EndTime instanceof Date ? data.EndTime : data.EndTime ? new Date(data.EndTime as string) : undefined,
         OpenTime: formatTime(data.OpenTime),
         ClosedTime: formatTime(data.ClosedTime),
+        ThumbnailUrl: data.ThumbnailUrl,
+        BannerUrl: data.BannerUrl,
+        TicketMapUrl: data.TicketMapUrl,
+        AgeRestriction: data.AgeRestriction,
+        CategoryId: data.CategoryId,
+        OrganizerId: organizerId,
+        Locations: data.Locations,
+      };
+      await update.mutateAsync({ id: eventId, body: payload });
+      router.push("/admin/events");
+    } catch (err) {
+      handleErrorApi({ error: err, setError });
+    }
+  };</parameter>
+</invoke>
+<parameter name="old_string">  const onSubmit = async (data: EventUpdateFormValues) => {
+    const formatTime = (time?: string) => {
+      if (!time) return undefined;
+      return time.length === 5 ? `${time}:00` : time;
+    };
+    try {
+      // Build payload explicitly WITHOUT OrganizerId to avoid BE error
+      const payload = {
+        Name: data.Name,
+        Slug: data.Slug,
+        Subtitle: data.Subtitle,
+        Description: data.Description,
+        StartTime: data.StartTime instanceof Date ? data.StartTime : data.StartTime ? new Date(data.StartTime as string) : undefined,
+        EndTime: data.EndTime instanceof Date ? data.EndTime : data.EndTime ? new Date(data.EndTime as string) : undefined,
+        OpenTime: formatTime(data.OpenTime),
+        ClosedTime: formatTime(data.ClosedTime),
+        ThumbnailUrl: data.ThumbnailUrl,
+        BannerUrl: data.BannerUrl,
+        TicketMapUrl: data.TicketMapUrl,
+        AgeRestriction: data.AgeRestriction,
+        CategoryId: data.CategoryId,
       };
       await update.mutateAsync({ id: eventId, body: payload });
       router.push("/admin/events");
@@ -537,6 +577,10 @@ export function EditEventForm({ eventId }: { eventId: string }) {
                     setValue(`Locations.${i}.Address`, result.address);
                     setValue(`Locations.${i}.Latitude`, result.latitude);
                     setValue(`Locations.${i}.Longitude`, result.longitude);
+                    // Populate province/district/ward from Mapbox
+                    if (result.province) setValue(`Locations.${i}.Province`, result.province);
+                    if (result.district) setValue(`Locations.${i}.District`, result.district);
+                    if (result.ward) setValue(`Locations.${i}.Ward`, result.ward);
                   }}
                   placeholder="Tìm địa chỉ (gõ để gợi ý)"
                   error={!!errors.Locations?.[i]?.Address}

@@ -17,6 +17,8 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { useGetUsers } from "@/hooks/useAuth";
 import { useGetOrganizers, useGetEvents } from "@/hooks/useEvent";
+import { useGetTicketListings } from "@/hooks/useTicket";
+import { useGetResaleTransactions } from "@/hooks/useBooking";
 import { bookingRequest } from "@/apiRequest/bookingService";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -47,6 +49,7 @@ import {
   ArrowRight,
   MoreHorizontal,
   Eye,
+  ArrowLeftRight,
 } from "lucide-react";
 
 const formatNumber = (n: number) => new Intl.NumberFormat("vi-VN").format(n);
@@ -72,6 +75,14 @@ export function AdminDashboardContent() {
       return { all: all.data.items, paid: paid.data.items };
     },
   });
+
+  // Resale data
+  const { data: listingsRes } = useGetTicketListings({ pageNumber: 1, pageSize: 500 });
+  const { data: transactionsRes } = useGetResaleTransactions({ pageNumber: 1, pageSize: 500 });
+  const listings = listingsRes?.data?.items ?? [];
+  const resaleTransactions = transactionsRes?.data?.items ?? [];
+  const activeListings = listings.filter((l) => l.status === 1 || l.status === 3).length; // ACTIVE status
+  const totalResaleRevenue = resaleTransactions.reduce((sum, tx) => sum + (Number(tx.cost) || 0), 0);
   const totalUsers = usersRes?.data?.totalItems ?? 0;
   const totalOrganizers = organizersRes?.data?.totalItems ?? 0;
   const pendingOrganizers = pendingOrgRes?.data?.totalItems ?? 0;
@@ -175,7 +186,7 @@ export function AdminDashboardContent() {
           </Button>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
             <div className="rounded-xl border border-zinc-100 bg-zinc-50/50 p-4">
               <div className="flex items-center gap-2">
                 <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
@@ -234,6 +245,24 @@ export function AdminDashboardContent() {
               <p className="mt-1 flex items-center gap-1 text-xs text-emerald-600">
                 <TrendingUp className="h-3 w-3" />
                 TB: {formatCurrency(avgOrder)}/đơn
+              </p>
+            </div>
+
+            <div className="rounded-xl border border-zinc-100 bg-zinc-50/50 p-4">
+              <div className="flex items-center gap-2">
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-violet-500/10 text-violet-600">
+                  <ArrowLeftRight className="h-4 w-4" />
+                </div>
+                <span className="text-xs font-medium text-zinc-500">Resale</span>
+                {activeListings > 0 && (
+                  <Badge variant="secondary" className="ml-auto text-[10px]">
+                    {activeListings} đang bán
+                  </Badge>
+                )}
+              </div>
+              <p className="mt-2 text-2xl font-bold text-zinc-900">{formatCurrency(totalResaleRevenue)}</p>
+              <p className="mt-1 text-xs text-zinc-500">
+                {listings.length} listings · {resaleTransactions.length} giao dịch
               </p>
             </div>
           </div>

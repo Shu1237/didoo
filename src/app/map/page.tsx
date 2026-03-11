@@ -41,9 +41,11 @@ const AnimatedDoubleArrow = ({
   </motion.svg>
 );
 
+const GOONG_API_KEY = "SnGhg9VIWX1fplbNQZkQnVNlUpsxCdViDKvUqtax";
+
 const mapStyle = {
-  normalStyle: "mapbox://styles/mapbox/streets-v12",
-  satelliteStyle: "mapbox://styles/mapbox/standard-satellite",
+  normalStyle: `https://tiles.goong.io/assets/goong_map_web.json?api_key=${GOONG_API_KEY}`,
+  satelliteStyle: `https://tiles.goong.io/assets/navigation_dark.json?api_key=${GOONG_API_KEY}`,
 };
 
 export default function MapPage() {
@@ -91,7 +93,7 @@ export default function MapPage() {
 
   const filteredEvents = useMemo(() => {
     let result = events.filter((e) => {
-      const isVisible =e.status === EventStatus.PUBLISHED 
+      const isVisible = e.status === EventStatus.PUBLISHED
       const hasLocation =
         e.locations?.[0]?.latitude != null && e.locations?.[0]?.longitude != null;
       return isVisible && hasLocation;

@@ -456,6 +456,16 @@ export function CreateEventForm() {
                 )}
               </div>
               <div className="space-y-2">
+                <Label>Tên địa điểm (Ví dụ: Trung tâm triển lãm, White Palace...)</Label>
+                <Input
+                  placeholder="Nhập tên địa điểm"
+                  {...register(`Locations.${i}.Name`)}
+                />
+                {errors.Locations?.[i]?.Name && (
+                  <p className="text-sm text-destructive">{String(errors.Locations[i]?.Name?.message ?? "")}</p>
+                )}
+              </div>
+              <div className="space-y-2">
                 <Label>Địa chỉ *</Label>
                 <AddressAutocompleteInput
                   value={watch(`Locations.${i}.Address`)}
@@ -463,6 +473,10 @@ export function CreateEventForm() {
                     setValue(`Locations.${i}.Address`, result.address);
                     setValue(`Locations.${i}.Latitude`, result.latitude);
                     setValue(`Locations.${i}.Longitude`, result.longitude);
+                    // Populate province/district/ward from Mapbox
+                    if (result.province) setValue(`Locations.${i}.Province`, result.province);
+                    if (result.district) setValue(`Locations.${i}.District`, result.district);
+                    if (result.ward) setValue(`Locations.${i}.Ward`, result.ward);
                   }}
                   placeholder="Tìm địa chỉ (gõ để gợi ý)"
                   error={!!errors.Locations?.[i]?.Address}

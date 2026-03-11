@@ -47,7 +47,7 @@ export default function HeroSection({ event }: HeroSectionProps) {
   };
 
   return (
-    <section className="relative h-[420px] md:h-[520px] w-full overflow-hidden">
+    <section className="relative h-[450px] md:h-[600px] w-full overflow-hidden">
       <Image
         src={event.bannerUrl || event.thumbnailUrl || FALLBACK_IMAGE}
         alt={event.name}
@@ -56,44 +56,45 @@ export default function HeroSection({ event }: HeroSectionProps) {
         priority
         sizes="100vw"
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-zinc-900/95 via-zinc-900/50 to-zinc-900/30" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
 
-      <button
-        type="button"
-        onClick={handleShare}
-        className="absolute right-6 top-6 z-10 flex h-11 w-11 items-center justify-center rounded-xl bg-white/20 text-white backdrop-blur-md transition-colors hover:bg-white/30 md:right-10 md:top-10"
-        aria-label="Chia sẻ"
-      >
-        <Share2 className="h-5 w-5" />
-      </button>
-
-      {/* Badges top-left */}
-      <div className="absolute left-6 top-6 md:left-10 md:top-10 flex flex-col gap-2">
-        {isHot && (
-          <span className="inline-flex w-fit rounded-lg bg-primary px-4 py-2 text-xs font-bold uppercase tracking-wider text-white">
-            Hot event
-          </span>
-        )}
-        <span className="inline-flex w-fit rounded-lg bg-white/20 backdrop-blur-sm px-4 py-2 text-xs font-bold uppercase tracking-wider text-white">
-          {event.category?.name || "Sự kiện"}
-        </span>
-      </div>
-
-      {/* Content - left aligned like reference */}
-      <div className="absolute inset-0 flex flex-col justify-center px-6 md:px-10 lg:px-16 text-left">
-        <h1 className="max-w-3xl text-3xl font-bold leading-tight text-white md:text-4xl lg:text-5xl">
-          {event.name}
-        </h1>
-        <div className="mt-6 flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-8 text-white/90">
-          <div className="flex items-center gap-2">
-            <CalendarDays className="h-5 w-5 shrink-0 text-primary" />
-            <span className="text-base md:text-lg">{dateLabel}</span>
+      <div className="mx-auto max-w-7xl relative h-full flex flex-col justify-end px-4 pb-12 sm:px-6 lg:px-8">
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-wrap items-center gap-2">
+            {isHot && (
+              <span className="inline-flex rounded-md bg-[#FF8A3D] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white">
+                Hot event
+              </span>
+            )}
+            <span className="inline-flex rounded-md bg-white/10 backdrop-blur-md border border-white/20 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white">
+              {event.category?.name || "Sự kiện"}
+            </span>
           </div>
-          <div className="flex items-center gap-2">
-            <MapPin className="h-5 w-5 shrink-0 text-primary" />
-            <span className="text-base md:text-lg">{locationLabel}</span>
+
+          <h1 className="max-w-4xl text-3xl font-black leading-tight text-white md:text-5xl lg:text-6xl tracking-tight">
+            {event.name}
+          </h1>
+
+          <div className="flex flex-wrap items-center gap-x-8 gap-y-3 text-white/90 font-medium">
+            <div className="flex items-center gap-2">
+              <CalendarDays className="h-4 w-4 shrink-0 text-[#FF8A3D]" />
+              <span className="text-sm md:text-base">{dateLabel}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <MapPin className="h-4 w-4 shrink-0 text-[#FF8A3D]" />
+              <span className="text-sm md:text-base">{locationLabel}</span>
+            </div>
           </div>
         </div>
+
+        <button
+          type="button"
+          onClick={handleShare}
+          className="absolute right-4 top-10 flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 text-white backdrop-blur-md border border-white/20 transition-all hover:bg-white/20 active:scale-95 group"
+          aria-label="Chia sẻ"
+        >
+          <Share2 className="h-5 w-5 transition-transform group-hover:rotate-12" />
+        </button>
       </div>
     </section>
   );

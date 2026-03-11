@@ -17,6 +17,7 @@ import { useGetTicketTypes } from "@/hooks/useTicket";
 import { bookingCreateSchema } from "@/schemas/booking";
 import { handleErrorApi } from "@/lib/errors";
 import { TicketType } from "@/types/ticket";
+import { useTicketHub } from "@/hooks/useTicketHub";
 
 type BookingDraftItem = {
   ticketTypeId: string;
@@ -51,6 +52,7 @@ export default function EventBookingPage({
     { enabled: !!id }
   );
   const { create } = useBooking();
+  const { realtimeAvailability, lockTickets, unlockTickets } = useTicketHub(id);
 
   const user = userRes?.data;
   const event = eventRes?.data;
@@ -115,8 +117,8 @@ export default function EventBookingPage({
     : 0;
 
   const handleQuantity = (tt: TicketType, delta: number) => {
-    const avail = Math.max(0, Number(tt.availableQuantity ?? 0));
-    if (avail <= 0) return;
+    const avail = realtimeAvailability[tt.id] ?? Math.max(0, Number(tt.availableQuantity ?? 0));
+    if (avail <= 0 && delta > 0) return;
 
     setSelected((prev) => {
       const isSame = prev?.ticketTypeId === tt.id;
@@ -128,10 +130,12 @@ export default function EventBookingPage({
 
       if (nextQty <= 0) {
         saveDraft(id, []);
+        unlockTickets(tt.id);
         return null;
       }
       const next = { ticketTypeId: tt.id, quantity: nextQty };
       saveDraft(id, [next]);
+      lockTickets(tt.id, nextQty);
       return next;
     });
   };
@@ -381,7 +385,7 @@ export default function EventBookingPage({
                 <h2 className="text-xl font-bold text-zinc-900">Loại vé</h2>
                 <div className="mt-4 space-y-4">
                   {ticketTypes.map((tt) => {
-                    const avail = Math.max(0, Number(tt.availableQuantity ?? 0));
+                    const avail = realtimeAvailability[tt.id] ?? Math.max(0, Number(tt.availableQuantity ?? 0));
                     const soldOut = avail <= 0;
                     const isSelected = selected?.ticketTypeId === tt.id;
 
@@ -462,7 +466,7 @@ export default function EventBookingPage({
                 <>
                   <div className="mt-4 space-y-4">
                     {ticketTypes.map((tt) => {
-                      const avail = Math.max(0, Number(tt.availableQuantity ?? 0));
+                      const avail = realtimeAvailability[tt.id] ?? Math.max(0, Number(tt.availableQuantity ?? 0));
                       const soldOut = avail <= 0;
                       const isSelected = selected?.ticketTypeId === tt.id;
 

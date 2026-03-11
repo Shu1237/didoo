@@ -7,10 +7,12 @@ export const tagSchema = z.object({
 });
 
 export const locationSchema = z.object({
+    Id: z.string().optional(),
+    Name: z.string().optional().or(z.literal("")),
     Address: z.string().min(1, "Địa chỉ là bắt buộc"),
-    Province: z.string().min(1, "Tỉnh/Thành phố là bắt buộc"),
-    District: z.string().min(1, "Quận/Huyện là bắt buộc"),
-    Ward: z.string().min(1, "Phường/Xã là bắt buộc"),
+    Province: z.string().optional().or(z.literal("")),
+    District: z.string().optional().or(z.literal("")),
+    Ward: z.string().optional().or(z.literal("")),
     Zipcode: z.union([z.string().min(1), z.literal("")]).optional(),
     Latitude: z.number().nullable().optional(),
     Longitude: z.number().nullable().optional(),
@@ -57,6 +59,7 @@ export const eventUpdateSchema = z.object({
     AgeRestriction: z.number().int().min(0).optional(),
     CategoryId: z.string().min(1).optional(),
     OrganizerId: z.string().min(1).optional(),
+    Locations: z.array(locationSchema).optional(),
 });
 
 

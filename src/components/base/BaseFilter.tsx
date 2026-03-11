@@ -1,7 +1,6 @@
-'use client'
-
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 import { useCallback, useState, useEffect } from 'react'
+import { Search, Tag, Calendar, XCircle, ChevronDown } from 'lucide-react'
 import {
     Select,
     SelectContent,
@@ -42,7 +41,6 @@ export default function BaseFilter({ filters, onFilterChange }: BaseFilterProps)
     const pathname = usePathname()
     const searchParams = useSearchParams()
 
-    // Initialize local state for text inputs (debounce)
     const [localState, setLocalState] = useState<Record<string, string>>(() => {
         const initialState: Record<string, string> = {}
         filters.forEach(filter => {
@@ -65,7 +63,6 @@ export default function BaseFilter({ filters, onFilterChange }: BaseFilterProps)
                 }
             })
 
-            // Reset page on filter change
             if (params.page === undefined && params.pageNumber === undefined) {
                 newSearchParams.delete('page')
                 newSearchParams.set('pageNumber', '1')
@@ -83,7 +80,6 @@ export default function BaseFilter({ filters, onFilterChange }: BaseFilterProps)
         }
     }
 
-    // Debounce effect just for text inputs in localState
     useEffect(() => {
         const timer = setTimeout(() => {
             Object.keys(localState).forEach(key => {
@@ -95,23 +91,19 @@ export default function BaseFilter({ filters, onFilterChange }: BaseFilterProps)
         }, 500)
 
         return () => clearTimeout(timer)
-    }, [localState]) // Logic: when localState changes, debounce update URL
+    }, [localState])
 
     const handleValuesChange = (key: string, value: string) => {
-        // for text inputs, only update local state, effect will handle URL update
         const filterDef = filters.find(f => f.key === key)
         if (filterDef?.type === 'text') {
             setLocalState(prev => ({ ...prev, [key]: value }))
         } else {
-            // for select/date, update URL immediately
             updateURL(key, value)
         }
     }
 
-    // Clear all filters
     const clearFilters = () => {
         router.push(pathname)
-        // Also reset local state
         const resetState: Record<string, string> = {}
         filters.forEach(filter => {
             if (filter.type === 'text') {
@@ -121,80 +113,77 @@ export default function BaseFilter({ filters, onFilterChange }: BaseFilterProps)
         setLocalState(resetState)
     }
 
+    const getIconForFilter = (key: string) => {
+        if (key.toLowerCase().includes('name') || key.toLowerCase().includes('search')) return Search
+        if (key.toLowerCase().includes('category')) return Tag
+        if (key.toLowerCase().includes('time') || key.toLowerCase().includes('date')) return Calendar
+        return Search
+    }
+
     return (
-        <div className="bg-card p-4 rounded-xl shadow-sm mb-6 border border-border grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {filters.map((filter) => {
-                const paramValue = searchParams.get(filter.key)
-                const value = filter.type === 'text'
-                    ? (localState[filter.key] !== undefined ? localState[filter.key] : (paramValue || ''))
-                    : (paramValue ?? filter.defaultValue ?? '')
+        <div className="bg-card p-4 rounded-xl shadow-sm mb-6 border border-border flex flex-col lg:flex-row items-end gap-4">
+            <div className="flex flex-col sm:flex-row flex-1 w-full gap-4">
+                {filters.map((filter) => {
+                    const paramValue = searchParams.get(filter.key)
+                    const value = filter.type === 'text'
+                        ? (localState[filter.key] !== undefined ? localState[filter.key] : (paramValue || ''))
+                        : (paramValue ?? filter.defaultValue ?? '')
 
-                return (
-                    <div key={filter.key} className={cn("space-y-2", filter.className)}>
-                        <Label className="text-sm font-medium text-foreground">{filter.label}</Label>
+                    return (
+                        <div key={filter.key} className={cn("flex-1 space-y-2 min-w-[140px]", filter.className)}>
+                            <Label className="text-sm font-medium text-foreground">{filter.label}</Label>
 
-                        {filter.type === 'text' && (
-                            <Input
-                                type="text"
-                                placeholder={filter.placeholder}
-                                value={value}
-                                onChange={(e) => handleValuesChange(filter.key, e.target.value)}
-                                className="w-full"
-                            />
-                        )}
+                            {filter.type === 'text' && (
+                                <Input
+                                    type="text"
+                                    placeholder={filter.placeholder}
+                                    value={value}
+                                    onChange={(e) => handleValuesChange(filter.key, e.target.value)}
+                                    className="w-full"
+                                />
+                            )}
 
-                        {filter.type === 'select' && (
-                            <Select
-                                value={value === '' || value === undefined ? '__all__' : String(value)}
-                                onValueChange={(v) => handleValuesChange(filter.key, v === '__all__' ? '' : v)}
-                            >
-                                <SelectTrigger className="w-full">
-                                    <SelectValue placeholder="Tất cả" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {filter.options?.map((opt) => (
-                                        <SelectItem
-                                            key={String(opt.value)}
-                                            value={opt.value === '' || opt.value === undefined ? '__all__' : String(opt.value)}
-                                        >
-                                            {opt.label}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        )}
+                            {filter.type === 'select' && (
+                                <Select
+                                    value={value === '' || value === undefined ? '__all__' : String(value)}
+                                    onValueChange={(v) => handleValuesChange(filter.key, v === '__all__' ? '' : v)}
+                                >
+                                    <SelectTrigger className="w-full">
+                                        <SelectValue placeholder="Tất cả" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {filter.options?.map((opt) => (
+                                            <SelectItem
+                                                key={String(opt.value)}
+                                                value={opt.value === '' || opt.value === undefined ? '__all__' : String(opt.value)}
+                                            >
+                                                {opt.label}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            )}
 
-                        {filter.type === 'date' && (
-                            <Input
-                                type="date"
-                                value={value}
-                                onChange={(e) => handleValuesChange(filter.key, e.target.value)}
-                                className="w-full"
-                            />
-                        )}
-
-                        {filter.type === 'number' && (
-                            <Input
-                                type="number"
-                                placeholder={filter.placeholder}
-                                value={value}
-                                onChange={(e) => handleValuesChange(filter.key, e.target.value)}
-                                className="w-full"
-                            />
-                        )}
-                    </div>
-                )
-            })}
-
-            <div className="flex items-end">
-                <Button
-                    variant="secondary"
-                    onClick={clearFilters}
-                    className="w-full"
-                >
-                    Xóa bộ lọc
-                </Button>
+                            {filter.type === 'date' && (
+                                <Input
+                                    type="date"
+                                    value={value}
+                                    onChange={(e) => handleValuesChange(filter.key, e.target.value)}
+                                    className="w-full"
+                                />
+                            )}
+                        </div>
+                    )
+                })}
             </div>
+
+            <Button
+                variant="secondary"
+                onClick={clearFilters}
+                className="lg:ml-auto shrink-0"
+            >
+                Xóa bộ lọc
+            </Button>
         </div>
     )
 }

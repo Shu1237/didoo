@@ -99,6 +99,7 @@ export function EditEventForm({ eventId }: { eventId: string }) {
       ThumbnailUrl: "",
       BannerUrl: "",
       TicketMapUrl: "",
+      Tags: [],
       Locations: [
         {
           Address: "",
@@ -119,17 +120,19 @@ export function EditEventForm({ eventId }: { eventId: string }) {
 
   useEffect(() => {
     if (event) {
-      const locations: EventLocationForm[] = event.locations?.length
-        ? event.locations.map((loc) => ({
-            Address: loc.address,
-            Province: loc.province ?? "",
-            District: "",
-            Ward: "",
-            Zipcode: "",
-            Latitude: loc.latitude ?? 0,
-            Longitude: loc.longitude ?? 0,
-            ContactEmail: "",
-            ContactPhone: "",
+      const mappedLocations: EventLocationForm[] = event.locations?.length
+        ? event.locations.map((loc: any) => ({
+            id: loc.id || loc.Id,
+            name: loc.name || loc.Name || "",
+            Address: loc.address || loc.Address || "",
+            Province: loc.province || loc.Province || "",
+            District: loc.district || loc.District || "",
+            Ward: loc.ward || loc.Ward || "",
+            Zipcode: loc.zipcode || loc.Zipcode || "",
+            Latitude: loc.latitude ?? loc.Latitude ?? 0,
+            Longitude: loc.longitude ?? loc.Longitude ?? 0,
+            ContactEmail: loc.contactEmail || loc.ContactEmail || "",
+            ContactPhone: loc.contactPhone || loc.ContactPhone || "",
           }))
         : [
             {
@@ -145,20 +148,20 @@ export function EditEventForm({ eventId }: { eventId: string }) {
             },
           ];
       reset({
-        Name: event.name,
-        Slug: event.slug,
-        Subtitle: event.subtitle ?? "",
-        Description: event.description,
-        CategoryId: event.category?.id ?? (event as { categoryId?: string }).categoryId ?? "",
-        AgeRestriction: event.ageRestriction ?? 0,
-        StartTime: event.startTime ? formatDateTimeLocal(event.startTime) : undefined,
-        EndTime: event.endTime ? formatDateTimeLocal(event.endTime) : undefined,
-        OpenTime: formatTime(event.openTime),
-        ClosedTime: formatTime(event.closedTime),
-        ThumbnailUrl: event.thumbnailUrl ?? "",
-        BannerUrl: event.bannerUrl ?? "",
-        TicketMapUrl: event.ticketMapUrl ?? "",
-        Locations: locations,
+        Name: event.name || (event as any).Name,
+        Slug: event.slug || (event as any).Slug,
+        Subtitle: event.subtitle ?? (event as any).Subtitle ?? "",
+        Description: event.description || (event as any).Description,
+        CategoryId: event.category?.id ?? (event as any).CategoryId ?? "",
+        AgeRestriction: event.ageRestriction ?? (event as any).AgeRestriction ?? 0,
+        StartTime: event.startTime ? formatDateTimeLocal(event.startTime) : (event as any).StartTime ? formatDateTimeLocal((event as any).StartTime) : undefined,
+        EndTime: event.endTime ? formatDateTimeLocal(event.endTime) : (event as any).EndTime ? formatDateTimeLocal((event as any).EndTime) : undefined,
+        OpenTime: formatTime(event.openTime || (event as any).OpenTime),
+        ClosedTime: formatTime(event.closedTime || (event as any).ClosedTime),
+        ThumbnailUrl: event.thumbnailUrl ?? (event as any).ThumbnailUrl ?? "",
+        BannerUrl: event.bannerUrl ?? (event as any).BannerUrl ?? "",
+        TicketMapUrl: event.ticketMapUrl ?? (event as any).TicketMapUrl ?? "",
+        Locations: mappedLocations,
       });
       if (event.bannerUrl) setBannerPreview(event.bannerUrl);
       if (event.thumbnailUrl) setThumbnailPreview(event.thumbnailUrl);
@@ -177,14 +180,14 @@ export function EditEventForm({ eventId }: { eventId: string }) {
       const result = await uploadImage.mutateAsync(file);
       const url = (result as { secure_url: string }).secure_url;
       if (type === "banner") {
+        setBannerPreview(url);
         setValue("BannerUrl", url);
-        setBannerPreview(URL.createObjectURL(file));
       } else if (type === "thumbnail") {
+        setThumbnailPreview(url);
         setValue("ThumbnailUrl", url);
-        setThumbnailPreview(URL.createObjectURL(file));
-      } else {
+      } else if (type === "ticketMap") {
+        setTicketMapPreview(url);
         setValue("TicketMapUrl", url);
-        setTicketMapPreview(URL.createObjectURL(file));
       }
     } catch {
       // handleErrorApi in useMedia
@@ -201,13 +204,24 @@ export function EditEventForm({ eventId }: { eventId: string }) {
       return time.length === 5 ? `${time}:00` : time;
     };
     try {
-      const { Locations: _locations, ...rest } = data;
-      const payload: EventUpdateBody = {
-        ...rest,
+      // Get OrganizerId from event.organizer
+      const organizerId = event?.organizer?.id;
+      const payload = {
+        Name: data.Name,
+        Slug: data.Slug,
+        Subtitle: data.Subtitle,
+        Description: data.Description,
         StartTime: data.StartTime instanceof Date ? data.StartTime : data.StartTime ? new Date(data.StartTime as string) : undefined,
         EndTime: data.EndTime instanceof Date ? data.EndTime : data.EndTime ? new Date(data.EndTime as string) : undefined,
         OpenTime: formatTime(data.OpenTime),
         ClosedTime: formatTime(data.ClosedTime),
+        ThumbnailUrl: data.ThumbnailUrl,
+        BannerUrl: data.BannerUrl,
+        TicketMapUrl: data.TicketMapUrl,
+        AgeRestriction: data.AgeRestriction,
+        CategoryId: data.CategoryId,
+        OrganizerId: organizerId,
+        Locations: data.Locations,
       };
       await update.mutateAsync({ id: eventId, body: payload });
       router.push("/organizer/events");
@@ -310,9 +324,8 @@ export function EditEventForm({ eventId }: { eventId: string }) {
         <CardContent className="space-y-4">
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="Name">Tên sự kiện *</Label>
+              <Label>Tên sự kiện *</Label>
               <Input
-                id="Name"
                 placeholder="Ví dụ: AI Conference 2026"
                 {...register("Name")}
                 className={errors.Name ? "border-destructive" : ""}
@@ -320,9 +333,8 @@ export function EditEventForm({ eventId }: { eventId: string }) {
               {errors.Name && <p className="text-sm text-destructive">{String(errors.Name.message ?? "")}</p>}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="Slug">Slug *</Label>
+              <Label>Slug *</Label>
               <Input
-                id="Slug"
                 placeholder="ai-conference-2026"
                 {...register("Slug")}
                 className={errors.Slug ? "border-destructive" : ""}
@@ -332,9 +344,8 @@ export function EditEventForm({ eventId }: { eventId: string }) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="Subtitle">Phụ đề</Label>
+            <Label>Phụ đề</Label>
             <Input
-              id="Subtitle"
               placeholder="Mô tả ngắn hiển thị bên dưới tên"
               {...register("Subtitle")}
             />
@@ -371,9 +382,8 @@ export function EditEventForm({ eventId }: { eventId: string }) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="AgeRestriction">Độ tuổi tối thiểu</Label>
+            <Label>Độ tuổi tối thiểu</Label>
             <Input
-              id="AgeRestriction"
               type="number"
               min={0}
               {...register("AgeRestriction", { valueAsNumber: true })}
@@ -382,9 +392,8 @@ export function EditEventForm({ eventId }: { eventId: string }) {
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="StartTime">Thời gian bắt đầu *</Label>
+              <Label>Thời gian bắt đầu *</Label>
               <Input
-                id="StartTime"
                 type="datetime-local"
                 {...register("StartTime")}
                 className={errors.StartTime ? "border-destructive" : ""}
@@ -394,9 +403,8 @@ export function EditEventForm({ eventId }: { eventId: string }) {
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="EndTime">Thời gian kết thúc *</Label>
+              <Label>Thời gian kết thúc *</Label>
               <Input
-                id="EndTime"
                 type="datetime-local"
                 {...register("EndTime")}
                 className={errors.EndTime ? "border-destructive" : ""}
@@ -409,18 +417,16 @@ export function EditEventForm({ eventId }: { eventId: string }) {
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="OpenTime">Giờ mở cửa </Label>
+              <Label>Giờ mở cửa </Label>
               <Input
-                id="OpenTime"
                 type="time"
                 placeholder="HH:mm"
                 {...register("OpenTime")}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="ClosedTime">Giờ đóng cửa </Label>
+              <Label>Giờ đóng cửa </Label>
               <Input
-                id="ClosedTime"
                 type="time"
                 placeholder="HH:mm"
                 {...register("ClosedTime")}
@@ -437,9 +443,8 @@ export function EditEventForm({ eventId }: { eventId: string }) {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="Description">Mô tả *</Label>
+            <Label>Mô tả *</Label>
             <Textarea
-              id="Description"
               placeholder="Mô tả chi tiết về sự kiện"
               rows={6}
               {...register("Description")}
@@ -515,21 +520,36 @@ export function EditEventForm({ eventId }: { eventId: string }) {
                   </Button>
                 )}
               </div>
-              <div className="space-y-2">
-                <Label>Địa chỉ *</Label>
-                <AddressAutocompleteInput
-                  value={watch(`Locations.${i}.Address`)}
-                  onChange={(result) => {
-                    setValue(`Locations.${i}.Address`, result.address);
-                    setValue(`Locations.${i}.Latitude`, result.latitude);
-                    setValue(`Locations.${i}.Longitude`, result.longitude);
-                  }}
-                  placeholder="Tìm địa chỉ (gõ để gợi ý)"
-                  error={!!errors.Locations?.[i]?.Address}
-                />
-                {errors.Locations?.[i]?.Address && (
-                  <p className="text-sm text-destructive">{String(errors.Locations[i]?.Address?.message ?? "")}</p>
-                )}
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Tên địa điểm (Ví dụ: Trung tâm triển lãm, White Palace...)</Label>
+                  <Input
+                    placeholder="Nhập tên địa điểm"
+                    {...register(`Locations.${i}.Name`)}
+                  />
+                  {errors.Locations?.[i]?.Name && (
+                    <p className="text-sm text-red-500 font-medium mt-1">{String(errors.Locations[i]?.Name?.message ?? "")}</p>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <Label>Địa chỉ *</Label>
+                  <AddressAutocompleteInput
+                    value={watch(`Locations.${i}.Address`)}
+                    onChange={(result) => {
+                      setValue(`Locations.${i}.Address`, result.address);
+                      setValue(`Locations.${i}.Province`, result.province || "");
+                      setValue(`Locations.${i}.District`, result.district || "");
+                      setValue(`Locations.${i}.Ward`, result.ward || "");
+                      setValue(`Locations.${i}.Latitude`, result.latitude);
+                      setValue(`Locations.${i}.Longitude`, result.longitude);
+                    }}
+                    placeholder="Tìm địa chỉ (gõ để gợi ý)"
+                    error={!!errors.Locations?.[i]?.Address}
+                  />
+                  {errors.Locations?.[i]?.Address && (
+                    <p className="text-sm text-red-500 font-medium mt-1">{String(errors.Locations[i]?.Address?.message ?? "")}</p>
+                  )}
+                </div>
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">

@@ -31,9 +31,12 @@ export const useEvent = () => {
     });
     const update = useMutation({
         mutationFn: async ({ id, body }: { id: string; body: EventUpdateBody }) => (await eventRequest.update(id, body)).data,
-        onSuccess: () => {
+        onSuccess: (_, variables) => {
             toast.success("Event updated successfully");
             queryClient.invalidateQueries({ queryKey: KEY.events });
+            if (variables.id) {
+                queryClient.invalidateQueries({ queryKey: QUERY_KEY.events.detail(variables.id) });
+            }
         },
     });
     const updateStatus = useMutation({

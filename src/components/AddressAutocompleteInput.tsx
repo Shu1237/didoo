@@ -3,18 +3,33 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import envconfig from "../../config";
-import { MapPin, Loader2 } from "lucide-react";
+import { MapPin, Loader2, Navigation } from "lucide-react";
 
-export interface MapboxFeature {
-  place_name: string;
-  center: [number, number]; // [lng, lat]
+// --- CHỖ NHÉT KEY CỦA BẠN ---
+const GOONG_API_KEY = "gGZrdLC21Off63di237Ldiy17egCN6EeSD3KsUcA"; 
+
+// --- Interfaces ---
+export interface GoongSuggestion {
+  description: string;
+  place_id: string;
+  structured_formatting: {
+    main_text: string;
+    secondary_text: string;
+  };
+  compound?: {
+    province?: string;
+    district?: string;
+    commune?: string;
+  };
 }
 
 export interface AddressResult {
   address: string;
   latitude: number;
   longitude: number;
+  province?: string;
+  district?: string;
+  ward?: string;
 }
 
 interface AddressAutocompleteInputProps {
@@ -32,40 +47,55 @@ const DEBOUNCE_MS = 300;
 export function AddressAutocompleteInput({
   value,
   onChange,
-  placeholder = "Tìm địa chỉ...",
+  placeholder = "Nhập số nhà, tên đường...",
   error = false,
   className,
   disabled = false,
   id,
 }: AddressAutocompleteInputProps) {
   const [inputValue, setInputValue] = useState(value ?? "");
-  const [suggestions, setSuggestions] = useState<MapboxFeature[]>([]);
+  const [suggestions, setSuggestions] = useState<GoongSuggestion[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const [highlightIndex, setHighlightIndex] = useState(-1);
+  const [isGettingLocation, setIsGettingLocation] = useState(false);
+  
   const containerRef = useRef<HTMLDivElement>(null);
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Sync external value
   useEffect(() => {
     setInputValue(value ?? "");
   }, [value]);
 
+  // 1. Tìm kiếm gợi ý
   const fetchSuggestions = useCallback(async (query: string) => {
-    const token = envconfig.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
-    if (!token || !query.trim()) {
+    if (!GOONG_API_KEY || !query.trim()) {
       setSuggestions([]);
       return;
     }
+
     setIsLoading(true);
     try {
-      const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${token}&autocomplete=true&country=vn&limit=5`;
+      const url = `https://rsapi.goong.io/Place/AutoComplete?api_key=${GOONG_API_KEY}&input=${encodeURIComponent(query)}`;
+      console.log("🔍 Fetching suggestions from Goong:", query);
       const res = await fetch(url);
+
+      if (!res.ok) {
+        console.error("Goong API error:", res.status, res.statusText);
+        setSuggestions([]);
+        return;
+      }
+
       const data = await res.json();
-      const features: MapboxFeature[] = data.features ?? [];
-      setSuggestions(features);
-      setHighlightIndex(-1);
-    } catch {
+      console.log("📍 Goong response:", data);
+
+      if (data.status === "OK") {
+        setSuggestions(data.predictions || []);
+      } else {
+        console.warn("Goong API status not OK:", data.status);
+        setSuggestions([]);
+      }
+    } catch (err) {
+      console.error("Goong Autocomplete Error:", err);
       setSuggestions([]);
     } finally {
       setIsLoading(false);
@@ -75,6 +105,8 @@ export function AddressAutocompleteInput({
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const v = e.target.value;
     setInputValue(v);
+    // Cập nhật form khi nhập tay
+    onChange({ address: v, latitude: 0, longitude: 0, province: "", district: "", ward: "" });
     if (debounceRef.current) clearTimeout(debounceRef.current);
     if (!v.trim()) {
       setSuggestions([]);
@@ -84,98 +116,166 @@ export function AddressAutocompleteInput({
     debounceRef.current = setTimeout(() => {
       fetchSuggestions(v);
       setIsOpen(true);
-      debounceRef.current = null;
     }, DEBOUNCE_MS);
   };
 
-  const selectSuggestion = (feature: MapboxFeature) => {
-    const [lng, lat] = feature.center;
-    setInputValue(feature.place_name);
-    setSuggestions([]);
+  // 2. Lấy tọa độ và địa chỉ chi tiết (Dùng Place Detail để có số nhà chuẩn)
+  const selectSuggestion = async (suggestion: GoongSuggestion) => {
+    setIsLoading(true);
     setIsOpen(false);
-    onChange({
-      address: feature.place_name,
-      latitude: lat,
-      longitude: lng,
-    });
-  };
+    try {
+      const detailUrl = `https://rsapi.goong.io/Place/Detail?api_key=${GOONG_API_KEY}&place_id=${suggestion.place_id}`;
+      const res = await fetch(detailUrl);
+      const data = await res.json();
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (!isOpen || suggestions.length === 0) return;
-    if (e.key === "ArrowDown") {
-      e.preventDefault();
-      setHighlightIndex((i) => (i < suggestions.length - 1 ? i + 1 : i));
-    } else if (e.key === "ArrowUp") {
-      e.preventDefault();
-      setHighlightIndex((i) => (i > 0 ? i - 1 : -1));
-    } else if (e.key === "Enter" && highlightIndex >= 0 && suggestions[highlightIndex]) {
-      e.preventDefault();
-      selectSuggestion(suggestions[highlightIndex]);
-    } else if (e.key === "Escape") {
-      setIsOpen(false);
-      setHighlightIndex(-1);
+      if (data.status === "OK" && data.result) {
+        const { lat, lng } = data.result.geometry.location;
+        const fullAddress = data.result.formatted_address;
+
+        console.log("📍 Place Detail response:", JSON.stringify(data.result, null, 2));
+
+        // Parse province/district/ward từ Place Detail response
+        // Ưu tiên: address_components > compound của suggestion
+        let province = "";
+        let district = "";
+        let ward = "";
+
+        // Thử parse từ address_components (nếu có)
+        if (data.result.address_components && Array.isArray(data.result.address_components)) {
+          for (const comp of data.result.address_components) {
+            const types = comp.types || [];
+            if (types.includes("administrative_area_level_1")) {
+              province = comp.long_name || "";
+            } else if (types.includes("administrative_area_level_2")) {
+              district = comp.long_name || "";
+            } else if (types.includes("administrative_area_level_3") || types.includes("ward")) {
+              ward = comp.long_name || "";
+            }
+          }
+          console.log("📍 Parsed from address_components:", { province, district, ward });
+        }
+
+        // Nếu không có address_components hoặc không parse được, dùng compound từ suggestion
+        if (!province && suggestion.compound?.province) {
+          province = suggestion.compound.province;
+          district = suggestion.compound.district || "";
+          ward = suggestion.compound.commune || "";
+          console.log("📍 Using compound from suggestion:", { province, district, ward });
+        }
+
+        // Chuẩn hóa tên tỉnh/thành phố
+        if (province) {
+          // Loại bỏ "Thành phố " hoặc "Tỉnh " prefix
+          province = province.replace(/^(Thành phố|Tỉnh)\s+/i, "").trim();
+        }
+
+        setInputValue(fullAddress);
+        setSuggestions([]);
+        onChange({
+          address: fullAddress,
+          latitude: lat,
+          longitude: lng,
+          province,
+          district,
+          ward,
+        });
+      }
+    } catch (error) {
+      console.error("Goong Detail Error:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  // Close on click outside
+  // 3. Định vị hiện tại
+  const getCurrentLocation = () => {
+    if (!navigator.geolocation) return alert("Trình duyệt không hỗ trợ");
+    setIsGettingLocation(true);
+    navigator.geolocation.getCurrentPosition(async (pos) => {
+      const { latitude, longitude } = pos.coords;
+      try {
+        const res = await fetch(`https://rsapi.goong.io/Geocode?latlng=${latitude},${longitude}&api_key=${GOONG_API_KEY}`);
+        const data = await res.json();
+        if (data.results?.[0]) {
+          const result = data.results[0];
+          const addr = result.formatted_address;
+
+          // Parse address components
+          let province = "";
+          let district = "";
+          let ward = "";
+
+          if (result.address_components) {
+            for (const comp of result.address_components) {
+              if (comp.types?.includes("administrative_area_level_1")) {
+                province = comp.long_name;
+              } else if (comp.types?.includes("administrative_area_level_2")) {
+                district = comp.long_name;
+              } else if (comp.types?.includes("ward") || comp.types?.includes("administrative_area_level_3")) {
+                ward = comp.long_name;
+              }
+            }
+          }
+
+          setInputValue(addr);
+          onChange({ address: addr, latitude, longitude, province, district, ward });
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setIsGettingLocation(false);
+      }
+    }, () => setIsGettingLocation(false));
+  };
+
+  // Đóng dropdown khi click ra ngoài
   useEffect(() => {
     const handler = (e: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-        setIsOpen(false);
-      }
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) setIsOpen(false);
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
   return (
-    <div ref={containerRef} className="relative">
+    <div ref={containerRef} className="relative w-full">
       <div className="relative">
-        <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400 pointer-events-none" />
+        <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
         <Input
           id={id}
-          type="text"
           value={inputValue}
           onChange={handleInputChange}
           onFocus={() => suggestions.length > 0 && setIsOpen(true)}
-          onKeyDown={handleKeyDown}
           placeholder={placeholder}
           disabled={disabled}
-          autoComplete="off"
-          className={cn(
-            "pl-9 pr-9",
-            error && "border-destructive",
-            className
-          )}
+          className={cn("pl-9 pr-10", error && "border-red-500", className)}
         />
-        {isLoading && (
-          <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400 animate-spin" />
-        )}
+        <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
+          {isLoading && <Loader2 className="h-4 w-4 animate-spin text-zinc-400" />}
+          <button type="button" onClick={getCurrentLocation} className="text-zinc-400 hover:text-zinc-600">
+            {isGettingLocation ? <Loader2 className="h-4 w-4 animate-spin" /> : <Navigation className="h-4 w-4" />}
+          </button>
+        </div>
       </div>
 
-      {isOpen && suggestions.length > 0 && (
-        <ul
-          className="absolute z-50 mt-1 w-full rounded-lg border border-zinc-200 bg-white shadow-lg py-1 max-h-60 overflow-auto"
-          role="listbox"
-        >
-          {suggestions.map((feature, i) => (
-            <li
-              key={feature.place_name + i}
-              role="option"
-              aria-selected={i === highlightIndex}
-              className={cn(
-                "cursor-pointer px-3 py-2 text-sm hover:bg-zinc-100",
-                i === highlightIndex && "bg-zinc-100"
-              )}
-              onMouseEnter={() => setHighlightIndex(i)}
-              onClick={() => selectSuggestion(feature)}
-            >
-              <span className="flex items-center gap-2">
-                <MapPin className="h-3.5 w-3.5 shrink-0 text-zinc-400" />
-                {feature.place_name}
-              </span>
-            </li>
-          ))}
+      {isOpen && (
+        <ul className="absolute z-50 mt-1 w-full rounded-md border bg-white shadow-md max-h-60 overflow-auto py-1">
+          {isLoading ? (
+            <li className="px-3 py-2 text-sm text-zinc-400">Đang tìm kiếm...</li>
+          ) : suggestions.length > 0 ? (
+            suggestions.map((s) => (
+              <li
+                key={s.place_id}
+                className="px-3 py-2 text-sm hover:bg-zinc-100 cursor-pointer flex flex-col"
+                onClick={() => selectSuggestion(s)}
+              >
+                <span className="font-medium text-zinc-900">{s.structured_formatting.main_text}</span>
+                <span className="text-xs text-zinc-500">{s.structured_formatting.secondary_text}</span>
+              </li>
+            ))
+          ) : inputValue.trim() ? (
+            <li className="px-3 py-2 text-sm text-zinc-400">Không tìm thấy địa chỉ. Kiểm tra API key Goong.</li>
+          ) : null}
         </ul>
       )}
     </div>

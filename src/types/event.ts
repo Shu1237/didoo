@@ -1,5 +1,6 @@
 import { CategoryStatus, EventStatus, InteractionType, OrganizerStatus } from "@/utils/enum";
 import { BasePaginationQuery } from "./base";
+import { TicketType } from "./ticket";
 
 /** Match BE EventGetListQuery */
 export interface EventGetListQuery extends BasePaginationQuery {
@@ -19,6 +20,7 @@ export interface EventGetListQuery extends BasePaginationQuery {
     hasCategory?: boolean;
     hasOrganizer?: boolean;
     hasLocations?: boolean;
+    hasTicketTypes?: boolean;
 }
 
 export interface EventTag {
@@ -28,11 +30,16 @@ export interface EventTag {
 /** Match BE EventEventLocationDTO */
 export interface EventLocation {
     id?: string;
-    name: string;
+    name?: string;
     address: string;
     province?: string;
+    district?: string;
+    ward?: string;
+    zipcode?: string;
     latitude?: number;
     longitude?: number;
+    contactEmail?: string;
+    contactPhone?: string;
 }
 
 /** Match BE EventDTO */
@@ -55,6 +62,7 @@ export interface Event {
     category?: Category;
     organizer?: Organizer;
     locations?: EventLocation[];
+    ticketTypes?: TicketType[];
 
 }
 

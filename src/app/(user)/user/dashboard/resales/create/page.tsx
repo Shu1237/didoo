@@ -172,7 +172,7 @@ export default function CreateResalePage() {
       }
 
       const payload = ticketListingCreateSchema.parse({
-        ticketId: values.ticketIds,
+        ticketIds: values.ticketIds,
         sellerUserId: user.id,
         askingPrice: Number(values.askingPrice),
         description: values.description?.trim() || undefined,

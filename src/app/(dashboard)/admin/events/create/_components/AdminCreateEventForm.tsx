@@ -442,6 +442,10 @@ export function AdminCreateEventForm() {
                     setValue(`Locations.${i}.Address`, result.address);
                     setValue(`Locations.${i}.Latitude`, result.latitude);
                     setValue(`Locations.${i}.Longitude`, result.longitude);
+                    // Populate province/district/ward from Mapbox
+                    if (result.province) setValue(`Locations.${i}.Province`, result.province);
+                    if (result.district) setValue(`Locations.${i}.District`, result.district);
+                    if (result.ward) setValue(`Locations.${i}.Ward`, result.ward);
                   }}
                   placeholder="Tìm địa chỉ (gõ để gợi ý)"
                   error={!!errors.Locations?.[i]?.Address}

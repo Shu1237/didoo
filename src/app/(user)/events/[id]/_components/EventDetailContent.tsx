@@ -63,12 +63,8 @@ export default function EventDetailContent({
   ticketTypes,
   eventRelated = [],
 }: EventDetailContentProps) {
-  const [activeTab, setActiveTab] = useState<TabId>("details");
-
   const { data: orgData } = useGetOrganizer(event.organizer?.id || "");
   const organizer = orgData?.data;
-  const orgImage =
-    organizer?.bannerUrl || organizer?.logoUrl || event.organizer?.logoUrl || FALLBACK_ORGANIZER_IMAGE;
 
   const minPrice =
     ticketTypes.length > 0
@@ -95,7 +91,7 @@ export default function EventDetailContent({
   };
 
   const quickInfoItems = [
-    { label: "Thể loại", value: event.category?.name || "Sự kiện chung", icon: Tag },
+    { label: "Thể loại", value: event.category?.name || "Sự kiện", icon: Tag },
     {
       label: "Độ tuổi",
       value: event.ageRestriction > 0 ? `${event.ageRestriction}+` : "Mọi lứa tuổi",
@@ -109,296 +105,200 @@ export default function EventDetailContent({
     },
   ];
 
-  const tabs: { id: TabId; label: string }[] = [
-    { id: "details", label: "Chi tiết" },
-    { id: "venue", label: "Địa điểm" },
-  ];
-
-  const handleTabClick = (tabId: TabId) => {
-    setActiveTab(tabId);
-    if (tabId === "venue" && event.locations?.length) {
-      setTimeout(() => {
-        document.getElementById("event-map")?.scrollIntoView({ behavior: "smooth" });
-      }, 100);
-    }
-  };
-
   const SectionHeading = ({ children }: { children: React.ReactNode }) => (
-    <h2 className="flex items-center gap-2 text-xl font-bold text-zinc-900">
-      <span className="h-6 w-1 rounded-full bg-primary" />
+    <h2 className="flex items-center gap-2 text-lg font-bold text-zinc-900 mb-4">
+      <span className="h-5 w-1 rounded-full bg-[#FF8A3D]" />
       {children}
     </h2>
   );
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-      {/* Breadcrumbs */}
-      <nav className="mb-8 flex items-center gap-2 text-sm text-zinc-500">
-        <Link href="/" className="hover:text-primary transition-colors">
-          Trang chủ
-        </Link>
-        <ChevronRight className="h-4 w-4" />
-        <Link
-          href={`/events?categoryId=${event.category?.id || ""}`}
-          className="hover:text-primary transition-colors"
-        >
-          {event.category?.name || "Sự kiện"}
-        </Link>
-        <ChevronRight className="h-4 w-4" />
-        <span className="text-zinc-900 font-medium truncate max-w-[200px]">{event.name}</span>
-      </nav>
-
-      <div className="grid gap-8 lg:grid-cols-12 lg:gap-10">
-        {/* Left: Tabs + Content */}
-        <div className="lg:col-span-7 xl:col-span-8">
-          {/* Tabs */}
-          <div className="border-b border-zinc-200">
-            <nav className="-mb-px flex gap-8">
-              {tabs.map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => handleTabClick(tab.id)}
-                  className={`border-b-2 py-4 text-sm font-semibold transition-colors ${
-                    activeTab === tab.id
-                      ? "border-primary text-primary"
-                      : "border-transparent text-zinc-500 hover:border-zinc-300 hover:text-zinc-700"
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              ))}
-            </nav>
+    <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+      <div className="grid gap-8 lg:grid-cols-12">
+        {/* Left: Main Content */}
+        <div className="lg:col-span-8 space-y-12">
+          {/* Quick Info Grid (Original Style) */}
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+            {quickInfoItems.map((item) => (
+              <div
+                key={item.label}
+                className="rounded-2xl border border-zinc-100 bg-white p-4 shadow-sm"
+              >
+                <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-zinc-50 text-zinc-500">
+                  <item.icon className="h-5 w-5" />
+                </div>
+                <p className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">
+                  {item.label}
+                </p>
+                <p className={`mt-0.5 text-sm font-bold ${item.label === "Trạng thái" ? "text-primary" : "text-zinc-900"}`}>
+                  {item.value}
+                </p>
+              </div>
+            ))}
           </div>
 
-          {activeTab === "details" && (
-            <motion.div
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="space-y-8 pt-8"
-            >
-              {/* Quick info - 4 cards */}
-              <div className="grid grid-cols-2 gap-4">
-                {quickInfoItems.map((item) => (
-                  <div
-                    key={item.label}
-                    className="flex items-center gap-4 rounded-xl border border-zinc-200 bg-white p-4"
-                  >
-                    <div
-                      className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${
-                        item.label === "Trạng thái"
-                          ? "bg-primary/10 text-primary"
-                          : "bg-zinc-100 text-zinc-600"
-                      }`}
-                    >
-                      <item.icon className="h-5 w-5" />
-                    </div>
-                    <div>
-                      <p className="text-[10px] font-bold uppercase tracking-wider text-zinc-500">
-                        {item.label}
-                      </p>
-                      <p
-                        className={`font-semibold ${
-                          item.label === "Trạng thái" ? "text-primary" : "text-zinc-900"
-                        }`}
-                      >
-                        {item.value}
-                      </p>
-                    </div>
+          {/* Location Summary & Map - Kept at Top per user request 'chỉ đổi cái chỗ th' */}
+          <section id="event-map" className="space-y-6">
+            <SectionHeading>Địa điểm</SectionHeading>
+            <div className="space-y-4">
+              <div className="rounded-2xl border border-zinc-200 bg-zinc-50/50 p-6">
+                <div className="flex items-start gap-4">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white shadow-sm border border-zinc-100 text-[#FF8A3D]">
+                    <MapPin className="h-6 w-6" />
                   </div>
+                  <div className="min-w-0">
+                    <p className="text-xl font-bold text-zinc-900 leading-tight">
+                      {event.locations?.[0]?.name || "Địa điểm chưa xác định"}
+                    </p>
+                    <p className="mt-2 text-base text-zinc-500 leading-relaxed">
+                      {event.locations?.[0]?.address || "Thông tin địa chỉ đang được cập nhật"}
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div className="rounded-2xl border border-zinc-200 overflow-hidden shadow-md h-[400px]">
+                <EventLocation event={event} />
+              </div>
+            </div>
+          </section>
+
+          {/* Description Section */}
+          <section>
+            <SectionHeading>Về sự kiện</SectionHeading>
+            <div className="prose prose-zinc max-w-none">
+              <p className="whitespace-pre-line text-sm leading-relaxed text-zinc-600">
+                {event.description}
+              </p>
+            </div>
+            {event.subtitle && (
+              <div className="mt-4 rounded-xl border border-amber-100 bg-amber-50/50 px-4 py-3">
+                <p className="text-xs font-medium text-zinc-700">{event.subtitle}</p>
+              </div>
+            )}
+            {event.tags && event.tags.length > 0 && (
+              <div className="mt-4 flex flex-wrap gap-1.5">
+                {event.tags.map((tag, i) => (
+                  <span
+                    key={`${tag.tagName}-${i}`}
+                    className="rounded-lg border border-zinc-100 bg-zinc-50 px-2.5 py-1 text-xs font-medium text-zinc-500"
+                  >
+                    #{tag.tagName}
+                  </span>
                 ))}
               </div>
+            )}
+          </section>
 
-              {/* Về sự kiện */}
-              <div>
-                <SectionHeading>Về sự kiện</SectionHeading>
-                <p className="mt-4 whitespace-pre-line text-base leading-relaxed text-zinc-600">
-                  {event.description}
-                </p>
-                {event.subtitle && (
-                  <div className="mt-4 rounded-xl border border-primary/20 bg-primary/5 px-4 py-3">
-                    <p className="text-sm font-medium text-zinc-800">{event.subtitle}</p>
-                  </div>
-                )}
-                {event.tags && event.tags.length > 0 && (
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    {event.tags.map((tag, i) => (
-                      <span
-                        key={`${tag.tagName}-${i}`}
-                        className="rounded-full border border-zinc-200 bg-zinc-50 px-3 py-1 text-sm font-medium text-zinc-600"
-                      >
-                        #{tag.tagName}
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* Nhà tổ chức */}
-              <div>
-                <SectionHeading>Nhà tổ chức</SectionHeading>
-                <Link
-                  href={`/organizers/${event.organizer?.id || ""}`}
-                  className="mt-4 flex items-center gap-4 rounded-2xl border border-zinc-200 bg-white p-5 transition hover:border-primary/30 hover:shadow-md"
-                >
-                  <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                    <Building2 className="h-7 w-7" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <h3 className="font-bold text-zinc-900">
-                      {organizer?.name || event.organizer?.name || "Organizer"}
-                    </h3>
-                    <p className="mt-1 line-clamp-2 text-sm text-zinc-600">
-                      {organizer?.description || "Nhà tổ chức sự kiện"}
-                    </p>
-                    <span className="mt-2 inline-flex items-center gap-1 text-sm font-medium text-primary">
-                      Xem trang cá nhân
-                      <ChevronRight className="h-4 w-4" />
-                    </span>
-                  </div>
-                  <ArrowUpRight className="h-5 w-5 shrink-0 text-zinc-400" />
-                </Link>
-              </div>
-            </motion.div>
-          )}
-
-          {activeTab === "venue" && (
-            <motion.div
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="pt-8"
+          {/* Organizer Section */}
+          <section>
+            <SectionHeading>Nhà tổ chức</SectionHeading>
+            <Link
+              href={`/organizers/${event.organizer?.id || ""}`}
+              className="flex items-center gap-4 rounded-xl border border-zinc-200 bg-white p-4 transition-shadow hover:shadow-md group"
             >
-              <div className="rounded-2xl border border-zinc-200 bg-zinc-50 p-6">
-                <h3 className="font-semibold text-zinc-900">Địa điểm sự kiện</h3>
-                <p className="mt-2 text-sm text-zinc-600">
-                  Xem bản đồ bên dưới để biết vị trí chính xác và chỉ đường.
-                </p>
-                <p className="mt-4 text-sm font-medium text-zinc-900">
-                  {event.locations?.[0]?.name || event.locations?.[0]?.address || "Đang cập nhật"}
-                </p>
-                <p className="mt-1 text-sm text-zinc-500">
-                  {event.locations?.[0]?.address}
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-zinc-50 text-zinc-500">
+                <Building2 className="h-6 w-6" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <h3 className="text-sm font-bold text-zinc-900 group-hover:text-primary transition-colors">
+                  {organizer?.name || event.organizer?.name || "Nhà tổ chức"}
+                </h3>
+                <p className="mt-0.5 line-clamp-1 text-xs text-zinc-500 italic">
+                  {organizer?.description || "Bấm để xem thêm thông tin về nhà tổ chức"}
                 </p>
               </div>
-            </motion.div>
-          )}
+              <ArrowUpRight className="h-4 w-4 shrink-0 text-zinc-300 group-hover:text-primary transition-colors" />
+            </Link>
+          </section>
         </div>
 
         {/* Right: Sidebar */}
-        <aside className="lg:col-span-5 xl:col-span-4 space-y-6">
-          {/* Ticket card */}
-          <div className="sticky top-24 space-y-6">
-            <div className="relative rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm overflow-hidden">
-              {ticketTypes.length > 0 && minPrice > 0 && (
-                <span className="absolute right-4 top-4 rounded-lg bg-primary px-3 py-1 text-[10px] font-bold uppercase text-white">
-                  Sale off
-                </span>
-              )}
-              <p className="text-[10px] font-bold uppercase tracking-wider text-zinc-500">
-                Giá vé từ
-              </p>
-              <p className="mt-1 text-3xl font-black text-zinc-900">
-                {ticketTypes.length > 0
-                  ? `${minPrice.toLocaleString("vi-VN")}₫`
-                  : "Liên hệ"}
-              </p>
+        <aside className="lg:col-span-4">
+          <div className="sticky top-24 space-y-8">
+            {/* Ticket Card */}
+            <div className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
+              <div className="mb-4">
+                <span className="text-xs font-bold uppercase tracking-wider text-zinc-400">Giá vé từ</span>
+                <div className="mt-1 flex items-baseline gap-1">
+                  <span className="text-3xl font-black text-zinc-900">
+                    {ticketTypes.length > 0 ? minPrice.toLocaleString("vi-VN") : "---"}
+                  </span>
+                  <span className="text-lg font-bold text-zinc-900">₫</span>
+                </div>
+              </div>
+
               {totalTickets > 0 && (
-                <p className="mt-2 text-sm text-zinc-600">
-                  Đã bán: {soldTickets.toLocaleString("vi-VN")}/{totalTickets.toLocaleString("vi-VN")} vé
-                </p>
+                <div className="space-y-1.5 mb-6">
+                  <div className="flex justify-between items-end">
+                    <span className="text-xs font-medium text-zinc-500">Đã bán {Math.round((soldTickets / totalTickets) * 100)}%</span>
+                    <span className="text-xs font-bold text-zinc-900">{soldTickets}/{totalTickets}</span>
+                  </div>
+                  <div className="h-1.5 w-full bg-zinc-100 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-primary rounded-full transition-all duration-500"
+                      style={{ width: `${(soldTickets / totalTickets) * 100}%` }}
+                    />
+                  </div>
+                </div>
               )}
+
               {ticketTypes.length > 0 ? (
                 <Button
                   asChild
-                  className="mt-6 h-14 w-full rounded-xl text-base font-semibold shadow-lg shadow-primary/20"
+                  className="h-12 w-full rounded-xl bg-primary hover:bg-primary/90 text-white font-bold"
                 >
                   <Link href={`/events/${event.id}/booking`}>
-                    <ShoppingCart className="mr-2 h-5 w-5" />
-                    Chọn vé ngay
+                    Mua vé ngay
                   </Link>
                 </Button>
               ) : (
-                <p className="mt-6 text-sm text-zinc-500">Sự kiện chưa mở bán vé.</p>
+                <div className="p-4 rounded-lg bg-zinc-50 text-center">
+                  <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest">Chưa mở bán</p>
+                </div>
               )}
-              <div className="mt-4 flex gap-3">
-                <Button variant="outline" size="sm" className="flex-1 rounded-xl">
-                  <Heart className="mr-2 h-4 w-4" />
+
+              <div className="mt-4 flex gap-2">
+                <Button variant="outline" className="flex-1 h-10 rounded-lg text-xs font-bold hover:bg-zinc-50">
+                  <Heart className="mr-2 h-3.5 w-3.5" />
                   Lưu
                 </Button>
                 <Button
                   variant="outline"
-                  size="sm"
-                  className="flex-1 rounded-xl"
+                  className="flex-1 h-10 rounded-lg text-xs font-bold hover:bg-zinc-50"
                   onClick={handleShare}
                 >
-                  <Share2 className="mr-2 h-4 w-4" />
+                  <Share2 className="mr-2 h-3.5 w-3.5" />
                   Chia sẻ
                 </Button>
               </div>
             </div>
 
-            {/* Địa điểm tổ chức */}
-            <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
-              <SectionHeading>Địa điểm tổ chức</SectionHeading>
-              <div className="mt-4">
-                <button
-                  type="button"
-                  onClick={() =>
-                    document.getElementById("event-map")?.scrollIntoView({ behavior: "smooth" })
-                  }
-                  className="relative block w-full aspect-video overflow-hidden rounded-xl border border-zinc-200 bg-zinc-100 group"
-                >
-                  <div className="absolute inset-0 flex items-center justify-center bg-zinc-200/80">
-                    <MapPin className="h-12 w-12 text-zinc-400" />
-                  </div>
-                  <div className="absolute inset-0 flex items-center justify-center bg-zinc-900/40 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <span className="rounded-lg bg-white px-4 py-2 text-sm font-semibold text-zinc-900">
-                      Xem bản đồ
-                    </span>
-                  </div>
-                </button>
-                <p className="mt-3 text-sm text-zinc-600 line-clamp-2">
-                  {event.locations?.[0]?.address || "Đang cập nhật địa chỉ"}
-                </p>
-              </div>
-            </div>
-
-            {/* Sự kiện tương tự */}
+            {/* Similar Events */}
             {eventRelated.length > 0 && (
-              <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
+              <div className="space-y-4">
                 <SectionHeading>Sự kiện tương tự</SectionHeading>
-                <div className="mt-4 space-y-4">
+                <div className="grid gap-4">
                   {eventRelated.slice(0, 3).map((ev) => (
                     <Link
                       key={ev.id}
                       href={`/events/${ev.id}`}
-                      className="flex gap-4 rounded-xl border border-zinc-200 p-3 transition hover:border-primary/30 hover:shadow-sm"
+                      className="flex gap-4 rounded-xl border border-zinc-100 bg-white p-3 transition-shadow hover:shadow-md group"
                     >
-                      <div className="relative h-16 w-20 shrink-0 overflow-hidden rounded-lg bg-zinc-100">
+                      <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-zinc-100">
                         <Image
-                          src={
-                            ev.thumbnailUrl ||
-                            ev.bannerUrl ||
-                            FALLBACK_EVENT_IMAGE
-                          }
+                          src={ev.thumbnailUrl || ev.bannerUrl || FALLBACK_EVENT_IMAGE}
                           alt={ev.name}
                           fill
-                          className="object-cover"
-                          sizes="80px"
+                          className="object-cover transition-transform group-hover:scale-105"
                         />
                       </div>
-                      <div className="min-w-0 flex-1">
-                        <h4 className="font-semibold text-zinc-900 line-clamp-2 text-sm">
+                      <div className="min-w-0 flex-1 py-1">
+                        <h4 className="text-sm font-bold text-zinc-900 line-clamp-2 leading-tight group-hover:text-primary transition-colors">
                           {ev.name}
                         </h4>
-                        <div className="mt-1 flex items-center gap-2 text-xs text-zinc-500">
-                          <CalendarDays className="h-3.5 w-3.5" />
-                          {format(new Date(ev.startTime), "dd MMM yyyy", { locale: vi })}
-                        </div>
-                        <div className="mt-0.5 flex items-center gap-2 text-xs text-zinc-500">
-                          <MapPin className="h-3.5 w-3.5" />
-                          <span className="line-clamp-1">
-                            {ev.locations?.[0]?.name || ev.locations?.[0]?.address || "TBA"}
-                          </span>
+                        <div className="mt-2 flex items-center gap-2 text-[10px] font-medium text-zinc-400">
+                          <CalendarDays className="h-3 w-3" />
+                          {format(new Date(ev.startTime), "dd/MM/yyyy", { locale: vi })}
                         </div>
                       </div>
                     </Link>
@@ -409,11 +309,25 @@ export default function EventDetailContent({
           </div>
         </aside>
       </div>
-
-      {/* Map section */}
-      <div id="event-map" className="mt-16">
-        <EventLocation event={event} />
-      </div>
     </div>
+  );
+}
+
+function ChevronDown(props: any) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="m6 9 6 6 6-6" />
+    </svg>
   );
 }

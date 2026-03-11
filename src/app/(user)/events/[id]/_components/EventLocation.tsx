@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Map, { Marker, NavigationControl } from "react-map-gl/mapbox";
-import "mapbox-gl/dist/mapbox-gl.css";
+import Map, { Marker, NavigationControl } from "react-map-gl/maplibre";
+import "maplibre-gl/dist/maplibre-gl.css";
+import maplibregl from "maplibre-gl";
 import { ArrowUpRight, MapPin, Navigation } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -42,31 +43,33 @@ export default function EventLocation({ event }: EventLocationProps) {
   useEffect(() => {
     async function resolveCoordinates() {
       setIsGeocoding(true);
-      const token = envconfig.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
+      const GOONG_API_KEY = "1kLRnoD5VyIe5cexVMp6fWAEMcAF0LyZSuA7hss5";
       const updatedLocations: ResolvedLocation[] = [];
 
       for (const loc of rawLocations) {
-        let lat = (loc as any).Latitude || loc.latitude;
-        let lng = (loc as any).Longitude || loc.longitude;
+        let lat = (loc as any).latitude ?? (loc as any).Latitude;
+        let lng = (loc as any).longitude ?? (loc as any).Longitude;
+        let addr = (loc as any).address || (loc as any).Address || "";
+        let name = (loc as any).name || (loc as any).Name || "";
 
         // If coordinates are missing/zero but we have an address, geocode it
-        if ((!lat || !lng || (lat === 0 && lng === 0)) && loc.address && token) {
+        if ((!lat || !lng || (lat === 0 && lng === 0)) && addr && GOONG_API_KEY) {
           try {
-            const res = await fetch(`https://api.mapbox.com/search/geocode/v6/forward?q=${encodeURIComponent(loc.address)}&access_token=${token}&limit=1`);
+            const res = await fetch(`https://rsapi.goong.io/Geocode?address=${encodeURIComponent(addr)}&api_key=${GOONG_API_KEY}`);
             const data = await res.json();
-            if (data.features && data.features.length > 0) {
-              const [resolvedLng, resolvedLat] = data.features[0].geometry.coordinates;
+            if (data.results && data.results.length > 0) {
+              const { lat: resolvedLat, lng: resolvedLng } = data.results[0].geometry.location;
               lat = resolvedLat;
               lng = resolvedLng;
             }
           } catch (error) {
-            console.error("Geocoding failed for address:", loc.address, error);
+            console.error("Goong geocoding failed for address:", addr, error);
           }
         }
 
         updatedLocations.push({
-          name: loc.name,
-          address: loc.address,
+          name: name,
+          address: addr,
           latitude: lat || null,
           longitude: lng || null
         });
@@ -128,20 +131,20 @@ export default function EventLocation({ event }: EventLocationProps) {
             </div>
           ) : (
             <>
-              {/* The Full Width Map Background */}
+              {/* Goong Map Implementation */}
               <Map
-                mapboxAccessToken={envconfig.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}
+                mapLib={maplibregl}
                 initialViewState={{
                   latitude: mapCenter.latitude,
                   longitude: mapCenter.longitude,
                   zoom: 14,
                 }}
-                mapStyle="mapbox://styles/mapbox/streets-v12"
+                mapStyle="https://tiles.goong.io/assets/goong_map_web.json?api_key=SnGhg9VIWX1fplbNQZkQnVNlUpsxCdViDKvUqtax"
                 style={{ width: "100%", height: "100%" }}
               >
                 <NavigationControl position="top-right" />
 
-                {resolvedLocations.map((loc) => {
+                {resolvedLocations.map((loc, idx) => {
                   const lat = loc.latitude;
                   const lng = loc.longitude;
 
@@ -149,7 +152,7 @@ export default function EventLocation({ event }: EventLocationProps) {
 
                   return (
                     <Marker
-                      key={`${loc.name}-${lat}-${lng}`}
+                      key={`${idx}-${lat}-${lng}`}
                       latitude={lat}
                       longitude={lng}
                       anchor="bottom"

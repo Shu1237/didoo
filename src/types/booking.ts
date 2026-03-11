@@ -37,6 +37,7 @@ export interface Booking {
     amount: number;
     totalPrice: number;
     status: string; // Pending, Paid, Cancelled, etc.
+    bookingType?: number; // 1 = Normal, 2 = TradePurchase
     paidAt?: string | null;
     createdAt?: string;
     updatedAt?: string | null;

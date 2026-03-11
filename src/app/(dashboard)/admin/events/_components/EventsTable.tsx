@@ -2,6 +2,7 @@
 
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useGetEvents } from "@/hooks/useEvent";
+import { useGetTicketTypes } from "@/hooks/useTicket";
 import {
   Table,
   TableBody,
@@ -63,6 +64,30 @@ function formatDate(s: string | undefined) {
   }
 }
 
+// Tính tổng vé đã bán và còn lại
+function getTicketStats(ticketTypes?: { totalQuantity: number; availableQuantity: number }[]) {
+  if (!ticketTypes || ticketTypes.length === 0) return { sold: 0, available: 0, total: 0 };
+  const total = ticketTypes.reduce((sum, t) => sum + (t.totalQuantity || 0), 0);
+  const available = ticketTypes.reduce((sum, t) => sum + (t.availableQuantity || 0), 0);
+  const sold = total - available;
+  return { sold, available, total };
+}
+
+// Component hiển thị vé
+function TicketCell({ eventId }: { eventId: string }) {
+  const { data: ticketRes } = useGetTicketTypes({ eventId }, { enabled: !!eventId });
+  const ticketTypes = ticketRes?.data?.items || [];
+  const { sold, available } = getTicketStats(ticketTypes);
+
+  return sold > 0 || available > 0 ? (
+    <span className="text-xs">
+      <span className="text-green-600 font-medium">{sold}</span>
+      <span className="text-zinc-400"> / </span>
+      <span className="text-zinc-600">{sold + available}</span>
+    </span>
+  ) : "—";
+}
+
 interface EventsTableProps {
   params: Record<string, string | string[] | undefined>;
   onDelete?: (event: Event) => void;
@@ -107,6 +132,7 @@ export function EventsTable({ params, onDelete, onApprove, onReject, onRestore, 
               <TableHead>Danh mục</TableHead>
               <TableHead>Organizer</TableHead>
               <TableHead>Ngày bắt đầu</TableHead>
+              <TableHead>Vé</TableHead>
               <TableHead>Trạng thái</TableHead>
               <TableHead className="w-12" />
             </TableRow>
@@ -127,6 +153,9 @@ export function EventsTable({ params, onDelete, onApprove, onReject, onRestore, 
                 <TableCell className="text-zinc-600">{e.category?.name ?? "—"}</TableCell>
                 <TableCell className="text-zinc-600">{e.organizer?.name ?? "—"}</TableCell>
                 <TableCell className="text-zinc-600">{formatDate(e.startTime)}</TableCell>
+                <TableCell className="text-zinc-600">
+                  <TicketCell eventId={e.id} />
+                </TableCell>
                 <TableCell>
                   <Badge
                     variant={

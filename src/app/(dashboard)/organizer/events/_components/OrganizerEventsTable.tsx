@@ -2,6 +2,7 @@
 
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useGetEvents } from "@/hooks/useEvent";
+import { useGetTicketTypes } from "@/hooks/useTicket";
 import {
   Table,
   TableBody,
@@ -62,6 +63,15 @@ function formatDate(s: string | undefined) {
   }
 }
 
+// Tính tổng vé đã bán và còn lại
+function getTicketStats(ticketTypes?: { totalQuantity: number; availableQuantity: number }[]) {
+  if (!ticketTypes || ticketTypes.length === 0) return { sold: 0, available: 0, total: 0 };
+  const total = ticketTypes.reduce((sum, t) => sum + (t.totalQuantity || 0), 0);
+  const available = ticketTypes.reduce((sum, t) => sum + (t.availableQuantity || 0), 0);
+  const sold = total - available;
+  return { sold, available, total };
+}
+
 export function OrganizerEventsTable({
   params,
   organizerId,
@@ -85,6 +95,21 @@ export function OrganizerEventsTable({
   const pageSize = data.data?.pageSize ?? 10;
   const totalPages = data.data?.totalPages ?? 1;
 
+  // Component hiển thị vé
+function TicketCell({ eventId }: { eventId: string }) {
+  const { data: ticketRes } = useGetTicketTypes({ eventId }, { enabled: !!eventId });
+  const ticketTypes = ticketRes?.data?.items || [];
+  const { sold, available } = getTicketStats(ticketTypes);
+
+  return sold > 0 || available > 0 ? (
+    <span className="text-xs">
+      <span className="text-green-600 font-medium">{sold}</span>
+      <span className="text-zinc-400"> / </span>
+      <span className="text-zinc-600">{sold + available}</span>
+    </span>
+  ) : "—";
+}
+
   const updateParam = (key: string, value: string) => {
     const p = new URLSearchParams(searchParams.toString());
     p.set(key, value);
@@ -102,6 +127,7 @@ export function OrganizerEventsTable({
               <TableHead>Tên</TableHead>
               <TableHead>Danh mục</TableHead>
               <TableHead>Ngày bắt đầu</TableHead>
+              <TableHead>Vé</TableHead>
               <TableHead>Trạng thái</TableHead>
               <TableHead className="w-12" />
             </TableRow>
@@ -121,6 +147,9 @@ export function OrganizerEventsTable({
                 <TableCell className="font-medium">{e.name}</TableCell>
                 <TableCell className="text-zinc-600">{e.category?.name ?? "—"}</TableCell>
                 <TableCell className="text-zinc-600">{formatDate(e.startTime)}</TableCell>
+                <TableCell className="text-zinc-600">
+                  <TicketCell eventId={e.id} />
+                </TableCell>
                 <TableCell>
                   <Badge
                     variant={

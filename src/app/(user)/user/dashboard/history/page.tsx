@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useGetMe } from "@/hooks/useAuth";
@@ -7,8 +8,10 @@ import { useGetBookings, useGetResaleTransactions } from "@/hooks/useBooking";
 import Loading from "@/components/loading";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Booking } from "@/types/booking";
 import { useGetEvent } from "@/hooks/useEvent";
+import { BookingTypeStatus } from "@/utils/enum";
 
 const FALLBACK_IMAGE =
   "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=2070&auto=format&fit=crop";
@@ -24,10 +27,19 @@ function getStatusStyle(status: string) {
   return { label: "Đã hủy", className: "bg-rose-500/10 text-rose-600 border-rose-200" };
 }
 
+function getBookingTypeStyle(bookingType?: number | string) {
+  const bt = Number(bookingType);
+  if (bt === BookingTypeStatus.TRADE_PURCHASE || bt === 2) {
+    return { label: "Mua lại", className: "bg-violet-500/10 text-violet-700 border-violet-200" };
+  }
+  return { label: "Mua trực tiếp", className: "bg-blue-500/10 text-blue-700 border-blue-200" };
+}
+
 function HistoryRow({ booking }: { booking: Booking }) {
   const { data: eventRes } = useGetEvent(booking.eventId);
   const event = eventRes?.data;
   const status = getStatusStyle(booking.status || "");
+  const bookingType = getBookingTypeStyle(booking.bookingType);
   const dateStr = booking.createdAt
     ? new Date(booking.createdAt).toLocaleDateString("vi-VN", {
         day: "2-digit",
@@ -50,7 +62,12 @@ function HistoryRow({ booking }: { booking: Booking }) {
         />
       </div>
       <div className="min-w-0 flex-1">
-        <h3 className="font-semibold text-zinc-900 truncate">{event?.name || "Sự kiện"}</h3>
+        <div className="flex flex-wrap items-center gap-2">
+          <h3 className="font-semibold text-zinc-900 truncate">{event?.name || "Sự kiện"}</h3>
+          <Badge variant="outline" className={bookingType.className}>
+            {bookingType.label}
+          </Badge>
+        </div>
         <p className="mt-1 text-sm text-zinc-500">#{booking.id?.substring(0, 8).toUpperCase()}</p>
         <p className="mt-1 text-sm text-zinc-500">{dateStr}</p>
       </div>

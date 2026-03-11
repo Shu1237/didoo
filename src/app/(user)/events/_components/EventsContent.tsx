@@ -47,24 +47,21 @@ export function EventsContent({
 
   return (
     <div className="min-w-0">
+
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-         <div></div>
+        <div />
         <div className="flex items-center gap-2">
-          <span className="text-sm text-zinc-500">Sắp xếp:</span>
+          <span className="text-sm text-zinc-500 font-medium">Sắp xếp:</span>
           <Select
             value={sortBy}
             onValueChange={(value) => onSortChange(value as SortBy)}
           >
             <SelectTrigger
-              className={`h-10 w-[170px] rounded-xl border bg-white text-sm font-medium text-zinc-900 ${
-                isResale
-                  ? "border-zinc-200 focus:ring-amber-500/20 focus:border-amber-500/5"
-                  : "border-zinc-200 focus:ring-primary/20"
-              }`}
+              className="h-10 w-[170px] rounded-xl border border-zinc-200 bg-white text-sm font-medium text-zinc-900 focus:ring-1 focus:ring-zinc-400"
             >
               <SelectValue placeholder="Sắp xếp" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="rounded-xl border-zinc-100 shadow-xl">
               <SelectItem value="featured">Nổi bật</SelectItem>
               <SelectItem value="date">Theo ngày</SelectItem>
               <SelectItem value="name">Theo tên</SelectItem>
@@ -102,7 +99,7 @@ export function EventsContent({
           </motion.div>
 
           {(totalPages > 1 || totalItems > itemsPerPage) && (
-            <div className="mt-10 py-6 border-t border-zinc-200">
+            <div className="mt-12 flex justify-center">
               <BasePagination
                 currentPage={currentPage}
                 totalPages={totalPages}
@@ -111,6 +108,8 @@ export function EventsContent({
                 onPageChange={onPageChange}
                 onPageSizeChange={onPageSizeChange}
                 pageSizeOptions={[9, 12, 18, 24]}
+                showInfo={false}
+                showSizeSelector={false}
               />
             </div>
           )}
