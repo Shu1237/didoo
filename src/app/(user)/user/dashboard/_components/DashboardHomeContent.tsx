@@ -3,8 +3,10 @@
 import Link from "next/link";
 import { Ticket, History, UserCircle, ArrowRight, CircleDollarSign } from "lucide-react";
 import { useGetMe } from "@/hooks/useAuth";
-import { useGetBookings, useGetResales, useGetResaleTransactions } from "@/hooks/useBooking";
+import { useGetBookings } from "@/hooks/useBooking";
+import { useGetTicketListings, useGetTickets } from "@/hooks/useTicket";
 import { Button } from "@/components/ui/button";
+import { BookingTypeStatus } from "@/utils/enum";
 
 export default function DashboardHomeContent() {
   const { data: meRes } = useGetMe();
@@ -14,18 +16,30 @@ export default function DashboardHomeContent() {
     { userId: user?.id, pageNumber: 1, pageSize: 5, isDescending: true },
     { enabled: !!user?.id }
   );
-  const { data: resalesRes } = useGetResales(
-    { salerUserId: user?.id || "", pageNumber: 1, pageSize: 5, isDescending: true },
+  const { data: ticketsRes } = useGetTickets(
+    { ownerId: user?.id, pageNumber: 1, pageSize: 1 },
     { enabled: !!user?.id }
   );
-  const { data: resaleTransactionsRes } = useGetResaleTransactions(
-    { buyerUserId: user?.id || "", pageNumber: 1, pageSize: 5, isDescending: true },
+  const { data: listingsRes } = useGetTicketListings(
+    { sellerUserId: user?.id, pageNumber: 1, pageSize: 5, isDescending: true },
+    { enabled: !!user?.id }
+  );
+  const { data: tradeBookingsRes } = useGetBookings(
+    user?.id
+      ? {
+          userId: user.id,
+          bookingType: BookingTypeStatus.TRADE_PURCHASE,
+          pageNumber: 1,
+          pageSize: 5,
+          isDescending: true,
+        }
+      : { pageNumber: 1, pageSize: 1 },
     { enabled: !!user?.id }
   );
   const recentBookings = bookingsRes?.data.items || [];
-  const totalBookings = bookingsRes?.data.totalItems ?? 0;
-  const totalResales = resalesRes?.data.totalItems ?? 0;
-  const recentResaleTransactions = resaleTransactionsRes?.data.items || [];
+  const totalTickets = ticketsRes?.data.totalItems ?? 0;
+  const totalResales = listingsRes?.data.totalItems ?? 0;
+  const recentResaleTransactions = tradeBookingsRes?.data.items || [];
 
   return (
     <div className="space-y-6">
@@ -46,7 +60,7 @@ export default function DashboardHomeContent() {
           </div>
           <div className="flex-1 min-w-0">
             <p className="font-semibold text-zinc-900">Vé của tôi</p>
-            <p className="text-sm text-zinc-500">{totalBookings} vé đã đặt</p>
+            <p className="text-sm text-zinc-500">{totalTickets} vé đang sở hữu</p>
           </div>
           <ArrowRight className="h-5 w-5 shrink-0 text-zinc-400 group-hover:text-primary group-hover:translate-x-1 transition-all" />
         </Link>
@@ -157,7 +171,7 @@ export default function DashboardHomeContent() {
                   <p className="text-sm text-zinc-500">{t.status}</p>
                 </div>
                 <p className="text-sm font-semibold text-zinc-900">
-                  {Number(t.cost || 0).toLocaleString("vi-VN")}đ
+                  {Number(t.totalPrice || 0).toLocaleString("vi-VN")}đ
                 </p>
               </div>
             ))}

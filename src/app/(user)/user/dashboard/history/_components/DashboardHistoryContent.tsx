@@ -26,7 +26,8 @@ function getStatusStyle(status: string) {
 
 function getBookingTypeStyle(bookingType?: number | string) {
   const bt = Number(bookingType);
-  if (bt === BookingTypeStatus.TRADE_PURCHASE || bt === 2) {
+  const btStr = String(bookingType ?? "").toLowerCase();
+  if (bt === BookingTypeStatus.TRADE_PURCHASE || bt === 2 || btStr.includes("trade")) {
     return { label: "Mua lại", className: "bg-violet-500/10 text-violet-700 border-violet-200" };
   }
   return { label: "Mua trực tiếp", className: "bg-blue-500/10 text-blue-700 border-blue-200" };

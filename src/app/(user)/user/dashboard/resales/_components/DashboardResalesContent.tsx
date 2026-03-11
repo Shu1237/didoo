@@ -15,6 +15,12 @@ import { BookingTypeStatus } from "@/utils/enum";
 import { ListingCard } from "./ListingCard";
 import { TransactionListingCard } from "./TransactionListingCard";
 
+function isTradePurchaseBooking(booking: Booking) {
+  const bt = booking.bookingType;
+  const btStr = String(bt ?? "").toLowerCase();
+  return bt === BookingTypeStatus.TRADE_PURCHASE || btStr === "2" || btStr.includes("trade");
+}
+
 export default function DashboardResalesContent() {
   const { data: meRes, isLoading: isMeLoading } = useGetMe();
   const user = meRes?.data;
@@ -39,7 +45,7 @@ export default function DashboardResalesContent() {
   );
 
   const listings = listingsRes?.data?.items ?? [];
-  const tradeBookings = tradeBookingsRes?.data?.items ?? [];
+  const tradeBookings = (tradeBookingsRes?.data?.items ?? []).filter(isTradePurchaseBooking);
   const tradeTotalPages = tradeBookingsRes?.data?.totalPages ?? 1;
 
   const txPages = useMemo(() => {

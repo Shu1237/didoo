@@ -1,8 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import Image from "next/image";
-import { ChevronRight, Ticket } from "lucide-react";
+import { Ticket } from "lucide-react";
 import { useGetEvent } from "@/hooks/useEvent";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -34,7 +33,7 @@ export function TransactionListingCard({ booking }: { booking: Booking }) {
           )}
         </div>
         <div className="flex flex-1 flex-col justify-between gap-3 p-4">
-          <div className="flex items-start justify-between gap-3">
+          <div className="flex items-start gap-3">
             <div className="space-y-2">
               <div className="flex items-center gap-2">
                 <span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500">Giao dịch</span>
@@ -46,13 +45,6 @@ export function TransactionListingCard({ booking }: { booking: Booking }) {
                 {booking.id}
               </div>
             </div>
-            <Link
-              href="#"
-              className="inline-flex items-center gap-1 text-sm font-semibold text-amber-600 hover:text-amber-700"
-            >
-              Chi tiết
-              <ChevronRight className="h-4 w-4" />
-            </Link>
           </div>
 
           <div className="grid gap-3 sm:grid-cols-4">

@@ -1,16 +1,17 @@
 "use client";
 
-import { Category } from "@/types/event";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, CalendarClock, Sparkles } from "lucide-react";
+import { Event } from "@/types/event";
 
 interface CategorySectionProps {
-  categories: Category[];
+  openedEvents: Event[];
 }
 
-export default function CategorySection({ categories }: CategorySectionProps) {
-  if (!categories?.length) return null;
+export default function CategorySection({ openedEvents }: CategorySectionProps) {
+  if (!openedEvents?.length) return null;
+  const items = openedEvents.slice(0, 3);
 
   return (
     <section className="py-12 lg:py-16 bg-white">
@@ -19,14 +20,27 @@ export default function CategorySection({ categories }: CategorySectionProps) {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-10"
+          className="mb-10 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end"
         >
-          <h2 className="text-2xl sm:text-3xl font-bold text-zinc-900 tracking-tight">
-            Khám phá theo danh mục
-          </h2>
-          <p className="mt-2 text-zinc-500 text-sm">
-            Chọn danh mục yêu thích để tìm sự kiện phù hợp
-          </p>
+          <div>
+            <span className="inline-flex items-center gap-2 text-sm font-semibold text-primary">
+              <Sparkles className="h-4 w-4" />
+              Đang mở
+            </span>
+            <h2 className="mt-2 text-2xl sm:text-3xl font-bold text-zinc-900 tracking-tight">
+              Sự kiện đang mở bán
+            </h2>
+            <p className="mt-2 text-zinc-500 text-sm">
+              Theo dõi các sự kiện đang mở để đặt vé ngay hôm nay.
+            </p>
+          </div>
+          <Link
+            href="/events"
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary/80 transition-colors"
+          >
+            Xem tất cả sự kiện
+            <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
         </motion.div>
 
         <motion.div
@@ -37,44 +51,38 @@ export default function CategorySection({ categories }: CategorySectionProps) {
             hidden: {},
             visible: { transition: { staggerChildren: 0.05 } },
           }}
-          className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3"
+          className="grid grid-cols-1 gap-4 md:grid-cols-3"
         >
-          {categories.map((category, idx) => (
+          {items.map((event) => (
             <motion.div
-              key={category.id}
+              key={event.id}
               variants={{
                 hidden: { opacity: 0, y: 12 },
                 visible: { opacity: 1, y: 0, transition: { duration: 0.3 } },
               }}
             >
               <Link
-                href={`/events?categoryId=${category.id}`}
-                className="group flex flex-col items-center gap-2 p-4 rounded-xl bg-zinc-50 border border-zinc-100 hover:bg-primary/5 hover:border-primary/30 hover:shadow-md transition-all duration-200"
+                href={`/events/${event.id}`}
+                className="group block rounded-2xl border border-zinc-200 bg-zinc-50 p-5 transition-all duration-200 hover:border-primary/30 hover:bg-primary/5 hover:shadow-md"
               >
-                <div className="w-10 h-10 rounded-xl bg-white border border-zinc-200 flex items-center justify-center text-lg font-bold text-primary/80 group-hover:bg-primary/10 group-hover:text-primary group-hover:border-primary/20 transition-colors">
-                  {category.name.charAt(0)}
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="line-clamp-1 text-sm font-semibold text-zinc-900">{event.name}</p>
+                    <p className="mt-1 text-xs text-zinc-500">
+                      {event.category?.name || "Sự kiện"}
+                    </p>
+                  </div>
+                  <span className="rounded-full bg-emerald-100 px-2 py-1 text-[10px] font-semibold text-emerald-700">
+                    ĐANG MỞ
+                  </span>
                 </div>
-                <span className="text-xs font-medium text-zinc-700 group-hover:text-primary text-center line-clamp-2">
-                  {category.name}
-                </span>
+                <p className="mt-3 flex items-center gap-1 text-xs font-medium text-zinc-600">
+                  <CalendarClock className="h-3.5 w-3.5" />
+                  {new Date(event.startTime).toLocaleString("vi-VN")}
+                </p>
               </Link>
             </motion.div>
           ))}
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          className="mt-8 text-center"
-        >
-          <Link
-            href="/events"
-            className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary/80 transition-colors"
-          >
-            Xem tất cả sự kiện
-            <ArrowRight className="w-3.5 h-3.5" />
-          </Link>
         </motion.div>
       </div>
     </section>

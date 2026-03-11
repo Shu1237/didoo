@@ -37,7 +37,7 @@ export interface Booking {
     amount: number;
     totalPrice: number;
     status: string; // Pending, Paid, Cancelled, etc.
-    bookingType?: number; // 1 = Normal, 2 = TradePurchase
+    bookingType?: number | string; // BE may return 1/2 or "Normal"/"TradePurchase"
     paidAt?: string | null;
     createdAt?: string;
     updatedAt?: string | null;

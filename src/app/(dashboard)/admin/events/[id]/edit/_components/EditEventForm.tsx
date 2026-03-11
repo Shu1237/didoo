@@ -219,35 +219,6 @@ export function EditEventForm({ eventId }: { eventId: string }) {
     } catch (err) {
       handleErrorApi({ error: err, setError });
     }
-  };</parameter>
-</invoke>
-<parameter name="old_string">  const onSubmit = async (data: EventUpdateFormValues) => {
-    const formatTime = (time?: string) => {
-      if (!time) return undefined;
-      return time.length === 5 ? `${time}:00` : time;
-    };
-    try {
-      // Build payload explicitly WITHOUT OrganizerId to avoid BE error
-      const payload = {
-        Name: data.Name,
-        Slug: data.Slug,
-        Subtitle: data.Subtitle,
-        Description: data.Description,
-        StartTime: data.StartTime instanceof Date ? data.StartTime : data.StartTime ? new Date(data.StartTime as string) : undefined,
-        EndTime: data.EndTime instanceof Date ? data.EndTime : data.EndTime ? new Date(data.EndTime as string) : undefined,
-        OpenTime: formatTime(data.OpenTime),
-        ClosedTime: formatTime(data.ClosedTime),
-        ThumbnailUrl: data.ThumbnailUrl,
-        BannerUrl: data.BannerUrl,
-        TicketMapUrl: data.TicketMapUrl,
-        AgeRestriction: data.AgeRestriction,
-        CategoryId: data.CategoryId,
-      };
-      await update.mutateAsync({ id: eventId, body: payload });
-      router.push("/admin/events");
-    } catch (err) {
-      handleErrorApi({ error: err, setError });
-    }
   };
 
   if (isLoading || !event) {

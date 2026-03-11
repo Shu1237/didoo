@@ -68,7 +68,8 @@ export interface TicketListingGetListQuery extends BasePaginationQuery {
     sellerUserId?: string;
     eventId?: string;
     bookingId?: string;
-    ticket?: TicketListingTicket;
+  // BE now returns grouped tickets as an array.
+  ticket?: TicketListingTicket[];
     sellerUser?: TicketListingUser;
     event?: TicketListingEvent;
     askingPrice: number;

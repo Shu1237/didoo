@@ -1,19 +1,16 @@
 "use client";
 
-import { MapPin, Calendar } from "lucide-react";
-import Image from "next/image";
-import { Event } from "@/types/event";
+import { ArrowRight } from "lucide-react";
+import { Category } from "@/types/event";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { format } from "date-fns";
-import { vi } from "date-fns/locale";
 
 interface MonthOverviewProps {
-  events: Event[];
+  categories: Category[];
 }
 
-export function MonthOverview({ events }: MonthOverviewProps) {
-  const highlightEvents = events.slice(1, 5);
+export function MonthOverview({ categories }: MonthOverviewProps) {
+  const topCategories = categories.slice(0, 3);
 
   return (
     <section className="py-16 lg:py-24 bg-white">
@@ -27,7 +24,7 @@ export function MonthOverview({ events }: MonthOverviewProps) {
           <h2 className="text-3xl sm:text-4xl font-bold text-zinc-900">
             Khám phá thêm
           </h2>
-          <p className="mt-2 text-zinc-600">Những sự kiện đáng chú ý</p>
+          <p className="mt-2 text-zinc-600">Danh mục nổi bật dành cho bạn</p>
         </motion.div>
 
         <motion.div
@@ -40,53 +37,54 @@ export function MonthOverview({ events }: MonthOverviewProps) {
           }}
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
         >
-          {highlightEvents.map((event) => (
+          {topCategories.map((category) => (
             <motion.div
-              key={event.id}
+              key={category.id}
               variants={{
                 hidden: { opacity: 0, y: 24 },
                 visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
               }}
             >
               <Link
-                href={`/events/${event.id}`}
-                className="block relative h-[380px] rounded-2xl overflow-hidden group"
+                href={`/events?categoryId=${category.id}`}
+                className="group flex h-[300px] flex-col justify-between rounded-2xl border border-zinc-200 bg-gradient-to-br from-white to-zinc-50 p-6 transition-all hover:border-primary/30 hover:shadow-lg"
               >
-                <Image
-                  src={
-                    event.thumbnailUrl ||
-                    event.bannerUrl ||
-                    "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=800"
-                  }
-                  alt={event.name}
-                  fill
-                  className="object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-zinc-900/90 via-zinc-900/30 to-transparent" />
-
-                <div className="absolute inset-0 p-6 flex flex-col justify-end">
-                  <span className="inline-flex w-fit px-3 py-1 rounded-full bg-white/20 backdrop-blur-sm text-white text-xs font-medium mb-3">
-                    {event.category?.name || "Sự kiện"}
-                  </span>
-                  <h3 className="text-xl font-bold text-white leading-tight line-clamp-2 mb-4">
-                    {event.name}
-                  </h3>
-                  <div className="flex flex-col gap-2 text-zinc-300 text-sm opacity-0 group-hover:opacity-100 transition-opacity">
-                    <div className="flex items-center gap-2">
-                      <Calendar className="w-4 h-4 shrink-0" />
-                      {format(new Date(event.startTime), "dd MMM yyyy", { locale: vi })}
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <MapPin className="w-4 h-4 shrink-0" />
-                      <span className="line-clamp-1">
-                        {event.locations?.[0]?.name || event.locations?.[0]?.address || "Sẽ cập nhật"}
-                      </span>
-                    </div>
-                  </div>
+                <span className="inline-flex w-fit rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-xs font-semibold text-primary">
+                  Danh mục
+                </span>
+                <div>
+                  <h3 className="line-clamp-2 text-2xl font-bold text-zinc-900">{category.name}</h3>
+                  <p className="mt-2 line-clamp-2 text-sm text-zinc-600">
+                    {category.description || "Khám phá các sự kiện nổi bật theo danh mục này."}
+                  </p>
                 </div>
+                <span className="inline-flex items-center gap-2 text-sm font-semibold text-primary">
+                  Xem sự kiện
+                  <ArrowRight className="h-4 w-4" />
+                </span>
               </Link>
             </motion.div>
           ))}
+
+          <motion.div
+            variants={{
+              hidden: { opacity: 0, y: 24 },
+              visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+            }}
+          >
+            <Link
+              href="/events"
+              className="group flex h-[300px] flex-col items-center justify-center rounded-2xl border border-dashed border-zinc-300 bg-zinc-50 p-6 text-center transition-all hover:border-primary/40 hover:bg-primary/5"
+            >
+              <span className="rounded-full bg-white p-4 shadow-sm">
+                <ArrowRight className="h-6 w-6 text-primary" />
+              </span>
+              <h3 className="mt-4 text-xl font-bold text-zinc-900">Xem thêm</h3>
+              <p className="mt-2 text-sm text-zinc-600">
+                Mở toàn bộ danh sách sự kiện và bộ lọc nâng cao.
+              </p>
+            </Link>
+          </motion.div>
         </motion.div>
       </div>
     </section>

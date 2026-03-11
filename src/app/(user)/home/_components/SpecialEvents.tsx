@@ -2,7 +2,7 @@
 
 import { Event } from "@/types/event";
 import Image from "next/image";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, CalendarDays, MapPin } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { format } from "date-fns";
@@ -14,6 +14,8 @@ interface SpecialEventsProps {
 
 export function SpecialEvents({ events }: SpecialEventsProps) {
   const gridEvents = events.slice(0, 4);
+  const getLocation = (event: Event) =>
+    event.locations?.[0]?.name || event.locations?.[0]?.address || "Địa điểm sẽ cập nhật";
 
   return (
     <section className="py-16 lg:py-24 bg-white">
@@ -112,6 +114,19 @@ export function SpecialEvents({ events }: SpecialEventsProps) {
                     <h4 className="font-semibold text-zinc-900 line-clamp-2 group-hover:text-primary transition-colors">
                       {event.name}
                     </h4>
+                    <div className="mt-2 space-y-1.5 text-xs text-zinc-500">
+                      <p className="flex items-center gap-1.5">
+                        <CalendarDays className="h-3.5 w-3.5" />
+                        {format(new Date(event.startTime), "dd/MM/yyyy HH:mm", { locale: vi })}
+                      </p>
+                      <p className="flex items-center gap-1.5 line-clamp-1">
+                        <MapPin className="h-3.5 w-3.5 shrink-0" />
+                        {getLocation(event)}
+                      </p>
+                    </div>
+                    <div className="mt-2 inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-1 text-[10px] font-semibold text-emerald-700">
+                      Đã phát hành
+                    </div>
                   </div>
                 </Link>
               </motion.div>

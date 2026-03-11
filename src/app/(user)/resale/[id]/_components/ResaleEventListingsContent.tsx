@@ -273,7 +273,7 @@ export function ResaleEventListingsContent({
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {pagedListings.map((listing) => {
               const lq = listing as ListingWithQuantity;
-              const qty = Number(lq.quantity ?? lq.totalQuantity ?? 1);
+              const qty = Number(listing.ticket?.length ?? lq.quantity ?? lq.totalQuantity ?? 1);
               const isVerified = true; // Mock constant based on design
 
               return (

@@ -7,26 +7,35 @@ import { TrendingEvents } from "@/app/(user)/home/_components/TrendingEvents";
 import { MonthOverview } from "@/app/(user)/home/_components/MonthOverview";
 import { useGetEvents, useGetCategories, useGetOrganizers } from "@/hooks/useEvent";
 import Loading from "@/components/loading";
+import { EventStatus, OrganizerStatus } from "@/utils/enum";
 import CategorySection from "./_components/CategorySection";
 import BecomeOrganizerSection from "./_components/BecomeOrganizerSection";
 
 export default function Home() {
-  const { data: eventsResponse, isLoading: isEventsLoading, isError: isEventsError } = useGetEvents({
+  const { data: openedEventsResponse, isLoading: isOpenedLoading, isError: isOpenedError } = useGetEvents({
     pageSize: 12,
     hasCategory: true,
     hasOrganizer: true,
     isDeleted: false,
+    status: EventStatus.OPENED,
+  });
+  const { data: publishedEventsResponse, isLoading: isPublishedLoading, isError: isPublishedError } = useGetEvents({
+    pageSize: 12,
+    hasCategory: true,
+    hasOrganizer: true,
+    isDeleted: false,
+    status: EventStatus.PUBLISHED,
   });
 
   const { data: categoriesResponse, isLoading: isCategoriesLoading } = useGetCategories({
     pageSize: 20,
   });
   const { data: organizersResponse, isLoading: isOrganizersLoading } = useGetOrganizers({
-    pageSize: 8,
+    pageSize: 8,status: OrganizerStatus.VERIFIED
   });
 
-  if (isEventsLoading || isCategoriesLoading || isOrganizersLoading) return <Loading />;
-  if (isEventsError || !eventsResponse) {
+  if (isOpenedLoading || isPublishedLoading || isCategoriesLoading || isOrganizersLoading) return <Loading />;
+  if ((isOpenedError && isPublishedError) || (!openedEventsResponse && !publishedEventsResponse)) {
     return (
       <div className="min-h-screen flex items-center justify-center text-zinc-500">
         Không thể tải dữ liệu. Vui lòng thử lại.
@@ -34,20 +43,22 @@ export default function Home() {
     );
   }
 
-  const events = eventsResponse.data.items;
+  const openedEvents = openedEventsResponse?.data.items || [];
+  const publishedEvents = publishedEventsResponse?.data.items || [];
   const categories = categoriesResponse?.data.items || [];
   const organizers = organizersResponse?.data.items || [];
+  const heroEvents = openedEvents.length > 0 ? openedEvents : publishedEvents;
 
   return (
     <div className="min-h-screen bg-zinc-50 text-zinc-900">
-      <HeroSection events={events.slice(0, 5)} />
+      <HeroSection events={heroEvents.slice(0, 5)} />
 
-      <CategorySection categories={categories} />
+      <CategorySection openedEvents={openedEvents.slice(0, 6)} />
 
-      <SpecialEvents events={events} />
+      <SpecialEvents events={publishedEvents} />
       <AboutSection categories={categories} />
       <TrendingEvents organizers={organizers} />
-      <MonthOverview events={events} />
+      <MonthOverview categories={categories} />
       <BecomeOrganizerSection />
     </div>
   );

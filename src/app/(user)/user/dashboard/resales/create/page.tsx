@@ -90,9 +90,14 @@ export default function CreateResalePage() {
     const set = new Set<string>();
     for (const listing of listings) {
       const status = Number(listing.status ?? 0);
-      const listingTicketId = listing.ticket?.id || listing.ticketId;
-      if (status !== TicketListingStatus.PENDING && status !== TicketListingStatus.SOLD && listingTicketId) {
-        set.add(listingTicketId);
+      const ticketIds = (listing.ticket || []).map((t) => t.id).filter(Boolean) as string[];
+      if (status !== TicketListingStatus.PENDING && status !== TicketListingStatus.SOLD) {
+        for (const ticketId of ticketIds) {
+          set.add(ticketId);
+        }
+        if (ticketIds.length === 0 && listing.ticketId) {
+          set.add(listing.ticketId);
+        }
       }
     }
     return set;
