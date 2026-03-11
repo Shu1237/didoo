@@ -81,7 +81,7 @@ export default function DetailPlace({ eventData, setSelectedEvent }: DetailPlace
           <div className="flex items-center gap-2">
             <Calendar className="w-3.5 h-3.5 text-primary shrink-0" />
             <span className="font-medium">
-              {isValidDate ? format(eventDate, "dd MMM, yyyy", { locale: vi }) : "TBA"}
+              {isValidDate ? format(eventDate, "dd MMM, yyyy", { locale: vi }) : "Sẽ cập nhật"}
             </span>
           </div>
           <div className="flex items-center gap-2">

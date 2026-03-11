@@ -100,7 +100,7 @@ export default function TradeBookingListingDetailPage({
                 Thông tin vé
               </h2>
               <p className="mt-4 text-sm text-zinc-600">
-                {listing.description || "Vé resale cho sự kiện. Liên hệ người bán nếu cần thêm thông tin."}
+                {listing.description || "Vé bán lại cho sự kiện. Liên hệ người bán nếu cần thêm thông tin."}
               </p>
               {!isAvailable && (
                 <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
@@ -116,7 +116,7 @@ export default function TradeBookingListingDetailPage({
               <p className="mt-4 text-3xl font-black text-primary">
                 {Number(listing.askingPrice || 0).toLocaleString("vi-VN")}đ
               </p>
-              <p className="mt-1 text-sm text-zinc-500">Giá bán lại từ người bán</p>
+              <p className="mt-1 text-sm text-zinc-500">Giá bán lại từ bên bán</p>
 
               <div className="mt-6 rounded-xl border border-primary/20 bg-primary/5 p-4 text-sm text-primary">
                 <p className="flex items-center gap-2 font-semibold">

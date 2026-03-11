@@ -1,6 +1,7 @@
 import { BasePaginationQuery } from "./base";
 import { Event } from "./event";
 export interface TicketGetListQuery extends BasePaginationQuery {
+    ownerId?: string;
     ticketTypeId?: string;
     eventId?: string;
     zone?: string;
@@ -29,16 +30,52 @@ export interface TicketListingGetListQuery extends BasePaginationQuery {
     isDeleted?: boolean;
     fields?: string;
   }
+
+  export interface TicketListingTicket {
+    id?: string;
+    ticketTypeId?: string;
+    zone?: string;
+    status?: number;
+    ownerId?: string;
+  }
+
+  export interface TicketListingUser {
+    id?: string;
+    fullName?: string;
+    avatarUrl?: string;
+    gender?: number;
+  }
+
+  export interface TicketListingEvent {
+    id?: string;
+    name?: string;
+    slug?: string;
+    description?: string;
+    startTime?: string;
+    endTime?: string;
+    openTime?: string;
+    closedTime?: string;
+    status?: number;
+    thumbnailUrl?: string;
+    bannerUrl?: string;
+    ageRestriction?: number;
+  }
   
   export interface TicketListing {
     id: string;
-    ticketId: string;
-    sellerUserId: string;
+    // Keep flat ids optional for backward compatibility with legacy FE usage.
+    ticketId?: string;
+    sellerUserId?: string;
+    eventId?: string;
+    bookingId?: string;
+    ticket?: TicketListingTicket;
+    sellerUser?: TicketListingUser;
+    event?: TicketListingEvent;
     askingPrice: number;
-    description?: string;
+    description?: string | null;
     status: number;
     createdAt: string;
-    updatedAt?: string;
+    updatedAt?: string | null;
   }
 
   export interface TicketTypeGetListQuery extends BasePaginationQuery {

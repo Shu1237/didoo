@@ -54,7 +54,7 @@ export default function ChangePasswordForm() {
 
       <PasswordField
         fieldName="oldPassword"
-        label="Current Password"
+        label="Mật khẩu hiện tại"
         placeholder="Nhập mật khẩu hiện tại"
         typeVisible={showOldPassword}
         onToggleVisible={() => setShowOldPassword((value) => !value)}
@@ -64,7 +64,7 @@ export default function ChangePasswordForm() {
 
       <PasswordField
         fieldName="password"
-        label="New Password"
+        label="Mật khẩu mới"
         placeholder="Nhập mật khẩu mới"
         typeVisible={showPassword}
         onToggleVisible={() => setShowPassword((value) => !value)}
@@ -74,18 +74,18 @@ export default function ChangePasswordForm() {
 
       <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3">
         <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
-          Password rules
+          Quy tắc mật khẩu
         </p>
         <ul className="mt-2 space-y-1.5 text-xs font-medium">
-          <RuleItem ok={hasMinLength} label="At least 8 characters" />
-          <RuleItem ok={hasUppercase} label="At least 1 uppercase letter" />
-          <RuleItem ok={hasSpecial} label="At least 1 special character" />
+          <RuleItem ok={hasMinLength} label="Ít nhất 8 ký tự" />
+          <RuleItem ok={hasUppercase} label="Ít nhất 1 chữ in hoa" />
+          <RuleItem ok={hasSpecial} label="Ít nhất 1 ký tự đặc biệt" />
         </ul>
       </div>
 
       <PasswordField
         fieldName="confirmPassword"
-        label="Confirm Password"
+        label="Xác nhận mật khẩu"
         placeholder="Nhập lại mật khẩu mới"
         typeVisible={showConfirmPassword}
         onToggleVisible={() => setShowConfirmPassword((value) => !value)}
@@ -103,7 +103,7 @@ export default function ChangePasswordForm() {
           ) : (
             <>
               <Save className="h-4 w-4" />
-              Update Password
+              Cập nhật mật khẩu
             </>
           )}
         </Button>

@@ -259,15 +259,15 @@ export default function MapEvent({ eventData }: MapEventProps) {
 
                         <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                           <MapPin className="w-3 h-3" />
-                          {event.locations?.[0]?.address || "N/A"}
+                          {event.locations?.[0]?.address || "Đang cập nhật"}
                         </div>
 
                         <div className="flex justify-between items-center mt-2">
                           <div className="text-xs font-medium text-primary">
-                            {event.distance.toFixed(1)} km away
+                            Cách {event.distance.toFixed(1)} km
                           </div>
                           <div className="text-xs font-bold text-foreground bg-accent/10 px-2 py-1 rounded-full">
-                            TBA
+                            Sắp mở bán
                           </div>
                         </div>
                       </div>

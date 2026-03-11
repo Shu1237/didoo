@@ -75,17 +75,17 @@ export default function ChangeEmailForm() {
         <input type="hidden" {...changeForm.register("userId")} />
 
         <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Current email</p>
-          <p className="mt-1 text-sm font-semibold text-slate-900">{currentEmail || "Not available"}</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Email hiện tại</p>
+          <p className="mt-1 text-sm font-semibold text-slate-900">{currentEmail || "Chưa có"}</p>
         </div>
 
         <div className="space-y-1.5">
-          <label className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">New email</label>
+          <label className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Email mới</label>
           <div className="relative">
             <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
             <Input
               type="email"
-              placeholder="new-email@example.com"
+              placeholder="email-moi@example.com"
               {...changeForm.register("newEmail")}
               className={`h-11 rounded-xl border-slate-200 bg-white pl-10 ${
                 changeForm.formState.errors.newEmail ? "border-rose-300 ring-1 ring-rose-200" : ""
@@ -104,11 +104,11 @@ export default function ChangeEmailForm() {
             {changeEmail.isPending ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin" />
-                Sending...
+                Đang gửi...
               </>
             ) : (
               <>
-                Continue
+                Tiếp tục
                 <ArrowRight className="h-4 w-4" />
               </>
             )}
@@ -134,7 +134,7 @@ export default function ChangeEmailForm() {
 
       <div className="space-y-2">
         <label className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
-          Verification code
+          Mã xác thực
         </label>
         <InputOTP
           maxLength={6}
@@ -164,7 +164,7 @@ export default function ChangeEmailForm() {
           onClick={() => setStep(1)}
           className="text-sm font-semibold text-slate-500 hover:text-slate-700"
         >
-          Use another email
+          Dùng email khác
         </button>
 
         <Button
@@ -175,10 +175,10 @@ export default function ChangeEmailForm() {
           {verifyChangeEmail.isPending ? (
             <>
               <Loader2 className="h-4 w-4 animate-spin" />
-              Verifying...
+              Đang xác thực...
             </>
           ) : (
-            "Verify Email"
+            "Xác thực email"
           )}
         </Button>
       </div>

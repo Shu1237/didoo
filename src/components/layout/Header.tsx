@@ -102,14 +102,6 @@ const Header = () => {
             </nav>
 
             <div className="flex items-center gap-2">
-              <button
-                type="button"
-                className="p-2.5 rounded-xl transition-all text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100"
-                aria-label="Tìm kiếm"
-              >
-                <Search className="w-5 h-5" />
-              </button>
-
               {user ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -146,7 +138,7 @@ const Header = () => {
                           className="flex items-center gap-2.5 px-2 py-2"
                         >
                           <LayoutDashboard className="w-4 h-4" />
-                          <span>Dashboard</span>
+                          <span>Bảng điều khiển</span>
                         </Link>
                       </DropdownMenuItem>
                     )}

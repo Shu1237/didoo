@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import Image from "next/image";
@@ -136,7 +136,7 @@ function TicketCard({ ticket }: { ticket: TicketCardView }) {
   const [showBarcode, setShowBarcode] = useState(false);
 
   const eventDate = event?.startTime ? new Date(event.startTime) : new Date();
-  const location = event?.locations?.[0]?.name || event?.locations?.[0]?.address || "Online / TBA";
+  const location = event?.locations?.[0]?.name || event?.locations?.[0]?.address || "Trực tuyến / Sẽ cập nhật";
 
   return (
     <article className="group overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm transition-all hover:border-primary/30 hover:shadow-md">
@@ -175,7 +175,7 @@ function TicketCard({ ticket }: { ticket: TicketCardView }) {
           <div className="flex items-center gap-2 text-sm text-zinc-600">
             <Clock className="h-4 w-4 shrink-0 text-zinc-400" />
             <span>
-              {event?.openTime || "TBA"} - {event?.closedTime || "TBA"}
+              {event?.openTime || "Sẽ cập nhật"} - {event?.closedTime || "Sẽ cập nhật"}
             </span>
           </div>
           <div className="flex items-start gap-2 text-sm text-zinc-600">

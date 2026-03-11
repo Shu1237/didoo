@@ -157,9 +157,9 @@ export function CreateUserForm() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="1">Admin</SelectItem>
-                  <SelectItem value="2">User</SelectItem>
-                  <SelectItem value="3">Organizer</SelectItem>
-                  <SelectItem value="4">Guest</SelectItem>
+                  <SelectItem value="2">Người dùng</SelectItem>
+                  <SelectItem value="3">Nhà tổ chức</SelectItem>
+                  <SelectItem value="4">Khách</SelectItem>
                 </SelectContent>
               </Select>
             </div>

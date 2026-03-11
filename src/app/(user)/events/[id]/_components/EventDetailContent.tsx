@@ -100,7 +100,7 @@ export default function EventDetailContent({
     { label: "Trạng thái", value: getStatusLabel(event.status), icon: Zap },
     {
       label: "Thời gian",
-      value: `${event.openTime || "TBA"} - ${event.closedTime || "TBA"}`,
+      value: `${event.openTime || "Sẽ cập nhật"} - ${event.closedTime || "Sẽ cập nhật"}`,
       icon: Clock3,
     },
   ];

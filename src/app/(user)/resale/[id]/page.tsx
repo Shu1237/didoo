@@ -46,7 +46,7 @@ export default function ResaleEventListingsPage({
         <div className="rounded-2xl border border-zinc-200 bg-white p-8 text-center shadow-sm">
           <p className="text-zinc-600">Không tìm thấy sự kiện.</p>
           <Button asChild className="mt-4 rounded-xl">
-            <Link href="/resale">Quay lại resale</Link>
+            <Link href="/resale">Quay lại vé bán lại</Link>
           </Button>
         </div>
       </main>

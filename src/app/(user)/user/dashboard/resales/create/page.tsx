@@ -90,7 +90,10 @@ export default function CreateResalePage() {
     const set = new Set<string>();
     for (const listing of listings) {
       const status = Number(listing.status ?? 0);
-      if (status !== TicketListingStatus.PENDING && status !== TicketListingStatus.SOLD && listing.ticketId) set.add(listing.ticketId);
+      const listingTicketId = listing.ticket?.id || listing.ticketId;
+      if (status !== TicketListingStatus.PENDING && status !== TicketListingStatus.SOLD && listingTicketId) {
+        set.add(listingTicketId);
+      }
     }
     return set;
   }, [listingsRes?.data.items]);

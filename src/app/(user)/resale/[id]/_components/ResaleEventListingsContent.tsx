@@ -1,21 +1,17 @@
 "use client";
 
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, type SVGProps } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { 
   ChevronLeft, 
   Ticket, 
-  User, 
   Calendar, 
   MapPin, 
   Search, 
-  Users, 
-  Filter, 
   ChevronRight,
   ShieldCheck,
-  Star,
   Info
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -30,7 +26,6 @@ import {
 } from "@/components/ui/select";
 import type { Event } from "@/types/event";
 import type { TicketListing } from "@/types/ticket";
-import { TicketListingStatus } from "@/utils/enum";
 
 const FALLBACK_IMAGE =
   "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=2000&auto=format&fit=crop";
@@ -40,6 +35,11 @@ interface ResaleEventListingsContentProps {
   event: Event;
   listings: TicketListing[];
 }
+
+type ListingWithQuantity = TicketListing & {
+  quantity?: number;
+  totalQuantity?: number;
+};
 
 export function ResaleEventListingsContent({
   eventId,
@@ -69,7 +69,8 @@ export function ResaleEventListingsContent({
         l.id.toLowerCase().includes(search) || 
         (l.description?.toLowerCase().includes(search) ?? false);
       
-      const lQty = Number((l as any).quantity ?? (l as any).totalQuantity ?? 0);
+      const lq = l as ListingWithQuantity;
+      const lQty = Number(lq.quantity ?? lq.totalQuantity ?? 0);
       const matchQuantity = !quantity || quantity === "all" || lQty === Number(quantity);
       
       const price = Number(l.askingPrice ?? 0);
@@ -110,11 +111,11 @@ export function ResaleEventListingsContent({
       {/* Breadcrumbs */}
       <div className="mx-auto max-w-7xl px-4 py-4">
         <nav className="flex items-center gap-2 text-sm text-zinc-500">
-          <Link href="/" className="hover:text-primary transition-colors">Home</Link>
+          <Link href="/" className="hover:text-primary transition-colors">Trang chủ</Link>
           <ChevronRight className="h-3 w-3" />
-          <Link href="/resale" className="hover:text-primary transition-colors">Conferences</Link>
+          <Link href="/resale" className="hover:text-primary transition-colors">Vé bán lại</Link>
           <ChevronRight className="h-3 w-3" />
-          <span className="font-medium text-zinc-900">{event.name} Resale</span>
+          <span className="font-medium text-zinc-900">{event.name} - Vé bán lại</span>
         </nav>
       </div>
 
@@ -133,7 +134,7 @@ export function ResaleEventListingsContent({
           <div className="absolute bottom-10 left-10 right-10 flex items-end justify-between">
             <div className="space-y-4">
               <Badge className="bg-[#FF8A3D] hover:bg-[#FF8A3D] text-white px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border-none">
-                OFFICIAL RESALE HUB
+                TRUNG TÂM BÁN LẠI CHÍNH THỨC
               </Badge>
               <h1 className="text-4xl md:text-5xl font-bold text-white tracking-tight">
                 {event.name}
@@ -142,11 +143,11 @@ export function ResaleEventListingsContent({
                 <div className="flex items-center gap-2">
                   <Calendar className="h-5 w-5 text-[#FF8A3D]" />
                   <span className="font-medium">
-                    {event.startTime ? new Date(event.startTime).toLocaleDateString("en-US", {
+                    {event.startTime ? new Date(event.startTime).toLocaleDateString("vi-VN", {
                       month: "short",
                       day: "numeric",
-                    }) : "TBA"}
-                    {event.endTime && ` - ${new Date(event.endTime).toLocaleDateString("en-US", {
+                    }) : "Sẽ cập nhật"}
+                    {event.endTime && ` - ${new Date(event.endTime).toLocaleDateString("vi-VN", {
                       day: "numeric",
                       year: "numeric"
                     })}`}
@@ -155,7 +156,7 @@ export function ResaleEventListingsContent({
                 <div className="flex items-center gap-2">
                   <MapPin className="h-5 w-5 text-[#FF8A3D]" />
                   <span className="font-medium">
-                    {event.locations?.[0]?.name || "Tech Convention Center, SF"}
+                    {event.locations?.[0]?.name || "Địa điểm sẽ cập nhật"}
                   </span>
                 </div>
               </div>
@@ -163,7 +164,7 @@ export function ResaleEventListingsContent({
 
             <div className="hidden md:block">
               <div className="backdrop-blur-md bg-white/10 border border-white/20 p-4 rounded-2xl shadow-xl min-w-[200px]">
-                <p className="text-zinc-300 text-xs font-medium mb-1">Starting from</p>
+                <p className="text-zinc-300 text-xs font-medium mb-1">Giá từ</p>
                 <p className="text-white text-3xl font-bold">
                   {minPrice.toLocaleString("vi-VN")}đ
                 </p>
@@ -248,16 +249,16 @@ export function ResaleEventListingsContent({
       <section className="mx-auto max-w-7xl px-4 mt-12">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-2">
-            <h2 className="text-xl font-bold text-zinc-900">Available Listings</h2>
+            <h2 className="text-xl font-bold text-zinc-900">Vé đang bán</h2>
             <Badge variant="secondary" className="bg-[#FFF4ED] text-[#FF8A3D] border-none font-medium">
-              {totalItems} found
+              {totalItems} kết quả
             </Badge>
           </div>
           
           <div className="flex items-center gap-2 text-sm font-medium text-zinc-500">
-            <span>Sort by:</span>
+            <span>Sắp xếp:</span>
             <button className="text-zinc-900 flex items-center gap-1 hover:text-primary transition-colors">
-              Lowest Price
+              Giá thấp nhất
               <ChevronDown className="h-4 w-4" />
             </button>
           </div>
@@ -266,37 +267,31 @@ export function ResaleEventListingsContent({
         {pagedListings.length === 0 ? (
           <div className="text-center py-20 bg-white rounded-3xl border border-dashed border-zinc-200">
             <Info className="h-12 w-12 text-zinc-300 mx-auto mb-4" />
-            <p className="text-zinc-500 font-medium">No listings match your selection.</p>
+            <p className="text-zinc-500 font-medium">Không có vé phù hợp bộ lọc đã chọn.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {pagedListings.map((listing) => {
-              const qty = Number((listing as any).quantity ?? (listing as any).totalQuantity ?? 1);
+              const lq = listing as ListingWithQuantity;
+              const qty = Number(lq.quantity ?? lq.totalQuantity ?? 1);
               const isVerified = true; // Mock constant based on design
-              const isPremium = listing.askingPrice && Number(listing.askingPrice) > 15000;
 
               return (
                 <div key={listing.id} className="bg-white rounded-3xl border border-zinc-100 p-6 flex flex-col h-full shadow-sm hover:shadow-md transition-shadow">
                   <div className="flex items-start justify-between mb-4">
                     <div className="text-[10px] font-bold text-zinc-400 tracking-wider">
-                      LISTING ID: #{listing.id.slice(-8).toUpperCase()}
+                      MÃ TIN: #{listing.id.slice(-8).toUpperCase()}
                     </div>
                     {isVerified && (
                       <Badge className="bg-[#E7F9EF] text-[#2ECC71] hover:bg-[#E7F9EF] border-none text-[10px] font-bold rounded-full px-2 py-0.5 flex items-center gap-1">
                         <ShieldCheck className="h-3 w-3" />
-                        VERIFIED
-                      </Badge>
-                    )}
-                    {!isVerified && isPremium && (
-                      <Badge className="bg-[#FFF8ED] text-[#F39C12] hover:bg-[#FFF8ED] border-none text-[10px] font-bold rounded-full px-2 py-0.5 flex items-center gap-1">
-                        <Star className="h-3 w-3 fill-current" />
-                        PREMIUM
+                        ĐÃ XÁC MINH
                       </Badge>
                     )}
                   </div>
 
                   <h3 className="text-xl font-bold text-zinc-900 mb-4 line-clamp-1">
-                    {listing.description || "Section A, Row 12"}
+                    {listing.description || "Khu A, hàng 12"}
                   </h3>
 
                   <div className="space-y-3 mb-8 flex-1">
@@ -304,26 +299,26 @@ export function ResaleEventListingsContent({
                       <div className="w-8 h-8 rounded-lg bg-zinc-50 flex items-center justify-center">
                         <Ticket className="h-4 w-4 text-[#FF8A3D]" />
                       </div>
-                      <span className="text-sm font-medium">Seats 104, 105 (Adjacent)</span>
+                      <span className="text-sm font-medium">Ghế 104, 105 (liền kề)</span>
                     </div>
                     <div className="flex items-center gap-3 text-zinc-600">
                       <div className="w-8 h-8 rounded-lg bg-zinc-50 flex items-center justify-center">
                         <Info className="h-4 w-4 text-[#FF8A3D]" />
                       </div>
-                      <span className="text-sm font-medium">Electronic Transfer via Email</span>
+                      <span className="text-sm font-medium">Chuyển vé điện tử qua email</span>
                     </div>
                   </div>
 
                   <div className="flex items-end justify-between pt-6 border-t border-zinc-50">
                     <div>
-                      <p className="text-[10px] font-bold text-zinc-400 uppercase mb-1">Total for {qty} tickets</p>
+                      <p className="text-[10px] font-bold text-zinc-400 uppercase mb-1">Tổng cho {qty} vé</p>
                       <p className="text-2xl font-black text-zinc-900 leading-none">
                         {Number(listing.askingPrice ?? 0).toLocaleString("vi-VN")}đ
                       </p>
                     </div>
                     <Button asChild className="bg-[#FF8A3D] hover:bg-[#E67A2E] text-white font-bold rounded-xl px-6">
                       <Link href={`/resale/${eventId}/trade-booking/${listing.id}`}>
-                        Buy Now
+                        Mua ngay
                       </Link>
                     </Button>
                   </div>
@@ -386,7 +381,7 @@ export function ResaleEventListingsContent({
   );
 }
 
-function ChevronDown(props: any) {
+function ChevronDown(props: SVGProps<SVGSVGElement>) {
   return (
     <svg
       {...props}

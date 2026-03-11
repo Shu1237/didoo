@@ -117,10 +117,10 @@ export default function ProfileForm() {
               </div>
               <div>
                 <h2 className="text-2xl font-black tracking-tight text-slate-900">
-                  Profile Information
+                  Thông tin hồ sơ
                 </h2>
                 <p className="text-sm font-medium text-slate-500 mt-0.5">
-                  Update your basic information and manage account details.
+                  Cập nhật thông tin cơ bản và quản lý tài khoản của bạn.
                 </p>
               </div>
             </div>
@@ -129,7 +129,7 @@ export default function ProfileForm() {
           <div className="p-8 md:p-10 bg-white flex-1">
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <Field label="Email Address">
+                <Field label="Địa chỉ email">
                   <Input
                     value={user?.email || ""}
                     disabled
@@ -137,15 +137,15 @@ export default function ProfileForm() {
                   />
                 </Field>
 
-                <Field label="Role">
+                <Field label="Vai trò">
                   <Input
-                    value={user?.role?.name || "User"}
+                    value={user?.role?.name || "Người dùng"}
                     disabled
                     className="h-11 rounded-xl border-slate-200 bg-slate-50 text-slate-700"
                   />
                 </Field>
 
-                <Field label="Full Name" error={form.formState.errors.FullName?.message as string | undefined}>
+                <Field label="Họ và tên" error={form.formState.errors.FullName?.message as string | undefined}>
                   <Input
                     {...form.register("FullName")}
                     placeholder="Nhập họ và tên"
@@ -153,7 +153,7 @@ export default function ProfileForm() {
                   />
                 </Field>
 
-                <Field label="Date of Birth" error={form.formState.errors.DateOfBirth?.message as string | undefined}>
+                <Field label="Ngày sinh" error={form.formState.errors.DateOfBirth?.message as string | undefined}>
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
@@ -199,7 +199,7 @@ export default function ProfileForm() {
                   ) : (
                     <>
                       <Save className="h-4 w-4" />
-                      Save Changes
+                      Lưu thay đổi
                     </>
                   )}
                 </Button>
@@ -218,10 +218,10 @@ export default function ProfileForm() {
               </div>
               <div>
                 <h2 className="text-2xl font-black tracking-tight text-slate-900">
-                  Security Settings
+                  Cài đặt bảo mật
                 </h2>
                 <p className="text-sm font-medium text-slate-500 mt-0.5">
-                  Manage your password and secure your account credentials.
+                  Quản lý mật khẩu và tăng cường bảo mật tài khoản.
                 </p>
               </div>
             </div>
@@ -235,12 +235,12 @@ export default function ProfileForm() {
                     <div className="rounded-full bg-slate-50 p-4 group-hover:bg-white group-hover:scale-110 transition-transform">
                       <KeyRound className="h-8 w-8 text-slate-700 group-hover:text-sky-600" />
                     </div>
-                    <span className="text-lg font-bold text-slate-900">Change password</span>
-                    <p className="text-sm font-medium text-slate-500 text-center max-w-[200px]">Update your login credentials securely.</p>
+                    <span className="text-lg font-bold text-slate-900">Đổi mật khẩu</span>
+                    <p className="text-sm font-medium text-slate-500 text-center max-w-[200px]">Cập nhật thông tin đăng nhập an toàn.</p>
                   </button>
                 </DialogTrigger>
                 <DialogContent className="max-h-[90vh] overflow-y-auto rounded-3xl border border-slate-200 bg-white p-6 md:p-7">
-                  <DialogTitle className="text-2xl font-bold text-slate-900">Update Password</DialogTitle>
+                  <DialogTitle className="text-2xl font-bold text-slate-900">Cập nhật mật khẩu</DialogTitle>
                   <DialogDescription className="text-sm text-slate-600">
                     Dùng mật khẩu mạnh hơn để tăng bảo mật.
                   </DialogDescription>
@@ -256,12 +256,12 @@ export default function ProfileForm() {
                     <div className="rounded-full bg-slate-50 p-4 group-hover:bg-white group-hover:scale-110 transition-transform">
                       <Mail className="h-8 w-8 text-slate-700 group-hover:text-sky-600" />
                     </div>
-                    <span className="text-lg font-bold text-slate-900">Change email</span>
+                    <span className="text-lg font-bold text-slate-900">Đổi email</span>
                     <p className="text-sm font-medium text-slate-500 text-center max-w-[200px]">Cập nhật email tài khoản của bạn.</p>
                   </button>
                 </DialogTrigger>
                 <DialogContent className="max-h-[90vh] overflow-y-auto rounded-3xl border border-slate-200 bg-white p-6 md:p-7">
-                  <DialogTitle className="text-2xl font-bold text-slate-900">Update Email</DialogTitle>
+                  <DialogTitle className="text-2xl font-bold text-slate-900">Cập nhật email</DialogTitle>
                   <DialogDescription className="text-sm text-slate-600">
                     Hệ thống sẽ gửi OTP để xác nhận email mới.
                   </DialogDescription>
