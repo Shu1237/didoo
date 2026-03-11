@@ -63,7 +63,16 @@ export const ENDPOINT_CLIENT = {
 
     // Ticket Types
     TICKET_TYPES: '/tickettypes',
+    TICKET_TYPES_ARRAY: '/tickettypes/array',
     TICKET_TYPE_DETAIL: (id: string) => `/tickettypes/${id}`,
+    TICKET_TYPE_DECREMENT: (id: string) => `/tickettypes/${id}/decrement`,
+
+    // Ticket Listings
+    TICKET_LISTINGS: '/ticketlistings',
+    TICKET_LISTING_DETAIL: (id: string) => `/ticketlistings/${id}`,
+    TICKET_LISTING_VALIDATE: (id: string) => `/ticketlistings/${id}/validate`,
+    TICKET_LISTING_CANCEL: (id: string) => `/ticketlistings/${id}/cancel`,
+    TICKET_LISTING_MARK_SOLD: (id: string) => `/ticketlistings/${id}/mark-sold`,
 
     // Bookings
     BOOKINGS: '/bookings',
@@ -77,5 +86,27 @@ export const ENDPOINT_CLIENT = {
     PAYMENT_METHODS: '/paymentmethods',
     PAYMENT_METHOD_DETAIL: (id: string) => `/paymentmethods/${id}`,
 
-    ORDER_DETAIL: (id: string) => `/orders/coordinator/${id}`, // Keeping existing ONE
+    // Payments
+    PAYMENTS: '/payments',
+    PAYMENT_DETAIL: (id: string) => `/payments/${id}`,
+    PAYMENT_CALLBACK: '/payments/callback',
+
+    // Trade Bookings
+    TRADE_BOOKINGS: '/trade-bookings',
+
+    // Resales
+    RESALES: '/resales',
+    RESALE_DETAIL: (id: string) => `/resales/${id}`,
+
+    // Resale Transactions
+    RESALE_TRANSACTIONS: '/resaletransactions',
+    RESALE_TRANSACTION_DETAIL: (id: string) => `/resaletransactions/${id}`,
+
+    // Notifications
+    NOTIFICATIONS: '/notifications',
+    NOTIFICATION_DETAIL: (id: string) => `/notifications/${id}`,
+
+    // Check-ins
+    CHECKINS: '/checkins',
+    CHECKIN_DETAIL: (id: string) => `/checkins/${id}`,
 }

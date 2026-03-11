@@ -2,12 +2,11 @@
 
 import { use } from "react";
 import Loading from "@/components/loading";
-import { useGetEvent, useGetEvents } from "@/hooks/useEvent";
-import { useGetTicketTypes } from "@/hooks/useTicketType";
+
+import { useGetTicketTypes } from "@/hooks/useTicket";
 import HeroSection from "./_components/HeroSection";
-import EventInfor from "./_components/EventInfor";
-import EventLocation from "./_components/EventLocation";
-import EventsGrid from "../_components/EventsGrid";
+import EventDetailContent from "./_components/EventDetailContent";
+import { useGetEvent, useGetEvents } from "@/hooks/useEvent";
 
 export default function DetailEventPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -18,10 +17,11 @@ export default function DetailEventPage({ params }: { params: Promise<{ id: stri
   const { data: relatedEventsResponse } = useGetEvents({
     categoryId: detailEvent?.category?.id,
     pageSize: 6,
+    hasCategory: true,
   });
 
   const eventRelated = (relatedEventsResponse?.data.items || []).filter(
-    (event) => event.id !== id,
+    (event) => event.id !== id
   );
 
   const { data: ticketTypesResponse } = useGetTicketTypes({ eventId: id });
@@ -31,37 +31,35 @@ export default function DetailEventPage({ params }: { params: Promise<{ id: stri
 
   if (!detailEvent) {
     return (
-      <div className="flex h-screen items-center justify-center bg-slate-50 text-slate-500">
-        <p className="font-bold tracking-widest uppercase">Event Not Found</p>
+      <div className="flex min-h-screen items-center justify-center bg-zinc-50">
+        <div className="text-center">
+          <p className="font-medium text-zinc-600">Không tìm thấy sự kiện</p>
+          <a
+            href="/events"
+            className="mt-4 inline-block font-semibold text-primary hover:underline"
+          >
+            Quay lại danh sách
+          </a>
+        </div>
       </div>
     );
   }
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-slate-50 text-slate-900">
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -top-28 left-[-8%] h-80 w-80 rounded-full bg-sky-200/60 blur-3xl" />
-        <div className="absolute top-1/4 right-[-8%] h-[24rem] w-[24rem] rounded-full bg-amber-200/50 blur-3xl" />
+    <main className="min-h-screen bg-zinc-50 text-zinc-900">
+      <div className="pointer-events-none fixed inset-0 overflow-hidden">
+        <div className="absolute -top-24 left-0 h-96 w-96 rounded-full bg-primary/5 blur-[100px]" />
+        <div className="absolute top-1/3 right-0 h-80 w-80 rounded-full bg-primary/5 blur-[80px]" />
       </div>
 
       <div className="relative z-10">
-        <HeroSection event={detailEvent} ticketTypes={ticketTypes} />
+        <HeroSection event={detailEvent} />
 
-        <div className="mx-auto w-full px-4 md:px-8 lg:px-12 xl:px-16 pb-20 space-y-16">
-          <div className="max-w-7xl mx-auto space-y-16">
-            <EventInfor event={detailEvent} />
-            <EventLocation event={detailEvent} />
-          </div>
-          {eventRelated.length > 0 && (
-            <div className="border-t border-slate-200/60 pt-16">
-              <EventsGrid
-                title="Suggested for you"
-                description="Explore more events similar to this one."
-                eventData={eventRelated}
-              />
-            </div>
-          )}
-        </div>
+        <EventDetailContent
+          event={detailEvent}
+          ticketTypes={ticketTypes}
+          eventRelated={eventRelated}
+        />
       </div>
     </main>
   );

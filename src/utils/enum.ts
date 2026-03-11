@@ -58,6 +58,10 @@ export enum EventStatus {
     CLOSED = 5,
 }
 
+export enum BookingTypeStatus {
+    NORMAL = 1,
+    TRADE_PURCHASE = 2,
+}
 /** api.md: 1=Pending, 2=Verified, 3=Banned */
 export enum OrganizerStatus {
     PENDING = 1,
@@ -65,6 +69,13 @@ export enum OrganizerStatus {
     BANNED = 3,
 }
 
+
+export enum TicketListingStatus {
+    ACTIVE = 1,
+    PENDING = 2,
+    SOLD = 3,
+    CANCELLED = 4,
+}
 /** api.md: 1=Active, 2=Inactive */
 export enum CategoryStatus {
     ACTIVE = 1,

@@ -1,5 +1,5 @@
 import { MapIcon, ShieldCheck, Users, Zap } from "lucide-react";
-import { Category } from "../types/category";
+import { Category } from "../types/event";
 import { Event } from "../types/event";
 import { CategoryStatus, EventStatus, OrganizerStatus } from "./enum";
 

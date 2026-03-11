@@ -70,7 +70,7 @@ export function BasePagination({
     };
 
     return (
-        <div className={cn("flex items-center gap-4", (showInfo || showSizeSelector) && showNavigation ? "justify-between w-full" : "justify-end")}>
+        <div className={cn("flex items-center gap-4", (!showInfo && !showSizeSelector) ? "justify-center" : (showInfo || showSizeSelector) && showNavigation ? "justify-between w-full" : "justify-end")}>
             {/* Info text & Size selector - Left side */}
             {(showInfo || (showSizeSelector && onPageSizeChange)) && (
                 <div className="flex items-center gap-4">

@@ -1,45 +1,90 @@
-'use client';
+"use client";
 
-import { Category } from "@/types/category";
 import { motion } from "framer-motion";
-import { SectionHeader } from "./SectionHeader";
-import { Layers } from "lucide-react";
+import Link from "next/link";
+import { ArrowRight, CalendarClock, Sparkles } from "lucide-react";
+import { Event } from "@/types/event";
 
 interface CategorySectionProps {
-    categories: Category[];
+  openedEvents: Event[];
 }
 
-export default function CategorySection({ categories }: CategorySectionProps) {
-    if (!categories || categories.length === 0) return null;
+export default function CategorySection({ openedEvents }: CategorySectionProps) {
+  if (!openedEvents?.length) return null;
+  const items = openedEvents.slice(0, 3);
 
-    return (
-        <section className="pt-24 pb-16 bg-slate-50 relative z-20 -mt-16">
-            <div className="container mx-auto px-4">
-                <div className="flex flex-col items-center justify-center text-center">
-                    <span className="text-primary font-black uppercase tracking-[0.2em] text-xs mb-2 flex items-center gap-2">
-                        <Layers className="w-4 h-4" /> Explore
-                    </span>
-                    <h3 className="text-3xl font-black text-slate-900 uppercase">Browse Categories</h3>
-                </div>
+  return (
+    <section className="py-12 lg:py-16 bg-white">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="mb-10 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end"
+        >
+          <div>
+            <span className="inline-flex items-center gap-2 text-sm font-semibold text-primary">
+              <Sparkles className="h-4 w-4" />
+              Đang mở
+            </span>
+            <h2 className="mt-2 text-2xl sm:text-3xl font-bold text-zinc-900 tracking-tight">
+              Sự kiện đang mở bán
+            </h2>
+            <p className="mt-2 text-zinc-500 text-sm">
+              Theo dõi các sự kiện đang mở để đặt vé ngay hôm nay.
+            </p>
+          </div>
+          <Link
+            href="/events"
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary/80 transition-colors"
+          >
+            Xem tất cả sự kiện
+            <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
+        </motion.div>
 
-                <div className="flex flex-wrap justify-center gap-4 mt-8">
-                    {categories.map((category, idx) => (
-                        <motion.div
-                            key={category.id}
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            whileInView={{ opacity: 1, scale: 1 }}
-                            viewport={{ once: true }}
-                            transition={{ delay: idx * 0.05 }}
-                            whileHover={{ scale: 1.05, translateY: -4 }}
-                            className="px-8 py-4 rounded-2xl bg-slate-50 border border-slate-100 shadow-sm hover:shadow-md hover:bg-white hover:border-primary/20 transition-all cursor-pointer group"
-                        >
-                            <span className="text-slate-600 group-hover:text-primary font-bold uppercase tracking-wider text-sm">
-                                {category.name}
-                            </span>
-                        </motion.div>
-                    ))}
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-40px" }}
+          variants={{
+            hidden: {},
+            visible: { transition: { staggerChildren: 0.05 } },
+          }}
+          className="grid grid-cols-1 gap-4 md:grid-cols-3"
+        >
+          {items.map((event) => (
+            <motion.div
+              key={event.id}
+              variants={{
+                hidden: { opacity: 0, y: 12 },
+                visible: { opacity: 1, y: 0, transition: { duration: 0.3 } },
+              }}
+            >
+              <Link
+                href={`/events/${event.id}`}
+                className="group block rounded-2xl border border-zinc-200 bg-zinc-50 p-5 transition-all duration-200 hover:border-primary/30 hover:bg-primary/5 hover:shadow-md"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="line-clamp-1 text-sm font-semibold text-zinc-900">{event.name}</p>
+                    <p className="mt-1 text-xs text-zinc-500">
+                      {event.category?.name || "Sự kiện"}
+                    </p>
+                  </div>
+                  <span className="rounded-full bg-emerald-100 px-2 py-1 text-[10px] font-semibold text-emerald-700">
+                    ĐANG MỞ
+                  </span>
                 </div>
-            </div>
-        </section>
-    );
+                <p className="mt-3 flex items-center gap-1 text-xs font-medium text-zinc-600">
+                  <CalendarClock className="h-3.5 w-3.5" />
+                  {new Date(event.startTime).toLocaleString("vi-VN")}
+                </p>
+              </Link>
+            </motion.div>
+          ))}
+        </motion.div>
+      </div>
+    </section>
+  );
 }

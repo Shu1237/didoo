@@ -1,6 +1,6 @@
 'use client';
 
-import { Category } from '@/types/category';
+import { Category } from '@/types/event';
 import { Event } from '@/types/event';
 import EventCard from '@/components/ui/CardEvent';
 import { Trophy } from 'lucide-react';

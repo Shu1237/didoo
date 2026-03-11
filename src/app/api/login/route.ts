@@ -1,5 +1,8 @@
 import { NextResponse } from 'next/server';
 
+
+const COOKIE_ACCESS_MAX_AGE = 2 * 60 * 60;
+
 export async function POST(request: Request) {
     const body = await request.json();
     const { accessToken, refreshToken } = body;
@@ -21,7 +24,7 @@ export async function POST(request: Request) {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
-        maxAge: 60 * 60,
+        maxAge: COOKIE_ACCESS_MAX_AGE,
     });
 
 
@@ -30,7 +33,7 @@ export async function POST(request: Request) {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
-        maxAge: 2 * 24 * 60 * 60,
+        maxAge: 7 * 24 * 60 * 60,
     });
 
     return response;

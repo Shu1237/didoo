@@ -1,6 +1,7 @@
 import { toast } from "sonner";
 import { UseFormSetError } from "react-hook-form";
-import { ResponseError } from "@/types/base";
+import { ResponseData, ResponseError } from "@/types/base";
+
 
 
 

@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { decodeJWT } from "@/lib/utils";
-import { JWTUserType } from "@/types/user";
+import { JWTUserType } from "@/types/auth";
 import { getRedirectPathForRole } from "@/utils/enum";
 
 export default async function RootPage() {
@@ -13,6 +13,7 @@ export default async function RootPage() {
       redirect(getRedirectPathForRole(decoded?.Role));
     } catch {
       // Token invalid, fall through to default
+      redirect("/login");
     }
   }
   redirect("/home");

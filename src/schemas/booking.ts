@@ -12,3 +12,15 @@ export const bookingCreateSchema = z.object({
 });
 
 export type BookingCreateBody = z.infer<typeof bookingCreateSchema>;
+
+
+export const tradeBookingCreateSchema = z.object({
+    listingId: z.string().uuid("Listing ID không hợp lệ"),
+    buyerUserId: z.string().uuid("Buyer User ID không hợp lệ"),
+    fullname: z.string().optional().or(z.literal("")),
+    email: z.string().email("Email không hợp lệ").optional().or(z.literal("")),
+    phone: z.string().optional().or(z.literal("")),
+});
+
+
+export type TradeBookingCreateBody = z.infer<typeof tradeBookingCreateSchema>;

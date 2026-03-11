@@ -1,177 +1,148 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Mail, CheckCircle2, ArrowLeft, Lock } from 'lucide-react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useAuth } from '@/hooks/useAuth';
-import { ForgotPasswordInput, forgotPasswordSchema } from '@/schemas/auth';
-import { handleErrorApi } from '@/lib/errors';
-import { toast } from 'sonner';
+import { useState } from "react";
+import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
+import { Mail, CheckCircle2, ArrowLeft } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useAuth } from "@/hooks/useAuth";
+import { ForgotPasswordInput, forgotPasswordSchema } from "@/schemas/auth";
+import { handleErrorApi } from "@/lib/errors";
+import { toast } from "sonner";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 export default function ForgotPasswordForm() {
-    const [step, setStep] = useState(1);
-    const { forgotPassword } = useAuth();
+  const [step, setStep] = useState(1);
+  const { forgotPassword } = useAuth();
 
-    const {
-        register,
-        handleSubmit,
-        watch,
-        setError,
-        formState: { errors, isValid },
-    } = useForm<ForgotPasswordInput>({
-        resolver: zodResolver(forgotPasswordSchema),
-        defaultValues: {
-            email: '',
-        },
-        mode: 'onChange',
-    });
+  const {
+    register,
+    handleSubmit,
+    watch,
+    setError,
+    formState: { errors, isValid },
+  } = useForm<ForgotPasswordInput>({
+    resolver: zodResolver(forgotPasswordSchema),
+    defaultValues: { email: "" },
+    mode: "onChange",
+  });
 
-    const email = watch('email');
+  const email = watch("email");
 
-    const onSubmit = async (data: ForgotPasswordInput) => {
-        try {
-            await forgotPassword.mutateAsync({
-                ...data,
-                clientUri: `${window.location.origin}/confirm`
-            });
-            setStep(2);
-            toast.success("Reset link sent successfully");
-        } catch (error) {
-            handleErrorApi({
-                error,
-                setError,
-            });
-        }
-    };
+  const onSubmit = async (data: ForgotPasswordInput) => {
+    try {
+      await forgotPassword.mutateAsync({
+        ...data,
+        clientUri: `${window.location.origin}/confirm`,
+      });
+      setStep(2);
+      toast.success("Đã gửi link đặt lại mật khẩu");
+    } catch (error) {
+      handleErrorApi({ error, setError });
+    }
+  };
 
-    const maskStyle = {
-        maskImage: 'radial-gradient(circle at top right, transparent 90px, black 50px)',
-        WebkitMaskImage: 'radial-gradient(circle at top right, transparent 100px, black 101px)',
-    };
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="grid grid-cols-1 lg:grid-cols-2 w-full max-w-5xl bg-white rounded-2xl border border-zinc-200 shadow-xl overflow-hidden lg:min-h-[420px]"
+    >
+      <div className="p-6 sm:p-8 lg:p-10">
+        <Link href="/login" className="inline-flex items-center gap-2 text-sm text-zinc-600 hover:text-zinc-900 mb-6">
+          <ArrowLeft className="h-4 w-4" />
+          Quay lại đăng nhập
+        </Link>
 
-    return (
-        <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="grid grid-cols-1 lg:grid-cols-2 bg-[#2D2D2D]/60 backdrop-blur-[40px] rounded-[50px] border border-white/10 shadow-[0_50px_100px_rgba(0,0,0,0.4)] overflow-hidden relative max-w-6xl w-full"
-        >
-            {/* LEFT SIDE: FORM */}
-            <div className="p-6 lg:p-10 text-white overflow-y-auto no-scrollbar">
-                <Link href="/login" className="inline-flex items-center text-white/40 hover:text-white transition-colors mb-4 group text-xs">
-                    <ArrowLeft className="w-3 h-3 mr-1.5 group-hover:-translate-x-1 transition-transform" />
-                    Back to Login
-                </Link>
+        <div className="flex justify-center mb-4">
+          <div className="h-14 w-14 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+            {step === 1 ? <Mail className="h-7 w-7" /> : <CheckCircle2 className="h-7 w-7" />}
+          </div>
+        </div>
 
-                <div className="flex justify-center mb-4">
-                    <div className="h-12 w-12 bg-[#FF9B8A]/10 rounded-xl flex items-center justify-center text-[#FF9B8A] shadow-inner">
-                        {step === 1 ? <Mail className="w-6 h-6" /> : <CheckCircle2 className="w-6 h-6" />}
-                    </div>
-                </div>
+        <h1 className="text-2xl font-bold text-zinc-900 text-center">
+          {step === 1 ? "Quên mật khẩu?" : "Kiểm tra email"}
+        </h1>
+        <p className="mt-2 text-zinc-600 text-sm text-center max-w-sm mx-auto">
+          {step === 1
+            ? "Nhập email và chúng tôi sẽ gửi link đặt lại mật khẩu."
+            : `Đã gửi link đặt lại mật khẩu đến ${email}`}
+        </p>
 
-                <h1 className="text-3xl font-bold mb-1 text-center">
-                    {step === 1 ? 'Forgot Password?' : 'Check Your Email'}
-                </h1>
-                <p className="text-white/40 text-sm mb-6 text-center max-w-xs mx-auto">
-                    {step === 1
-                        ? "Enter your email and we'll send you a reset link."
-                        : `We've sent a password reset link to ${email}`}
+        <AnimatePresence mode="wait">
+          {step === 1 ? (
+            <motion.form
+              key="step1"
+              initial={{ opacity: 0, x: 16 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -16 }}
+              className="mt-8 space-y-4"
+              onSubmit={handleSubmit(onSubmit)}
+            >
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-zinc-700">Email</label>
+                <Input
+                  type="email"
+                  placeholder="example@gmail.com"
+                  {...register("email")}
+                  className={`h-11 rounded-xl border-zinc-200 bg-zinc-50 ${errors.email ? "border-rose-300" : ""}`}
+                />
+                {errors.email && <p className="text-xs text-rose-600">{errors.email.message}</p>}
+              </div>
+
+              <Button
+                type="submit"
+                disabled={forgotPassword.isPending || !isValid}
+                className="w-full h-12 rounded-xl font-semibold"
+              >
+                {forgotPassword.isPending ? (
+                  <span className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                  "Gửi link đặt lại"
+                )}
+              </Button>
+            </motion.form>
+          ) : (
+            <motion.div
+              key="step2"
+              initial={{ opacity: 0, scale: 0.98 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="mt-8 space-y-6"
+            >
+              <div className="rounded-2xl border border-zinc-200 bg-zinc-50 p-4">
+                <p className="text-sm text-zinc-600 leading-relaxed">
+                  Vui lòng kiểm tra hộp thư và nhấp vào link đặt lại. Link có hiệu lực 30 phút. Nếu không thấy, hãy kiểm tra thư mục spam.
                 </p>
+              </div>
 
-                <AnimatePresence mode="wait">
-                    {step === 1 ? (
-                        <motion.form
-                            key="step1"
-                            initial={{ opacity: 0, x: 20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            exit={{ opacity: 0, x: -20 }}
-                            className="space-y-4"
-                            onSubmit={handleSubmit(onSubmit)}
-                        >
-                            <div className="space-y-1">
-                                <label className="text-xs font-medium text-white/60 ml-2">Email Address</label>
-                                <input
-                                    type="email"
-                                    placeholder="johndoe@gmail.com"
-                                    {...register("email")}
-                                    className={`w-full bg-black/50 border border-transparent rounded-full px-5 py-3 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#FF9B8A]/20 transition-all placeholder:text-gray-500 text-white ${errors.email ? '!border-red-500 bg-red-500/10' : ''}`}
-                                />
-                                {errors.email && (
-                                    <p className="text-[10px] text-red-500 ml-2 mt-0.5 font-medium">{errors.email.message}</p>
-                                )}
-                            </div>
+              <button
+                type="button"
+                onClick={() => setStep(1)}
+                className="block mx-auto text-sm font-semibold text-primary hover:underline"
+              >
+                Không nhận được email? Thử lại
+              </button>
 
-                            <button
-                                type="submit"
-                                disabled={forgotPassword.isPending || !isValid}
-                                className="w-full h-12 bg-[#FF9B8A] text-white font-bold rounded-full py-2 shadow-lg shadow-[#FF9B8A]/20 hover:bg-[#FF8A75] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-base active:scale-[0.98]"
-                            >
-                                {forgotPassword.isPending ? (
-                                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                                ) : (
-                                    "Send Reset Link"
-                                )}
-                            </button>
-                        </motion.form>
-                    ) : (
-                        <motion.div
-                            key="step2"
-                            initial={{ opacity: 0, scale: 0.95 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            className="text-center space-y-6"
-                        >
-                            <div className="bg-white/5 border border-white/10 rounded-2xl p-4 backdrop-blur-sm">
-                                <p className="text-white/60 text-xs leading-relaxed">
-                                    Please check your inbox and click the reset link. It expires in 30 minutes.
-                                    If you don't see it, check your spam folder.
-                                </p>
-                            </div>
+              <Button asChild variant="outline" className="w-full h-12 rounded-xl">
+                <Link href="/login">Quay lại đăng nhập</Link>
+              </Button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
 
-                            <button
-                                onClick={() => setStep(1)}
-                                className="text-[#FF9B8A] text-xs font-semibold hover:underline bg-transparent border-none p-0 cursor-pointer block mx-auto"
-                            >
-                                Didn't receive the email? Try again
-                            </button>
-
-                            <Link href="/login" className="block w-full h-12 bg-white/5 hover:bg-white/10 text-white font-bold rounded-full py-2 transition-all flex items-center justify-center border border-white/10 text-sm">
-                                Return to Login
-                            </Link>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-            </div>
-
-            {/* RIGHT SIDE: DECORATION */}
-            <div className="hidden lg:block p-4 relative">
-                <div
-                    className="h-full bg-black rounded-[45px] p-16 flex flex-col justify-center relative shadow-2xl"
-                    style={maskStyle}
-                >
-                    <div className="relative z-10 space-y-10">
-                        <div className="inline-block p-3 bg-white/5 rounded-2xl backdrop-blur-md mb-4 border border-white/10">
-                            <Lock className="w-8 h-8 text-[#FF9B8A]" />
-                        </div>
-                        <h2 className="text-[52px] font-bold text-white leading-[1.1]">Security is our priority.</h2>
-                        <p className="text-xl text-white/40 font-light max-w-sm leading-relaxed">
-                            We use advanced encryption to ensure your data stays safe while you explore the best events around.
-                        </p>
-                    </div>
-
-                    <div className="absolute top-10 right-10 opacity-10 pointer-events-none">
-                        <Image src="/DiDoo.png" alt="logo" width={200} height={200} className="grayscale brightness-0 invert" />
-                    </div>
-
-                    <div className="absolute bottom-10 right-10 opacity-20 pointer-events-none">
-                        <svg width="200" height="200" viewBox="0 0 100 100" fill="none" className="text-[#FF9B8A]">
-                            <path d="M50 0L53 47L100 50L53 53L50 100L47 53L0 50L47 47L50 0Z" fill="currentColor" />
-                        </svg>
-                    </div>
-                </div>
-            </div>
-        </motion.div>
-    );
+      <div className="hidden lg:flex flex-col justify-center p-10 bg-zinc-900 text-white min-h-[420px]">
+        <h2 className="text-2xl font-bold leading-tight">
+          Bảo mật là ưu tiên
+          <br />
+          <span className="text-zinc-400">của chúng tôi</span>
+        </h2>
+        <p className="mt-4 text-zinc-400 text-sm max-w-sm leading-relaxed">
+          Chúng tôi sử dụng mã hóa tiên tiến để đảm bảo dữ liệu của bạn an toàn khi bạn khám phá những sự kiện tuyệt vời.
+        </p>
+      </div>
+    </motion.div>
+  );
 }

@@ -1,13 +1,15 @@
 'use client';
 
 import { useRef, useEffect, useState } from 'react';
-import MapComponent, { Marker, NavigationControl, useMap, Source, Layer } from 'react-map-gl/mapbox';
-import 'mapbox-gl/dist/mapbox-gl.css';
+import MapComponent, { Marker, NavigationControl, useMap, Source, Layer } from 'react-map-gl/maplibre';
+import 'maplibre-gl/dist/maplibre-gl.css';
+import maplibregl from 'maplibre-gl';
 import Image from 'next/image';
 import { Event } from '@/types/event';
 import { Spinner } from '@/components/ui/spinner';
 import { envconfig } from '../../../../config';
 
+const MAP_TILES_KEY = "SnGhg9VIWX1fplbNQZkQnVNlUpsxCdViDKvUqtax";
 // User location pin - địa điểm hiện tại
 const UserLocationPin = ({ className = "w-8 h-8" }: { className?: string }) => (
   <svg
@@ -28,106 +30,6 @@ const UserLocationPin = ({ className = "w-8 h-8" }: { className?: string }) => (
   </svg>
 );
 
-// Component to enable 3D buildings
-const Map3DLayer = () => {
-  const { current: mapRef } = useMap();
-
-  useEffect(() => {
-    if (!mapRef) return;
-    const map = mapRef.getMap();
-    if (!map) return;
-
-    const setupMap = () => {
-      // Add DEM source for terrain
-      if (!map.getSource('mapbox-dem')) {
-        map.addSource('mapbox-dem', {
-          type: 'raster-dem',
-          url: 'mapbox://mapbox.mapbox-terrain-dem-v1',
-          tileSize: 512,
-          maxzoom: 14
-        });
-      }
-
-      // Set terrain
-      if (!map.getTerrain()) {
-        map.setTerrain({ source: 'mapbox-dem', exaggeration: 1.5 });
-      }
-
-      // Add 3D buildings layer with improved colors
-      if (!map.getLayer('3d-buildings')) {
-        const layers = map.getStyle()?.layers;
-        const labelLayerId = layers?.find(
-          (layer: any) => layer.type === 'symbol' && layer.layout?.['text-field']
-        )?.id;
-
-        map.addLayer(
-          {
-            id: '3d-buildings',
-            source: 'composite',
-            'source-layer': 'building',
-            filter: ['==', 'extrude', 'true'],
-            type: 'fill-extrusion',
-            minzoom: 14,
-            paint: {
-              'fill-extrusion-color': [
-                'interpolate',
-                ['linear'],
-                ['get', 'height'],
-                0, '#dbeafe',
-                50, '#93c5fd',
-                100, '#60a5fa',
-                150, '#3b82f6'
-              ],
-              'fill-extrusion-height': [
-                'interpolate',
-                ['linear'],
-                ['zoom'],
-                14, 0,
-                14.5, ['get', 'height']
-              ],
-              'fill-extrusion-base': [
-                'interpolate',
-                ['linear'],
-                ['zoom'],
-                14, 0,
-                14.5, ['get', 'min_height']
-              ],
-              'fill-extrusion-opacity': 0.8,
-              'fill-extrusion-vertical-gradient': true
-            }
-          },
-          labelLayerId
-        );
-      }
-
-      // Enhanced sky layer
-      if (!map.getLayer('sky')) {
-        map.addLayer({
-          id: 'sky',
-          type: 'sky',
-          paint: {
-            'sky-type': 'atmosphere',
-            'sky-atmosphere-sun': [0.0, 90.0],
-            'sky-atmosphere-sun-intensity': 15
-          }
-        });
-      }
-    };
-
-    if (map.isStyleLoaded()) {
-      setupMap();
-    } else {
-      map.on('style.load', setupMap);
-    }
-
-    return () => {
-      map.off('style.load', setupMap);
-    };
-  }, [mapRef]);
-
-  return null;
-};
-
 interface MapProps {
   coordinates: { lat: number; lng: number } | null;
   events: Event[];
@@ -137,39 +39,87 @@ interface MapProps {
   mapStyle?: string;
 }
 
+// Utility to decode Goong/Google polyline
+const decodePolyline = (encoded: string) => {
+  const poly = [];
+  let index = 0, len = encoded.length;
+  let lat = 0, lng = 0;
+
+  while (index < len) {
+    let b, shift = 0, result = 0;
+    do {
+      b = encoded.charCodeAt(index++) - 63;
+      result |= (b & 0x1f) << shift;
+      shift += 5;
+    } while (b >= 0x20);
+    let dlat = ((result & 1) ? ~(result >> 1) : (result >> 1));
+    lat += dlat;
+
+    shift = 0;
+    result = 0;
+    do {
+      b = encoded.charCodeAt(index++) - 63;
+      result |= (b & 0x1f) << shift;
+      shift += 5;
+    } while (b >= 0x20);
+    let dlng = ((result & 1) ? ~(result >> 1) : (result >> 1));
+    lng += dlng;
+
+    poly.push([lng * 1e-5, lat * 1e-5]); // Goong uses [lng, lat] for GeoJSON
+  }
+  return poly;
+};
+
+// ================== COMPONENT ==================
 const Map = ({ coordinates, events, isLoading, selectedEvent, setSelectedEvent, mapStyle }: MapProps) => {
   const mapRef = useRef<any>(null);
   const [routeData, setRouteData] = useState<any>(null);
   const [isLoadingRoute, setIsLoadingRoute] = useState(false);
   const [routeInfo, setRouteInfo] = useState<{ distance: string; duration: string } | null>(null);
 
-  // Fetch route from Mapbox Directions API
-  const fetchRoute = async (start: [number, number], end: [number, number]) => {
+  // Fetch route from Goong Directions API
+  const fetchRoute = async (start: { lat: number, lng: number }, end: { lat: number, lng: number }) => {
     setIsLoadingRoute(true);
+    console.log('Fetching route from:', start, 'to:', end);
     try {
+      // Use MAP_TILES_KEY as it's the one we know is currently valid for the user
       const response = await fetch(
-        `https://api.mapbox.com/directions/v5/mapbox/driving/${start[0]},${start[1]};${end[0]},${end[1]}?geometries=geojson&overview=full&steps=true&access_token=${envconfig.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}`
+        `https://rsapi.goong.io/Direction?origin=${start.lat},${start.lng}&destination=${end.lat},${end.lng}&vehicle=car&api_key=${MAP_TILES_KEY}`
       );
       const data = await response.json();
+      console.log('Goong Directions Data:', data);
 
       if (data.routes && data.routes.length > 0) {
         const route = data.routes[0];
-        setRouteData({
-          type: 'Feature',
-          properties: {},
-          geometry: route.geometry
-        });
 
-        // Format distance and duration
-        const distanceKm = (route.distance / 1000).toFixed(1);
-        const durationMin = Math.round(route.duration / 60);
+        // 1. Decode polyline
+        if (route.overview_polyline && route.overview_polyline.points) {
+          const decodedCoords = decodePolyline(route.overview_polyline.points);
+          console.log('Decoded Polyline Coords:', decodedCoords);
+
+          setRouteData({
+            type: 'Feature',
+            geometry: {
+              type: 'LineString',
+              coordinates: decodedCoords
+            },
+            properties: {}
+          });
+        }
+
+        // 2. Set distance and duration
+        const distanceText = route.legs[0].distance.text;
+        const durationText = route.legs[0].duration.text;
+
         setRouteInfo({
-          distance: `${distanceKm} km`,
-          duration: `${durationMin} phút`
+          distance: distanceText,
+          duration: durationText
         });
+      } else {
+        console.warn('No routes found in Goong response:', data);
       }
     } catch (error) {
-      console.error('Error fetching route:', error);
+      console.error('Error fetching route from Goong:', error);
     } finally {
       setIsLoadingRoute(false);
     }
@@ -183,9 +133,9 @@ const Map = ({ coordinates, events, isLoading, selectedEvent, setSelectedEvent, 
     if (!map) return;
 
     // Fetch route
-    const eventLng = selectedEvent.locations?.[0]?.longitude || 0;
-    const eventLat = selectedEvent.locations?.[0]?.latitude || 0;
-    fetchRoute([coordinates.lng, coordinates.lat], [eventLng, eventLat]);
+    const eventLng = (selectedEvent.locations?.[0] as any)?.longitude ?? (selectedEvent.locations?.[0] as any)?.Longitude ?? 0;
+    const eventLat = (selectedEvent.locations?.[0] as any)?.latitude ?? (selectedEvent.locations?.[0] as any)?.Latitude ?? 0;
+    fetchRoute({ lat: coordinates.lat, lng: coordinates.lng }, { lat: eventLat, lng: eventLng });
 
     // Smooth camera animation
     map.easeTo({
@@ -196,8 +146,6 @@ const Map = ({ coordinates, events, isLoading, selectedEvent, setSelectedEvent, 
 
     setTimeout(() => {
       // Calculate bounds to fit both points
-      const eventLng = selectedEvent.locations?.[0]?.longitude || 0;
-      const eventLat = selectedEvent.locations?.[0]?.latitude || 0;
       const bounds = [
         [Math.min(coordinates.lng, eventLng), Math.min(coordinates.lat, eventLat)],
         [Math.max(coordinates.lng, eventLng), Math.max(coordinates.lat, eventLat)]
@@ -302,7 +250,7 @@ const Map = ({ coordinates, events, isLoading, selectedEvent, setSelectedEvent, 
     <div className="relative w-full h-full overflow-hidden rounded-none">
       <MapComponent
         ref={mapRef}
-        mapboxAccessToken={envconfig.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}
+        mapLib={maplibregl}
         initialViewState={{
           longitude: coordinates.lng,
           latitude: coordinates.lat,
@@ -311,16 +259,11 @@ const Map = ({ coordinates, events, isLoading, selectedEvent, setSelectedEvent, 
           bearing: 0
         }}
         style={{ width: '100%', height: '100%' }}
-        mapStyle={mapStyle || "mapbox://styles/mapbox/standard"}
-        terrain={{ source: 'mapbox-dem', exaggeration: 1.5 }}
-        antialias={true}
+        mapStyle={mapStyle || `https://tiles.goong.io/assets/goong_map_web.json?api_key=${MAP_TILES_KEY}`}
       >
-        {/* 3D Buildings & Terrain Layer */}
-        <Map3DLayer />
-
         {/* Route layers */}
         {routeData && (
-          <Source id="route" type="geojson" data={routeData}>
+          <Source id="route-source" type="geojson" data={routeData}>
             <Layer {...routeOutlineLayerStyle} />
             <Layer {...routeLayerStyle} />
           </Source>
@@ -365,11 +308,17 @@ const Map = ({ coordinates, events, isLoading, selectedEvent, setSelectedEvent, 
         {/* Event Markers - Chưa chọn: ghim đơn giản | Đang chọn: ảnh + popup */}
         {events.map((event) => {
           const isSelected = selectedEvent?.id === event.id;
+          const loc = event.locations?.[0] as any;
+          const lat = loc?.latitude ?? loc?.Latitude ?? 0;
+          const lng = loc?.longitude ?? loc?.Longitude ?? 0;
+
+          if (lat === 0 || lng === 0) return null;
+
           return (
             <Marker
               key={event.id}
-              longitude={event.locations?.[0]?.longitude || 0}
-              latitude={event.locations?.[0]?.latitude || 0}
+              longitude={lng}
+              latitude={lat}
               anchor={isSelected ? "center" : "bottom"}
             >
               <div
@@ -425,8 +374,8 @@ const Map = ({ coordinates, events, isLoading, selectedEvent, setSelectedEvent, 
                         </div>
                         <div className="px-4 py-3 text-center">
                           <p className="text-sm font-bold text-gray-900 dark:text-white line-clamp-2">{event.name}</p>
-                          {event.locations?.[0]?.address && (
-                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 truncate">{event.locations[0].address}</p>
+                          {loc?.address && (
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 truncate">{loc.address}</p>
                           )}
                         </div>
                         <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-3 h-3 bg-white dark:bg-gray-900 rotate-45 border-r border-b border-white/20" />
@@ -450,19 +399,19 @@ const Map = ({ coordinates, events, isLoading, selectedEvent, setSelectedEvent, 
               </svg>
             </div>
             <div>
-              <p className="text-sm text-gray-600 font-medium">Lộ trình đến {selectedEvent.name}</p>
+              <p className="text-sm text-gray-600 font-medium">Lộ trình đến {selectedEvent?.name}</p>
               <div className="flex items-center gap-4 mt-1">
                 <div className="flex items-center gap-1">
                   <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                   </svg>
-                  <span className="text-sm font-bold text-gray-900">{routeInfo.distance}</span>
+                  <span className="text-sm font-bold text-gray-900">{routeInfo?.distance}</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                  <span className="text-sm font-bold text-gray-900">{routeInfo.duration}</span>
+                  <span className="text-sm font-bold text-gray-900">{routeInfo?.duration}</span>
                 </div>
               </div>
             </div>

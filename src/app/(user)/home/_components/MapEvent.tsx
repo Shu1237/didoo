@@ -2,14 +2,18 @@
 
 import { MapPin, Calendar } from "lucide-react";
 import Image from "next/image";
-import MapComponent, { Marker, NavigationControl } from 'react-map-gl/mapbox';
-import "mapbox-gl/dist/mapbox-gl.css";
+import MapComponent, { Marker, NavigationControl } from 'react-map-gl/maplibre';
+import "maplibre-gl/dist/maplibre-gl.css";
+import maplibregl from "maplibre-gl";
 import { useEffect, useRef, useState, useMemo } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Spinner } from "@/components/ui/spinner";
 import { getDistanceKm } from "@/utils/helper";
 import { Event } from "@/types/event";
+import { useLocationContext } from "@/contexts/locationContext";
 import envconfig from "../../../../../config";
+
+const GOONG_API_KEY = "1kLRnoD5VyIe5cexVMp6fWAEMcAF0LyZSuA7hss5";
 
 interface MapEventProps {
   eventData: Event[];
@@ -21,12 +25,10 @@ const RADIUS_KM = 25;
 
 // ================== COMPONENT ==================
 export default function MapEvent({ eventData }: MapEventProps) {
-  const [userLocation, setUserLocation] =
-    useState<{ lat: number; lng: number } | null>(null);
+  const { location, isLoading: isLocationLoading } = useLocationContext();
+  const userLocation = location ? { lat: location.latitude, lng: location.longitude } : null;
 
-  const [selectedEvent, setSelectedEvent] =
-    useState<Event | null>(null);
-
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [mapVisible, setMapVisible] = useState(false);
   const [visibleEvents, setVisibleEvents] = useState<number[]>([]);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -34,26 +36,13 @@ export default function MapEvent({ eventData }: MapEventProps) {
 
   const sectionRef = useRef<HTMLDivElement | null>(null);
 
-  // ================== 1️⃣ GET USER GPS ==================
+  // Sync loading state with location context (with slight delay for UX)
   useEffect(() => {
-    //  default to HCMC if geolocation not available
-    if (!navigator.geolocation) {
-      setUserLocation({ lat: 10.776889, lng: 106.700806 });
-      setTimeout(() => setIsLoading(false), 800);
-      return;
+    if (!isLocationLoading) {
+      const t = setTimeout(() => setIsLoading(false), 400);
+      return () => clearTimeout(t);
     }
-    navigator.geolocation.getCurrentPosition((position) => {
-      setUserLocation({
-        lat: position.coords.latitude,
-        lng: position.coords.longitude,
-      });
-      setTimeout(() => setIsLoading(false), 800);
-    }, () => {
-      // Fallback if permission denied
-      setUserLocation({ lat: 10.776889, lng: 106.700806 });
-      setTimeout(() => setIsLoading(false), 800);
-    });
-  }, []);
+  }, [isLocationLoading]);
 
   // ================== 2️⃣ INTERSECTION ==================
   useEffect(() => {
@@ -79,15 +68,21 @@ export default function MapEvent({ eventData }: MapEventProps) {
     if (!userLocation) return [];
 
     return eventData
-      .map((event) => ({
-        ...event,
-        distance: getDistanceKm(
-          userLocation.lat,
-          userLocation.lng,
-          event.locations?.[0]?.latitude || 0,
-          event.locations?.[0]?.longitude || 0
-        ),
-      }))
+      .map((event) => {
+        const loc = event.locations?.[0] as any;
+        const lat = loc?.latitude ?? loc?.Latitude ?? 0;
+        const lng = loc?.longitude ?? loc?.Longitude ?? 0;
+
+        return {
+          ...event,
+          distance: getDistanceKm(
+            userLocation.lat,
+            userLocation.lng,
+            lat,
+            lng
+          ),
+        };
+      })
       .filter((e) => e.distance <= RADIUS_KM)
       .sort((a, b) => a.distance - b.distance)
       .slice(0, 3);
@@ -148,14 +143,14 @@ export default function MapEvent({ eventData }: MapEventProps) {
               ) : (
                 userLocation && (
                   <MapComponent
-                    mapboxAccessToken={envconfig.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN!}
+                    mapLib={maplibregl}
                     initialViewState={{
-                      longitude: selectedEvent && selectedEvent.locations?.[0] ? selectedEvent.locations[0].longitude : userLocation.lng,
-                      latitude: selectedEvent && selectedEvent.locations?.[0] ? selectedEvent.locations[0].latitude : userLocation.lat,
+                      longitude: selectedEvent && selectedEvent.locations?.[0] ? ((selectedEvent.locations[0] as any).longitude ?? (selectedEvent.locations[0] as any).Longitude) : userLocation.lng,
+                      latitude: selectedEvent && selectedEvent.locations?.[0] ? ((selectedEvent.locations[0] as any).latitude ?? (selectedEvent.locations[0] as any).Latitude) : userLocation.lat,
                       zoom: 13,
                     }}
                     style={{ width: "100%", height: "520px" }}
-                    mapStyle="mapbox://styles/mapbox/streets-v12"
+                    mapStyle="https://tiles.goong.io/assets/goong_map_web.json?api_key=SnGhg9VIWX1fplbNQZkQnVNlUpsxCdViDKvUqtax"
                   >
                     <NavigationControl position="top-right" />
 
@@ -169,27 +164,33 @@ export default function MapEvent({ eventData }: MapEventProps) {
                     </Marker>
 
                     {/* EVENT MARKERS */}
-                    {nearbyEvents.map((event) => (
-                      <Marker
-                        key={event.id}
-                        longitude={event.locations?.[0]?.longitude || 0}
-                        latitude={event.locations?.[0]?.latitude || 0}
-                        anchor="bottom"
-                        onClick={(e) => {
-                          e.originalEvent.stopPropagation();
-                          setSelectedEvent(event);
-                          setIsExpanded(true);
-                        }}
-                      >
-                        <div
-                          className={`w-8 h-8 rounded-full border-2 border-white shadow-lg transition-all ${selectedEvent?.id === event.id
-                            ? 'bg-red-500 scale-125 animate-bounce'
-                            : 'bg-orange-500'
-                            }`}
-                          title={event.name}
-                        />
-                      </Marker>
-                    ))}
+                    {nearbyEvents.map((event) => {
+                      const loc = event.locations?.[0] as any;
+                      const lat = loc?.latitude ?? loc?.Latitude ?? 0;
+                      const lng = loc?.longitude ?? loc?.Longitude ?? 0;
+
+                      return (
+                        <Marker
+                          key={event.id}
+                          longitude={lng}
+                          latitude={lat}
+                          anchor="bottom"
+                          onClick={(e) => {
+                            e.originalEvent.stopPropagation();
+                            setSelectedEvent(event);
+                            setIsExpanded(true);
+                          }}
+                        >
+                          <div
+                            className={`w-8 h-8 rounded-full border-2 border-white shadow-lg transition-all ${selectedEvent?.id === event.id
+                              ? 'bg-red-500 scale-125 animate-bounce'
+                              : 'bg-orange-500'
+                              }`}
+                            title={event.name}
+                          />
+                        </Marker>
+                      );
+                    })}
                   </MapComponent>
                 )
               )}
@@ -258,15 +259,15 @@ export default function MapEvent({ eventData }: MapEventProps) {
 
                         <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                           <MapPin className="w-3 h-3" />
-                          {event.locations?.[0]?.address || "N/A"}
+                          {event.locations?.[0]?.address || "Đang cập nhật"}
                         </div>
 
                         <div className="flex justify-between items-center mt-2">
                           <div className="text-xs font-medium text-primary">
-                            {event.distance.toFixed(1)} km away
+                            Cách {event.distance.toFixed(1)} km
                           </div>
                           <div className="text-xs font-bold text-foreground bg-accent/10 px-2 py-1 rounded-full">
-                            TBA
+                            Sắp mở bán
                           </div>
                         </div>
                       </div>

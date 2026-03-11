@@ -1,15 +1,22 @@
-import { CategoryGetListQuery } from "@/types/category";
-import { EventGetListQuery } from "@/types/event";
-import { EventReviewGetListQuery } from "@/types/eventReview";
-import { FavoriteGetListQuery } from "@/types/favorite";
-import { InteractionGetListQuery } from "@/types/interaction";
-import { OrganizerGetListQuery } from "@/types/organizer";
-import { TicketGetListQuery } from "@/types/ticket";
-import { TicketTypeGetListQuery } from "@/types/ticketType";
-import { BookingGetListQuery } from "@/types/booking";
-import { BookingDetailGetListQuery } from "@/types/bookingDetail";
-import { PaymentMethodGetListQuery } from "@/types/paymentMethod";
-import { UserGetListQuery } from "@/types/user";
+import {
+    CategoryGetListQuery,
+    EventGetListQuery,
+    EventReviewGetListQuery,
+    FavoriteGetListQuery,
+    InteractionGetListQuery,
+    OrganizerGetListQuery,
+} from "@/types/event";
+import { TicketGetListQuery, TicketTypeGetListQuery } from "@/types/ticket";
+import {
+    BookingGetListQuery,
+    BookingDetailGetListQuery,
+    PaymentMethodGetListQuery,
+    PaymentGetListQuery,
+    ResaleGetListQuery,
+    ResaleTransactionGetListQuery,
+} from "@/types/booking";
+import { NotificationGetListQuery, CheckInGetListQuery } from "@/types/operation";
+import { UserGetListQuery } from "@/types/auth";
 
 
 export const KEY = {
@@ -26,6 +33,11 @@ export const KEY = {
     bookings: ['bookings'],
     bookingDetails: ['booking-details'],
     paymentMethods: ['payment-methods'],
+    payments: ['payments'],
+    resales: ['resales'],
+    resaleTransactions: ['resale-transactions'],
+    notifications: ['notifications'],
+    checkIns: ['check-ins'],
 } as const;
 
 export const QUERY_KEY = {
@@ -79,5 +91,25 @@ export const QUERY_KEY = {
     paymentMethods: {
         list: (query?: PaymentMethodGetListQuery) => [...KEY.paymentMethods, 'list', query] as const,
         detail: (id: string) => [...KEY.paymentMethods, 'detail', id] as const,
+    },
+    payments: {
+        list: (query?: PaymentGetListQuery) => [...KEY.payments, 'list', query] as const,
+        detail: (id: string) => [...KEY.payments, 'detail', id] as const,
+    },
+    resales: {
+        list: (query?: ResaleGetListQuery) => [...KEY.resales, 'list', query] as const,
+        detail: (id: string) => [...KEY.resales, 'detail', id] as const,
+    },
+    resaleTransactions: {
+        list: (query?: ResaleTransactionGetListQuery) => [...KEY.resaleTransactions, 'list', query] as const,
+        detail: (id: string) => [...KEY.resaleTransactions, 'detail', id] as const,
+    },
+    notifications: {
+        list: (query?: NotificationGetListQuery) => [...KEY.notifications, 'list', query] as const,
+        detail: (id: string) => [...KEY.notifications, 'detail', id] as const,
+    },
+    checkIns: {
+        list: (query?: CheckInGetListQuery) => [...KEY.checkIns, 'list', query] as const,
+        detail: (id: string) => [...KEY.checkIns, 'detail', id] as const,
     },
 } as const;

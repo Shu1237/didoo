@@ -1,106 +1,92 @@
 "use client";
 
-import { ArrowUpRight, MapPin, Clock } from "lucide-react";
-import Image from "next/image";
-import { Event } from "@/types/event";
+import { ArrowRight } from "lucide-react";
+import { Category } from "@/types/event";
 import Link from "next/link";
 import { motion } from "framer-motion";
 
-// Reusing avatars from api/dicebear or local images
-const AVATARS = [
-    "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix",
-    "https://api.dicebear.com/7.x/avataaars/svg?seed=Aneka",
-    "https://api.dicebear.com/7.x/avataaars/svg?seed=Mark"
-];
-
 interface MonthOverviewProps {
-    events: Event[];
+  categories: Category[];
 }
 
-export const MonthOverview = ({ events }: MonthOverviewProps) => {
-    // Select specific events for the grid (avoiding the first one if it's used in Hero)
-    // We'll use index 1, 2, 3, 4 for the 4 small cards
-    const highlightEvents = events.slice(1, 5);
+export function MonthOverview({ categories }: MonthOverviewProps) {
+  const topCategories = categories.slice(0, 3);
 
-    return (
-        <section className="py-20 bg-slate-50">
-            <div className="container mx-auto px-6">
-                <motion.div
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, margin: "-100px" }}
-                    transition={{ duration: 0.6 }}
-                    className="mb-12"
-                >
-                    <h2 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight leading-[1.1] uppercase">
-                        More to <br />
-                        <span className="text-slate-400">Discover</span>
-                    </h2>
-                </motion.div>
+  return (
+    <section className="py-16 lg:py-24 bg-white">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="mb-12"
+        >
+          <h2 className="text-3xl sm:text-4xl font-bold text-zinc-900">
+            Khám phá thêm
+          </h2>
+          <p className="mt-2 text-zinc-600">Danh mục nổi bật dành cho bạn</p>
+        </motion.div>
 
-                <motion.div
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={{ once: true, margin: "-50px" }}
-                    variants={{
-                        hidden: {},
-                        visible: {
-                            transition: { staggerChildren: 0.15 }
-                        }
-                    }}
-                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
-                >
-                    {highlightEvents.map((event) => (
-                        <motion.div
-                            key={event.id}
-                            variants={{
-                                hidden: { opacity: 0, scale: 0.95, y: 40 },
-                                visible: { opacity: 1, scale: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } }
-                            }}
-                            className="h-[450px] lg:h-[550px] w-full"
-                        >
-                            <Link href={`/events/${event.id}`} className="block relative w-full h-full rounded-[2.5rem] overflow-hidden group shadow-lg hover:shadow-2xl hover:shadow-primary/20 transition-all duration-500">
-                                <Image
-                                    src={event.thumbnailUrl || event.bannerUrl || 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=2070'}
-                                    alt={event.name}
-                                    fill
-                                    className="object-cover transition-transform duration-1000 group-hover:scale-110"
-                                />
-                                {/* Gradient Overlay */}
-                                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/95 via-slate-900/40 to-transparent opacity-80 group-hover:opacity-100 transition-opacity duration-500" />
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-40px" }}
+          variants={{
+            hidden: {},
+            visible: { transition: { staggerChildren: 0.12 } },
+          }}
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
+        >
+          {topCategories.map((category) => (
+            <motion.div
+              key={category.id}
+              variants={{
+                hidden: { opacity: 0, y: 24 },
+                visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+              }}
+            >
+              <Link
+                href={`/events?categoryId=${category.id}`}
+                className="group flex h-[300px] flex-col justify-between rounded-2xl border border-zinc-200 bg-gradient-to-br from-white to-zinc-50 p-6 transition-all hover:border-primary/30 hover:shadow-lg"
+              >
+                <span className="inline-flex w-fit rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-xs font-semibold text-primary">
+                  Danh mục
+                </span>
+                <div>
+                  <h3 className="line-clamp-2 text-2xl font-bold text-zinc-900">{category.name}</h3>
+                  <p className="mt-2 line-clamp-2 text-sm text-zinc-600">
+                    {category.description || "Khám phá các sự kiện nổi bật theo danh mục này."}
+                  </p>
+                </div>
+                <span className="inline-flex items-center gap-2 text-sm font-semibold text-primary">
+                  Xem sự kiện
+                  <ArrowRight className="h-4 w-4" />
+                </span>
+              </Link>
+            </motion.div>
+          ))}
 
-                                {/* Content */}
-                                <div className="absolute inset-0 p-8 flex flex-col justify-end">
-                                    <div className="translate-y-8 group-hover:translate-y-0 transition-transform duration-500 ease-out">
-                                        <span className="inline-block px-4 py-1.5 mb-4 rounded-full bg-white/20 backdrop-blur-md text-white text-[10px] font-black uppercase tracking-widest border border-white/20">
-                                            {event.category?.name || "Event"}
-                                        </span>
-                                        <h3 className="text-2xl lg:text-3xl font-black text-white mb-2 leading-[1.1] line-clamp-3">
-                                            {event.name}
-                                        </h3>
-
-                                        {/* Reveal on hover details */}
-                                        <div className="flex flex-col gap-3 mt-6 text-slate-300 text-sm font-medium opacity-0 group-hover:opacity-100 transition-all duration-500 delay-100">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center shrink-0">
-                                                    <Clock className="w-3.5 h-3.5 text-white" />
-                                                </div>
-                                                {new Date(event.startTime).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                                            </div>
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center shrink-0">
-                                                    <MapPin className="w-3.5 h-3.5 text-white" />
-                                                </div>
-                                                <span className="line-clamp-1">{event.locations?.[0]?.name || "Online / TBA"}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </Link>
-                        </motion.div>
-                    ))}
-                </motion.div>
-            </div>
-        </section>
-    );
-};
+          <motion.div
+            variants={{
+              hidden: { opacity: 0, y: 24 },
+              visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+            }}
+          >
+            <Link
+              href="/events"
+              className="group flex h-[300px] flex-col items-center justify-center rounded-2xl border border-dashed border-zinc-300 bg-zinc-50 p-6 text-center transition-all hover:border-primary/40 hover:bg-primary/5"
+            >
+              <span className="rounded-full bg-white p-4 shadow-sm">
+                <ArrowRight className="h-6 w-6 text-primary" />
+              </span>
+              <h3 className="mt-4 text-xl font-bold text-zinc-900">Xem thêm</h3>
+              <p className="mt-2 text-sm text-zinc-600">
+                Mở toàn bộ danh sách sự kiện và bộ lọc nâng cao.
+              </p>
+            </Link>
+          </motion.div>
+        </motion.div>
+      </div>
+    </section>
+  );
+}

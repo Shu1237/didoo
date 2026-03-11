@@ -1,102 +1,104 @@
-import { Button } from '@/components/ui/button';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Calendar } from '@/components/ui/calendar';
-import { format } from 'date-fns';
-import { Search, MapPin, Calendar as CalendarIcon } from 'lucide-react';
-import { useState } from 'react';
-import { cn } from '@/lib/utils';
-import { vi } from 'date-fns/locale';
-import { Category } from '@/types/category';
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { format } from "date-fns";
+import { Search, Tag, Calendar as CalendarIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { vi } from "date-fns/locale";
+import { Category } from "@/types/event";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface SearchFilterProps {
-    categories?: Category[];
+  categories?: Category[];
 }
 
-export const SearchFilter = ({ categories = [] }: SearchFilterProps) => {
-    const [date, setDate] = useState<Date>();
-    const [selectedCategory, setSelectedCategory] = useState<string>('');
+export default function SearchFilter({ categories = [] }: SearchFilterProps) {
+  const router = useRouter();
+  const [keyword, setKeyword] = useState("");
+  const [date, setDate] = useState<Date>();
+  const [categoryId, setCategoryId] = useState<string>("all");
 
-    return (
-        <div className="relative z-30 max-w-5xl mx-auto px-4 -mt-24 sm:-mt-10">
-            <div className="bg-[#1e1b4b]/60 backdrop-blur-md border border-white/10 shadow-2xl rounded-[2.5rem] p-3">
-                <div className="grid grid-cols-1 md:grid-cols-12 gap-2">
-                    {/* Event Name Input */}
-                    <div className="md:col-span-4 relative group">
-                        <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none z-10">
-                            <Search className="h-5 w-5 text-gray-400 group-focus-within:text-white transition-colors" />
-                        </div>
-                        <input
-                            type="text"
-                            placeholder="Search events, artists..."
-                            className="flex h-14 w-full pl-12 pr-4 rounded-xl bg-white/5 border border-white/10 text-white hover:bg-white/10 hover:border-white/20 focus:bg-white/10 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/20 transition-all placeholder:text-gray-400"
-                        />
-                    </div>
+  const handleSearch = () => {
+    const params = new URLSearchParams();
+    if (keyword.trim()) params.set("name", keyword.trim());
+    if (categoryId && categoryId !== "all") params.set("categoryId", categoryId);
+    if (date) params.set("startTime", format(date, "yyyy-MM-dd"));
+    router.push(`/events?${params.toString()}`);
+  };
 
-                    {/* Category Selection */}
-                    <div className="md:col-span-3 relative group">
-                        <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none z-10">
-                            <MapPin className="h-5 w-5 text-gray-400 group-focus-within:text-white transition-colors" />
-                        </div>
-                        <select
-                            value={selectedCategory}
-                            onChange={(e) => setSelectedCategory(e.target.value)}
-                            className="flex h-14 w-full pl-12 pr-4 rounded-xl bg-white/5 border border-white/10 text-white hover:bg-white/10 hover:border-white/20 focus:bg-white/10 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/20 transition-all appearance-none cursor-pointer"
-                        >
-                            <option value="" className="bg-slate-900 text-gray-400">All Categories</option>
-                            {categories.map((cat) => (
-                                <option key={cat.id} value={cat.id} className="bg-slate-900 text-white">
-                                    {cat.name}
-                                </option>
-                            ))}
-                        </select>
-                        <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none">
-                            <svg className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                            </svg>
-                        </div>
-                    </div>
+  return (
+    <div className="relative z-20 max-w-4xl mx-auto px-4 -mt-16 sm:-mt-12">
+      <div className="rounded-2xl border border-zinc-200 bg-white/95 backdrop-blur-md shadow-xl p-4 sm:p-5">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
+          <div className="md:col-span-4 relative">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
+            <input
+              type="text"
+              value={keyword}
+              onChange={(e) => setKeyword(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+              placeholder="Tìm sự kiện, nghệ sĩ..."
+              className="flex h-12 w-full pl-11 pr-4 rounded-xl border border-zinc-200 bg-zinc-50 text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+            />
+          </div>
 
-                    {/* Date Picker - Đã đồng bộ class */}
-                    <div className="md:col-span-3 relative group">
-                        <Popover>
-                            <PopoverTrigger asChild>
-                                <Button
-                                    variant="outline"
-                                    className={cn(
-                                        "w-full h-14 pl-12 justify-start text-left font-normal rounded-xl",
-                                        "bg-white/5 border-white/10 text-white hover:bg-white/10 hover:border-white/20 hover:text-white",
-                                        "focus:ring-1 focus:ring-primary/20 transition-all",
-                                        !date && "text-gray-400"
-                                    )}
-                                >
-                                    <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-                                        <CalendarIcon className="h-5 w-5 text-gray-400 group-hover:text-white transition-colors" />
-                                    </div>
-                                    {date ? format(date, "dd/MM/yyyy") : <span>Select Date</span>}
-                                </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0 rounded-2xl shadow-xl border-border/50" align="start">
-                                <Calendar
-                                    mode="single"
-                                    selected={date}
-                                    onSelect={setDate}
-                                    initialFocus
-                                    locale={vi}
-                                />
-                            </PopoverContent>
-                        </Popover>
-                    </div>
+          <div className="md:col-span-3">
+            <Select value={categoryId} onValueChange={setCategoryId}>
+              <SelectTrigger className="h-12 rounded-xl border-zinc-200 bg-zinc-50">
+                <Tag className="h-4 w-4 text-zinc-400 mr-2" />
+                <SelectValue placeholder="Danh mục" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Tất cả</SelectItem>
+                {categories.map((c) => (
+                  <SelectItem key={c.id} value={c.id}>
+                    {c.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
-                    {/* Search Button */}
-                    <div className="md:col-span-2">
-                        <Button className="w-full h-14 rounded-xl text-base font-bold shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all bg-primary hover:bg-primary/90 text-white">
-                            Search
-                        </Button>
-                    </div>
-                </div>
-            </div>
+          <div className="md:col-span-3">
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "w-full h-12 justify-start rounded-xl border-zinc-200 bg-zinc-50 font-normal",
+                    !date && "text-zinc-500"
+                  )}
+                >
+                  <CalendarIcon className="h-4 w-4 mr-2 text-zinc-400" />
+                  {date ? format(date, "dd/MM/yyyy", { locale: vi }) : "Chọn ngày"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0 rounded-xl" align="start">
+                <Calendar mode="single" selected={date} onSelect={setDate} locale={vi} />
+              </PopoverContent>
+            </Popover>
+          </div>
+
+          <div className="md:col-span-2">
+            <Button
+              onClick={handleSearch}
+              className="w-full h-12 rounded-xl font-semibold bg-primary hover:bg-primary/90"
+            >
+              Tìm kiếm
+            </Button>
+          </div>
         </div>
-    );
-};
-
-export default SearchFilter;
+      </div>
+    </div>
+  );
+}

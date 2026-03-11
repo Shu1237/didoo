@@ -1,7 +1,7 @@
-import { authRequest } from "@/apiRequest/auth";
+import { authRequest } from "@/apiRequest/authService";
 import { useSessionStore } from "@/stores/sesionStore";
-import envconfig from "../../config";
-import { ResponseData, ResponseError } from "../types/base";
+import { envconfig } from "../../config";
+import { ResponseData, ResponseError } from "@/types/base";
 import { toast } from "sonner";
 import { EntityError, HttpError } from "@/lib/errors";
 import { HttpErrorCode } from "@/utils/enum";
@@ -13,9 +13,6 @@ interface CustomOptions extends RequestInit {
 }
 
 const isExpired = "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại hoặc làm mới Token.";
-
-
-
 
 // Helper: Check runtime
 const isServerRuntime = () => typeof window === "undefined";
@@ -67,24 +64,18 @@ class TokenRefreshInterceptor {
 
     private async performRefresh(): Promise<string> {
         const refreshToken = useSessionStore.getState().refreshToken;
-        const accessToken = useSessionStore.getState().accessToken;
-        const user = useSessionStore.getState().user;
 
         if (!refreshToken) {
             throw new Error("NO_REFRESH_TOKEN");
         }
-        if (!user || !user.UserId) {
-            throw new Error("NO_USER_ID");
-        }
+
         try {
             // Gọi API refresh token
             const result = await authRequest.refreshTokenClient({
-                id: user.UserId,
-                accessToken: accessToken || "",
                 refreshToken: refreshToken
             });
 
-            if (!result.data?.accessToken || !result.data?.refreshToken) {
+            if (!result.data?.accessToken) {
                 throw new Error("INVALID_REFRESH_RESPONSE");
             }
 
@@ -125,7 +116,7 @@ class TokenRefreshInterceptor {
             // Client: clear store + toast + redirect
             useSessionStore.getState().clearSession();
             toast.error("Phiên đăng nhập đã hết hạn");
-            if (!isServerRuntime()) {
+            if (typeof window !== "undefined") {
                 window.location.href = `/login`;
             }
         }
@@ -153,8 +144,6 @@ async function httpRequest<T>(
             : JSON.stringify(options.body)
         : undefined;
 
-
-
     // Get auth token
     const authToken = options?.skipAuth
         ? null
@@ -170,8 +159,7 @@ async function httpRequest<T>(
     if (authToken) {
         baseHeaders["Authorization"] = `Bearer ${authToken}`;
     }
-
-    baseHeaders["ngrok-skip-browser-warning"] = "true";
+    baseHeaders["ngrok-skip-browser-warning"] = "1";
 
     // Prepare URL
     const baseUrl = options?.baseURL === undefined
@@ -197,7 +185,6 @@ async function httpRequest<T>(
         headers: {
             ...baseHeaders,
             ...options?.headers,
-            "ngrok-skip-browser-warning": "true"
         } as HeadersInit,
         body,
         method,
@@ -207,7 +194,6 @@ async function httpRequest<T>(
 
     // Handle 401 - Token expired
     if (res.status === HttpErrorCode.UNAUTHORIZED && payload.message === isExpired && !options?.skipAuth) {
-        console.log(payload.message);
         // Server: không thể refresh, throw error
         if (isServerRuntime()) {
             tokenInterceptor.handleAuthError();
@@ -239,13 +225,12 @@ async function httpRequest<T>(
 
     // Handle other errors
     if (!res.ok) {
-        if (res.status === HttpErrorCode.UNPROCESSABLE_ENTITY) {
-            throw new EntityError(
-                payload as unknown as ResponseError
-            );
-        } else {
-            throw new HttpError(payload as unknown as ResponseError);
+        const errorPayload = payload as unknown as ResponseError;
+        const hasValidationErrors = Array.isArray(errorPayload?.listErrors) && errorPayload.listErrors.length > 0;
+        if (res.status === HttpErrorCode.UNPROCESSABLE_ENTITY || (res.status === HttpErrorCode.BAD_REQUEST && hasValidationErrors)) {
+            throw new EntityError(errorPayload);
         }
+        throw new HttpError(errorPayload);
     }
 
     return payload;

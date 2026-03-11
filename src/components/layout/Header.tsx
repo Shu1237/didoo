@@ -3,208 +3,191 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter, usePathname } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useSessionStore } from "@/stores/sesionStore";
-import { authRequest } from "@/apiRequest/auth";
 import { Button } from "@/components/ui/button";
 import {
-    ChevronDown,
-    MapPin,
-    Wifi,
-    Gift,
-    List,
-    Ticket,
-    LogOut,
-    LayoutDashboard,
-    Palette,
-    Brush,
-    Rocket,
-    Zap,
-    Briefcase,
-    Cpu,
-    Search,
-    ArrowUpRight,
-    User as UserIcon
+  LogOut,
+  LayoutDashboard,
+  Search,
+  ArrowUpRight,
+  User as UserIcon,
 } from "lucide-react";
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Roles, OrganizerStatus } from "@/utils/enum";
+import { Roles } from "@/utils/enum";
 import { useAuth } from "@/hooks/useAuth";
+import { useProfileWithOrganizer } from "@/hooks/useProfileWithOrganizer";
 
 const Header = () => {
-    const user = useSessionStore((state) => state.user);
-    const organizer = useSessionStore((state) => state.organizer);
-    const router = useRouter();
-    const pathname = usePathname();
-    const [hoveredNav, setHoveredNav] = useState<string | null>(null);
-    const [isScrolled, setIsScrolled] = useState(false);
-    const { logout } = useAuth();
-    useEffect(() => {
-        const handleScroll = () => {
-            setIsScrolled(window.scrollY > 10);
-        };
+  const user = useSessionStore((state) => state.user);
+  const { isVerifiedOrganizer } = useProfileWithOrganizer();
+  const pathname = usePathname();
+  const [isScrolled, setIsScrolled] = useState(false);
+  const { logout } = useAuth();
 
-        window.addEventListener("scroll", handleScroll);
-        return () => window.removeEventListener("scroll", handleScroll);
-    }, []);
+  useEffect(() => {
+    const handleScroll = () => setIsScrolled(window.scrollY > 10);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
-    const handleLogout = async () => {
-        if (!user || !user.UserId) return;
-        await logout.mutateAsync({ userId: user.UserId });
-    };
+  const handleLogout = async () => {
+    if (!user || !user.UserId) return;
+    await logout.mutateAsync({ userId: user.UserId });
+  };
 
-    const isVerifiedOrganizer = organizer?.status === OrganizerStatus.VERIFIED;
+  const showDashboard = () => {
+    if (!user) return false;
+    if (user.Role === Roles.ADMIN) return true;
+    return user.Role === Roles.USER && isVerifiedOrganizer;
+  };
 
-    const showDashboard = () => {
-        if (!user) return false;
-        if (user.Role === Roles.ADMIN || user.Role === Roles.ORGANIZER) return true;
-        return user.Role === Roles.USER && isVerifiedOrganizer;
-    };
+  const getDashboardLink = () => {
+    if (!user) return null;
+    if (user.Role === Roles.ADMIN) return "/admin/dashboard";
+    if (isVerifiedOrganizer) return "/organizer/dashboard";
+    return null;
+  };
 
-    const getDashboardLink = () => {
-        if (!user) return null;
-        if (user.Role === Roles.ADMIN) return "/admin/dashboard";
-        if (user.Role === Roles.ORGANIZER || isVerifiedOrganizer) return "/organizer/dashboard";
-        return null;
-    };
+  const isActive = (path: string) =>
+    pathname === path || pathname?.startsWith(path + "/");
 
-    const isActive = (path: string) => pathname === path || pathname?.startsWith(path + "/");
+  return (
+    <>
+      <div
+        className={`fixed left-0 right-0 z-50 flex justify-center px-4 transition-all duration-300 ${isScrolled ? "top-0" : "top-4"}`}
+      >
+        <header
+          className="w-full max-w-6xl transition-all duration-300 bg-white/90 backdrop-blur-xl border border-zinc-200/80 shadow-lg shadow-zinc-900/5 rounded-2xl py-2.5 px-6"
+        >
+          <div className="flex items-center justify-between h-12">
+            <Link
+              href="/home"
+              className="flex items-center gap-2.5 group shrink-0"
+            >
+              <div className="relative h-9 w-9 overflow-hidden rounded-xl shadow-sm ring-1 ring-zinc-200/50">
+                <Image
+                  src="/DiDoo.png"
+                  alt="DiDoo"
+                  width={36}
+                  height={36}
+                  className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-105"
+                />
+              </div>
+              <span className="font-bold text-xl tracking-tight text-zinc-900">
+                DiDoo
+              </span>
+            </Link>
 
-    return (
-        <>
-            {/* Overlay làm mờ nền khi hover Mega Menu */}
-            <div
-                className={`fixed inset-0 bg-black/10 backdrop-blur-sm z-40 transition-opacity duration-300 ${hoveredNav === 'categories' ? 'opacity-100 visible' : 'opacity-0 invisible pointer-events-none'}`}
-            />
+            <nav className="hidden md:flex items-center gap-0.5 bg-zinc-100/80 p-1 rounded-xl border border-zinc-200/60">
+              <NavItem
+                href="/home"
+                active={isActive("/home")}
+                label="Trang chủ"
+              />
+              <NavItem
+                href="/events"
+                active={isActive("/events")}
+                label="Sự kiện"
+              />
+              <NavItem href="/map" active={isActive("/map")} label="Bản đồ" />
+              <NavItem href="/resale" active={isActive("/resale")} label="Vé bán lại" />
+            </nav>
 
-            {/* Container Header dạng viên thuốc */}
-            <div className={`fixed left-0 right-0 z-50 flex justify-center px-4 transition-all duration-300 ${isScrolled ? 'top-0' : 'top-4'}`}>
-                <header
-                    className="w-full max-w-6xl transition-all duration-300 bg-white/70 backdrop-blur-md border border-white/20 shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] rounded-full py-2 px-6"
-                    onMouseLeave={() => setHoveredNav(null)}
-                >
-                    <div className="flex items-center justify-between h-12">
-
-                        {/* LEFT: Logo */}
-                        <Link href="/home" className="flex items-center gap-2 group shrink-0">
-                            <div className="relative h-8 w-8 overflow-hidden rounded-full shadow-sm">
-                                <Image
-                                    src="/DiDoo.png"
-                                    alt="Logo"
-                                    width={32}
-                                    height={32}
-                                    className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-110"
-                                />
-                            </div>
-                            <span className="font-bold text-xl tracking-tighter text-slate-900">
-                                DiDoo
-                            </span>
+            <div className="flex items-center gap-2">
+              {user ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button className="bg-primary hover:bg-primary/90 text-white rounded-xl px-5 h-9 text-sm font-semibold shadow-md shadow-primary/20 transition-all">
+                      Tài khoản
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    align="end"
+                    className="w-56 bg-white rounded-xl border border-zinc-200 shadow-xl p-2 mt-3"
+                  >
+                    <DropdownMenuLabel className="text-[10px] uppercase text-zinc-400 font-semibold px-2 py-1.5">
+                      Tài khoản
+                    </DropdownMenuLabel>
+                    <DropdownMenuItem
+                      className="rounded-lg cursor-pointer focus:bg-zinc-50"
+                      asChild
+                    >
+                      <Link
+                        href="/user/dashboard/profile"
+                        className="flex items-center gap-2.5 px-2 py-2"
+                      >
+                        <UserIcon className="w-4 h-4" />
+                        <span>Hồ sơ</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    {showDashboard() && getDashboardLink() && (
+                      <DropdownMenuItem
+                        className="rounded-lg cursor-pointer focus:bg-zinc-50"
+                        asChild
+                      >
+                        <Link
+                          href={getDashboardLink()!}
+                          className="flex items-center gap-2.5 px-2 py-2"
+                        >
+                          <LayoutDashboard className="w-4 h-4" />
+                          <span>Bảng điều khiển</span>
                         </Link>
-
-                        {/* CENTER: Navigation */}
-                        <nav className="hidden md:flex items-center gap-1 bg-slate-100/50 p-1 rounded-full border border-slate-200/50">
-                            <NavItem href="/home" active={isActive('/home')} label="Home" />
-                            <NavItem href="/events" active={isActive('/events')} label="Events" />
-
-                            {/* Categories Mega Menu Removed as requested */}
-
-                            <NavItem href="/map" active={isActive('/map')} label="Map" />
-                        </nav>
-
-                        {/* RIGHT: Auth / Actions */}
-                        <div className="flex items-center gap-2">
-                            <button className="p-2 rounded-full transition-all text-slate-500 hover:text-slate-900 hover:bg-slate-100/50">
-                                <Search className="w-5 h-5" />
-                            </button>
-
-                            {user ? (
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button className="bg-orange-500 hover:bg-orange-600 text-white rounded-full px-5 h-9 text-sm font-medium shadow-lg shadow-orange-500/20 transition-all">
-                                            Account
-                                        </Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end" className="w-56 bg-white/90 backdrop-blur-md rounded-xl border-slate-100 shadow-xl p-2 mt-4">
-                                        <DropdownMenuLabel className="text-[10px] uppercase text-slate-400 font-bold px-2 py-1.5">Settings</DropdownMenuLabel>
-                                        <DropdownMenuItem className="rounded-lg cursor-pointer" asChild>
-                                            <Link href="/user/tickets" className="flex items-center gap-2.5 px-2 py-2"><Ticket className="w-4 h-4" /> <span>My Tickets</span></Link>
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem className="rounded-lg cursor-pointer" asChild>
-                                            <Link href="/user/profile" className="flex items-center gap-2.5 px-2 py-2"><UserIcon className="w-4 h-4" /> <span>Profile</span></Link>
-                                        </DropdownMenuItem>
-                                        {showDashboard() && getDashboardLink() && (
-                                            <DropdownMenuItem className="rounded-lg cursor-pointer" asChild>
-                                                <Link href={getDashboardLink()!} className="flex items-center gap-2.5 px-2 py-2"><LayoutDashboard className="w-4 h-4" /> <span>Dashboard</span></Link>
-                                            </DropdownMenuItem>
-                                        )}
-                                        <DropdownMenuSeparator />
-                                        <DropdownMenuItem onClick={handleLogout} className="text-red-500 rounded-lg cursor-pointer flex items-center gap-2.5 px-2 py-2">
-                                            <LogOut className="w-4 h-4" /> <span className="font-medium">Logout</span>
-                                        </DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-                            ) : (
-                                <Link href="/login">
-                                    <Button className="rounded-full px-5 h-9 text-sm font-semibold flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white shadow-lg">
-                                        Ticket <ArrowUpRight className="w-4 h-4" />
-                                    </Button>
-                                </Link>
-                            )}
-                        </div>
-                    </div>
-                </header>
+                      </DropdownMenuItem>
+                    )}
+                    <DropdownMenuSeparator className="bg-zinc-200" />
+                    <DropdownMenuItem
+                      onClick={handleLogout}
+                      className="text-rose-600 focus:text-rose-600 focus:bg-rose-50 rounded-lg cursor-pointer flex items-center gap-2.5 px-2 py-2"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      <span className="font-medium">Đăng xuất</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <Link href="/login">
+                  <Button className="rounded-xl px-5 h-9 text-sm font-semibold flex items-center gap-2 bg-zinc-900 hover:bg-zinc-800 text-white shadow-md transition-all">
+                    Đặt vé
+                    <ArrowUpRight className="w-4 h-4" />
+                  </Button>
+                </Link>
+              )}
             </div>
-        </>
-    );
+          </div>
+        </header>
+      </div>
+    </>
+  );
 };
 
-// --- Sub-components tối ưu cho giao diện mới ---
-
-const NavItem = ({ href, active, label }: { href: string; active: boolean; label: string }) => (
-    <Link href={href}>
-        <div className={`px-4 py-1.5 text-[14px] font-medium transition-all rounded-full ${active
-            ? "bg-white text-orange-600 shadow-sm"
-            : "text-slate-600 hover:text-slate-900 hover:bg-white/50"
-            }`}>
-            {label}
-        </div>
-    </Link>
-);
-
-const DropdownItem = ({ href, icon, title }: { href: string; icon: React.ReactNode; title: string }) => (
-    <Link href={href} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-slate-50 transition-colors group">
-        <div className="text-slate-400 group-hover:text-slate-900">{icon}</div>
-        <span className="text-sm text-slate-600 group-hover:text-slate-900 font-medium">{title}</span>
-    </Link>
-);
-
-const CategorySection = ({ title, items }: { title: string; items: any[] }) => (
-    <div className="space-y-4">
-        <h3 className="text-[11px] font-bold text-slate-400 uppercase tracking-widest px-3">{title}</h3>
-        <div className="space-y-1">
-            {items.map((item, idx) => (
-                <MegaMenuItem key={idx} {...item} />
-            ))}
-        </div>
+const NavItem = ({
+  href,
+  active,
+  label,
+}: {
+  href: string;
+  active: boolean;
+  label: string;
+}) => (
+  <Link href={href}>
+    <div
+      className={`px-4 py-2 text-sm font-medium transition-all rounded-lg ${
+        active
+          ? "bg-white text-primary shadow-sm border border-zinc-200/60"
+          : "text-zinc-600 hover:text-zinc-900 hover:bg-white/60"
+      }`}
+    >
+      {label}
     </div>
-);
-
-const MegaMenuItem = ({ href, icon, title, desc }: { href: string; icon: React.ReactNode; title: string; desc: string }) => (
-    <Link href={href} className="flex items-start gap-3 p-3 rounded-2xl hover:bg-slate-50 transition-all group">
-        <div className="p-2 rounded-xl bg-slate-100 group-hover:bg-white group-hover:shadow-sm text-slate-600 group-hover:text-slate-900 transition-all">
-            {icon}
-        </div>
-        <div>
-            <div className="font-bold text-slate-700 group-hover:text-slate-900 text-[13px]">{title}</div>
-            <div className="text-[11px] text-slate-400 mt-0.5">{desc}</div>
-        </div>
-    </Link>
+  </Link>
 );
 
 export default Header;

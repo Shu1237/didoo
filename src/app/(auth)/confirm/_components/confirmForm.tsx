@@ -1,233 +1,195 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Lock, Eye, EyeOff, ShieldCheck, ArrowRight } from 'lucide-react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useAuth } from '@/hooks/useAuth';
-import { VerifyForgotPasswordInput, verifyForgotPasswordSchema } from '@/schemas/auth';
-import { handleErrorApi } from '@/lib/errors';
-import { toast } from 'sonner';
-import { useRouter } from 'next/navigation';
+import { useState } from "react";
+import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
+import { Lock, Eye, EyeOff, ShieldCheck, ArrowRight } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useAuth } from "@/hooks/useAuth";
+import { VerifyForgotPasswordInput, verifyForgotPasswordSchema } from "@/schemas/auth";
+import { handleErrorApi } from "@/lib/errors";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 export default function ConfirmForm({ resetKey }: { resetKey?: string }) {
-    const [success, setSuccess] = useState(false);
-    const { verifyForgotPassword } = useAuth();
-    const router = useRouter();
+  const [success, setSuccess] = useState(false);
+  const { verifyForgotPassword } = useAuth();
+  const router = useRouter();
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-    const [showPassword, setShowPassword] = useState(false);
-    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const {
+    register,
+    handleSubmit,
+    setError,
+    formState: { errors, isValid },
+  } = useForm<VerifyForgotPasswordInput>({
+    resolver: zodResolver(verifyForgotPasswordSchema),
+    defaultValues: {
+      key: resetKey || "",
+      password: "",
+      confirmPassword: "",
+    },
+    mode: "onChange",
+  });
 
-    const {
-        register,
-        handleSubmit,
-        setError,
-        watch,
-        formState: { errors, isValid },
-    } = useForm<VerifyForgotPasswordInput>({
-        resolver: zodResolver(verifyForgotPasswordSchema),
-        defaultValues: {
-            key: resetKey || '',
-            password: '',
-            confirmPassword: '',
-        },
-        mode: 'onChange',
-    });
-
-    const currentPassword = watch("password");
-    const isPasswordSecure =
-        currentPassword.length >= 8 &&
-        /[A-Z]/.test(currentPassword) &&
-        /[!@#$%^&*(),?":{}|<>]/.test(currentPassword);
-
-    const onSubmit = async (data: VerifyForgotPasswordInput) => {
-        if (!resetKey) {
-            toast.error("Invalid reset key. Please request a new link.");
-            return;
-        }
-
-        try {
-            await verifyForgotPassword.mutateAsync(data);
-            setSuccess(true);
-            toast.success("Password reset successfully!");
-
-            // Auto redirect after 3 seconds
-            setTimeout(() => {
-                router.replace('/login?reset=success');
-            }, 3000);
-        } catch (error) {
-            handleErrorApi({
-                error,
-                setError,
-            });
-        }
-    };
-
-    const maskStyle = {
-        maskImage: 'radial-gradient(circle at top right, transparent 90px, black 50px)',
-        WebkitMaskImage: 'radial-gradient(circle at top right, transparent 100px, black 101px)',
-    };
-
+  const onSubmit = async (data: VerifyForgotPasswordInput) => {
     if (!resetKey) {
-        return (
-            <div className="text-center p-12 bg-[#2D2D2D]/60 backdrop-blur-3xl rounded-[40px] border border-white/10 max-w-md w-full">
-                <div className="h-20 w-20 bg-red-500/10 rounded-full flex items-center justify-center text-red-500 mx-auto mb-6">
-                    <Lock className="w-10 h-10" />
-                </div>
-                <h2 className="text-2xl font-bold text-white mb-4">Invalid Reset Link</h2>
-                <p className="text-white/40 mb-8">This link is missing a security key or has already been used. Please request a new one.</p>
-                <Link href="/forgot-password" className="block w-full h-14 bg-[#FF9B8A] text-white font-bold rounded-full py-4 transition-all flex items-center justify-center shadow-lg shadow-[#FF9B8A]/20">
-                    Request New Link
-                </Link>
-            </div>
-        );
+      toast.error("Link không hợp lệ. Vui lòng yêu cầu link mới.");
+      return;
     }
+    try {
+      await verifyForgotPassword.mutateAsync(data);
+      setSuccess(true);
+      setTimeout(() => router.replace("/login?reset=success"), 3000);
+    } catch (error) {
+      handleErrorApi({ error, setError });
+    }
+  };
 
+  if (!resetKey) {
     return (
-        <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="grid grid-cols-1 lg:grid-cols-2 bg-[#2D2D2D]/60 backdrop-blur-[40px] rounded-[50px] border border-white/10 shadow-[0_50px_100px_rgba(0,0,0,0.4)] overflow-hidden relative max-w-6xl w-full"
-        >
-  /* LEFT SIDE: FORM */
-            <div className="p-6 lg:p-10 text-white overflow-y-auto no-scrollbar">
-                <AnimatePresence mode="wait">
-                    {!success ? (
-                        <motion.div
-                            key="form-confirm"
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            exit={{ opacity: 0, scale: 0.95 }}
-                        >
-                            <div className="inline-block p-3 bg-[#FF9B8A]/10 rounded-xl text-[#FF9B8A] mb-4">
-                                <ShieldCheck className="w-6 h-6" />
-                            </div>
-                            <h1 className="text-3xl font-bold mb-1 leading-tight">Reset Password</h1>
-                            <p className="text-white/40 text-base mb-6">Enter your new secure password below.</p>
-
-                            <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
-                                <input type="hidden" {...register("key")} />
-
-                                <div className="space-y-1">
-                                    <label className="text-xs font-medium text-white/60 ml-2">New Password</label>
-                                    <div className="relative">
-                                        <input
-                                            type={showPassword ? "text" : "password"}
-                                            placeholder="••••••••"
-                                            {...register("password")}
-                                            className={`w-full bg-black/50 border border-transparent rounded-full px-5 py-3 pr-12 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#FF9B8A]/20 transition-all placeholder:text-gray-500 text-white ${errors.password ? '!border-red-500 bg-red-500/10' : ''}`}
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={() => setShowPassword(!showPassword)}
-                                            className="absolute right-5 top-1/2 -translate-y-1/2 text-white/40 hover:text-white transition-colors"
-                                        >
-                                            {showPassword ? <Lock className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
-                                        </button>
-                                    </div>
-                                    {errors.password && (
-                                        <p className="text-[10px] text-red-500 ml-2 mt-0.5 font-medium leading-relaxed">{errors.password.message}</p>
-                                    )}
-                                </div>
-
-                                <AnimatePresence>
-                                    {isPasswordSecure && (
-                                        <motion.div
-                                            initial={{ opacity: 0, height: 0 }}
-                                            animate={{ opacity: 1, height: 'auto' }}
-                                            exit={{ opacity: 0, height: 0 }}
-                                            className="space-y-1 overflow-hidden"
-                                        >
-                                            <label className="text-xs font-medium text-white/60 ml-2">Confirm New Password</label>
-                                            <div className="relative">
-                                                <input
-                                                    type={showConfirmPassword ? "text" : "password"}
-                                                    placeholder="••••••••"
-                                                    {...register("confirmPassword")}
-                                                    className={`w-full bg-black/50 border border-transparent rounded-full px-5 py-3 pr-12 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#FF9B8A]/20 transition-all placeholder:text-gray-500 text-white ${errors.confirmPassword ? '!border-red-500 bg-red-500/10' : ''}`}
-                                                />
-                                                <button
-                                                    type="button"
-                                                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                                    className="absolute right-5 top-1/2 -translate-y-1/2 text-white/40 hover:text-white transition-colors"
-                                                >
-                                                    {showConfirmPassword ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
-                                                </button>
-                                            </div>
-                                            {errors.confirmPassword && (
-                                                <p className="text-[10px] text-red-500 ml-2 mt-0.5 font-medium leading-relaxed">{errors.confirmPassword.message}</p>
-                                            )}
-                                        </motion.div>
-                                    )}
-                                </AnimatePresence>
-
-                                <button
-                                    type="submit"
-                                    disabled={verifyForgotPassword.isPending || !isValid}
-                                    className="w-full h-12 bg-[#FF9B8A] text-white font-bold rounded-full py-2 shadow-lg shadow-[#FF9B8A]/20 hover:bg-[#FF8A75] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-base active:scale-[0.98] mt-2"
-                                >
-                                    {verifyForgotPassword.isPending ? (
-                                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                                    ) : (
-                                        "Reset Password"
-                                    )}
-                                </button>
-                            </form>
-                        </motion.div>
-                    ) : (
-                        <motion.div
-                            key="success-confirm"
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            className="text-center py-6"
-                        >
-                            <div className="mx-auto h-16 w-16 bg-green-500/20 rounded-full flex items-center justify-center text-green-500 mb-6 border border-green-500/30">
-                                <ShieldCheck className="w-8 h-8" />
-                            </div>
-                            <h2 className="text-3xl font-bold mb-2">You're All Set!</h2>
-                            <p className="text-white/40 text-sm mb-8 max-w-xs mx-auto">
-                                Your password has been successfully reset. Log in with your new credentials.
-                            </p>
-
-                            <div className="space-y-3">
-                                <Link href="/login" className="w-full h-12 bg-[#FF9B8A] text-white font-bold rounded-full py-2 shadow-lg shadow-[#FF9B8A]/20 hover:bg-[#FF8A75] transition-all flex items-center justify-center gap-2 text-base">
-                                    Log In Now <ArrowRight className="w-4 h-4" />
-                                </Link>
-                                <p className="text-white/20 text-xs">Redirecting to login in 3 seconds...</p>
-
-                                <button
-                                    onClick={() => window.close()}
-                                    className="mt-4 text-white/40 hover:text-white text-xs transition-colors border-b border-transparent hover:border-white/20"
-                                >
-                                    Close this tab
-                                </button>
-                            </div>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-            </div>
-
-            {/* RIGHT SIDE: DECORATION */}
-            <div className="hidden lg:block p-4 relative">
-                <div
-                    className="h-full bg-black rounded-[45px] p-16 flex flex-col justify-center relative shadow-2xl"
-                    style={maskStyle}
-                >
-                    <div className="relative z-10 space-y-10">
-                        <h2 className="text-[52px] font-bold text-white leading-[1.1]">Everything looks good!</h2>
-                        <p className="text-xl text-white/40 font-light max-w-sm leading-relaxed">
-                            You're just one step away from getting back into your account and resuming your journey.
-                        </p>
-                    </div>
-
-                    <div className="absolute top-10 right-10 opacity-10 pointer-events-none grayscale brightness-0 invert">
-                        <Image src="/DiDoo.png" alt="logo" width={200} height={200} />
-                    </div>
-                </div>
-            </div>
-        </motion.div>
+      <div className="w-full max-w-md bg-white rounded-2xl border border-zinc-200 shadow-xl p-8 text-center">
+        <div className="h-16 w-16 rounded-full bg-rose-100 flex items-center justify-center text-rose-500 mx-auto mb-6">
+          <Lock className="h-8 w-8" />
+        </div>
+        <h2 className="text-xl font-bold text-zinc-900 mb-3">Link không hợp lệ</h2>
+        <p className="text-zinc-600 text-sm mb-6">
+          Link thiếu mã bảo mật hoặc đã được sử dụng. Vui lòng yêu cầu link mới.
+        </p>
+        <Button asChild className="w-full h-12 rounded-xl font-semibold">
+          <Link href="/forgot-password">Yêu cầu link mới</Link>
+        </Button>
+      </div>
     );
+  }
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="grid grid-cols-1 lg:grid-cols-2 w-full max-w-5xl bg-white rounded-2xl border border-zinc-200 shadow-xl overflow-hidden lg:min-h-[420px]"
+    >
+      <div className="p-6 sm:p-8 lg:p-10">
+        <AnimatePresence mode="wait">
+          {!success ? (
+            <motion.div
+              key="form"
+              initial={{ opacity: 0, x: -16 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, scale: 0.98 }}
+            >
+              <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary mb-6">
+                <ShieldCheck className="h-6 w-6" />
+              </div>
+              <h1 className="text-2xl font-bold text-zinc-900">Đặt lại mật khẩu</h1>
+              <p className="mt-1 text-zinc-600 text-sm mb-6">Nhập mật khẩu mới bên dưới.</p>
+
+              <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
+                <input type="hidden" {...register("key")} />
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-zinc-700">Mật khẩu mới</label>
+                  <div className="relative">
+                    <Input
+                      type={showPassword ? "text" : "password"}
+                      placeholder="••••••••"
+                      {...register("password")}
+                      className={`h-11 rounded-xl border-zinc-200 bg-zinc-50 pr-11 ${errors.password ? "border-rose-300" : ""}`}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600"
+                    >
+                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
+                  {errors.password && <p className="text-xs text-rose-600">{errors.password.message}</p>}
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-zinc-700">Xác nhận mật khẩu mới</label>
+                  <div className="relative">
+                    <Input
+                      type={showConfirmPassword ? "text" : "password"}
+                      placeholder="••••••••"
+                      {...register("confirmPassword")}
+                      className={`h-11 rounded-xl border-zinc-200 bg-zinc-50 pr-11 ${errors.confirmPassword ? "border-rose-300" : ""}`}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600"
+                    >
+                      {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
+                  {errors.confirmPassword && <p className="text-xs text-rose-600">{errors.confirmPassword.message}</p>}
+                </div>
+
+                <Button
+                  type="submit"
+                  disabled={verifyForgotPassword.isPending || !isValid}
+                  className="w-full h-12 rounded-xl font-semibold"
+                >
+                  {verifyForgotPassword.isPending ? (
+                    <span className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  ) : (
+                    "Đặt lại mật khẩu"
+                  )}
+                </Button>
+              </form>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="success"
+              initial={{ opacity: 0, scale: 0.98 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="text-center py-4"
+            >
+              <div className="mx-auto h-16 w-16 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 mb-6">
+                <ShieldCheck className="h-8 w-8" />
+              </div>
+              <h2 className="text-2xl font-bold text-zinc-900 mb-2">Hoàn tất!</h2>
+              <p className="text-zinc-600 text-sm mb-8 max-w-xs mx-auto">
+                Mật khẩu đã được đặt lại thành công. Đăng nhập bằng mật khẩu mới.
+              </p>
+
+              <div className="space-y-3">
+                <Button asChild className="w-full h-12 rounded-xl font-semibold">
+                  <Link href="/login">
+                    Đăng nhập ngay
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Link>
+                </Button>
+                <p className="text-xs text-zinc-500">Đang chuyển đến trang đăng nhập trong 3 giây...</p>
+                <button
+                  type="button"
+                  onClick={() => window.close()}
+                  className="text-xs text-zinc-500 hover:text-zinc-700 underline"
+                >
+                  Đóng tab này
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
+      <div className="hidden lg:flex flex-col justify-center p-10 bg-zinc-900 text-white min-h-[420px]">
+        <h2 className="text-2xl font-bold leading-tight">
+          Sắp xong rồi!
+          <br />
+          <span className="text-zinc-400">Chỉ còn một bước nữa</span>
+        </h2>
+        <p className="mt-4 text-zinc-400 text-sm max-w-sm leading-relaxed">
+          Bạn chỉ còn một bước nữa để lấy lại tài khoản và tiếp tục hành trình.
+        </p>
+      </div>
+    </motion.div>
+  );
 }

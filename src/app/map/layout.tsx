@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Header from "@/components/layout/Header";
 
 export default function MapLayout({
@@ -9,9 +10,10 @@ export default function MapLayout({
     <div className="h-screen w-full overflow-hidden bg-background">
       <Header />
 
-      {/* Content offset xuống dưới header */}
       <div className="h-full">
-        {children}
+        <Suspense fallback={<div className="h-full w-full flex items-center justify-center bg-muted/30" />}>
+          {children}
+        </Suspense>
       </div>
     </div>
   );

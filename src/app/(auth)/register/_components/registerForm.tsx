@@ -1,37 +1,51 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import Image from 'next/image';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Eye, EyeOff } from 'lucide-react';
+import Link from "next/link";
+import Image from "next/image";
+import { motion, AnimatePresence } from "framer-motion";
+import { CalendarDays, Eye, EyeOff } from "lucide-react";
 import {
   InputOTP,
   InputOTPGroup,
   InputOTPSeparator,
   InputOTPSlot,
-} from '@/components/ui/input-otp';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useAuth } from '@/hooks/useAuth';
-import * as z from 'zod';
+} from "@/components/ui/input-otp";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useAuth } from "@/hooks/useAuth";
+import { RegisterInput, registerSchema } from "@/schemas/auth";
+import { z } from "zod";
+import { useState } from "react";
+import { handleErrorApi } from "@/lib/errors";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { useAuthContext } from "@/contexts/authContext";
+import { format } from "date-fns";
+import { vi } from "date-fns/locale";
 
-import { RegisterInput, registerSchema } from '@/schemas/auth';
-import { useState } from 'react';
-import { handleErrorApi } from '@/lib/errors';
-import { toast } from 'sonner';
-import { GoogleLogin } from '@react-oauth/google';
+const registerFormSchema = registerSchema.extend({
+  otp: z.string().optional(),
+});
 
-type FormValues = RegisterInput & { otp?: string; avatarUrl?: string };
+type FormValues = z.input<typeof registerFormSchema>;
+
+function parseDateValue(value: unknown): Date | undefined {
+  if (value instanceof Date && !Number.isNaN(value.getTime())) return value;
+  if (typeof value === "string" && value) {
+    const parsed = new Date(value);
+    if (!Number.isNaN(parsed.getTime())) return parsed;
+  }
+  return undefined;
+}
+
 
 
 
 export default function RegisterForm() {
-  const maskStyle = {
-    maskImage: 'radial-gradient(circle at top right, transparent 90px, black 50px)',
-    WebkitMaskImage: 'radial-gradient(circle at top right, transparent 100px, black 101px)',
-  };
-
-  const { register, verifyRegister, loginGoogle } = useAuth();
+  const { register: registerUser, verifyRegister } = useAuth();
+  const { setTokenFromContext } = useAuthContext();
   const [error, setError] = useState<string | null>(null);
   const [step, setStep] = useState(1);
 
@@ -41,19 +55,20 @@ export default function RegisterForm() {
     setValue,
     watch,
     setError: setErrorForm,
-    formState: { errors, isValid },
+    formState: { errors },
   } = useForm<FormValues>({
-    resolver: zodResolver(registerSchema) as any,
+    resolver: zodResolver(registerFormSchema),
     defaultValues: {
-      fullName: '',
-      email: '',
+      fullName: "",
+      email: "",
       gender: 0,
-      password: '',
-      confirmPassword: '',
-      otp: '',
-      avatarUrl: 'string',
+      password: "",
+      confirmPassword: "",
+      otp: "",
+      avatarUrl: "",
+      dateOfBirth: undefined,
     },
-    mode: 'onChange'
+    mode: "onChange",
   });
 
   const [showPassword, setShowPassword] = useState(false);
@@ -62,24 +77,21 @@ export default function RegisterForm() {
   const currentEmail = watch("email");
   const currentPassword = watch("password");
 
-  const isPasswordSecure =
-    currentPassword.length >= 8 &&
-    /[A-Z]/.test(currentPassword) &&
-    /[!@#$%^&*(),?":{}|<>]/.test(currentPassword);
-
   const onSubmit = async (data: FormValues) => {
+    const registerPayload: RegisterInput = registerSchema.parse({
+      ...data,
+      gender: 0,
+      phone: data.phone?.trim() || "",
+    });
+
     if (step === 1) {
-      if (register.isPending) return;
+      if (registerUser.isPending) return;
       setError(null);
       try {
-        await register.mutateAsync(data);
+        await registerUser.mutateAsync(registerPayload);
         setStep(2);
       } catch (err: any) {
-        console.log(err);
-        handleErrorApi({
-          error: err,
-          setError: setErrorForm
-        });
+        handleErrorApi({ error: err, setError: setErrorForm });
         setError(err?.message || "Đăng ký thất bại. Vui lòng kiểm tra lại thông tin.");
       }
     } else if (step === 2) {
@@ -89,16 +101,9 @@ export default function RegisterForm() {
       const submitEmail = currentEmail || data.email;
       if (submitOtp && submitOtp.length === 6) {
         try {
-          await verifyRegister.mutateAsync({
-            email: submitEmail,
-            otp: submitOtp,
-          });
-          // Redirect to login will be handled by onSuccess in useAuth
+          await verifyRegister.mutateAsync({ email: submitEmail, otp: submitOtp });
         } catch (err: any) {
-          handleErrorApi({
-            error: err,
-            setError: setErrorForm
-          });
+          handleErrorApi({ error: err, setError: setErrorForm });
           setError(err?.message || "Xác thực thất bại.");
         }
       } else {
@@ -107,29 +112,36 @@ export default function RegisterForm() {
     }
   };
 
+  
 
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      className="grid grid-cols-1 lg:grid-cols-2 bg-[#2D2D2D]/60 backdrop-blur-[40px] rounded-[50px] border border-white/10 shadow-[0_50px_100px_rgba(0,0,0,0.4)] overflow-visible relative"
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="grid grid-cols-1 lg:grid-cols-2 w-full max-w-5xl bg-white rounded-2xl border border-zinc-200 shadow-xl overflow-hidden lg:min-h-[520px]"
     >
-      {/* FORM BÊN TRÁI */}
-      <div className="p-6 lg:p-10 text-white max-h-[90vh] overflow-y-auto no-scrollbar">
-        <Link href="/home" className="inline-block mb-4 hover:scale-105 transition-transform">
-          <Image src="/DiDoo.png" alt="DiDoo logo" width={50} height={50} className="rounded-xl shadow-lg" priority />
-        </Link>
-        <h1 className="text-3xl font-bold mb-1">
-          {step === 1 && 'Create Account'}
-          {step === 2 && 'Verify Account'}
+      <div
+        className={`p-6 sm:p-8 lg:p-10 ${
+          step === 2
+            ? "flex min-h-[520px] flex-col justify-center"
+            : "max-h-[90vh] overflow-y-auto"
+        }`}
+      >
+        {/* <Link href="/home" className="inline-block mb-6 hover:opacity-80 transition-opacity">
+          <Image src="/DiDoo.png" alt="DiDoo" width={48} height={48} className="rounded-xl" priority />
+        </Link> */}
+
+        <h1 className="text-2xl font-bold text-zinc-900">
+          {step === 1 ? "Tạo tài khoản" : "Xác thực tài khoản"}
         </h1>
-        <p className="text-white/40 text-base mb-4">
-          {step === 1 && 'Join us and start exploring events'}
-          {step === 2 && `An OTP has been sent to ${watch('email')}`}
+        <p className="mt-1 text-zinc-600 text-sm">
+          {step === 1
+            ? "Tham gia và bắt đầu khám phá sự kiện"
+            : `Mã OTP đã được gửi đến ${watch("email")}`}
         </p>
 
         {error && (
-          <div className="mb-4 p-2 bg-red-500/20 border border-red-500/50 text-red-200 text-xs rounded-xl text-center">
+          <div className="mt-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-600 text-sm">
             {error}
           </div>
         )}
@@ -137,193 +149,189 @@ export default function RegisterForm() {
         <AnimatePresence mode="wait">
           <motion.form
             key={step}
-            initial={{ opacity: 0, x: 20 }}
+            initial={{ opacity: 0, x: 16 }}
             animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.3 }}
-            className="space-y-3"
+            exit={{ opacity: 0, x: -16 }}
+            transition={{ duration: 0.2 }}
+            className={`space-y-4 ${step === 2 ? "mt-8" : "mt-6"}`}
             onSubmit={handleSubmit(onSubmit)}
           >
             {step === 1 && (
               <>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-1">
-                    <label className="text-xs font-medium text-white/60 ml-2">Full Name</label>
-                    <input
-                      type="text"
-                      placeholder="John Doe"
+                <div className="grid grid-cols-1 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-zinc-700">Họ tên</label>
+                    <Input
+                      placeholder="Nguyễn Văn A"
                       {...registerField("fullName")}
-                      className={`w-full bg-black/50 border border-transparent rounded-full px-5 py-3 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#FF9B8A]/20 transition-all placeholder:text-gray-400 text-white ${errors.fullName ? '!border-red-500 bg-red-500/10' : ''}`}
+                      className={`h-11 rounded-xl border-zinc-200 bg-zinc-50 ${errors.fullName ? "border-rose-300" : ""}`}
                     />
-                    {errors.fullName && (
-                      <p className="text-[10px] text-red-500 ml-2 mt-0.5 whitespace-pre-line leading-relaxed">{errors.fullName.message}</p>
-                    )}
+                    {errors.fullName && <p className="text-xs text-rose-600">{errors.fullName.message}</p>}
                   </div>
-
-                  <div className="space-y-1">
-                    <label className="text-xs font-medium text-white/60 ml-2">Email</label>
-                    <input
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-zinc-700">Email</label>
+                    <Input
                       type="email"
-                      placeholder="Johndoe@gmail.com"
+                      placeholder="example@gmail.com"
                       {...registerField("email")}
-                      className={`w-full bg-black/50 border border-transparent rounded-full px-5 py-3 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#FF9B8A]/20 transition-all placeholder:text-gray-400 text-white ${errors.email ? '!border-red-500 bg-red-500/10' : ''}`}
+                      className={`h-11 rounded-xl border-zinc-200 bg-zinc-50 ${errors.email ? "border-rose-300" : ""}`}
                     />
-                    {errors.email && (
-                      <p className="text-[10px] text-red-500 ml-2 mt-0.5 whitespace-pre-line leading-relaxed">{errors.email.message}</p>
-                    )}
+                    {errors.email && <p className="text-xs text-rose-600">{errors.email.message}</p>}
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3 pb-1">
-                  <div className="space-y-1">
-                    <label className="text-xs font-medium text-white/60 ml-2">Gender</label>
-                    <select
-                      {...registerField("gender", { valueAsNumber: true })}
-                      className="w-full bg-black/50 border border-transparent rounded-full px-4 py-3 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#FF9B8A]/20 transition-all text-white appearance-none cursor-pointer"
-                      style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='white'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='Length19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center', backgroundSize: '1rem' }}
-                    >
-                      <option value={0} className="bg-[#1A1A1A]">Male</option>
-                      <option value={1} className="bg-[#1A1A1A]">Female</option>
-                      <option value={2} className="bg-[#1A1A1A]">Other</option>
-                    </select>
-                  </div>
-
-                  <div className="space-y-1">
-                    <label className="text-xs font-medium text-white/60 ml-2">Birth Date</label>
-                    <input
-                      type="date"
-                      {...registerField("dateOfBirth")}
-                      className={`w-full bg-black/50 border border-transparent rounded-full px-4 py-3 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#FF9B8A]/20 transition-all placeholder:text-gray-400 text-white [color-scheme:dark] ${errors.dateOfBirth ? '!border-red-500 bg-red-500/10' : ''}`}
-                    />
-                    {errors.dateOfBirth && (
-                      <p className="text-[10px] text-red-500 ml-2 mt-0.5 whitespace-pre-line leading-relaxed">{errors.dateOfBirth.message}</p>
-                    )}
+                <div className="grid grid-cols-1 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-zinc-700">Ngày sinh</label>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className={`h-11 w-full justify-start rounded-xl border-zinc-200 bg-zinc-50 px-3 text-left font-normal ${
+                            errors.dateOfBirth ? "border-rose-300" : ""
+                          }`}
+                        >
+                          <CalendarDays className="mr-2 h-4 w-4" />
+                          {(() => {
+                            const selectedDate = parseDateValue(watch("dateOfBirth"));
+                            return selectedDate
+                              ? format(selectedDate, "dd/MM/yyyy", { locale: vi })
+                              : "Chọn ngày sinh";
+                          })()}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={parseDateValue(watch("dateOfBirth"))}
+                          onSelect={(date) =>
+                            setValue("dateOfBirth", date, {
+                              shouldValidate: true,
+                              shouldDirty: true,
+                            })
+                          }
+                          captionLayout="dropdown"
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    {errors.dateOfBirth && <p className="text-xs text-rose-600">{errors.dateOfBirth.message}</p>}
                   </div>
                 </div>
 
-                <div className="space-y-1">
-                  <label className="text-xs font-medium text-white/60 ml-2">Password</label>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-zinc-700">Mật khẩu</label>
                   <div className="relative">
-                    <input
+                    <Input
                       type={showPassword ? "text" : "password"}
                       placeholder="••••••••"
                       {...registerField("password")}
-                      className={`w-full bg-black/50 border border-transparent rounded-full px-5 py-3 pr-12 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#FF9B8A]/20 transition-all placeholder:text-gray-400 text-white ${errors.password ? '!border-red-500 bg-red-500/10' : ''}`}
+                      className={`h-11 rounded-xl border-zinc-200 bg-zinc-50 pr-11 ${errors.password ? "border-rose-300" : ""}`}
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-5 top-1/2 -translate-y-1/2 text-white/40 hover:text-white transition-colors"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600"
                     >
-                      {showPassword ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                      {showPassword ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
                     </button>
                   </div>
-                  {errors.password && (
-                    <p className="text-[10px] text-red-500 ml-2 mt-0.5 whitespace-pre-line leading-relaxed">{errors.password.message}</p>
-                  )}
-                  {/* Password Requirements */}
+                  {errors.password && <p className="text-xs text-rose-600">{errors.password.message}</p>}
                   {currentPassword && (
-                    <div className="mt-1 ml-2 space-y-0.5">
-                      <span className={`text-[10px] flex items-center gap-1 ${currentPassword.length >= 8 ? 'text-green-400' : 'text-white/40'}`}>
-                        <span className={`w-1 h-1 rounded-full inline-block flex-shrink-0 ${currentPassword.length >= 8 ? 'bg-green-400' : 'bg-white/40'}`} /> Min 8 characters
-                      </span>
-                      <span className={`text-[10px] flex items-center gap-1 ${/[A-Z]/.test(currentPassword) ? 'text-green-400' : 'text-white/40'}`}>
-                        <span className={`w-1 h-1 rounded-full inline-block flex-shrink-0 ${/[A-Z]/.test(currentPassword) ? 'bg-green-400' : 'bg-white/40'}`} /> One uppercase letter
-                      </span>
-                      <span className={`text-[10px] flex items-center gap-1 ${/[!@#$%^&*(),.?":{}|<>]/.test(currentPassword) ? 'text-green-400' : 'text-white/40'}`}>
-                        <span className={`w-1 h-1 rounded-full inline-block flex-shrink-0 ${/[!@#$%^&*(),.?":{}|<>]/.test(currentPassword) ? 'bg-green-400' : 'bg-white/40'}`} /> One special character
-                      </span>
+                    <div className="mt-1 space-y-0.5 text-xs">
+                      <p className={currentPassword.length >= 8 ? "text-emerald-600" : "text-zinc-500"}>• Tối thiểu 8 ký tự</p>
+                      <p className={/[A-Z]/.test(currentPassword) ? "text-emerald-600" : "text-zinc-500"}>• Ít nhất 1 chữ hoa</p>
+                      <p className={/[!@#$%^&*(),.?":{}|<>]/.test(currentPassword) ? "text-emerald-600" : "text-zinc-500"}>• Ít nhất 1 ký tự đặc biệt</p>
                     </div>
                   )}
                 </div>
 
-                <div className="space-y-1">
-                  <label className="text-xs font-medium text-white/60 ml-2">Confirm Password</label>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-zinc-700">Xác nhận mật khẩu</label>
                   <div className="relative">
-                    <input
+                    <Input
                       type={showConfirmPassword ? "text" : "password"}
                       placeholder="••••••••"
                       {...registerField("confirmPassword")}
-                      className={`w-full bg-black/50 border border-transparent rounded-full px-5 py-3 pr-12 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#FF9B8A]/20 transition-all placeholder:text-gray-400 text-white ${errors.confirmPassword ? '!border-red-500 bg-red-500/10' : ''}`}
+                      className={`h-11 rounded-xl border-zinc-200 bg-zinc-50 pr-11 ${errors.confirmPassword ? "border-rose-300" : ""}`}
                     />
                     <button
                       type="button"
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      className="absolute right-5 top-1/2 -translate-y-1/2 text-white/40 hover:text-white transition-colors"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600"
                     >
-                      {showConfirmPassword ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                      {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
                   </div>
-                  {errors.confirmPassword && (
-                    <p className="text-[10px] text-red-500 ml-2 mt-0.5 whitespace-pre-line leading-relaxed">{errors.confirmPassword.message}</p>
-                  )}
+                  {errors.confirmPassword && <p className="text-xs text-rose-600">{errors.confirmPassword.message}</p>}
                 </div>
 
-                <button
-                  type="submit"
-                  disabled={register.isPending}
-                  className="w-full h-12 mt-2 bg-[#FF9B8A] text-white font-bold rounded-full py-2 shadow-lg shadow-[#FF9B8A]/20 hover:bg-[#FF8A75] transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                >
-                  {register.isPending ? (
-                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                <Button type="submit" disabled={registerUser.isPending} className="w-full h-12 rounded-xl font-semibold">
+                  {registerUser.isPending ? (
+                    <span className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                   ) : (
-                    "Sign Up"
+                    "Đăng ký"
                   )}
-                </button>
+                </Button>
               </>
             )}
 
             {step === 2 && (
-              <div className="space-y-4">
-                <div className="space-y-2 flex flex-col items-center">
-                  <div className="flex justify-center py-2">
-                    <InputOTP
-                      maxLength={6}
-                      value={currentOtp || ''}
-                      onChange={(value) => setValue("otp", value, { shouldValidate: true })}
-                    >
-                      <InputOTPGroup>
-                        <InputOTPSlot index={0} className="w-10 h-10 text-base" />
-                        <InputOTPSlot index={1} className="w-10 h-10 text-base" />
-                        <InputOTPSlot index={2} className="w-10 h-10 text-base" />
-                      </InputOTPGroup>
-                      <InputOTPSeparator />
-                      <InputOTPGroup>
-                        <InputOTPSlot index={3} className="w-10 h-10 text-base" />
-                        <InputOTPSlot index={4} className="w-10 h-10 text-base" />
-                        <InputOTPSlot index={5} className="w-10 h-10 text-base" />
-                      </InputOTPGroup>
-                    </InputOTP>
-                  </div>
-                  {errors.otp && (
-                    <p className="text-center text-[10px] text-red-500 whitespace-pre-line leading-relaxed">{errors.otp.message}</p>
-                  )}
+              <div className="flex flex-col items-center space-y-6 text-center">
+                <div className="flex justify-center">
+                  <InputOTP
+                    maxLength={6}
+                    value={currentOtp || ""}
+                    onChange={(value) => setValue("otp", value, { shouldValidate: true })}
+                  >
+                    <InputOTPGroup className="gap-2">
+                      <InputOTPSlot index={0} className="w-12 h-12 rounded-xl border-zinc-200 text-center text-lg" />
+                      <InputOTPSlot index={1} className="w-12 h-12 rounded-xl border-zinc-200 text-center text-lg" />
+                      <InputOTPSlot index={2} className="w-12 h-12 rounded-xl border-zinc-200 text-center text-lg" />
+                    </InputOTPGroup>
+                    <InputOTPSeparator />
+                    <InputOTPGroup className="gap-2">
+                      <InputOTPSlot index={3} className="w-12 h-12 rounded-xl border-zinc-200 text-center text-lg" />
+                      <InputOTPSlot index={4} className="w-12 h-12 rounded-xl border-zinc-200 text-center text-lg" />
+                      <InputOTPSlot index={5} className="w-12 h-12 rounded-xl border-zinc-200 text-center text-lg" />
+                    </InputOTPGroup>
+                  </InputOTP>
                 </div>
+                {errors.otp && <p className="text-center text-xs text-rose-600">{errors.otp.message}</p>}
 
-                <button
+                <Button
                   type="submit"
                   disabled={verifyRegister.isPending || (currentOtp?.length || 0) !== 6}
-                  className="w-full h-12 bg-[#FF9B8A] text-white font-bold rounded-full py-2 shadow-lg shadow-[#FF9B8A]/20 hover:bg-[#FF8A75] transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  className="h-12 w-full max-w-md rounded-xl font-semibold"
                 >
                   {verifyRegister.isPending ? (
-                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                    <span className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                   ) : (
-                    "Verify OTP"
+                    "Xác thực OTP"
                   )}
-                </button>
+                </Button>
 
-                <p className="text-center text-xs text-white/40">
-                  Didn&apos;t receive code?{' '}
+                <p className="text-sm text-zinc-600">
+                  Không nhận được mã?{" "}
                   <button
                     type="button"
-                    disabled={register.isPending}
-                    className="text-[#FF9B8A] font-semibold hover:underline bg-transparent border-none p-0 cursor-pointer"
+                    disabled={registerUser.isPending}
                     onClick={() => {
-                      const { confirmPassword, otp, ...rest } = watch() as any;
-                      register.mutate({ ...rest, gender: 0 });
+                      const { otp, ...rest } = watch();
+                      const parsed = registerSchema.safeParse({
+                        ...rest,
+                        gender: 0,
+                        phone: rest.phone?.trim() || "",
+                      });
+                      if (!parsed.success) {
+                        setError(parsed.error.issues[0]?.message || "Thông tin đăng ký không hợp lệ.");
+                        return;
+                      }
+                      registerUser.mutate(parsed.data);
                     }}
+                    className="font-semibold text-primary hover:underline"
                   >
-                    Resend
+                    Gửi lại
                   </button>
                 </p>
               </div>
@@ -331,102 +339,24 @@ export default function RegisterForm() {
           </motion.form>
         </AnimatePresence>
 
-        <div className="mt-6 flex flex-col items-center gap-2">
-          <p className="text-xs text-white/50 font-medium">Hoặc đăng ký với</p>
-          <div className="w-[72px] h-[72px] rounded-full bg-white flex items-center justify-center shadow-xl shadow-black/25 border border-zinc-200 ring-[3px] ring-zinc-100 ring-offset-[3px] ring-offset-[#2D2D2D]/80 hover:scale-105 hover:shadow-2xl transition-all duration-300 overflow-hidden">
-            <GoogleLogin
-              onSuccess={async (credentialResponse) => {
-                if (loginGoogle.isPending) return;
-                const googleToken = credentialResponse.credential;
-                if (!googleToken) {
-                  setError("Không nhận được token từ Google");
-                  return;
-                }
-                try {
-                  await loginGoogle.mutateAsync({
-                    GoogleToken: googleToken,
-                    Location: { latitude: 0, longitude: 0 }
-                  });
-                } catch (err: any) {
-                  handleErrorApi({ error: err });
-                  setError(err?.message || "Đăng nhập Google thất bại.");
-                }
-              }}
-              onError={() => {
-                setError("Đăng nhập Google thất bại.");
-                toast.error("Google Login failed");
-              }}
-              type="icon"
-              shape="circle"
-              theme="outline"
-              size="large"
-            />
-          </div>
-        </div>
-
-        <p className="text-center text-xs text-white/40 mt-4">
-          Already have an account?{' '}
-          <Link href="/login" className="text-[#FF9B8A] font-bold hover:underline">
-            Sign in
+        <p className="mt-6 text-center text-sm text-zinc-600">
+          Đã có tài khoản?{" "}
+          <Link href="/login" className="font-semibold text-primary hover:underline">
+            Đăng nhập
           </Link>
         </p>
       </div>
 
-      {/* KHỐI ĐEN VÀ VẾT CẮT (RIGHT SIDE) */}
-      <div className="hidden lg:block p-4 relative">
-        <div
-          className="h-full bg-black rounded-[45px] p-16 pt-12 pb-24 flex flex-col justify-center relative"
-          style={maskStyle}
-        >
-          <div className="relative z-10 space-y-10">
-            <h2 className="text-[52px] font-bold text-white leading-[1.1]">Join our explorers</h2>
-            <p className="text-xl text-white/60 font-light max-w-sm leading-relaxed">Discover and book your favorite events with ease. Start your journey with DiDoo today.</p>
-
-          </div>
-
-          <div className="absolute bottom-10 right-10 opacity-20 pointer-events-none">
-            <svg width="200" height="200" viewBox="0 0 100 100" fill="none" className="text-blue-400">
-              <path d="M50 0L53 47L100 50L53 53L50 100L47 53L0 50L47 47L50 0Z" fill="currentColor" />
-            </svg>
-          </div>
-        </div>
-
-        <motion.div
-          initial={{ y: 50, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          className="absolute bottom-[-40px] left-[100px] w-[400px] z-30 drop-shadow-[0_30px_50px_rgba(0,0,0,0.5)]"
-        >
-          <div
-            className="bg-white/90 backdrop-blur-md p-10 rounded-[55px] relative"
-            style={maskStyle}
-          >
-            <div className="relative z-10">
-              <h4 className="text-black font-bold text-[24px] mb-3 leading-tight pr-14">Find your perfect event and book now</h4>
-              <p className="text-gray-500 text-base mb-8 leading-relaxed">Be among thousands of explorers discovering amazing events near you.</p>
-              <div className="flex items-center -space-x-3">
-                {[1, 2, 3, 4].map(i => (
-                  <div key={i} className="w-11 h-11 rounded-full border-[4px] border-white bg-gray-200 overflow-hidden">
-                    <Image src={`https://i.pravatar.cc/150?u=${i}`} alt="user" width={44} height={44} />
-                  </div>
-                ))}
-                <div className="w-11 h-11 rounded-full bg-black text-white text-[10px] flex items-center justify-center border-[4px] border-white font-bold">+2</div>
-              </div>
-            </div>
-          </div>
-        </motion.div>
+      <div className="hidden lg:flex flex-col justify-center p-10 bg-zinc-900 text-white min-h-[520px]">
+        <h2 className="text-2xl font-bold leading-tight">
+          Tham gia cộng đồng
+          <br />
+          <span className="text-zinc-400">người yêu sự kiện</span>
+        </h2>
+        <p className="mt-4 text-zinc-400 text-sm max-w-sm leading-relaxed">
+          Khám phá và đặt vé sự kiện yêu thích một cách dễ dàng. Bắt đầu hành trình với DiDoo ngay hôm nay.
+        </p>
       </div>
     </motion.div>
-  );
-}
-
-function SocialIcon({ icon, onClick }: { icon: string, onClick?: () => void }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="w-10 h-10 rounded-full bg-white flex items-center justify-center hover:scale-110 active:scale-95 transition-all shadow-xl shadow-black/10"
-    >
-      {icon === 'google' && <Image src="https://www.svgrepo.com/show/475656/google-color.svg" width={22} height={22} alt="G" />}
-    </button>
   );
 }
