@@ -269,6 +269,7 @@ export function EventDetailContent({ eventId }: { eventId: string }) {
                   <TableRow className="border-zinc-200 hover:bg-transparent">
                     <TableHead>Tên</TableHead>
                     <TableHead>Giá</TableHead>
+                    <TableHead>Số vé tối đa/người</TableHead>
                     <TableHead>Tổng số</TableHead>
                     <TableHead>Còn lại</TableHead>
                     <TableHead className="w-12" />
@@ -278,7 +279,8 @@ export function EventDetailContent({ eventId }: { eventId: string }) {
                   {ticketTypes.map((tt) => (
                     <TableRow key={tt.id} className="border-zinc-100">
                       <TableCell className="font-medium">{tt.name}</TableCell>
-                      <TableCell>{formatCurrency(tt.price)}</TableCell>
+                      <TableCell>{tt.price ? formatCurrency(tt.price) : "Miễn phí"}</TableCell>
+                      <TableCell>{tt.maxTicketsPerUser ?? "Không giới hạn"}</TableCell>
                       <TableCell>{tt.totalQuantity}</TableCell>
                       <TableCell>{tt.availableQuantity}</TableCell>
                       <TableCell>

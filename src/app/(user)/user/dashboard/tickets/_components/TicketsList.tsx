@@ -184,7 +184,7 @@ function TicketCard({ ticket }: { ticket: TicketCardView }) {
           </div>
           <div className="flex items-center justify-between border-t border-zinc-100 pt-3">
             <span className="text-sm text-zinc-500">Giá vé</span>
-            <span className="font-bold text-zinc-900">{Number(ticket.totalPrice || 0).toLocaleString("vi-VN")}đ</span>
+            <span className="font-bold text-zinc-900">{ticket.totalPrice === 0 ? "Miễn phí" : `${Number(ticket.totalPrice).toLocaleString("vi-VN")}đ`}</span>
           </div>
         </div>
 

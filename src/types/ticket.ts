@@ -96,5 +96,6 @@ export interface TicketType {
     totalQuantity: number;
     availableQuantity: number;
     description?: string;
+    maxTicketsPerUser?: number | null;
     createdAt?: string;
 }

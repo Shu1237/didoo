@@ -163,12 +163,12 @@ export function ResaleEventListingsContent({
             </div>
 
             <div className="hidden md:block">
-              <div className="backdrop-blur-md bg-white/10 border border-white/20 p-4 rounded-2xl shadow-xl min-w-[200px]">
+              {/* <div className="backdrop-blur-md bg-white/10 border border-white/20 p-4 rounded-2xl shadow-xl min-w-[200px]">
                 <p className="text-zinc-300 text-xs font-medium mb-1">Giá từ</p>
                 <p className="text-white text-3xl font-bold">
                   {minPrice.toLocaleString("vi-VN")}đ
                 </p>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>
