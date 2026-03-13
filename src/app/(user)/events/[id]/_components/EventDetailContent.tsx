@@ -217,27 +217,52 @@ export default function EventDetailContent({
           <div className="sticky top-24 space-y-8">
             {/* Ticket Card */}
             <div className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
-              <div className="mb-4">
+              {/* <div className="mb-4">
                 <span className="text-xs font-bold uppercase tracking-wider text-zinc-400">Giá vé từ</span>
                 <div className="mt-1 flex items-baseline gap-1">
                   <span className="text-3xl font-black text-zinc-900">
-                    {ticketTypes.length > 0 ? minPrice.toLocaleString("vi-VN") : "---"}
+                    {ticketTypes.length > 0
+                      ? minPrice === 0
+                        ? "Miễn phí"
+                        : `${minPrice.toLocaleString("vi-VN")}`
+                      : "---"}
                   </span>
-                  <span className="text-lg font-bold text-zinc-900">₫</span>
+                  {ticketTypes.length > 0 && minPrice > 0 && (
+                    <span className="text-lg font-bold text-zinc-900">₫</span>
+                  )}
                 </div>
-              </div>
+              </div> */}
 
-              {totalTickets > 0 && (
-                <div className="space-y-1.5 mb-6">
-                  <div className="flex justify-between items-end">
-                    <span className="text-xs font-medium text-zinc-500">Đã bán {Math.round((soldTickets / totalTickets) * 100)}%</span>
+              {ticketTypes.length > 0 && (
+                <div className="space-y-3 mb-6">
+                  {ticketTypes.map((tt) => {
+                    const total = tt.totalQuantity ?? 0;
+                    const available = tt.availableQuantity ?? 0;
+                    const sold = total - available;
+                    const pct = total > 0 ? Math.round((sold / total) * 100) : 0;
+                    return (
+                      <div key={tt.id} className="rounded-lg border border-zinc-100 bg-zinc-50/50 px-3 py-2">
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="min-w-0">
+                            <p className="text-sm font-semibold text-zinc-900 truncate">{tt.name}</p>
+                            <p className="text-xs text-zinc-500">
+                              {Number(tt.price ?? 0) === 0 ? "Miễn phí" : `${Number(tt.price).toLocaleString("vi-VN")}₫`}
+                            </p>
+                          </div>
+                          <span className="text-xs font-bold text-zinc-900 shrink-0">{sold}/{total}</span>
+                        </div>
+                        <div className="mt-1.5 h-1 w-full bg-zinc-200 rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-primary rounded-full transition-all duration-300"
+                            style={{ width: `${pct}%` }}
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
+                  <div className="flex justify-between items-end pt-1">
+                    <span className="text-xs font-medium text-zinc-500">Đã bán {totalTickets > 0 ? Math.round((soldTickets / totalTickets) * 100) : 0}%</span>
                     <span className="text-xs font-bold text-zinc-900">{soldTickets}/{totalTickets}</span>
-                  </div>
-                  <div className="h-1.5 w-full bg-zinc-100 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-primary rounded-full transition-all duration-500"
-                      style={{ width: `${(soldTickets / totalTickets) * 100}%` }}
-                    />
                   </div>
                 </div>
               )}

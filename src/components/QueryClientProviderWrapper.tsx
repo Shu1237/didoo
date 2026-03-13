@@ -19,7 +19,7 @@ export default function QueryClientProviderWrapper({
           queries: {
 
             staleTime: 5 * 60 * 1000,
-            retry: false,
+            retry: 3,
             refetchOnWindowFocus: false,
           },
         },

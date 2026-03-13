@@ -61,7 +61,7 @@ export default function DashboardHeader() {
     <header className="flex h-14 shrink-0 items-center justify-between border-b border-zinc-200 px-6 bg-white">
       <nav className="flex items-center gap-2 text-sm text-zinc-600">
         
-      </nav>
+      </nav> 
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -74,11 +74,11 @@ export default function DashboardHeader() {
             <ChevronDown className="h-4 w-4 text-zinc-500" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-56 rounded-xl border-zinc-200">
+        <DropdownMenuContent align="end" className="w-48 rounded-xl border-zinc-200 mt-2">
           <DropdownMenuItem asChild>
-            <Link href={isOrganizer ? "/organizer/profile" : "/admin/profile"} className="flex items-center gap-2">
+            <Link href="/home" className="flex items-center gap-2">
               <User className="h-4 w-4" />
-              Hồ sơ
+              Về trang chủ
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem onClick={handleLogout} className="flex items-center gap-2 text-red-600">

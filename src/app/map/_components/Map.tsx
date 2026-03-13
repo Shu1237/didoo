@@ -9,7 +9,7 @@ import { Event } from '@/types/event';
 import { Spinner } from '@/components/ui/spinner';
 import { envconfig } from '../../../../config';
 
-const MAP_TILES_KEY = "SnGhg9VIWX1fplbNQZkQnVNlUpsxCdViDKvUqtax";
+
 // User location pin - địa điểm hiện tại
 const UserLocationPin = ({ className = "w-8 h-8" }: { className?: string }) => (
   <svg
@@ -84,7 +84,7 @@ const Map = ({ coordinates, events, isLoading, selectedEvent, setSelectedEvent, 
     try {
       // Use MAP_TILES_KEY as it's the one we know is currently valid for the user
       const response = await fetch(
-        `https://rsapi.goong.io/Direction?origin=${start.lat},${start.lng}&destination=${end.lat},${end.lng}&vehicle=car&api_key=${MAP_TILES_KEY}`
+        `https://rsapi.goong.io/Direction?origin=${start.lat},${start.lng}&destination=${end.lat},${end.lng}&vehicle=car&api_key=${envconfig.NEXT_PUBLIC_MAP_TILES_KEY}`
       );
       const data = await response.json();
       console.log('Goong Directions Data:', data);
@@ -259,7 +259,7 @@ const Map = ({ coordinates, events, isLoading, selectedEvent, setSelectedEvent, 
           bearing: 0
         }}
         style={{ width: '100%', height: '100%' }}
-        mapStyle={mapStyle || `https://tiles.goong.io/assets/goong_map_web.json?api_key=${MAP_TILES_KEY}`}
+        mapStyle={mapStyle || `https://tiles.goong.io/assets/goong_map_web.json?api_key=${envconfig.NEXT_PUBLIC_MAP_TILES_KEY}`}
       >
         {/* Route layers */}
         {routeData && (

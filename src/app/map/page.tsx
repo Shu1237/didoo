@@ -5,14 +5,13 @@ import { useSearchParams, useRouter } from "next/navigation";
 import Header from "./_components/Header";
 import List from "./_components/List";
 import Map from "./_components/Map";
-import { MapPin, Satellite } from "lucide-react";
+import { MapPin } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Event } from "@/types/event";
-import { Button } from "@/components/ui/button";
 import { useGetEvents } from "@/hooks/useEvent";
 import { EventStatus } from "@/utils/enum";
 import { useLocationContext } from "@/contexts/locationContext";
-
+import { envconfig } from "../../../config";
 const AnimatedDoubleArrow = ({
   direction,
   isAnimating,
@@ -41,19 +40,15 @@ const AnimatedDoubleArrow = ({
   </motion.svg>
 );
 
-const GOONG_API_KEY = "SnGhg9VIWX1fplbNQZkQnVNlUpsxCdViDKvUqtax";
 
-const mapStyle = {
-  normalStyle: `https://tiles.goong.io/assets/goong_map_web.json?api_key=${GOONG_API_KEY}`,
-  satelliteStyle: `https://tiles.goong.io/assets/navigation_dark.json?api_key=${GOONG_API_KEY}`,
-};
+
+const mapStyleUrl = `https://tiles.goong.io/assets/goong_map_web.json?api_key=${envconfig.NEXT_PUBLIC_MAP_TILES_KEY}`;
 
 export default function MapPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { location } = useLocationContext();
   const coordinates = location ? { lat: location.latitude, lng: location.longitude } : null;
-  const [mapStyleType, setMapStyleType] = useState(mapStyle.normalStyle);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
@@ -118,11 +113,7 @@ export default function MapPage() {
     return result;
   }, [events, sortBy, coordinates?.lat, coordinates?.lng]);
 
-  const toggleMapStyle = () => {
-    setMapStyleType((prev) =>
-      prev === mapStyle.normalStyle ? mapStyle.satelliteStyle : mapStyle.normalStyle
-    );
-  };
+
 
   const isMapLoading = !coordinates;
 
@@ -135,7 +126,7 @@ export default function MapPage() {
           isLoading={isMapLoading}
           selectedEvent={selectedEvent}
           setSelectedEvent={setSelectedEvent}
-          mapStyle={mapStyleType}
+          mapStyle={mapStyleUrl}
         />
       </div>
 
@@ -198,21 +189,6 @@ export default function MapPage() {
           </motion.div>
         )}
       </AnimatePresence>
-
-      <div className="absolute bottom-6 right-6 z-20">
-        <Button
-          variant="secondary"
-          size="icon"
-          onClick={toggleMapStyle}
-          className="rounded-full shadow-xl bg-white/90 dark:bg-card/90 hover:scale-110 transition-transform"
-        >
-          {mapStyleType === mapStyle.satelliteStyle ? (
-            <MapPin className="w-5 h-5 text-primary" />
-          ) : (
-            <Satellite className="w-5 h-5 text-primary" />
-          )}
-        </Button>
-      </div>
     </div>
   );
 }

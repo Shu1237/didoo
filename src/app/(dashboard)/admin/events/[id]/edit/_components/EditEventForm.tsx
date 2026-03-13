@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { eventUpdateSchema, locationSchema, type EventUpdateBody } from "@/schemas/event";
+import { eventUpdateSchema, locationSchema  } from "@/schemas/event";
 import { useEvent, useGetEvent, useGetCategories } from "@/hooks/useEvent";
 import { useMedia } from "@/hooks/useMedia";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
