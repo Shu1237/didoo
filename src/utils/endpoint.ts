@@ -58,7 +58,7 @@ export const ENDPOINT_CLIENT = {
     INTERACTION_SOFT_DELETE: (userId: string, eventId: string, type: number) => `/api/interactions/${userId}/${eventId}/${type}/soft`,
 
     // Tickets
-    TICKETS: '/tickets',
+    TICKETS: '/api/tickets',
     TICKET_DETAIL: (id: string) => `/api/tickets/${id}`,
 
     // Ticket Types
