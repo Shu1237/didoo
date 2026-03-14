@@ -9,8 +9,9 @@ import { toast } from "sonner";
 import Loading from "@/components/loading";
 import { Button } from "@/components/ui/button";
 import { useGetMe } from "@/hooks/useAuth";
-import { useBooking } from "@/hooks/useBooking";
+import { useBooking, useGetBookings } from "@/hooks/useBooking";
 import { useGetEvent } from "@/hooks/useEvent";
+import { BookingTypeStatus } from "@/utils/enum";
 import { useGetTicketTypes } from "@/hooks/useTicket";
 import { bookingCreateSchema } from "@/schemas/booking";
 import { handleErrorApi } from "@/lib/errors";
@@ -19,7 +20,7 @@ import { useTicketHub } from "@/hooks/useTicketHub";
 import { BookingContent } from "./_components/BookingContent";
 import { BookingConfirmContent } from "./_components/BookingConfirmContent";
 
-type BookingDraftItem = {
+export type BookingDraftItem = {
   ticketTypeId: string;
   quantity: number;
 };
@@ -52,9 +53,19 @@ export default function EventBookingPage({
     { enabled: !!id }
   );
   const { create } = useBooking();
-  const { realtimeAvailability, lockTickets, unlockTickets } = useTicketHub(id);
-
+  const { selectTicket } = useTicketHub(id);
   const user = userRes?.data;
+  const { data: bookingsRes } = useGetBookings(
+    {
+      userId: user?.id,
+      eventId: id,
+      bookingType: BookingTypeStatus.NORMAL,
+      pageNumber: 1,
+      pageSize: 100,
+      fields: "id,userId,eventId,amount,status,bookingType,bookingDetails",
+    },
+    { enabled: !!user?.id && !!id }
+  );
   const event = eventRes?.data;
   const ticketTypes = ticketTypesRes?.data?.items || [];
 
@@ -109,9 +120,9 @@ export default function EventBookingPage({
 
   const totalPrice = selected
     ? (() => {
-        const tt = ticketTypes.find((t) => t.id === selected.ticketTypeId);
-        return (tt?.price ?? 0) * selected.quantity;
-      })()
+      const tt = ticketTypes.find((t) => t.id === selected.ticketTypeId);
+      return (tt?.price ?? 0) * selected.quantity;
+    })()
     : 0;
 
   const maxPerUser = (tt: TicketType) => {
@@ -127,7 +138,7 @@ export default function EventBookingPage({
   };
 
   const handleQuantity = (tt: TicketType, delta: number) => {
-    const avail = realtimeAvailability[tt.id] ?? Math.max(0, Number(tt.availableQuantity ?? 0));
+    const avail = ticketStore$.availability[id][tt.id].get() ?? Math.max(0, Number(tt.availableQuantity ?? 0));
     if (avail <= 0 && delta > 0) return;
 
     const limit = maxAllowed(tt);
@@ -140,16 +151,22 @@ export default function EventBookingPage({
           ? Math.min(limit, 1)
           : 0;
 
-      if (nextQty <= 0) {
-        saveDraft(id, []);
-        unlockTickets(tt.id);
-        return null;
+    if (nextQty <= 0) {
+      if (prev?.ticketTypeId && (prev?.quantity ?? 0) > 0) {
+        selectTicket(prev.ticketTypeId, -(prev.quantity ?? 0));
       }
-      const next = { ticketTypeId: tt.id, quantity: nextQty };
-      saveDraft(id, [next]);
-      lockTickets(tt.id, nextQty);
-      return next;
-    });
+      setSelected(null);
+      saveDraft(id, []);
+      return;
+    }
+
+    if (delta > 0 && prev && prev.ticketTypeId !== tt.id && (prev.quantity ?? 0) > 0) {
+      selectTicket(prev.ticketTypeId, -(prev.quantity ?? 0));
+    }
+    selectTicket(tt.id, nextQty - (isSame ? (prev?.quantity ?? 0) : 0));
+
+    setSelected({ ticketTypeId: tt.id, quantity: nextQty });
+    saveDraft(id, [{ ticketTypeId: tt.id, quantity: nextQty }]);
   };
 
   const handleGoToConfirm = () => {
@@ -248,6 +265,7 @@ export default function EventBookingPage({
           <div className="max-w-lg rounded-2xl border border-zinc-200 bg-white p-8 text-center shadow-sm">
             <p className="text-zinc-600">Bạn chưa chọn vé. Vui lòng quay lại chọn vé.</p>
             <Button className="mt-5 rounded-xl" onClick={() => setStep(1)}>
+            <Button className="mt-5 rounded-xl" onClick={() => setStep(1)}>
               Chọn vé
             </Button>
           </div>
@@ -256,6 +274,18 @@ export default function EventBookingPage({
     }
 
     return (
+      <BookingConfirmContent
+        event={event}
+        selectedItems={selectedItems}
+        selectedQuantity={selected?.quantity ?? 0}
+        totalPrice={totalPrice}
+        register={register}
+        errors={errors}
+        handleSubmit={handleSubmit}
+        onSubmit={handleConfirm}
+        onBack={() => setStep(1)}
+        isPending={create.isPending}
+      />
       <BookingConfirmContent
         event={event}
         selectedItems={selectedItems}

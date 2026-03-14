@@ -46,6 +46,12 @@ export const useGetNotifications = (params?: NotificationGetListQuery, options?:
   queryFn: () => notificationRequest.getList(params || {}),
   enabled: options?.enabled ?? true,
 });
+
+export const useGetMyNotifications = (params?: NotificationGetListQuery, options?: { enabled?: boolean }) => useQuery({
+  queryKey: [...QUERY_KEY.notifications.list(params), "me"] as const,
+  queryFn: () => notificationRequest.getMyList(params || {}),
+  enabled: options?.enabled ?? true,
+});
 export const useGetNotification = (id: string, options?: { enabled?: boolean }) => useQuery({
   queryKey: QUERY_KEY.notifications.detail(id),
   queryFn: () => notificationRequest.getById(id),
@@ -61,6 +67,10 @@ export const useNotification = () => {
     mutationFn: async ({ id, body }: { id: string; body: NotificationUpdateBody }) => (await notificationRequest.update(id, body)).data,
     onSuccess: () => queryClient.invalidateQueries({ queryKey: KEY.notifications }),
   });
+  const markAsRead = useMutation({
+    mutationFn: async (id: string) => (await notificationRequest.markAsRead(id)).data,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: KEY.notifications }),
+  });
   const deleteNotification = useMutation({
     mutationFn: async (id: string) => (await notificationRequest.delete(id)).message,
     onSuccess: () => queryClient.invalidateQueries({ queryKey: KEY.notifications }),
@@ -71,5 +81,5 @@ export const useNotification = () => {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: KEY.notifications }),
     onError: (error) => handleErrorApi({ error }),
   });
-  return { create, update, deleteNotification, restore };
+  return { create, update, markAsRead, deleteNotification, restore };
 };

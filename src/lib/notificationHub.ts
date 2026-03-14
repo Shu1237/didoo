@@ -10,15 +10,18 @@ const getBaseUrl = () => {
 };
 
 /**
- * Tạo kết nối SignalR tới TicketHub (giữ vé real-time)
+ * Tạo kết nối SignalR tới NotificationHub (thông báo real-time)
  */
-export const createTicketHubConnection = () => {
-    const hubUrl = `${getBaseUrl()}/hubs/ticket`;
+export const createNotificationHubConnection = () => {
+    const hubUrl = `${getBaseUrl()}/hubs/notification`;
 
     return new signalR.HubConnectionBuilder()
         .withUrl(hubUrl, {
             accessTokenFactory: () => {
                 const token = useSessionStore.getState().accessToken;
+                if (!token) {
+                    console.log("[SignalR] No token yet, connection will wait");
+                }
                 return token || "";
             },
             skipNegotiation: false,
@@ -26,10 +29,10 @@ export const createTicketHubConnection = () => {
         })
         .withAutomaticReconnect({
             nextRetryDelayInMilliseconds: (retryContext) => {
-                if (retryContext.elapsedMilliseconds < 60000) {
-                    return 2000;
+                if (retryContext.elapsedMilliseconds < 120000) {
+                    return 5000;
                 }
-                return 10000;
+                return 30000;
             },
         })
         .configureLogging(createSilentLogger())
@@ -52,4 +55,3 @@ function createSilentLogger(): signalR.ILogger {
         },
     };
 }
-

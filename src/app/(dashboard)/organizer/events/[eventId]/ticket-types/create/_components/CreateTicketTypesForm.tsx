@@ -219,6 +219,8 @@ export function CreateTicketTypesForm({ eventId }: { eventId: string }) {
               </div>
             );
             })}
+            );
+            })}
             <div className="flex gap-2">
               <Button
                 type="button"

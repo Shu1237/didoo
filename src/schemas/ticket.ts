@@ -49,8 +49,10 @@ export const ticketTypeCreateSchema = z.object({
     eventId: z.uuid(),
     name: z.string().min(1),
     price: z.number().min(0).default(0),
+    price: z.number().min(0).default(0),
     totalQuantity: z.number().int().min(0),
     availableQuantity: z.number().int().min(0),
+    maxTicketsPerUser: z.number().int().min(0).optional().nullable(),
     maxTicketsPerUser: z.number().int().min(0).optional().nullable(),
     description: z.string().optional(),
 });
@@ -67,6 +69,7 @@ const ticketTypeArrayItemSchema = z.object({
     totalQuantity: z.number().int().min(0),
     availableQuantity: z.number().int().min(0),
     maxTicketsPerUser: z.number().int().min(0).optional().nullable(),
+    maxTicketsPerUser: z.number().int().min(0).optional().nullable(),
     description: z.string().optional(),
 });
 
@@ -76,8 +79,10 @@ export const ticketTypeCreateArraySchema = z.object({
 
 export const ticketTypeUpdateSchema = z.object({
     saleType: z.enum(TICKET_SALE_TYPES).optional(),
+    saleType: z.enum(TICKET_SALE_TYPES).optional(),
     name: z.string().min(1).optional(),
     price: z.number().min(0).optional(),
+    maxTicketsPerUser: z.number().int().min(0).optional().nullable(),
     maxTicketsPerUser: z.number().int().min(0).optional().nullable(),
     totalQuantity: z.number().int().min(0).optional(),
     availableQuantity: z.number().int().min(0).optional(),
@@ -102,7 +107,7 @@ export type TicketUpdateBody = z.input<typeof ticketUpdateSchema>;
 export const ticketListingCreateSchema = z.object({
     ticketIds: z.array(z.string().uuid()).min(1, "Vui lòng chọn ít nhất 1 vé"),
     sellerUserId: z.string().uuid(),
-    askingPrice: z.number().min(0),
+    askingPrice: z.number().min(0).default(0),
     description: z.string().optional(),
   });
   

@@ -20,6 +20,7 @@ export interface BookingDetailItem {
     id: string;
     seatId?: string | null;
     ticketId?: string | null;
+    ticketTypeId?: string | null;
     resaleId?: string | null;
     quantity: number;
     pricePerTicket: number;

@@ -93,6 +93,15 @@ export default function CreateResalePage() {
           set.add(listing.ticketId);
         }
       }
+      const ticketIds = (listing.ticket || []).map((t) => t.id).filter(Boolean) as string[];
+      if (status !== TicketListingStatus.PENDING && status !== TicketListingStatus.SOLD) {
+        for (const ticketId of ticketIds) {
+          set.add(ticketId);
+        }
+        if (ticketIds.length === 0 && listing.ticketId) {
+          set.add(listing.ticketId);
+        }
+      }
     }
     return set;
   }, [listingsRes?.data.items]);
@@ -122,6 +131,7 @@ export default function CreateResalePage() {
     return all.filter((e) => (ownedCountByEvent.get(e.id) || 0) > 0);
   }, [eventsRes?.data.items, ownedCountByEvent]);
 
+
   const selectedTicketIds = form.watch("ticketIds") || [];
 
   const ticketsOfSelectedEvent = useMemo(() => {
@@ -129,9 +139,18 @@ export default function CreateResalePage() {
     return candidateTickets.filter(
       (ticket) => (ticket.event?.id || "") === selectedEventId
     );
+    return candidateTickets.filter(
+      (ticket) => (ticket.event?.id || "") === selectedEventId
+    );
   }, [candidateTickets, selectedEventId]);
 
   const hasOwnedTicketsForSelectedEvent = ticketsOfSelectedEvent.length > 0;
+
+  /** Có vé trả phí (price > 0) trong sự kiện đã chọn → hiển thị input askingPrice */
+  const hasPaidTicketsInSelectedEvent = useMemo(
+    () => ticketsOfSelectedEvent.some((t) => Number(t.ticketType?.price ?? 0) > 0),
+    [ticketsOfSelectedEvent]
+  );
 
   const toggleTicket = (ticketId: string) => {
     const current = form.getValues("ticketIds") || [];
@@ -144,6 +163,10 @@ export default function CreateResalePage() {
       );
       return;
     }
+    form.setValue("ticketIds", [...current, ticketId], {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
     form.setValue("ticketIds", [...current, ticketId], {
       shouldDirty: true,
       shouldValidate: true,
@@ -175,6 +198,15 @@ export default function CreateResalePage() {
     form.setValue(field, value as never, { shouldDirty: true, shouldValidate: true });
   };
 
+  const handleSelectEvent = (eventId: string) => {
+    setSelectedEventId(eventId);
+    form.setValue("ticketIds", [], { shouldDirty: true, shouldValidate: true });
+  };
+
+  const handleFormChange = (field: "askingPrice" | "description", value: number | string) => {
+    form.setValue(field, value as never, { shouldDirty: true, shouldValidate: true });
+  };
+
   const onSubmit = async (values: FormValues) => {
     if (!user?.id) return;
     if (!selectedEventId) {
@@ -189,6 +221,9 @@ export default function CreateResalePage() {
       const selectedTickets = ticketsOfSelectedEvent.filter((ticket) =>
         values.ticketIds.includes(ticket.id)
       );
+      const selectedTickets = ticketsOfSelectedEvent.filter((ticket) =>
+        values.ticketIds.includes(ticket.id)
+      );
       if (selectedTickets.length === 0) {
         form.setError("ticketIds", { message: "Vui lòng chọn ít nhất một vé." });
         return;
@@ -197,7 +232,7 @@ export default function CreateResalePage() {
       const payload = ticketListingCreateSchema.parse({
         ticketIds: values.ticketIds,
         sellerUserId: user.id,
-        askingPrice: Number(values.askingPrice),
+        askingPrice: hasPaidTicketsInSelectedEvent ? Number(values.askingPrice ?? 0) : 0,
         description: values.description?.trim() || undefined,
       });
 
