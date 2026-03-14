@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ticketTypeUpdateSchema, type TicketTypeUpdateBody, TICKET_SALE_TYPES, type TicketSaleType } from "@/schemas/ticket";
+import { ticketTypeUpdateSchema, type TicketTypeUpdateBody } from "@/schemas/ticket";
 import { useTicketType } from "@/hooks/useTicket";
 import { useGetEvent } from "@/hooks/useEvent";
 import { useGetTicketType } from "@/hooks/useTicket";
@@ -11,14 +11,14 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+// import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"; // COMMENT: dùng cho saleType paid/free
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { handleErrorApi } from "@/lib/errors";
 import { useRouter } from "next/navigation";
 import { Loader2, ArrowLeft, Trash2 } from "lucide-react";
 import Link from "next/link";
 
-const SALE_TYPE_LABELS: Record<TicketSaleType, string> = { paid: "Bán vé", free: "Miễn phí" };
+// const SALE_TYPE_LABELS: Record<TicketSaleType, string> = { paid: "Bán vé", free: "Miễn phí" }; // COMMENT: flow free không dùng
 
 export function EditTicketTypeForm({
   eventId,
@@ -40,17 +40,15 @@ export function EditTicketTypeForm({
     register,
     handleSubmit,
     reset,
-    setValue,
-    watch,
     setError,
     formState: { errors },
   } = useForm<TicketTypeUpdateBody>({
     resolver: zodResolver(ticketTypeUpdateSchema),
     defaultValues: {
-      saleType: "paid",
+      saleType: "free",
       name: "",
       price: 0,
-      maxTicketsPerUser: null,
+      maxTicketsPerUser: 1,
       totalQuantity: 0,
       availableQuantity: 0,
       description: "",
@@ -59,12 +57,12 @@ export function EditTicketTypeForm({
 
   useEffect(() => {
     if (ticketType) {
-      const isFree = Number(ticketType.price ?? 0) === 0;
+      // Flow free: luôn dùng free, price = 0
       reset({
-        saleType: isFree ? "free" : "paid",
+        saleType: "free",
         name: ticketType.name,
-        price: ticketType.price ?? 0,
-        maxTicketsPerUser: ticketType.maxTicketsPerUser ?? null,
+        price: 0,
+        maxTicketsPerUser: ticketType.maxTicketsPerUser ?? 1,
         totalQuantity: ticketType.totalQuantity,
         availableQuantity: ticketType.availableQuantity,
         description: ticketType.description ?? "",
@@ -72,14 +70,15 @@ export function EditTicketTypeForm({
     }
   }, [ticketType, reset]);
 
-  const saleType = watch("saleType") ?? "paid";
+  // const saleType = watch("saleType") ?? "paid"; // COMMENT: flow free không dùng
 
   const onSubmit = async (data: TicketTypeUpdateBody) => {
     try {
       const body = {
         name: data.name,
-        price: data.saleType === "free" ? 0 : (data.price ?? 0),
-        maxTicketsPerUser: data.saleType === "free" ? (data.maxTicketsPerUser ?? 1) : null,
+        // Flow free: price luôn = 0, không hiển thị price
+        price: 0,
+        maxTicketsPerUser: data.maxTicketsPerUser ?? 1,
         totalQuantity: data.totalQuantity,
         availableQuantity: data.availableQuantity,
         description: data.description,
@@ -123,18 +122,14 @@ export function EditTicketTypeForm({
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          {/* --- COMMENT: Phần chọn loại vé (paid/free) - ẩn vì flow chỉ bán vé free ---
           <div className="space-y-2">
             <Label>Loại vé</Label>
             <Select value={saleType} onValueChange={(v) => setValue("saleType", v as TicketSaleType)}>
-              <SelectTrigger className="w-full sm:w-48">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="paid">{SALE_TYPE_LABELS.paid}</SelectItem>
-                <SelectItem value="free">{SALE_TYPE_LABELS.free}</SelectItem>
-              </SelectContent>
+              ...
             </Select>
           </div>
+          */}
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="name">Tên loại vé *</Label>
@@ -148,37 +143,24 @@ export function EditTicketTypeForm({
                 <p className="text-sm text-destructive">{errors.name.message}</p>
               )}
             </div>
-            {saleType === "free" ? (
-              <div className="space-y-2">
-                <Label htmlFor="maxTicketsPerUser">Số vé free tối đa / người *</Label>
-                <Input
-                  id="maxTicketsPerUser"
-                  type="number"
-                  min={1}
-                  placeholder="1"
-                  {...register("maxTicketsPerUser", { valueAsNumber: true })}
-                  className={errors.maxTicketsPerUser ? "border-destructive" : ""}
-                />
-                {errors.maxTicketsPerUser && (
-                  <p className="text-sm text-destructive">{errors.maxTicketsPerUser.message}</p>
-                )}
-              </div>
-            ) : (
-              <div className="space-y-2">
-                <Label htmlFor="price">Giá (VNĐ) *</Label>
-                <Input
-                  id="price"
-                  type="number"
-                  min={0}
-                  placeholder="0"
-                  {...register("price", { valueAsNumber: true })}
-                  className={errors.price ? "border-destructive" : ""}
-                />
-                {errors.price && (
-                  <p className="text-sm text-destructive">{errors.price.message}</p>
-                )}
-              </div>
-            )}
+            {/* Flow free: luôn hiển thị maxTicketsPerUser, ẩn price */}
+            <div className="space-y-2">
+              <Label htmlFor="maxTicketsPerUser">Số vé tối đa / người *</Label>
+              <Input
+                id="maxTicketsPerUser"
+                type="number"
+                min={1}
+                placeholder="1"
+                {...register("maxTicketsPerUser", { valueAsNumber: true })}
+                className={errors.maxTicketsPerUser ? "border-destructive" : ""}
+              />
+              {errors.maxTicketsPerUser && (
+                <p className="text-sm text-destructive">{errors.maxTicketsPerUser.message}</p>
+              )}
+            </div>
+            {/* --- COMMENT: Phần nhập giá (VNĐ) - ẩn vì flow chỉ bán vé free, price default = 0 ---
+            {saleType === "free" ? (...maxTicketsPerUser...) : (...price...)}
+            */}
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">

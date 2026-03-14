@@ -29,6 +29,7 @@ interface CreateResaleContentProps {
   selectedTicketIds: string[];
   formValues: { askingPrice: number; description: string };
   formErrors: { ticketIds?: { message?: string }; askingPrice?: { message?: string } };
+  hasPaidTicketsInSelectedEvent: boolean;
   hasOwnedTicketsForSelectedEvent: boolean;
   isPending: boolean;
   onSelectEvent: (eventId: string) => void;
@@ -47,6 +48,7 @@ export function CreateResaleContent({
   selectedTicketIds,
   formValues,
   formErrors,
+  hasPaidTicketsInSelectedEvent,
   hasOwnedTicketsForSelectedEvent,
   isPending,
   onSelectEvent,
@@ -61,7 +63,7 @@ export function CreateResaleContent({
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-zinc-900">Đăng vé bán lại</h1>
-          <p className="mt-1 text-zinc-600">Vui lòng chọn vé bạn muốn bán lại và nhập giá bán mong muốn.</p>
+          <p className="mt-1 text-zinc-600">Vui lòng chọn vé bạn muốn bán lại. Vé free (0đ) không cần nhập giá.</p>
         </div>
         <Button variant="outline" asChild>
           <Link href="/user/dashboard/resales">
@@ -192,20 +194,20 @@ export function CreateResaleContent({
           <h2 className="text-xl font-semibold text-zinc-900">Thông tin bán lại</h2>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-zinc-700">Giá bán mong muốn (VNĐ)</label>
-            <Input
-              type="number"
-              min={0}
-              value={formValues.askingPrice ?? 0}
-              onChange={(e) =>
-                onFormChange("askingPrice", Number(e.target.value || 0))
-              }
-            />
-            {formErrors.askingPrice?.message ? (
-              <p className="text-sm text-rose-600">{String(formErrors.askingPrice.message)}</p>
-            ) : null}
-          </div>
+          {hasPaidTicketsInSelectedEvent ? (
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-zinc-700">Giá bán mong muốn (VNĐ)</label>
+              <Input
+                type="number"
+                min={0}
+                value={formValues.askingPrice ?? 0}
+                onChange={(e) => onFormChange("askingPrice", Number(e.target.value || 0))}
+              />
+              {formErrors.askingPrice?.message ? (
+                <p className="text-sm text-rose-600">{String(formErrors.askingPrice.message)}</p>
+              ) : null}
+            </div>
+          ) : null}
 
           <div className="space-y-2">
             <label className="text-sm font-medium text-zinc-700">Mô tả (tuỳ chọn)</label>

@@ -20,6 +20,7 @@ interface BookingContentProps {
   realtimeAvailability: Record<string, number>;
   maxPerUser: (tt: TicketType) => number | null;
   maxAllowed: (tt: TicketType) => number;
+  hasReachedMax: (tt: TicketType) => boolean;
   onQuantityChange: (tt: TicketType, delta: number) => void;
   onGoToConfirm: () => void;
 }
@@ -33,6 +34,7 @@ export function BookingContent({
   realtimeAvailability,
   maxPerUser,
   maxAllowed,
+  hasReachedMax,
   onQuantityChange,
   onGoToConfirm,
 }: BookingContentProps) {
@@ -41,11 +43,13 @@ export function BookingContent({
     soldOut,
     isSelected,
     limit,
+    reachedMax,
   }: {
     tt: TicketType;
     soldOut: boolean;
     isSelected: boolean;
     limit: number;
+    reachedMax: boolean;
   }) => {
     const total = tt.totalQuantity ?? 0;
     const avail = realtimeAvailability[tt.id] ?? Math.max(0, Number(tt.availableQuantity ?? 0));
@@ -79,6 +83,11 @@ export function BookingContent({
                 {cap != null && ` · Tối đa ${cap} vé/người`}
               </span>
             )}
+            {!soldOut && reachedMax && (
+              <span className="mt-2 inline-block text-xs font-medium text-amber-600">
+                Bạn đã đạt giới hạn vé cho loại này
+              </span>
+            )}
             {soldOut && (
               <span className="mt-2 inline-block text-xs font-medium text-rose-600">
                 Hết vé
@@ -107,7 +116,7 @@ export function BookingContent({
             <button
               type="button"
               onClick={() => onQuantityChange(tt, 1)}
-              disabled={isSelected && (selected?.quantity ?? 0) >= limit}
+              disabled={reachedMax || (isSelected && (selected?.quantity ?? 0) >= limit)}
               className="flex h-9 w-9 items-center justify-center rounded-full border border-zinc-200 text-zinc-600 transition hover:bg-zinc-100 disabled:opacity-50"
             >
               <Plus className="h-4 w-4" />
@@ -206,6 +215,7 @@ export function BookingContent({
                   const soldOut = avail <= 0;
                   const isSelected = selected?.ticketTypeId === tt.id;
                   const limit = maxAllowed(tt);
+                  const reachedMax = hasReachedMax(tt);
                   return (
                     <TicketCard
                       key={tt.id}
@@ -213,6 +223,7 @@ export function BookingContent({
                       soldOut={soldOut}
                       isSelected={isSelected}
                       limit={limit}
+                      reachedMax={reachedMax}
                     />
                   );
                 })}

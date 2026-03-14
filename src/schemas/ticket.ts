@@ -23,25 +23,26 @@ const ticketTypeRowSchema = z
     .object({
         saleType: z.enum(TICKET_SALE_TYPES, { message: "Chọn loại vé" }),
         name: z.string().min(1, "Tên loại vé là bắt buộc"),
-        price: z.number().min(0, "Giá phải >= 0").optional(),
+        // price: z.number().min(0, "Giá phải >= 0").optional(), // COMMENT: flow free - price default 0, không hiển thị
+        price: z.number().min(0).optional(),
         maxTicketsPerUser: z.number().int().min(1, "Số vé tối đa/người phải >= 1").optional().nullable(),
         totalQuantity: z.number().int().min(0, "Số lượng phải >= 0"),
         description: z.string().optional(),
     })
     .superRefine((data, ctx) => {
-        if (data.saleType === "paid") {
-            if (data.price == null || data.price < 0) {
-                ctx.addIssue({ code: "custom", message: "Vui lòng nhập giá vé", path: ["price"] });
-            }
-        }
-        if (data.saleType === "free") {
-            if (data.maxTicketsPerUser == null || data.maxTicketsPerUser < 1) {
-                ctx.addIssue({
-                    code: "custom",
-                    message: "Vui lòng nhập số vé free tối đa mỗi người",
-                    path: ["maxTicketsPerUser"],
-                });
-            }
+        // COMMENT: Flow free - không validate price cho paid
+        // if (data.saleType === "paid") {
+        //     if (data.price == null || data.price < 0) {
+        //         ctx.addIssue({ code: "custom", message: "Vui lòng nhập giá vé", path: ["price"] });
+        //     }
+        // }
+        // Flow free: luôn yêu cầu maxTicketsPerUser
+        if (data.maxTicketsPerUser == null || data.maxTicketsPerUser < 1) {
+            ctx.addIssue({
+                code: "custom",
+                message: "Vui lòng nhập số vé tối đa mỗi người",
+                path: ["maxTicketsPerUser"],
+            });
         }
     });
 
@@ -102,7 +103,7 @@ export type TicketUpdateBody = z.input<typeof ticketUpdateSchema>;
 export const ticketListingCreateSchema = z.object({
     ticketIds: z.array(z.string().uuid()).min(1, "Vui lòng chọn ít nhất 1 vé"),
     sellerUserId: z.string().uuid(),
-    askingPrice: z.number().min(0),
+    askingPrice: z.number().min(0).default(0),
     description: z.string().optional(),
   });
   

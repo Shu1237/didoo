@@ -9,8 +9,9 @@ import { toast } from "sonner";
 import Loading from "@/components/loading";
 import { Button } from "@/components/ui/button";
 import { useGetMe } from "@/hooks/useAuth";
-import { useBooking } from "@/hooks/useBooking";
+import { useBooking, useGetBookings } from "@/hooks/useBooking";
 import { useGetEvent } from "@/hooks/useEvent";
+import { BookingTypeStatus } from "@/utils/enum";
 import { useGetTicketTypes } from "@/hooks/useTicket";
 import { bookingCreateSchema } from "@/schemas/booking";
 import { handleErrorApi } from "@/lib/errors";
@@ -52,9 +53,19 @@ export default function EventBookingPage({
     { enabled: !!id }
   );
   const { create } = useBooking();
-  const { realtimeAvailability, lockTickets, unlockTickets } = useTicketHub(id);
-
+  const { realtimeAvailability, selectTicket } = useTicketHub(id);
   const user = userRes?.data;
+  const { data: bookingsRes } = useGetBookings(
+    {
+      userId: user?.id,
+      eventId: id,
+      bookingType: BookingTypeStatus.NORMAL,
+      pageNumber: 1,
+      pageSize: 100,
+      fields: "id,userId,eventId,amount,status,bookingType,bookingDetails",
+    },
+    { enabled: !!user?.id && !!id }
+  );
   const event = eventRes?.data;
   const ticketTypes = ticketTypesRes?.data?.items || [];
 
@@ -114,6 +125,26 @@ export default function EventBookingPage({
       })()
     : 0;
 
+  const purchasedCountByTicketTypeId = useMemo(() => {
+    const map = new Map<string, number>();
+    const bookings = bookingsRes?.data?.items ?? [];
+    for (const b of bookings) {
+      if (b.status === "Cancelled" || b.status === "3") continue;
+      const details = b.bookingDetails ?? [];
+      for (const d of details) {
+        const tid = d.ticketTypeId;
+        if (tid) {
+          map.set(tid, (map.get(tid) ?? 0) + (d.quantity ?? 0));
+        }
+      }
+      if (details.length === 0 && b.amount) {
+        const tid = (b as { ticketTypeId?: string }).ticketTypeId;
+        if (tid) map.set(tid, (map.get(tid) ?? 0) + b.amount);
+      }
+    }
+    return map;
+  }, [bookingsRes?.data?.items]);
+
   const maxPerUser = (tt: TicketType) => {
     const v = tt.maxTicketsPerUser;
     return v != null && Number(v) > 0 ? Number(v) : null;
@@ -122,8 +153,19 @@ export default function EventBookingPage({
   const maxAllowed = (tt: TicketType) => {
     const avail = realtimeAvailability[tt.id] ?? Math.max(0, Number(tt.availableQuantity ?? 0));
     const cap = maxPerUser(tt);
-    if (cap != null) return Math.min(cap, avail);
+    const purchased = purchasedCountByTicketTypeId.get(tt.id) ?? 0;
+    if (cap != null) {
+      const remaining = Math.max(0, cap - purchased);
+      return Math.min(remaining, avail);
+    }
     return avail;
+  };
+
+  const hasReachedMax = (tt: TicketType) => {
+    const cap = maxPerUser(tt);
+    if (cap == null) return false;
+    const purchased = purchasedCountByTicketTypeId.get(tt.id) ?? 0;
+    return purchased >= cap;
   };
 
   const handleQuantity = (tt: TicketType, delta: number) => {
@@ -131,25 +173,30 @@ export default function EventBookingPage({
     if (avail <= 0 && delta > 0) return;
 
     const limit = maxAllowed(tt);
+    const prev = selected;
+    const isSame = prev?.ticketTypeId === tt.id;
+    const nextQty = isSame
+      ? Math.max(0, Math.min(limit, (prev?.quantity ?? 0) + delta))
+      : delta > 0
+        ? Math.min(limit, 1)
+        : 0;
 
-    setSelected((prev) => {
-      const isSame = prev?.ticketTypeId === tt.id;
-      const nextQty = isSame
-        ? Math.max(0, Math.min(limit, (prev?.quantity ?? 0) + delta))
-        : delta > 0
-          ? Math.min(limit, 1)
-          : 0;
-
-      if (nextQty <= 0) {
-        saveDraft(id, []);
-        unlockTickets(tt.id);
-        return null;
+    if (nextQty <= 0) {
+      if (prev?.ticketTypeId && (prev?.quantity ?? 0) > 0) {
+        selectTicket(prev.ticketTypeId, -(prev.quantity ?? 0));
       }
-      const next = { ticketTypeId: tt.id, quantity: nextQty };
-      saveDraft(id, [next]);
-      lockTickets(tt.id, nextQty);
-      return next;
-    });
+      setSelected(null);
+      saveDraft(id, []);
+      return;
+    }
+
+    if (delta > 0 && prev && prev.ticketTypeId !== tt.id && (prev.quantity ?? 0) > 0) {
+      selectTicket(prev.ticketTypeId, -(prev.quantity ?? 0));
+    }
+    selectTicket(tt.id, nextQty - (isSame ? (prev?.quantity ?? 0) : 0));
+
+    setSelected({ ticketTypeId: tt.id, quantity: nextQty });
+    saveDraft(id, [{ ticketTypeId: tt.id, quantity: nextQty }]);
   };
 
   const handleGoToConfirm = () => {
@@ -281,6 +328,7 @@ export default function EventBookingPage({
       realtimeAvailability={realtimeAvailability}
       maxPerUser={maxPerUser}
       maxAllowed={maxAllowed}
+      hasReachedMax={hasReachedMax}
       onQuantityChange={handleQuantity}
       onGoToConfirm={handleGoToConfirm}
     />

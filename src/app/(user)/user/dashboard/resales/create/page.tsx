@@ -15,6 +15,7 @@ import { handleErrorApi } from "@/lib/errors";
 import { EventStatus, TicketListingStatus } from "@/utils/enum";
 import { CreateResaleContent } from "./_components/CreateResaleContent";
 
+// Vé price=0: ẩn askingPrice, default=0. Vé price>0: hiển thị input askingPrice
 const createListingFormSchema = ticketListingCreateSchema.pick({
   ticketIds: true,
   askingPrice: true,
@@ -28,10 +29,8 @@ function isReadyTicket(status: string | number | undefined) {
   return raw === "1" || raw.includes("ready") || raw.includes("available");
 }
 
-/** Vé miễn phí (0đ) không được phép resale */
-function isPaidTicket(price: number | undefined) {
-  return Number(price ?? 0) > 0;
-}
+/** Flow vé free: cho phép resale cả vé free, askingPrice default = 0 */
+// function isPaidTicket(price: number | undefined) { return Number(price ?? 0) > 0; } // COMMENT: trước đây chỉ cho resale vé trả phí
 
 export default function CreateResalePage() {
   const router = useRouter();
@@ -102,8 +101,8 @@ export default function CreateResalePage() {
     return tickets.filter(
       (ticket) =>
         isReadyTicket(ticket.status) &&
-        !activeListingTicketIds.has(ticket.id) &&
-        isPaidTicket(Number(ticket.ticketType?.price ?? 0))
+        !activeListingTicketIds.has(ticket.id)
+      // Flow vé free: cho phép resale cả vé free, bỏ filter isPaidTicket
     );
   }, [ticketsRes?.data.items, activeListingTicketIds]);
 
@@ -132,6 +131,12 @@ export default function CreateResalePage() {
   }, [candidateTickets, selectedEventId]);
 
   const hasOwnedTicketsForSelectedEvent = ticketsOfSelectedEvent.length > 0;
+
+  /** Có vé trả phí (price > 0) trong sự kiện đã chọn → hiển thị input askingPrice */
+  const hasPaidTicketsInSelectedEvent = useMemo(
+    () => ticketsOfSelectedEvent.some((t) => Number(t.ticketType?.price ?? 0) > 0),
+    [ticketsOfSelectedEvent]
+  );
 
   const toggleTicket = (ticketId: string) => {
     const current = form.getValues("ticketIds") || [];
@@ -197,7 +202,7 @@ export default function CreateResalePage() {
       const payload = ticketListingCreateSchema.parse({
         ticketIds: values.ticketIds,
         sellerUserId: user.id,
-        askingPrice: Number(values.askingPrice),
+        askingPrice: hasPaidTicketsInSelectedEvent ? Number(values.askingPrice ?? 0) : 0,
         description: values.description?.trim() || undefined,
       });
 
@@ -222,6 +227,7 @@ export default function CreateResalePage() {
         askingPrice: form.watch("askingPrice") ?? 0,
         description: form.watch("description") || "",
       }}
+      hasPaidTicketsInSelectedEvent={hasPaidTicketsInSelectedEvent}
       formErrors={form.formState.errors}
       hasOwnedTicketsForSelectedEvent={hasOwnedTicketsForSelectedEvent}
       isPending={create.isPending}
