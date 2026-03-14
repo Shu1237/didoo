@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useEffect, useMemo, useState } from "react";
+import { use, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -9,14 +9,17 @@ import { toast } from "sonner";
 import Loading from "@/components/loading";
 import { Button } from "@/components/ui/button";
 import { useGetMe } from "@/hooks/useAuth";
-import { useBooking, useGetBookings } from "@/hooks/useBooking";
+import { useBooking } from "@/hooks/useBooking";
 import { useGetEvent } from "@/hooks/useEvent";
-import { BookingTypeStatus } from "@/utils/enum";
 import { useGetTicketTypes } from "@/hooks/useTicket";
+import { useOwnedTicketsCountByTicketType } from "@/hooks/useOwnedTicketsByEvent";
 import { bookingCreateSchema } from "@/schemas/booking";
+import { EventStatus } from "@/utils/enum";
 import { handleErrorApi } from "@/lib/errors";
 import { TicketType } from "@/types/ticket";
 import { useTicketHub } from "@/hooks/useTicketHub";
+import { ticketStore$ } from "@/stores/ticketStore";
+import { observer } from "@legendapp/state/react";
 import { BookingContent } from "./_components/BookingContent";
 import { BookingConfirmContent } from "./_components/BookingConfirmContent";
 
@@ -40,7 +43,7 @@ const bookingContactSchema = bookingCreateSchema.pick({
 
 type BookingContactFormValues = z.infer<typeof bookingContactSchema>;
 
-export default function EventBookingPage({
+function EventBookingPageInner({
   params,
 }: {
   params: Promise<{ id: string }>;
@@ -55,17 +58,6 @@ export default function EventBookingPage({
   const { create } = useBooking();
   const { selectTicket } = useTicketHub(id);
   const user = userRes?.data;
-  const { data: bookingsRes } = useGetBookings(
-    {
-      userId: user?.id,
-      eventId: id,
-      bookingType: BookingTypeStatus.NORMAL,
-      pageNumber: 1,
-      pageSize: 100,
-      fields: "id,userId,eventId,amount,status,bookingType,bookingDetails",
-    },
-    { enabled: !!user?.id && !!id }
-  );
   const event = eventRes?.data;
   const ticketTypes = ticketTypesRes?.data?.items || [];
 
@@ -125,20 +117,54 @@ export default function EventBookingPage({
     })()
     : 0;
 
+  const ownedCountByTicketType = useOwnedTicketsCountByTicketType(id, user?.id, {
+    enabled: !!user?.id && !!id,
+  });
+
   const maxPerUser = (tt: TicketType) => {
     const v = tt.maxTicketsPerUser;
     return v != null && Number(v) > 0 ? Number(v) : null;
   };
 
+  const realtimeAvailability: Record<string, number> = (() => {
+    const all = ticketStore$.availability.get() ?? {};
+    const ev = all[id] ?? {};
+    return typeof ev === "object" ? ev : {};
+  })();
+
   const maxAllowed = (tt: TicketType) => {
     const avail = realtimeAvailability[tt.id] ?? Math.max(0, Number(tt.availableQuantity ?? 0));
     const cap = maxPerUser(tt);
-    if (cap != null) return Math.min(cap, avail);
+    const owned = ownedCountByTicketType.get(tt.id) ?? 0;
+    if (cap != null) {
+      const remainingByCap = Math.max(0, cap - owned);
+      return Math.min(remainingByCap, avail);
+    }
     return avail;
   };
 
+  const prevSelectedRef = useRef<BookingDraftItem | null>(null);
+
+  useEffect(() => {
+    const prev = prevSelectedRef.current;
+    const next = selected;
+
+    if (prev?.ticketTypeId === next?.ticketTypeId) {
+      const delta = (next?.quantity ?? 0) - (prev?.quantity ?? 0);
+      if (delta !== 0 && next) {
+        selectTicket(next.ticketTypeId, delta);
+      } else if (!next && prev) {
+        selectTicket(prev.ticketTypeId, -(prev.quantity ?? 0));
+      }
+    } else {
+      if (prev) selectTicket(prev.ticketTypeId, -(prev.quantity ?? 0));
+      if (next) selectTicket(next.ticketTypeId, next.quantity);
+    }
+    prevSelectedRef.current = next;
+  }, [selected, selectTicket]);
+
   const handleQuantity = (tt: TicketType, delta: number) => {
-    const avail = ticketStore$.availability[id][tt.id].get() ?? Math.max(0, Number(tt.availableQuantity ?? 0));
+    const avail = realtimeAvailability[tt.id] ?? Math.max(0, Number(tt.availableQuantity ?? 0));
     if (avail <= 0 && delta > 0) return;
 
     const limit = maxAllowed(tt);
@@ -151,22 +177,14 @@ export default function EventBookingPage({
           ? Math.min(limit, 1)
           : 0;
 
-    if (nextQty <= 0) {
-      if (prev?.ticketTypeId && (prev?.quantity ?? 0) > 0) {
-        selectTicket(prev.ticketTypeId, -(prev.quantity ?? 0));
+      if (nextQty <= 0) {
+        saveDraft(id, []);
+        return null;
       }
-      setSelected(null);
-      saveDraft(id, []);
-      return;
-    }
 
-    if (delta > 0 && prev && prev.ticketTypeId !== tt.id && (prev.quantity ?? 0) > 0) {
-      selectTicket(prev.ticketTypeId, -(prev.quantity ?? 0));
-    }
-    selectTicket(tt.id, nextQty - (isSame ? (prev?.quantity ?? 0) : 0));
-
-    setSelected({ ticketTypeId: tt.id, quantity: nextQty });
-    saveDraft(id, [{ ticketTypeId: tt.id, quantity: nextQty }]);
+      saveDraft(id, [{ ticketTypeId: tt.id, quantity: nextQty }]);
+      return { ticketTypeId: tt.id, quantity: nextQty };
+    });
   };
 
   const handleGoToConfirm = () => {
@@ -245,6 +263,25 @@ export default function EventBookingPage({
     );
   }
 
+  if ((event.status as number) !== EventStatus.OPENED) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-zinc-50 px-4">
+        <div className="max-w-md rounded-2xl border border-zinc-200 bg-white p-8 text-center shadow-sm">
+          <p className="text-zinc-600">
+            {(event.status as number) === EventStatus.PUBLISHED
+              ? "Sự kiện chưa mở bán vé."
+              : (event.status as number) === EventStatus.CLOSED
+                ? "Sự kiện đã đóng đăng ký."
+                : "Hiện không thể mua vé sự kiện này."}
+          </p>
+          <Button asChild className="mt-5 rounded-xl">
+            <Link href={`/events/${id}`}>Quay lại sự kiện</Link>
+          </Button>
+        </div>
+      </main>
+    );
+  }
+
   if (ticketTypes.length === 0) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-zinc-50 px-4">
@@ -265,7 +302,6 @@ export default function EventBookingPage({
           <div className="max-w-lg rounded-2xl border border-zinc-200 bg-white p-8 text-center shadow-sm">
             <p className="text-zinc-600">Bạn chưa chọn vé. Vui lòng quay lại chọn vé.</p>
             <Button className="mt-5 rounded-xl" onClick={() => setStep(1)}>
-            <Button className="mt-5 rounded-xl" onClick={() => setStep(1)}>
               Chọn vé
             </Button>
           </div>
@@ -274,18 +310,6 @@ export default function EventBookingPage({
     }
 
     return (
-      <BookingConfirmContent
-        event={event}
-        selectedItems={selectedItems}
-        selectedQuantity={selected?.quantity ?? 0}
-        totalPrice={totalPrice}
-        register={register}
-        errors={errors}
-        handleSubmit={handleSubmit}
-        onSubmit={handleConfirm}
-        onBack={() => setStep(1)}
-        isPending={create.isPending}
-      />
       <BookingConfirmContent
         event={event}
         selectedItems={selectedItems}
@@ -311,8 +335,11 @@ export default function EventBookingPage({
       realtimeAvailability={realtimeAvailability}
       maxPerUser={maxPerUser}
       maxAllowed={maxAllowed}
+      ownedCountByTicketType={ownedCountByTicketType}
       onQuantityChange={handleQuantity}
       onGoToConfirm={handleGoToConfirm}
     />
   );
 }
+
+export default observer(EventBookingPageInner);

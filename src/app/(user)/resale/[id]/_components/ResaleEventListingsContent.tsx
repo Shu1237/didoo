@@ -25,7 +25,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { Event } from "@/types/event";
-import type { TicketListing } from "@/types/ticket";
+import type { TicketListing, TicketType } from "@/types/ticket";
 
 const FALLBACK_IMAGE =
   "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=2000&auto=format&fit=crop";
@@ -34,6 +34,8 @@ interface ResaleEventListingsContentProps {
   eventId: string;
   event: Event;
   listings: TicketListing[];
+  ticketTypes: TicketType[];
+  ownedCountByTicketType: Map<string, number>;
 }
 
 type ListingWithQuantity = TicketListing & {
@@ -41,10 +43,34 @@ type ListingWithQuantity = TicketListing & {
   totalQuantity?: number;
 };
 
+function wouldExceedMaxTicketsPerUser(
+  listing: TicketListing,
+  ticketTypes: TicketType[],
+  ownedCountByTicketType: Map<string, number>
+): boolean {
+  const tickets = listing.ticket ?? [];
+  const ttById = new Map(ticketTypes.map((tt) => [tt.id, tt]));
+
+  for (const t of tickets) {
+    const ttId = t.ticketTypeId;
+    if (!ttId) continue;
+    const tt = ttById.get(ttId);
+    const maxPerUser = tt?.maxTicketsPerUser;
+    if (maxPerUser == null || Number(maxPerUser) <= 0) continue;
+
+    const listingCountForType = tickets.filter((x) => x.ticketTypeId === ttId).length;
+    const owned = ownedCountByTicketType.get(ttId) ?? 0;
+    if (listingCountForType + owned > Number(maxPerUser)) return true;
+  }
+  return false;
+}
+
 export function ResaleEventListingsContent({
   eventId,
   event,
   listings,
+  ticketTypes,
+  ownedCountByTicketType,
 }: ResaleEventListingsContentProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -275,6 +301,7 @@ export function ResaleEventListingsContent({
               const lq = listing as ListingWithQuantity;
               const qty = Number(listing.ticket?.length ?? lq.quantity ?? lq.totalQuantity ?? 1);
               const isVerified = true; // Mock constant based on design
+              const exceedsMax = wouldExceedMaxTicketsPerUser(listing, ticketTypes, ownedCountByTicketType);
 
               return (
                 <div key={listing.id} className="bg-white rounded-3xl border border-zinc-100 p-6 flex flex-col h-full shadow-sm hover:shadow-md transition-shadow">
@@ -316,11 +343,20 @@ export function ResaleEventListingsContent({
                         {Number(listing.askingPrice ?? 0).toLocaleString("vi-VN")}đ
                       </p>
                     </div>
-                    <Button asChild className="bg-[#FF8A3D] hover:bg-[#E67A2E] text-white font-bold rounded-xl px-6">
-                      <Link href={`/resale/${eventId}/trade-booking/${listing.id}`}>
-                        Mua ngay
-                      </Link>
-                    </Button>
+                    {exceedsMax ? (
+                      <Button
+                        disabled
+                        className="bg-zinc-200 text-zinc-500 font-bold rounded-xl px-6 cursor-not-allowed"
+                      >
+                        Vượt giới hạn vé/người
+                      </Button>
+                    ) : (
+                      <Button asChild className="bg-[#FF8A3D] hover:bg-[#E67A2E] text-white font-bold rounded-xl px-6">
+                        <Link href={`/resale/${eventId}/trade-booking/${listing.id}`}>
+                          Mua ngay
+                        </Link>
+                      </Button>
+                    )}
                   </div>
                 </div>
               );

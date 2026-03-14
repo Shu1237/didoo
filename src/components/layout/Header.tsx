@@ -24,8 +24,6 @@ import {
 import { Roles } from "@/utils/enum";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfileWithOrganizer } from "@/hooks/useProfileWithOrganizer";
-import { NotificationBell } from "./NotificationBell";
-
 const Header = () => {
   const user = useSessionStore((state) => state.user);
   const { isVerifiedOrganizer } = useProfileWithOrganizer();
@@ -104,8 +102,6 @@ const Header = () => {
 
             <div className="flex items-center gap-2">
               {user ? (
-                <>
-                <NotificationBell />
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button className="bg-primary hover:bg-primary/90 text-white rounded-xl px-5 h-9 text-sm font-semibold shadow-md shadow-primary/20 transition-all">
@@ -155,7 +151,6 @@ const Header = () => {
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
-                </>
               ) : (
                 <Link href="/login">
                   <Button className="rounded-xl px-5 h-9 text-sm font-semibold flex items-center gap-2 bg-zinc-900 hover:bg-zinc-800 text-white shadow-md transition-all">

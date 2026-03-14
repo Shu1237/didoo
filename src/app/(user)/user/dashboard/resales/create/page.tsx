@@ -28,10 +28,6 @@ function isReadyTicket(status: string | number | undefined) {
   return raw === "1" || raw.includes("ready") || raw.includes("available");
 }
 
-/** Vé miễn phí (0đ) không được phép resale */
-function isPaidTicket(price: number | undefined) {
-  return Number(price ?? 0) > 0;
-}
 
 export default function CreateResalePage() {
   const router = useRouter();
@@ -46,7 +42,7 @@ export default function CreateResalePage() {
       pageSize: 100,
       hasLocations: true,
       isDescending: true,
-      status: EventStatus.PUBLISHED,
+      status: EventStatus.OPENED,
     },
     true
   );
@@ -93,28 +89,20 @@ export default function CreateResalePage() {
           set.add(listing.ticketId);
         }
       }
-      const ticketIds = (listing.ticket || []).map((t) => t.id).filter(Boolean) as string[];
-      if (status !== TicketListingStatus.PENDING && status !== TicketListingStatus.SOLD) {
-        for (const ticketId of ticketIds) {
-          set.add(ticketId);
-        }
-        if (ticketIds.length === 0 && listing.ticketId) {
-          set.add(listing.ticketId);
-        }
-      }
     }
     return set;
   }, [listingsRes?.data.items]);
 
+  /** Vé free và vé trả phí đều được phép resale */
   const candidateTickets = useMemo(() => {
     const tickets = ticketsRes?.data.items || [];
     return tickets.filter(
       (ticket) =>
-        isReadyTicket(ticket.status) &&
-        !activeListingTicketIds.has(ticket.id) &&
-        isPaidTicket(Number(ticket.ticketType?.price ?? 0))
+        isReadyTicket(ticket.status) && !activeListingTicketIds.has(ticket.id)
     );
   }, [ticketsRes?.data.items, activeListingTicketIds]);
+
+  const isFreeTicket = (price: number | undefined) => Number(price ?? 0) === 0;
 
   const ownedCountByEvent = useMemo(() => {
     const map = new Map<string, number>();
@@ -139,18 +127,57 @@ export default function CreateResalePage() {
     return candidateTickets.filter(
       (ticket) => (ticket.event?.id || "") === selectedEventId
     );
-    return candidateTickets.filter(
-      (ticket) => (ticket.event?.id || "") === selectedEventId
-    );
   }, [candidateTickets, selectedEventId]);
+
+  /** Nhóm vé theo loại: free vs paid, mỗi nhóm theo ticketTypeId */
+  const ticketsByTypeInEvent = useMemo(() => {
+    const free: { ticketTypeId: string; name: string; tickets: typeof ticketsOfSelectedEvent }[] = [];
+    const paid: { ticketTypeId: string; name: string; price: number; tickets: typeof ticketsOfSelectedEvent }[] = [];
+    const seenFree = new Map<string, number>();
+    const seenPaid = new Map<string, number>();
+
+    for (const t of ticketsOfSelectedEvent) {
+      const ttId = t.ticketType?.id ?? t.ticketTypeId ?? "";
+      const name = t.ticketType?.name ?? "N/A";
+      const price = Number(t.ticketType?.price ?? 0);
+
+      if (isFreeTicket(price)) {
+        const idx = seenFree.get(ttId) ?? free.length;
+        if (idx === free.length) {
+          free.push({ ticketTypeId: ttId, name, tickets: [] });
+          seenFree.set(ttId, idx);
+        }
+        free[idx].tickets.push(t);
+      } else {
+        const idx = seenPaid.get(ttId) ?? paid.length;
+        if (idx === paid.length) {
+          paid.push({ ticketTypeId: ttId, name, price, tickets: [] });
+          seenPaid.set(ttId, idx);
+        }
+        paid[idx].tickets.push(t);
+      }
+    }
+    return { free, paid };
+  }, [ticketsOfSelectedEvent]);
 
   const hasOwnedTicketsForSelectedEvent = ticketsOfSelectedEvent.length > 0;
 
-  /** Có vé trả phí (price > 0) trong sự kiện đã chọn → hiển thị input askingPrice */
-  const hasPaidTicketsInSelectedEvent = useMemo(
-    () => ticketsOfSelectedEvent.some((t) => Number(t.ticketType?.price ?? 0) > 0),
-    [ticketsOfSelectedEvent]
-  );
+  /** Vé đã chọn có cùng loại không? Và là free hay paid? (Chỉ được chọn 1 loại vé) */
+  const selectedTicketsMeta = useMemo(() => {
+    if (selectedTicketIds.length === 0) return { sameType: true, isFree: false, ticketTypeName: "" };
+    const selected = ticketsOfSelectedEvent.filter((t) => selectedTicketIds.includes(t.id));
+    if (selected.length === 0) return { sameType: true, isFree: false, ticketTypeName: "" };
+    const firstTypeId = selected[0].ticketType?.id ?? selected[0].ticketTypeId ?? "";
+    const allSame = selected.every(
+      (t) => (t.ticketType?.id ?? t.ticketTypeId ?? "") === firstTypeId
+    );
+    const isFree = isFreeTicket(selected[0].ticketType?.price);
+    return {
+      sameType: allSame,
+      isFree,
+      ticketTypeName: selected[0].ticketType?.name ?? "N/A",
+    };
+  }, [selectedTicketIds, ticketsOfSelectedEvent]);
 
   const toggleTicket = (ticketId: string) => {
     const current = form.getValues("ticketIds") || [];
@@ -163,39 +190,35 @@ export default function CreateResalePage() {
       );
       return;
     }
-    form.setValue("ticketIds", [...current, ticketId], {
-      shouldDirty: true,
-      shouldValidate: true,
-    });
+    const ticket = ticketsOfSelectedEvent.find((t) => t.id === ticketId);
+    if (!ticket) return;
+    const ticketTypeId = ticket.ticketType?.id ?? ticket.ticketTypeId ?? "";
+    const existing = ticketsOfSelectedEvent.filter((t) => current.includes(t.id));
+    const existingTypeId = existing[0]?.ticketType?.id ?? existing[0]?.ticketTypeId ?? "";
+    if (existing.length > 0 && existingTypeId !== ticketTypeId) {
+      toast.error("Chỉ được chọn vé cùng loại. Vui lòng bỏ chọn vé trước rồi chọn lại.");
+      return;
+    }
     form.setValue("ticketIds", [...current, ticketId], {
       shouldDirty: true,
       shouldValidate: true,
     });
   };
 
-  const chooseMany = () => {
+  const chooseMany = (ticketTypeId: string) => {
     if (!selectedEventId) {
       toast.error("Vui lòng chọn sự kiện trước.");
       return;
     }
-    form.setValue(
-      "ticketIds",
-      ticketsOfSelectedEvent.map((t) => t.id),
-      { shouldDirty: true, shouldValidate: true }
-    );
+    const group = ticketsByTypeInEvent.free.find((g) => g.ticketTypeId === ticketTypeId)
+      ?? ticketsByTypeInEvent.paid.find((g) => g.ticketTypeId === ticketTypeId);
+    if (!group) return;
+    const ids = "tickets" in group ? group.tickets.map((t) => t.id) : [];
+    form.setValue("ticketIds", ids, { shouldDirty: true, shouldValidate: true });
   };
 
   const clearAll = () => {
     form.setValue("ticketIds", [], { shouldDirty: true, shouldValidate: true });
-  };
-
-  const handleSelectEvent = (eventId: string) => {
-    setSelectedEventId(eventId);
-    form.setValue("ticketIds", [], { shouldDirty: true, shouldValidate: true });
-  };
-
-  const handleFormChange = (field: "askingPrice" | "description", value: number | string) => {
-    form.setValue(field, value as never, { shouldDirty: true, shouldValidate: true });
   };
 
   const handleSelectEvent = (eventId: string) => {
@@ -221,18 +244,24 @@ export default function CreateResalePage() {
       const selectedTickets = ticketsOfSelectedEvent.filter((ticket) =>
         values.ticketIds.includes(ticket.id)
       );
-      const selectedTickets = ticketsOfSelectedEvent.filter((ticket) =>
-        values.ticketIds.includes(ticket.id)
-      );
       if (selectedTickets.length === 0) {
         form.setError("ticketIds", { message: "Vui lòng chọn ít nhất một vé." });
         return;
       }
+      const firstTypeId = selectedTickets[0].ticketType?.id ?? selectedTickets[0].ticketTypeId ?? "";
+      const allSameType = selectedTickets.every(
+        (t) => (t.ticketType?.id ?? t.ticketTypeId ?? "") === firstTypeId
+      );
+      if (!allSameType) {
+        form.setError("ticketIds", { message: "Vé phải cùng loại mới được đăng bán." });
+        return;
+      }
+      const isFree = isFreeTicket(selectedTickets[0].ticketType?.price);
 
       const payload = ticketListingCreateSchema.parse({
         ticketIds: values.ticketIds,
         sellerUserId: user.id,
-        askingPrice: hasPaidTicketsInSelectedEvent ? Number(values.askingPrice ?? 0) : 0,
+        askingPrice: isFree ? 0 : Number(values.askingPrice ?? 0),
         description: values.description?.trim() || undefined,
       });
 
@@ -251,8 +280,9 @@ export default function CreateResalePage() {
       currentEvents={currentEvents}
       ownedCountByEvent={ownedCountByEvent}
       selectedEventId={selectedEventId}
-      ticketsOfSelectedEvent={ticketsOfSelectedEvent}
+      ticketsByTypeInEvent={ticketsByTypeInEvent}
       selectedTicketIds={selectedTicketIds}
+      selectedTicketsMeta={selectedTicketsMeta}
       formValues={{
         askingPrice: form.watch("askingPrice") ?? 0,
         description: form.watch("description") || "",

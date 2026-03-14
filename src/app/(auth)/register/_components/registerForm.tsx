@@ -22,7 +22,7 @@ import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useAuthContext } from "@/contexts/authContext";
-import { format } from "date-fns";
+import { format, startOfDay, subDays } from "date-fns";
 import { vi } from "date-fns/locale";
 
 const registerFormSchema = registerSchema.extend({
@@ -212,6 +212,8 @@ export default function RegisterForm() {
                             })
                           }
                           captionLayout="dropdown"
+                          locale={vi}
+                          disabled={{ after: subDays(startOfDay(new Date()), 1) }}
                         />
                       </PopoverContent>
                     </Popover>

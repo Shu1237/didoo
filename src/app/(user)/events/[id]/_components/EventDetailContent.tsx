@@ -41,7 +41,8 @@ const FALLBACK_EVENT_IMAGE =
   "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=800";
 
 function getStatusLabel(status: EventStatus) {
-  if (status === EventStatus.PUBLISHED || status === EventStatus.OPENED) return "Đang mở bán";
+  if (status === EventStatus.OPENED) return "Đang mở bán";
+  if (status === EventStatus.PUBLISHED) return "Đã công bố (chưa mở bán)";
   if (status === EventStatus.CLOSED) return "Đã đóng";
   if (status === EventStatus.CANCELLED) return "Đã hủy";
   return "Sắp diễn ra";
@@ -268,14 +269,26 @@ export default function EventDetailContent({
               )}
 
               {ticketTypes.length > 0 ? (
-                <Button
-                  asChild
-                  className="h-12 w-full rounded-xl bg-primary hover:bg-primary/90 text-white font-bold"
-                >
-                  <Link href={`/events/${event.id}/booking`}>
-                    Mua vé ngay
-                  </Link>
-                </Button>
+                event.status === EventStatus.OPENED ? (
+                  <Button
+                    asChild
+                    className="h-12 w-full rounded-xl bg-primary hover:bg-primary/90 text-white font-bold"
+                  >
+                    <Link href={`/events/${event.id}/booking`}>
+                      Mua vé ngay
+                    </Link>
+                  </Button>
+                ) : (
+                  <div className="flex h-12 w-full items-center justify-center rounded-xl border border-zinc-200 bg-zinc-50 text-center">
+                    <p className="text-sm font-medium text-zinc-500">
+                      {event.status === EventStatus.PUBLISHED
+                        ? "Chưa mở bán vé"
+                        : event.status === EventStatus.CLOSED
+                          ? "Đã đóng đăng ký"
+                          : "Không thể mua vé"}
+                    </p>
+                  </div>
+                )
               ) : (
                 <div className="p-4 rounded-lg bg-zinc-50 text-center">
                   <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest">Chưa mở bán</p>

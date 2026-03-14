@@ -17,6 +17,7 @@ import { handleErrorApi } from "@/lib/errors";
 import { useRouter } from "next/navigation";
 import { Loader2, ArrowLeft, Trash2 } from "lucide-react";
 import Link from "next/link";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const SALE_TYPE_LABELS: Record<TicketSaleType, string> = { paid: "Bán vé", free: "Miễn phí" };
 
@@ -54,12 +55,14 @@ export function EditTicketTypeForm({
       totalQuantity: 0,
       availableQuantity: 0,
       description: "",
+      enableMaxTicketsPerUser: false,
     },
   });
 
   useEffect(() => {
     if (ticketType) {
       const isFree = Number(ticketType.price ?? 0) === 0;
+      const hasMaxPerUser = ticketType.maxTicketsPerUser != null && ticketType.maxTicketsPerUser >= 1;
       reset({
         saleType: isFree ? "free" : "paid",
         name: ticketType.name,
@@ -68,6 +71,7 @@ export function EditTicketTypeForm({
         totalQuantity: ticketType.totalQuantity,
         availableQuantity: ticketType.availableQuantity,
         description: ticketType.description ?? "",
+        enableMaxTicketsPerUser: !isFree && hasMaxPerUser,
       });
     }
   }, [ticketType, reset]);
@@ -79,7 +83,9 @@ export function EditTicketTypeForm({
       const body = {
         name: data.name,
         price: data.saleType === "free" ? 0 : (data.price ?? 0),
-        maxTicketsPerUser: data.saleType === "free" ? (data.maxTicketsPerUser ?? 1) : null,
+        maxTicketsPerUser: data.saleType === "free"
+          ? (data.maxTicketsPerUser ?? 1)
+          : (data.enableMaxTicketsPerUser ? (data.maxTicketsPerUser ?? null) : null),
         totalQuantity: data.totalQuantity,
         availableQuantity: data.availableQuantity,
         description: data.description,
@@ -125,7 +131,14 @@ export function EditTicketTypeForm({
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-2">
             <Label>Loại vé</Label>
-            <Select value={saleType} onValueChange={(v) => setValue("saleType", v as TicketSaleType)}>
+            <Select
+              value={saleType}
+              onValueChange={(v) => {
+                const newType = v as TicketSaleType;
+                setValue("saleType", newType);
+                if (newType === "free") setValue("price", 0);
+              }}
+            >
               <SelectTrigger className="w-full sm:w-48">
                 <SelectValue />
               </SelectTrigger>
@@ -148,37 +161,33 @@ export function EditTicketTypeForm({
                 <p className="text-sm text-destructive">{errors.name.message}</p>
               )}
             </div>
-            {saleType === "free" ? (
-              <div className="space-y-2">
-                <Label htmlFor="maxTicketsPerUser">Số vé free tối đa / người *</Label>
-                <Input
-                  id="maxTicketsPerUser"
-                  type="number"
-                  min={1}
-                  placeholder="1"
-                  {...register("maxTicketsPerUser", { valueAsNumber: true })}
-                  className={errors.maxTicketsPerUser ? "border-destructive" : ""}
-                />
-                {errors.maxTicketsPerUser && (
-                  <p className="text-sm text-destructive">{errors.maxTicketsPerUser.message}</p>
-                )}
-              </div>
-            ) : (
-              <div className="space-y-2">
-                <Label htmlFor="price">Giá (VNĐ) *</Label>
+            <div className="space-y-2">
+              <Label htmlFor="price">Giá (VNĐ) *</Label>
+              {saleType === "free" ? (
                 <Input
                   id="price"
                   type="number"
-                  min={0}
-                  placeholder="0"
-                  {...register("price", { valueAsNumber: true })}
-                  className={errors.price ? "border-destructive" : ""}
+                  value={0}
+                  disabled
+                  readOnly
+                  className="bg-zinc-100 cursor-not-allowed"
                 />
-                {errors.price && (
-                  <p className="text-sm text-destructive">{errors.price.message}</p>
-                )}
-              </div>
-            )}
+              ) : (
+                <>
+                  <Input
+                    id="price"
+                    type="number"
+                    min={0}
+                    placeholder="0"
+                    {...register("price", { valueAsNumber: true })}
+                    className={errors.price ? "border-destructive" : ""}
+                  />
+                  {errors.price && (
+                    <p className="text-sm text-destructive">{errors.price.message}</p>
+                  )}
+                </>
+              )}
+            </div>
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
@@ -212,8 +221,56 @@ export function EditTicketTypeForm({
             </div>
           </div>
 
+          {saleType === "free" ? (
+            <div className="space-y-2">
+              <Label htmlFor="maxTicketsPerUser">Số vé free tối đa / người *</Label>
+              <Input
+                id="maxTicketsPerUser"
+                type="number"
+                min={1}
+                placeholder="1"
+                {...register("maxTicketsPerUser", { valueAsNumber: true })}
+                className={errors.maxTicketsPerUser ? "border-destructive" : ""}
+              />
+              {errors.maxTicketsPerUser && (
+                <p className="text-sm text-destructive">{errors.maxTicketsPerUser.message}</p>
+              )}
+            </div>
+          ) : (
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <Checkbox
+                  id="enableMaxTicketsPerUser"
+                  checked={watch("enableMaxTicketsPerUser") ?? false}
+                  onCheckedChange={(checked) => {
+                    setValue("enableMaxTicketsPerUser", !!checked);
+                    if (!checked) setValue("maxTicketsPerUser", null);
+                  }}
+                />
+                <Label htmlFor="enableMaxTicketsPerUser" className="cursor-pointer font-normal">
+                  Giới hạn số vé mỗi người
+                </Label>
+              </div>
+              {(watch("enableMaxTicketsPerUser") ?? false) && (
+                <div className="mt-2">
+                  <Input
+                    id="maxTicketsPerUser"
+                    type="number"
+                    min={1}
+                    placeholder="Ví dụ: 5"
+                    {...register("maxTicketsPerUser", { valueAsNumber: true })}
+                    className={errors.maxTicketsPerUser ? "border-destructive" : ""}
+                  />
+                  {errors.maxTicketsPerUser && (
+                    <p className="text-sm text-destructive mt-1">{errors.maxTicketsPerUser.message}</p>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
           <div className="space-y-2">
-            <Label htmlFor="description">Mô tả </Label>
+            <Label htmlFor="description">Mô tả</Label>
             <Input
               id="description"
               placeholder="Mô tả ngắn về loại vé"

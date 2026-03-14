@@ -263,7 +263,7 @@ export function EventDetailContent({ eventId }: { eventId: string }) {
               </Button>
             </div>
           ) : (
-            <div className="rounded-2xl border border-zinc-200">
+            <div className="overflow-x-auto rounded-2xl border border-zinc-200">
               <Table>
                 <TableHeader>
                   <TableRow className="border-zinc-200 hover:bg-transparent">

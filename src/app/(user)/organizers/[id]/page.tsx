@@ -4,6 +4,7 @@ import { use } from "react";
 import Link from "next/link";
 import Loading from "@/components/loading";
 import { Button } from "@/components/ui/button";
+import { EventStatus } from "@/utils/enum";
 import { useGetEvents, useGetOrganizer } from "@/hooks/useEvent";
 import { toast } from "sonner";
 import { OrganizerBanner } from "./_components/OrganizerBanner";
@@ -28,12 +29,15 @@ export default function OrganizerProfilePage({
 
   const { data: eventsResponse, isLoading: isEventsLoading } = useGetEvents({
     organizerId: id,
-    pageSize: 20,
+    pageSize: 50,
     hasCategory: true,
     hasLocations: true,
     isDeleted: false,
   });
-  const allEvents = eventsResponse?.data.items || [];
+  const rawEvents = eventsResponse?.data.items || [];
+  const allEvents = rawEvents.filter(
+    (e) => (e.status as number) !== EventStatus.DRAFT
+  );
 
   const handleShare = async () => {
     try {

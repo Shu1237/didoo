@@ -12,6 +12,7 @@ export interface TicketGetListQuery extends BasePaginationQuery {
 
 export interface Ticket {
     id: string;
+    ticketTypeId?: string;
     ticketType?: Partial<TicketType>;
     event?: Partial<Event>;
     zone?: string;

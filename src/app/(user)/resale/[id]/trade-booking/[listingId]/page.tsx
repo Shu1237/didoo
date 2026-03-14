@@ -6,13 +6,38 @@ import Link from "next/link";
 import { ArrowRight, CalendarDays, MapPin, ShieldCheck, Ticket } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Loading from "@/components/loading";
+import { useGetMe } from "@/hooks/useAuth";
 import { useGetEvent } from "@/hooks/useEvent";
-import { useGetTicketListing, useValidateTicketListing } from "@/hooks/useTicket";
+import { useGetTicketListing, useGetTicketTypes, useValidateTicketListing } from "@/hooks/useTicket";
+import { useOwnedTicketsCountByTicketType } from "@/hooks/useOwnedTicketsByEvent";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
+import type { TicketListing, TicketType } from "@/types/ticket";
 
 const FALLBACK_IMAGE =
   "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=800";
+
+function wouldExceedMaxTicketsPerUser(
+  listing: TicketListing,
+  ticketTypes: TicketType[],
+  ownedCountByTicketType: Map<string, number>
+): boolean {
+  const tickets = listing.ticket ?? [];
+  const ttById = new Map(ticketTypes.map((tt) => [tt.id, tt]));
+
+  for (const t of tickets) {
+    const ttId = t.ticketTypeId;
+    if (!ttId) continue;
+    const tt = ttById.get(ttId);
+    const maxPerUser = tt?.maxTicketsPerUser;
+    if (maxPerUser == null || Number(maxPerUser) <= 0) continue;
+
+    const listingCountForType = tickets.filter((x) => x.ticketTypeId === ttId).length;
+    const owned = ownedCountByTicketType.get(ttId) ?? 0;
+    if (listingCountForType + owned > Number(maxPerUser)) return true;
+  }
+  return false;
+}
 
 export default function TradeBookingListingDetailPage({
   params,
@@ -21,6 +46,7 @@ export default function TradeBookingListingDetailPage({
 }) {
   const { id, listingId } = use(params);
 
+  const { data: userRes } = useGetMe();
   const { data: eventRes, isLoading: isEventLoading } = useGetEvent(id);
   const { data: listingRes, isLoading: isListingLoading } = useGetTicketListing(listingId, {
     enabled: !!listingId,
@@ -28,11 +54,24 @@ export default function TradeBookingListingDetailPage({
   const { data: validateRes, isLoading: isValidateLoading } = useValidateTicketListing(listingId, {
     enabled: !!listingId,
   });
+  const { data: ticketTypesRes } = useGetTicketTypes(
+    { eventId: id, pageNumber: 1, pageSize: 100 },
+    { enabled: !!id }
+  );
+  const ownedCountByTicketType = useOwnedTicketsCountByTicketType(id, userRes?.data?.id, {
+    enabled: !!id && !!userRes?.data?.id,
+  });
 
   const event = eventRes?.data;
   const listing = listingRes?.data;
   const validateData = validateRes?.data;
-  const isAvailable = validateData?.isAvailable ?? false;
+  const ticketTypes = ticketTypesRes?.data?.items ?? [];
+  const isAvailableFromApi = validateData?.isAvailable ?? false;
+  const exceedsMax =
+    listing && ticketTypes.length > 0
+      ? wouldExceedMaxTicketsPerUser(listing, ticketTypes, ownedCountByTicketType)
+      : false;
+  const isAvailable = isAvailableFromApi && !exceedsMax;
 
   if (isEventLoading || isListingLoading || isValidateLoading) return <Loading />;
 
@@ -104,7 +143,9 @@ export default function TradeBookingListingDetailPage({
               </p>
               {!isAvailable && (
                 <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
-                  Vé này không còn khả dụng để mua. Vui lòng chọn vé khác.
+                  {exceedsMax
+                    ? "Mua thêm vé này sẽ vượt quá giới hạn số vé mỗi người cho loại vé này. Vui lòng chọn vé khác."
+                    : "Vé này không còn khả dụng để mua. Vui lòng chọn vé khác."}
                 </div>
               )}
             </div>

@@ -18,8 +18,7 @@ interface DetailPlaceProps {
 export default function DetailPlace({ eventData, setSelectedEvent }: DetailPlaceProps) {
   const eventDate = new Date(eventData.startTime);
   const isValidDate = !isNaN(eventDate.getTime());
-  const isActive =
-    eventData.status === EventStatus.OPENED || eventData.status === EventStatus.PUBLISHED;
+  const isActive = eventData.status === EventStatus.OPENED;
 
   return (
     <div

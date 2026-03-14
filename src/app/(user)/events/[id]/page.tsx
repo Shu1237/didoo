@@ -6,6 +6,7 @@ import Loading from "@/components/loading";
 import { useGetTicketTypes } from "@/hooks/useTicket";
 import HeroSection from "./_components/HeroSection";
 import EventDetailContent from "./_components/EventDetailContent";
+import { EventStatus } from "@/utils/enum";
 import { useGetEvent, useGetEvents } from "@/hooks/useEvent";
 
 export default function DetailEventPage({ params }: { params: Promise<{ id: string }> }) {
@@ -34,6 +35,22 @@ export default function DetailEventPage({ params }: { params: Promise<{ id: stri
       <div className="flex min-h-screen items-center justify-center bg-zinc-50">
         <div className="text-center">
           <p className="font-medium text-zinc-600">Không tìm thấy sự kiện</p>
+          <a
+            href="/events"
+            className="mt-4 inline-block font-semibold text-primary hover:underline"
+          >
+            Quay lại danh sách
+          </a>
+        </div>
+      </div>
+    );
+  }
+
+  if ((detailEvent.status as number) === EventStatus.DRAFT) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-zinc-50">
+        <div className="text-center">
+          <p className="font-medium text-zinc-600">Sự kiện chưa được công bố.</p>
           <a
             href="/events"
             className="mt-4 inline-block font-semibold text-primary hover:underline"

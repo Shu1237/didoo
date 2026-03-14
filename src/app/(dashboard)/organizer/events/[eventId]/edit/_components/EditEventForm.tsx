@@ -10,6 +10,8 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { DatePicker } from "@/components/ui/date-picker";
+import { TimePicker } from "@/components/ui/time-picker";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
@@ -40,14 +42,13 @@ const eventUpdateFormSchema = eventUpdateSchema.extend({
 type EventUpdateFormValues = z.input<typeof eventUpdateFormSchema>;
 type EventLocationForm = EventUpdateFormValues["Locations"][number];
 
-function formatDateTimeLocal(s: string | undefined) {
-  if (!s) return "";
+function parseToDate(s: string | undefined): Date | undefined {
+  if (!s) return undefined;
   try {
     const d = new Date(s);
-    const pad = (n: number) => String(n).padStart(2, "0");
-    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    return isNaN(d.getTime()) ? undefined : d;
   } catch {
-    return "";
+    return undefined;
   }
 }
 
@@ -154,8 +155,8 @@ export function EditEventForm({ eventId }: { eventId: string }) {
         Description: event.description || (event as any).Description,
         CategoryId: event.category?.id ?? (event as any).CategoryId ?? "",
         AgeRestriction: event.ageRestriction ?? (event as any).AgeRestriction ?? 0,
-        StartTime: event.startTime ? formatDateTimeLocal(event.startTime) : (event as any).StartTime ? formatDateTimeLocal((event as any).StartTime) : undefined,
-        EndTime: event.endTime ? formatDateTimeLocal(event.endTime) : (event as any).EndTime ? formatDateTimeLocal((event as any).EndTime) : undefined,
+        StartTime: parseToDate(event.startTime || (event as any).StartTime),
+        EndTime: parseToDate(event.endTime || (event as any).EndTime),
         OpenTime: formatTime(event.openTime || (event as any).OpenTime),
         ClosedTime: formatTime(event.closedTime || (event as any).ClosedTime),
         ThumbnailUrl: event.thumbnailUrl ?? (event as any).ThumbnailUrl ?? "",
@@ -242,45 +243,10 @@ export function EditEventForm({ eventId }: { eventId: string }) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-      {/* Top row: Banner (3), Thumbnail (7) - giống Create */}
+      {/* Top row: Thumbnail (trái), Banner (phải) - giữ nguyên format design */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-[3fr_7fr]">
         <div className="space-y-2">
-          <Label>Banner</Label>
-          <div
-            onClick={() => !isUploading && bannerInputRef.current?.click()}
-            className={`relative flex h-[200px] w-full cursor-pointer items-center justify-center overflow-hidden rounded-xl border-2 border-dashed border-zinc-200 bg-zinc-50 transition-colors ${
-              isUploading ? "cursor-not-allowed opacity-70" : "hover:border-zinc-300 hover:bg-zinc-100"
-            }`}
-          >
-            <input
-              ref={bannerInputRef}
-              type="file"
-              accept="image/*"
-              className="hidden"
-              disabled={isUploading}
-              onChange={(e) => {
-                const f = e.target.files?.[0];
-                if (f) handleFileUpload(f, "banner");
-                e.target.value = "";
-              }}
-            />
-            {uploadingType === "banner" && (
-              <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/80">
-                <Loader2 className="h-10 w-10 animate-spin text-zinc-600" />
-              </div>
-            )}
-            {bannerPreview ? (
-              <img src={bannerPreview} alt="Banner" className="h-full w-full object-cover" />
-            ) : (
-              <div className="flex flex-col items-center gap-2 text-zinc-500">
-                <ImagePlus className="h-10 w-10" />
-                <span className="text-sm">Tải lên banner</span>
-              </div>
-            )}
-          </div>
-        </div>
-        <div className="space-y-2">
-          <Label>Thumbnail</Label>
+          <Label>Ảnh đại diện</Label>
           <div
             onClick={() => !isUploading && thumbnailInputRef.current?.click()}
             className={`relative flex h-[200px] w-full cursor-pointer items-center justify-center overflow-hidden rounded-xl border-2 border-dashed border-zinc-200 bg-zinc-50 transition-colors ${
@@ -289,6 +255,7 @@ export function EditEventForm({ eventId }: { eventId: string }) {
           >
             <input
               ref={thumbnailInputRef}
+              name="thumbnail"
               type="file"
               accept="image/*"
               className="hidden"
@@ -305,11 +272,47 @@ export function EditEventForm({ eventId }: { eventId: string }) {
               </div>
             )}
             {thumbnailPreview ? (
-              <img src={thumbnailPreview} alt="Thumbnail" className="h-full w-full object-cover" />
+              <img src={thumbnailPreview} alt="Ảnh đại diện" className="h-full w-full object-cover" />
             ) : (
               <div className="flex flex-col items-center gap-2 text-zinc-500">
                 <ImagePlus className="h-10 w-10" />
-                <span className="text-sm">Tải lên thumbnail</span>
+                <span className="text-sm">Tải lên ảnh đại diện</span>
+              </div>
+            )}
+          </div>
+        </div>
+        <div className="space-y-2">
+          <Label>Ảnh bìa</Label>
+          <div
+            onClick={() => !isUploading && bannerInputRef.current?.click()}
+            className={`relative flex h-[200px] w-full cursor-pointer items-center justify-center overflow-hidden rounded-xl border-2 border-dashed border-zinc-200 bg-zinc-50 transition-colors ${
+              isUploading ? "cursor-not-allowed opacity-70" : "hover:border-zinc-300 hover:bg-zinc-100"
+            }`}
+          >
+            <input
+              ref={bannerInputRef}
+              name="banner"
+              type="file"
+              accept="image/*"
+              className="hidden"
+              disabled={isUploading}
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                if (f) handleFileUpload(f, "banner");
+                e.target.value = "";
+              }}
+            />
+            {uploadingType === "banner" && (
+              <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/80">
+                <Loader2 className="h-10 w-10 animate-spin text-zinc-600" />
+              </div>
+            )}
+            {bannerPreview ? (
+              <img src={bannerPreview} alt="Ảnh bìa" className="h-full w-full object-cover" />
+            ) : (
+              <div className="flex flex-col items-center gap-2 text-zinc-500">
+                <ImagePlus className="h-10 w-10" />
+                <span className="text-sm">Tải lên ảnh bìa</span>
               </div>
             )}
           </div>
@@ -392,22 +395,32 @@ export function EditEventForm({ eventId }: { eventId: string }) {
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label>Thời gian bắt đầu *</Label>
-              <Input
-                type="datetime-local"
-                {...register("StartTime")}
-                className={errors.StartTime ? "border-destructive" : ""}
+              <Label>Ngày bắt đầu *</Label>
+              <DatePicker
+                value={((): Date | undefined => {
+                  const v = watch("StartTime");
+                  if (v instanceof Date) return v;
+                  return v ? parseToDate(String(v)) : undefined;
+                })()}
+                onChange={(d) => setValue("StartTime", d as Date)}
+                placeholder="Chọn ngày bắt đầu"
+                error={!!errors.StartTime}
               />
               {errors.StartTime && (
                 <p className="text-sm text-destructive">{String(errors.StartTime.message ?? "")}</p>
               )}
             </div>
             <div className="space-y-2">
-              <Label>Thời gian kết thúc *</Label>
-              <Input
-                type="datetime-local"
-                {...register("EndTime")}
-                className={errors.EndTime ? "border-destructive" : ""}
+              <Label>Ngày kết thúc *</Label>
+              <DatePicker
+                value={((): Date | undefined => {
+                  const v = watch("EndTime");
+                  if (v instanceof Date) return v;
+                  return v ? parseToDate(String(v)) : undefined;
+                })()}
+                onChange={(d) => setValue("EndTime", d as Date)}
+                placeholder="Chọn ngày kết thúc"
+                error={!!errors.EndTime}
               />
               {errors.EndTime && (
                 <p className="text-sm text-destructive">{String(errors.EndTime.message ?? "")}</p>
@@ -417,19 +430,19 @@ export function EditEventForm({ eventId }: { eventId: string }) {
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label>Giờ mở cửa </Label>
-              <Input
-                type="time"
+              <Label>Giờ mở cửa</Label>
+              <TimePicker
+                value={watch("OpenTime") || ""}
+                onChange={(v) => setValue("OpenTime", v)}
                 placeholder="HH:mm"
-                {...register("OpenTime")}
               />
             </div>
             <div className="space-y-2">
-              <Label>Giờ đóng cửa </Label>
-              <Input
-                type="time"
+              <Label>Giờ đóng cửa</Label>
+              <TimePicker
+                value={watch("ClosedTime") || ""}
+                onChange={(v) => setValue("ClosedTime", v)}
                 placeholder="HH:mm"
-                {...register("ClosedTime")}
               />
             </div>
           </div>

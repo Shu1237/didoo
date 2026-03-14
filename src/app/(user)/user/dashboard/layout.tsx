@@ -5,13 +5,12 @@ import { usePathname } from "next/navigation";
 import { useGetMe } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
 import Loading from "@/components/loading";
-import { LayoutDashboard, Ticket, History, UserCircle, CircleDollarSign, Bell } from "lucide-react";
+import { LayoutDashboard, Ticket, History, UserCircle, CircleDollarSign } from "lucide-react";
 
 const navItems = [
   { title: "Tổng quan", href: "/user/dashboard", icon: LayoutDashboard },
   { title: "Vé của tôi", href: "/user/dashboard/tickets", icon: Ticket },
   { title: "Vé bán lại", href: "/user/dashboard/resales", icon: CircleDollarSign },
-  { title: "Thông báo", href: "/user/dashboard/notifications", icon: Bell },
   { title: "Lịch sử mua hàng", href: "/user/dashboard/history", icon: History },
   { title: "Hồ sơ", href: "/user/dashboard/profile", icon: UserCircle },
 ];

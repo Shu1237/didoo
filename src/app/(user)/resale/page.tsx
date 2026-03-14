@@ -28,7 +28,7 @@ export default function ResalePage() {
       hasCategory: true,
       hasOrganizer: true,
       hasLocations: true,
-      status: EventStatus.PUBLISHED, // EventStatus.PUBLISHED - chỉ hiện sự kiện đang publish
+      status: EventStatus.OPENED,
       isDeleted: false,
       ...(name && { name }),
       ...(categoryId !== "all" && { categoryId }),
