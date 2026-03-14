@@ -10,12 +10,15 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+// import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"; // COMMENT: dùng cho saleType paid/free
 import { handleErrorApi } from "@/lib/errors";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Plus, Check, Loader2, Pencil, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
+
+// const SALE_TYPE_LABELS: Record<TicketSaleType, string> = { paid: "Bán vé", free: "Miễn phí" }; // COMMENT: flow free không dùng
 
 export function CreateTicketTypesForm({ eventId }: { eventId: string }) {
   const router = useRouter();
@@ -37,7 +40,8 @@ export function CreateTicketTypesForm({ eventId }: { eventId: string }) {
   } = useForm<TicketTypesBatchBody>({
     resolver: zodResolver(ticketTypesBatchSchema),
     defaultValues: {
-      items: [{ name: "", price: 0, totalQuantity: 0, description: "" }],
+      // Flow bán vé free: price = 0, luôn dùng maxTicketsPerUser
+      items: [{ saleType: "free", name: "", price: 0, totalQuantity: 0, maxTicketsPerUser: 1, description: "" }],
     },
   });
 
@@ -49,14 +53,16 @@ export function CreateTicketTypesForm({ eventId }: { eventId: string }) {
         ticketTypes: data.items.map((item) => ({
           eventId,
           name: item.name,
-          price: item.price,
+          // Flow free: price luôn = 0, không hiển thị price
+          price: 0,
           totalQuantity: item.totalQuantity,
           availableQuantity: item.totalQuantity,
+          maxTicketsPerUser: item.maxTicketsPerUser ?? 1,
           description: item.description,
         })),
       };
       await createArray.mutateAsync(payload);
-      reset({ items: [{ name: "", price: 0, totalQuantity: 0, description: "" }] });
+      reset({ items: [{ saleType: "free", name: "", price: 0, totalQuantity: 0, maxTicketsPerUser: 1, description: "" }] });
       router.push(`/organizer/events/${eventId}`);
     } catch (err) {
       handleErrorApi({ error: err, setError });
@@ -98,7 +104,10 @@ export function CreateTicketTypesForm({ eventId }: { eventId: string }) {
             }}
             className="space-y-4"
           >
-            {fields.map((field, i) => (
+            {fields.map((field, i) => {
+              // Flow free: không dùng saleType, luôn hiển thị maxTicketsPerUser, ẩn price
+              // const saleType = watch(`items.${i}.saleType`) ?? "paid";
+              return (
               <div
                 key={field.id}
                 className="space-y-4 rounded-xl border border-zinc-200 p-4"
@@ -119,6 +128,23 @@ export function CreateTicketTypesForm({ eventId }: { eventId: string }) {
                     </Button>
                   )}
                 </div>
+                {/* --- COMMENT: Phần chọn loại vé (paid/free) - ẩn vì flow chỉ bán vé free ---
+                <div className="space-y-2">
+                  <Label>Loại vé</Label>
+                  <Select
+                    value={saleType}
+                    onValueChange={(v) => setValue(`items.${i}.saleType`, v as TicketSaleType)}
+                  >
+                    <SelectTrigger className="w-full sm:w-48">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="paid">{SALE_TYPE_LABELS.paid}</SelectItem>
+                      <SelectItem value="free">{SALE_TYPE_LABELS.free}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                */}
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="space-y-2">
                     <Label>Tên loại vé *</Label>
@@ -133,21 +159,36 @@ export function CreateTicketTypesForm({ eventId }: { eventId: string }) {
                       </p>
                     )}
                   </div>
+                  {/* Flow free: luôn hiển thị maxTicketsPerUser, ẩn price */}
                   <div className="space-y-2">
-                    <Label>Giá (VNĐ) *</Label>
+                    <Label>Số vé tối đa / người *</Label>
                     <Input
                       type="number"
-                      min={0}
-                      placeholder="0"
-                      {...register(`items.${i}.price`, { valueAsNumber: true })}
-                      className={errors.items?.[i]?.price ? "border-destructive" : ""}
+                      min={1}
+                      placeholder="1"
+                      {...register(`items.${i}.maxTicketsPerUser`, { valueAsNumber: true })}
+                      className={errors.items?.[i]?.maxTicketsPerUser ? "border-destructive" : ""}
                     />
-                    {errors.items?.[i]?.price && (
+                    {errors.items?.[i]?.maxTicketsPerUser && (
                       <p className="text-sm text-destructive">
-                        {errors.items[i]?.price?.message}
+                        {errors.items[i]?.maxTicketsPerUser?.message}
                       </p>
                     )}
                   </div>
+                  {/* --- COMMENT: Phần nhập giá (VNĐ) - ẩn vì flow chỉ bán vé free, price default = 0 ---
+                  {saleType === "free" ? (
+                    <div className="space-y-2">
+                      <Label>Số vé free tối đa / người *</Label>
+                      ...
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      <Label>Giá (VNĐ) *</Label>
+                      <Input type="number" min={0} {...register(`items.${i}.price`, { valueAsNumber: true })} />
+                      ...
+                    </div>
+                  )}
+                  */}
                 </div>
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="space-y-2">
@@ -176,13 +217,14 @@ export function CreateTicketTypesForm({ eventId }: { eventId: string }) {
                   </div>
                 </div>
               </div>
-            ))}
+            );
+            })}
             <div className="flex gap-2">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() =>
-                  append({ name: "", price: 0, totalQuantity: 0, description: "" })
+                  append({ saleType: "free", name: "", price: 0, totalQuantity: 0, maxTicketsPerUser: 1, description: "" })
                 }
               >
                 <Plus className="h-4 w-4" />
@@ -208,7 +250,8 @@ export function CreateTicketTypesForm({ eventId }: { eventId: string }) {
                   <div>
                     <p className="font-medium text-zinc-900">{tt.name}</p>
                     <p className="text-sm text-zinc-500">
-                      {tt.price.toLocaleString("vi-VN")} VNĐ · Số lượng: {tt.totalQuantity}
+                      {/* Flow free: luôn hiển thị Miễn phí, không hiện price */}
+                      Miễn phí · Tối đa {tt.maxTicketsPerUser ?? 1} vé/người · Số lượng: {tt.totalQuantity}
                     </p>
                   </div>
                   <div className="flex items-center gap-2">

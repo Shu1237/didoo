@@ -116,7 +116,7 @@ export default function EventsHero({
                       <div className="flex items-center gap-2">
                         <MapPin className="h-4 w-4 shrink-0" />
                         <span className="line-clamp-1">
-                          {featuredEvent.locations?.[0]?.name || featuredEvent.locations?.[0]?.address || "Địa điểm TBA"}
+                          {featuredEvent.locations?.[0]?.name || featuredEvent.locations?.[0]?.address || "Địa điểm sẽ cập nhật"}
                         </span>
                       </div>
                     </div>

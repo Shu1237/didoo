@@ -120,7 +120,13 @@ export default function RegisterForm() {
       animate={{ opacity: 1, y: 0 }}
       className="grid grid-cols-1 lg:grid-cols-2 w-full max-w-5xl bg-white rounded-2xl border border-zinc-200 shadow-xl overflow-hidden lg:min-h-[520px]"
     >
-      <div className="p-6 sm:p-8 lg:p-10 overflow-y-auto max-h-[90vh]">
+      <div
+        className={`p-6 sm:p-8 lg:p-10 ${
+          step === 2
+            ? "flex min-h-[520px] flex-col justify-center"
+            : "max-h-[90vh] overflow-y-auto"
+        }`}
+      >
         {/* <Link href="/home" className="inline-block mb-6 hover:opacity-80 transition-opacity">
           <Image src="/DiDoo.png" alt="DiDoo" width={48} height={48} className="rounded-xl" priority />
         </Link> */}
@@ -147,7 +153,7 @@ export default function RegisterForm() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -16 }}
             transition={{ duration: 0.2 }}
-            className="mt-6 space-y-4"
+            className={`space-y-4 ${step === 2 ? "mt-8" : "mt-6"}`}
             onSubmit={handleSubmit(onSubmit)}
           >
             {step === 1 && (

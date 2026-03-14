@@ -118,11 +118,17 @@ export const useValidateTicketListing = (id: string, options?: { enabled?: boole
   queryFn: () => ticketListingRequest.validate(id),
   enabled: (options?.enabled ?? true) && !!id,
 });
+// refresh my ticket
 export const useTicketListing = () => {
   const queryClient = useQueryClient();
   const create = useMutation({
     mutationFn: async (body: TicketListingCreateBody) => (await ticketListingRequest.create(body)).data,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: [...KEY.tickets, "listings"] }),
+    onSuccess: async (_, body) => {
+      await queryClient.invalidateQueries({ queryKey: [...KEY.tickets, "listings"] });
+      await queryClient.invalidateQueries({
+        queryKey: QUERY_KEY.tickets.list({ ownerId: body.sellerUserId }),
+      });
+    },
   });
   const cancel = useMutation({
     mutationFn: async ({ id, body }: { id: string; body: TicketListingCancelBody }) => (await ticketListingRequest.cancel(id, body)).data,

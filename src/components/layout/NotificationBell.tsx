@@ -1,0 +1,88 @@
+"use client";
+
+import Link from "next/link";
+import { Bell } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useNotificationContextOptional } from "@/contexts/notificationContext";
+import { useGetNotifications } from "@/hooks/useOperation";
+import { useSessionStore } from "@/stores/sesionStore";
+
+export function NotificationBell() {
+  const ctx = useNotificationContextOptional();
+  const notifications = ctx?.notifications ?? [];
+  const user = useSessionStore((state) => state.user);
+  const { data: apiRes } = useGetNotifications(
+    { pageNumber: 1, pageSize: 10, isRead: false, userId: user?.UserId },
+    { enabled: !!user?.UserId }
+  );
+  const apiItems = apiRes?.data?.items ?? [];
+  const unreadCount = apiItems.length + notifications.length;
+  const displayItems = [
+    ...notifications.map((n) => ({ ...n, source: "realtime" as const })),
+    ...apiItems.map((n) => ({
+      title: n.title ?? "",
+      message: n.message ?? "",
+      type: (n as { type?: string }).type ?? "",
+      relatedId: n.event?.id ?? (n as { relatedId?: string }).relatedId ?? null,
+      source: "api" as const,
+    })),
+  ].slice(0, 10);
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="icon" className="relative h-9 w-9 rounded-xl">
+          <Bell className="h-5 w-5 text-zinc-600" />
+          {unreadCount > 0 && (
+            <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-rose-500 text-[10px] font-bold text-white">
+              {unreadCount > 9 ? "9+" : unreadCount}
+            </span>
+          )}
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-80 rounded-xl border border-zinc-200 p-2">
+        <DropdownMenuLabel className="flex items-center justify-between px-2 py-2">
+          <span className="text-sm font-semibold text-zinc-900">Thông báo</span>
+          <Link
+            href="/user/dashboard/notifications"
+            className="text-xs font-medium text-primary hover:underline"
+          >
+            Xem tất cả
+          </Link>
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        {displayItems.length === 0 ? (
+          <div className="py-8 text-center text-sm text-zinc-500">Chưa có thông báo</div>
+        ) : (
+          displayItems.map((n, i) => (
+            <DropdownMenuItem key={i} asChild>
+              <Link
+                href={
+                  n.type === "OrganizerVerify"
+                    ? "/organizer/dashboard"
+                    : n.type === "BookingSuccess"
+                      ? "/user/dashboard/tickets"
+                      : n.type === "ResaleSuccess"
+                        ? "/user/dashboard/resales"
+                        : "/user/dashboard/notifications"
+                }
+                className="flex flex-col items-start gap-0.5 rounded-lg px-3 py-2.5"
+              >
+                <span className="text-sm font-medium text-zinc-900">{n.title}</span>
+                <span className="line-clamp-2 text-xs text-zinc-500">{n.message}</span>
+              </Link>
+            </DropdownMenuItem>
+          ))
+        )}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}

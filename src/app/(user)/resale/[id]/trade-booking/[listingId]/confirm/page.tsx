@@ -17,7 +17,7 @@ import { tradeBookingCreateSchema, TradeBookingCreateBody } from "@/schemas/book
 import { handleErrorApi } from "@/lib/errors";
 
 const reasonMap: Record<string, string> = {
-  "listing-unavailable": "Listing không còn khả dụng hoặc đã được bán.",
+  "listing-unavailable": "Tin đăng không còn khả dụng hoặc đã được bán.",
   payment_failed: "Thanh toán thất bại hoặc đã bị hủy.",
 };
 
@@ -59,7 +59,7 @@ function TradeBookingCallbackResult({
             <Button asChild variant="outline" className="rounded-xl">
               <Link href={`/resale/${id}`}>
                 <ChevronLeft className="mr-1 h-4 w-4" />
-                Quay lại resale
+                Quay lại vé bán lại
               </Link>
             </Button>
           </div>
@@ -75,7 +75,7 @@ function TradeBookingCallbackResult({
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100">
             <CheckCircle2 className="h-8 w-8 text-emerald-600" />
           </div>
-          <h1 className="text-2xl font-bold text-zinc-900">Mua vé resale thành công</h1>
+          <h1 className="text-2xl font-bold text-zinc-900">Mua vé bán lại thành công</h1>
           <p className="mt-2 text-sm text-zinc-600">
             Giao dịch của bạn đã hoàn tất. Vé sẽ được cập nhật trong khu vực vé của tôi.
           </p>
@@ -86,7 +86,7 @@ function TradeBookingCallbackResult({
             <Button asChild variant="outline" className="rounded-xl">
               <Link href={`/resale/${id}`}>
                 <ChevronLeft className="mr-1 h-4 w-4" />
-                Quay lại resale
+                Quay lại vé bán lại
               </Link>
             </Button>
           </div>
@@ -96,7 +96,7 @@ function TradeBookingCallbackResult({
   }
 
   const reasonKey = "payment_failed";
-  const reasonMessage = reasonMap[reasonKey] || "Không thể hoàn tất giao dịch resale. Vui lòng thử lại.";
+  const reasonMessage = reasonMap[reasonKey] || "Không thể hoàn tất giao dịch mua lại. Vui lòng thử lại.";
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-zinc-50 px-4">
@@ -104,7 +104,7 @@ function TradeBookingCallbackResult({
         <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-rose-100">
           <AlertCircle className="h-8 w-8 text-rose-600" />
         </div>
-        <h1 className="text-2xl font-bold text-zinc-900">Trade-booking thất bại</h1>
+        <h1 className="text-2xl font-bold text-zinc-900">Giao dịch mua lại thất bại</h1>
         <p className="mt-2 text-sm text-zinc-600">{reasonMessage}</p>
         <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
           <Button asChild className="rounded-xl">
@@ -116,7 +116,7 @@ function TradeBookingCallbackResult({
           <Button asChild variant="outline" className="rounded-xl">
             <Link href={`/resale/${id}`}>
               <ChevronLeft className="mr-1 h-4 w-4" />
-              Quay lại resale
+              Quay lại vé bán lại
             </Link>
             </Button>
           </div>
@@ -193,9 +193,9 @@ function TradeBookingConfirmForm({
     return (
       <main className="flex min-h-screen items-center justify-center bg-zinc-50 px-4">
         <div className="max-w-lg rounded-2xl border border-zinc-200 bg-white p-8 text-center shadow-sm">
-          <p className="text-zinc-600">Không tìm thấy dữ liệu listing resale.</p>
+          <p className="text-zinc-600">Không tìm thấy dữ liệu tin đăng bán lại.</p>
           <Button asChild className="mt-4 rounded-xl">
-            <Link href={`/resale/${id}`}>Quay lại danh sách listing</Link>
+            <Link href={`/resale/${id}`}>Quay lại danh sách tin đăng</Link>
           </Button>
         </div>
       </main>
@@ -206,7 +206,7 @@ function TradeBookingConfirmForm({
     return (
       <main className="flex min-h-screen items-center justify-center bg-zinc-50 px-4">
         <div className="max-w-lg rounded-2xl border border-zinc-200 bg-white p-8 text-center shadow-sm">
-          <p className="text-zinc-600">Bạn cần đăng nhập để tiếp tục mua vé resale.</p>
+          <p className="text-zinc-600">Bạn cần đăng nhập để tiếp tục mua vé bán lại.</p>
           <Button asChild className="mt-4 rounded-xl">
             <Link href={`/login?redirect=/resale/${id}/trade-booking/${listingId}/confirm`}>Đăng nhập</Link>
           </Button>
@@ -233,7 +233,7 @@ function TradeBookingConfirmForm({
             <CardContent className="flex items-start gap-3 p-4 text-amber-800">
               <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0" />
               <p className="text-sm">
-                Listing này không còn khả dụng để mua. Vui lòng quay lại chọn listing khác.
+                Tin đăng này không còn khả dụng để mua. Vui lòng quay lại chọn tin đăng khác.
               </p>
             </CardContent>
           </Card>
@@ -243,7 +243,7 @@ function TradeBookingConfirmForm({
           <section className="space-y-5 lg:col-span-7">
             <Card className="border-zinc-200">
               <CardHeader>
-                <h1 className="text-2xl font-bold text-zinc-900">Xác nhận trade-booking</h1>
+                <h1 className="text-2xl font-bold text-zinc-900">Xác nhận mua vé</h1>
                 <p className="text-sm text-zinc-600">Sự kiện: {event.name}</p>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -288,10 +288,10 @@ function TradeBookingConfirmForm({
 
           <aside className="lg:col-span-5">
             <div className="sticky top-24 rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
-              <h2 className="text-xl font-bold text-zinc-900">Thông tin listing</h2>
+              <h2 className="text-xl font-bold text-zinc-900">Thông tin tin đăng</h2>
               <div className="mt-4 space-y-2 text-sm">
                 <p className="text-zinc-600">
-                  Listing ID: <span className="font-semibold text-zinc-900">{listing.id}</span>
+                  Mã tin đăng: <span className="font-semibold text-zinc-900">{listing.id}</span>
                 </p>
                 <p className="text-zinc-600">
                   Giá bán lại:{" "}
@@ -310,10 +310,10 @@ function TradeBookingConfirmForm({
               <div className="mt-5 rounded-2xl border border-primary/20 bg-primary/5 p-4 text-sm text-primary">
                 <p className="flex items-center gap-2 font-semibold">
                   <ShieldCheck className="h-4 w-4" />
-                  Flow resale an toàn
+                  Quy trình mua lại an toàn
                 </p>
                 <p className="mt-1 text-zinc-600">
-                  Validate listing → tạo trade-booking → callback thanh toán → chuyển quyền sở hữu vé.
+                  Kiểm tra tin đăng → tạo đơn mua lại → nhận kết quả thanh toán → chuyển quyền sở hữu vé.
                 </p>
               </div>
 
@@ -322,7 +322,7 @@ function TradeBookingConfirmForm({
                 disabled={create.isPending || !!isUnavailable}
                 className="mt-5 h-12 w-full rounded-xl text-base font-semibold"
               >
-                {create.isPending ? "Đang xử lý..." : "Xác nhận mua vé resale"}
+                {create.isPending ? "Đang xử lý..." : "Xác nhận mua vé bán lại"}
               </Button>
             </div>
           </aside>

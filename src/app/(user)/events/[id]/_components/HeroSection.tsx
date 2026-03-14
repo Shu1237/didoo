@@ -27,7 +27,7 @@ export default function HeroSection({ event }: HeroSectionProps) {
       : "Đang cập nhật";
 
   const locationLabel =
-    event.locations?.[0]?.name || event.locations?.[0]?.address || "Địa điểm TBA";
+    event.locations?.[0]?.name || event.locations?.[0]?.address || "Địa điểm sẽ cập nhật";
 
   const isHot =
     event.status === EventStatus.PUBLISHED || event.status === EventStatus.OPENED;

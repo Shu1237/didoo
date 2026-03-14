@@ -107,14 +107,14 @@ export default function BecomeOrganizerForm({ onSuccess }: { onSuccess?: () => v
             </div>
 
             <div>
-              <p className="mb-1 text-xs font-semibold uppercase tracking-[0.14em] text-zinc-500">Banner</p>
+              <p className="mb-1 text-xs font-semibold uppercase tracking-[0.14em] text-zinc-500">Ảnh bìa</p>
               <button
                 type="button"
                 onClick={() => bannerInputRef.current?.click()}
                 className="group relative flex aspect-[16/9] w-full items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed border-zinc-300 bg-zinc-50 transition hover:border-primary"
               >
                 {bannerUrl ? (
-                  <Image src={bannerUrl} alt="Banner preview" fill className="object-cover" />
+                  <Image src={bannerUrl} alt="Xem trước ảnh bìa" fill className="object-cover" />
                 ) : (
                   <div className="flex flex-col items-center gap-1 text-zinc-400">
                     {uploadImage.isPending ? (

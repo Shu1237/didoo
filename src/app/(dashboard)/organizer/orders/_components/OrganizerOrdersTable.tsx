@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal } from "lucide-react";
 import Link from "next/link";
+import { BookingTypeStatus } from "@/utils/enum";
 
 function formatCurrency(n: number) {
   return new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(n);
@@ -65,7 +66,7 @@ export function OrganizerOrdersTable({
 
   const { data: bookingsRes, isLoading } = useGetBookings(
     eventId
-      ? { eventId, pageNumber, pageSize, isDescending, status }
+      ? { eventId, pageNumber, pageSize, isDescending, status, bookingType: BookingTypeStatus.NORMAL }
       : { pageNumber: 1, pageSize: 1 }
   );
 

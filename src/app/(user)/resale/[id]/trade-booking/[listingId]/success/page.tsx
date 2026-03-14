@@ -18,7 +18,7 @@ export default function TradeBookingSuccessPage({
         <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100">
           <CheckCircle2 className="h-8 w-8 text-emerald-600" />
         </div>
-        <h1 className="text-2xl font-bold text-zinc-900">Mua vé resale thành công</h1>
+        <h1 className="text-2xl font-bold text-zinc-900">Mua vé bán lại thành công</h1>
         <p className="mt-2 text-sm text-zinc-600">
           Giao dịch của bạn đã hoàn tất. Vé sẽ được cập nhật trong khu vực vé của tôi.
         </p>
@@ -29,7 +29,7 @@ export default function TradeBookingSuccessPage({
           <Button asChild variant="outline" className="rounded-xl">
             <Link href={`/resale/${id}`}>
               <ChevronLeft className="mr-1 h-4 w-4" />
-              Quay lại resale
+              Quay lại vé bán lại
             </Link>
           </Button>
         </div>

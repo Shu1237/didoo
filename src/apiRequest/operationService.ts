@@ -17,10 +17,13 @@ export const checkInRequest = {
 export const notificationRequest = {
   getList: (params?: NotificationGetListQuery) =>
     http.get<PaginatedData<Notification>>(ENDPOINT_CLIENT.NOTIFICATIONS, { query: params || {} }),
+  getMyList: (params?: NotificationGetListQuery) =>
+    http.get<PaginatedData<Notification>>(ENDPOINT_CLIENT.NOTIFICATIONS_ME, { query: params || {} }),
   getById: (id: string) => http.get<Notification>(ENDPOINT_CLIENT.NOTIFICATION_DETAIL(id)),
   create: (body: NotificationCreateBody) => http.post<Notification>(ENDPOINT_CLIENT.NOTIFICATIONS, body),
   update: (id: string, body: NotificationUpdateBody) =>
     http.put<Partial<Notification>>(ENDPOINT_CLIENT.NOTIFICATION_DETAIL(id), body),
+  markAsRead: (id: string) => http.patch<Partial<Notification>>(ENDPOINT_CLIENT.NOTIFICATION_MARK_READ(id), {}),
   delete: (id: string) => http.delete<null>(ENDPOINT_CLIENT.NOTIFICATION_DETAIL(id)),
   restore: (id: string) => http.patch<null>(ENDPOINT_CLIENT.NOTIFICATION_DETAIL(id), {}),
 };

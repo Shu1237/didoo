@@ -93,7 +93,7 @@ export default function EventsGrid({
                   <div className="flex items-center gap-2">
                     <MapPin className="w-3.5 h-3.5 shrink-0" />
                     <span className="line-clamp-1">
-                      {event.locations?.[0]?.name || event.locations?.[0]?.address || "TBA"}
+                      {event.locations?.[0]?.name || event.locations?.[0]?.address || "Sẽ cập nhật"}
                     </span>
                   </div>
                 </div>

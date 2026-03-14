@@ -17,7 +17,7 @@ interface OrganizerEventCardProps {
 export function OrganizerEventCard({ event }: OrganizerEventCardProps) {
   const startDate = new Date(event.startTime);
   const location =
-    event.locations?.[0]?.name || event.locations?.[0]?.address || "TBA";
+    event.locations?.[0]?.name || event.locations?.[0]?.address || "Sẽ cập nhật";
 
   return (
     <Link
@@ -41,7 +41,7 @@ export function OrganizerEventCard({ event }: OrganizerEventCardProps) {
         <div className="mt-2 flex flex-col gap-1 text-xs text-zinc-500">
           <span className="flex items-center gap-1.5">
             <CalendarDays className="h-3.5 w-3.5" />
-            {event.openTime || "TBA"} - {event.closedTime || "TBA"}
+            {event.openTime || "Sẽ cập nhật"} - {event.closedTime || "Sẽ cập nhật"}
           </span>
           <span className="flex items-center gap-1.5">
             <MapPin className="h-3.5 w-3.5" />

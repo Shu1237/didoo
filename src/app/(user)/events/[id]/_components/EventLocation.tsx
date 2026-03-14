@@ -159,7 +159,7 @@ export default function EventLocation({ event }: EventLocationProps) {
                     >
                       <div className="relative rounded-full border-2 border-white bg-primary p-1 text-white shadow-lg motion-safe:animate-bounce flex items-center justify-center w-10 h-10 overflow-hidden">
                         {categoryIcon ? (
-                          <img src={categoryIcon} alt="Marker Icon" className="w-full h-full object-cover" />
+                          <img src={categoryIcon} alt="Biểu tượng vị trí" className="w-full h-full object-cover" />
                         ) : (
                           <MapPin className="h-4 w-4" />
                         )}
@@ -199,7 +199,7 @@ export default function EventLocation({ event }: EventLocationProps) {
               <div className="flex items-start justify-between gap-4 mb-4">
                 <div>
                   <h3 className="text-lg font-black text-zinc-900 line-clamp-1">{firstLocation.name}</h3>
-                  <p className="mt-1 text-xs text-zinc-500 font-semibold line-clamp-2">{firstLocation.address || "Địa chỉ TBA"}</p>
+                  <p className="mt-1 text-xs text-zinc-500 font-semibold line-clamp-2">{firstLocation.address || "Địa chỉ sẽ cập nhật"}</p>
                 </div>
                 <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary shadow-inner">
                   <MapPin className="h-4 w-4" />

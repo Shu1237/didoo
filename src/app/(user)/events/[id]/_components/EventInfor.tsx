@@ -58,7 +58,7 @@ export default function EventInfor({ event }: EventInforProps) {
     },
     {
       label: "Thời gian",
-      value: `${event.openTime || "TBA"} - ${event.closedTime || "TBA"}`,
+      value: `${event.openTime || "Sẽ cập nhật"} - ${event.closedTime || "Sẽ cập nhật"}`,
       icon: Clock3,
     },
     {
@@ -170,7 +170,7 @@ export default function EventInfor({ event }: EventInforProps) {
             <div className="relative h-36 w-full overflow-hidden">
               <Image
                 src={orgImage}
-                alt={organizerDetails?.name || event.organizer?.name || "Organizer"}
+                alt={organizerDetails?.name || event.organizer?.name || "Nhà tổ chức"}
                 fill
                 className="object-cover transition-transform duration-500 group-hover:scale-105"
               />
@@ -183,7 +183,7 @@ export default function EventInfor({ event }: EventInforProps) {
                   <div className="relative h-20 w-20 overflow-hidden rounded-2xl border-4 border-white bg-white shadow-lg">
                     <Image
                       src={organizerDetails.logoUrl}
-                      alt="Logo"
+                      alt="Logo nhà tổ chức"
                       fill
                       className="object-cover"
                     />
@@ -197,7 +197,7 @@ export default function EventInfor({ event }: EventInforProps) {
                 }
               >
                 <h3 className="text-xl font-bold text-zinc-900 line-clamp-1">
-                  {organizerDetails?.name || event.organizer?.name || "Organizer"}
+                  {organizerDetails?.name || event.organizer?.name || "Nhà tổ chức"}
                 </h3>
                 {organizerDetails?.isVerified && (
                   <div className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-primary">

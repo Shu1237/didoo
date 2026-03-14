@@ -41,7 +41,7 @@ export default function EventActions({ eventId }: EventActionsProps) {
   const saveBusy = createInteraction.isPending || removeInteraction.isPending;
 
   const requireLogin = () => {
-    toast.error("Please log in to use this feature");
+    toast.error("Vui lòng đăng nhập để sử dụng tính năng này");
   };
 
   const handleFavorite = () => {
@@ -81,10 +81,10 @@ export default function EventActions({ eventId }: EventActionsProps) {
         });
       } else {
         await navigator.clipboard.writeText(window.location.href);
-        toast.success("Event link copied to clipboard");
+        toast.success("Đã sao chép liên kết sự kiện");
       }
     } catch {
-      toast.info("Share cancelled");
+      toast.info("Đã hủy chia sẻ");
     }
   };
 
@@ -95,10 +95,10 @@ export default function EventActions({ eventId }: EventActionsProps) {
         onClick={handleFavorite}
         disabled={favoriteBusy}
         className={`${baseButtonClass} w-full sm:w-auto ${isFavorited ? "border-rose-200 bg-rose-50 text-rose-600" : ""}`}
-        title={isFavorited ? "Unfavorite" : "Favorite"}
+        title={isFavorited ? "Bỏ yêu thích" : "Yêu thích"}
       >
         <Heart className={`h-4 w-4 md:h-5 md:w-5 ${isFavorited ? "fill-current" : ""}`} />
-        <span>{isFavorited ? "Favorited" : "Favorite"}</span>
+        <span>{isFavorited ? "Đã yêu thích" : "Yêu thích"}</span>
       </button>
 
       <button
@@ -106,20 +106,20 @@ export default function EventActions({ eventId }: EventActionsProps) {
         onClick={handleSave}
         disabled={saveBusy}
         className={`${baseButtonClass} w-full sm:w-auto ${isSaved ? "border-sky-200 bg-sky-50 text-sky-700" : ""}`}
-        title={isSaved ? "Unsave" : "Save Event"}
+        title={isSaved ? "Bỏ lưu" : "Lưu sự kiện"}
       >
         <Bookmark className={`h-4 w-4 md:h-5 md:w-5 ${isSaved ? "fill-current" : ""}`} />
-        <span>{isSaved ? "Saved" : "Save"}</span>
+        <span>{isSaved ? "Đã lưu" : "Lưu"}</span>
       </button>
 
       <button
         type="button"
         onClick={handleShare}
         className={`${baseButtonClass} w-full sm:w-auto`}
-        title="Share Event"
+        title="Chia sẻ sự kiện"
       >
         <Share2 className="h-4 w-4 md:h-5 md:w-5" />
-        <span>Share</span>
+        <span>Chia sẻ</span>
       </button>
     </div>
   );

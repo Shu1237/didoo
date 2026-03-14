@@ -7,7 +7,7 @@ import { AlertCircle, ChevronLeft, RotateCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const reasonMap: Record<string, string> = {
-  "listing-unavailable": "Listing không còn khả dụng hoặc đã được bán.",
+  "listing-unavailable": "Tin đăng không còn khả dụng hoặc đã được bán.",
   payment_failed: "Thanh toán thất bại hoặc đã bị hủy.",
 };
 
@@ -19,7 +19,7 @@ export default function TradeBookingFailPage({
   const { id, listingId } = use(params);
   const searchParams = useSearchParams();
   const reasonKey = searchParams.get("reason") || "";
-  const reasonMessage = reasonMap[reasonKey] || "Không thể hoàn tất giao dịch resale. Vui lòng thử lại.";
+  const reasonMessage = reasonMap[reasonKey] || "Không thể hoàn tất giao dịch mua lại. Vui lòng thử lại.";
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-zinc-50 px-4">
@@ -27,7 +27,7 @@ export default function TradeBookingFailPage({
         <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-rose-100">
           <AlertCircle className="h-8 w-8 text-rose-600" />
         </div>
-        <h1 className="text-2xl font-bold text-zinc-900">Trade-booking thất bại</h1>
+        <h1 className="text-2xl font-bold text-zinc-900">Giao dịch mua lại thất bại</h1>
         <p className="mt-2 text-sm text-zinc-600">{reasonMessage}</p>
         <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
           <Button asChild className="rounded-xl">
@@ -39,7 +39,7 @@ export default function TradeBookingFailPage({
           <Button asChild variant="outline" className="rounded-xl">
             <Link href={`/resale/${id}`}>
               <ChevronLeft className="mr-1 h-4 w-4" />
-              Quay lại resale
+              Quay lại vé bán lại
             </Link>
           </Button>
         </div>

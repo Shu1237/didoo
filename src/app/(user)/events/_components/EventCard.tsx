@@ -25,7 +25,7 @@ export function EventCard({
   href,
 }: EventCardProps) {
   const imageUrl = event.thumbnailUrl || event.bannerUrl || FALLBACK_IMAGE;
-  const location = event.locations?.[0]?.name || event.locations?.[0]?.address || "TBA";
+  const location = event.locations?.[0]?.name || event.locations?.[0]?.address || "Sẽ cập nhật";
 
   return (
     <Link

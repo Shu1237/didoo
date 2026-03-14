@@ -26,12 +26,12 @@ const STATUS_CONFIG = {
     className: "border-amber-200 bg-amber-50 text-amber-700",
   },
   [OrganizerStatus.VERIFIED]: {
-    label: "Organizer đã xác minh",
+    label: "Nhà tổ chức đã xác minh",
     icon: CheckCircle2,
     className: "border-emerald-200 bg-emerald-50 text-emerald-700",
   },
   [OrganizerStatus.BANNED]: {
-    label: "Organizer bị khóa",
+    label: "Nhà tổ chức bị khóa",
     icon: XCircle,
     className: "border-rose-200 bg-rose-50 text-rose-700",
   },
@@ -73,7 +73,7 @@ export default function ProfileSidebar() {
         <div className="-mt-12 px-5 pb-6">
           <div className="flex items-end gap-3">
             <Avatar className="h-20 w-20 border-4 border-slate-50 shadow-sm">
-              <AvatarImage src={user?.avatarUrl || ""} alt={user?.fullName || "User"} />
+              <AvatarImage src={user?.avatarUrl || ""} alt={user?.fullName || "Người dùng"} />
               <AvatarFallback className="bg-slate-200 text-xl font-bold text-slate-700">
                 {initials}
               </AvatarFallback>
@@ -88,15 +88,15 @@ export default function ProfileSidebar() {
           </div>
 
           <div className="mt-5 grid grid-cols-2 gap-2">
-            <Metric label="Tickets" value="--" icon={Ticket} />
-            <Metric label="Reviews" value="--" icon={UserCircle2} />
+            <Metric label="Vé" value="--" icon={Ticket} />
+            <Metric label="Đánh giá" value="--" icon={UserCircle2} />
           </div>
         </div>
       </div>
 
       <div className="p-5 pt-0">
         <p className="mb-3 px-1 text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">
-          Account Settings
+          Cài đặt tài khoản
         </p>
 
         <ul className="space-y-1">
@@ -105,14 +105,14 @@ export default function ProfileSidebar() {
             className={`flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-semibold cursor-pointer transition-colors ${tab === 'general' ? 'bg-slate-200/50 text-slate-800' : 'text-slate-500 hover:bg-slate-200/30'}`}
           >
             <Settings2 className={`h-4 w-4 ${tab === 'general' ? 'text-slate-700' : 'text-slate-400'}`} />
-            General
+            Chung
           </li>
           <li
             onClick={() => handleTabChange('security')}
             className={`flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-semibold cursor-pointer transition-colors ${tab === 'security' ? 'bg-slate-200/50 text-slate-800' : 'text-slate-500 hover:bg-slate-200/30'}`}
           >
             <Shield className={`h-4 w-4 ${tab === 'security' ? 'text-slate-700' : 'text-slate-400'}`} />
-            Privacy & Security
+            Quyền riêng tư & bảo mật
           </li>
         </ul>
 
@@ -124,7 +124,7 @@ export default function ProfileSidebar() {
           >
             <Link href="/user/dashboard/organizer/create">
               <Rocket className="h-4 w-4 mr-2" />
-              Đăng ký organizer
+              Đăng ký nhà tổ chức
             </Link>
           </Button>
         )}
@@ -135,14 +135,14 @@ export default function ProfileSidebar() {
               }`}
           >
             {isOrganizerLoading ? (
-              <span>Loading status...</span>
+              <span>Đang tải trạng thái...</span>
             ) : statusConfig ? (
               <>
                 <statusConfig.icon className="h-4 w-4 shrink-0" />
                 <span>{statusConfig.label}</span>
               </>
             ) : (
-              <span>Status updating...</span>
+              <span>Đang cập nhật trạng thái...</span>
             )}
           </div>
         )}

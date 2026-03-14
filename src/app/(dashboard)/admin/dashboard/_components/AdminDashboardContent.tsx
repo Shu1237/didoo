@@ -51,14 +51,14 @@ import {
   Eye,
   ArrowLeftRight,
 } from "lucide-react";
-
+import { Roles } from "@/utils/enum";
 const formatNumber = (n: number) => new Intl.NumberFormat("vi-VN").format(n);
 const formatCurrency = (n: number) => `${formatNumber(Math.round(n))}₫`;
 
 const CHART_COLORS = ["#EA580C", "#0D9488", "#7C3AED", "#059669", "#DC2626"];
 
 export function AdminDashboardContent() {
-  const { data: usersRes } = useGetUsers({ pageSize: 1 });
+  const { data: usersRes } = useGetUsers({ pageSize: 1, roleId: Roles.USER });
   const { data: organizersRes } = useGetOrganizers({ pageSize: 1 });
   const { data: pendingOrgRes } = useGetOrganizers({ pageSize: 1, status: OrganizerStatus.PENDING });
   const { data: eventsRes } = useGetEvents({ pageSize: 1 });
@@ -206,7 +206,7 @@ export function AdminDashboardContent() {
                 <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
                   <Building2 className="h-4 w-4" />
                 </div>
-                <span className="text-xs font-medium text-zinc-500">Organizer</span>
+                <span className="text-xs font-medium text-zinc-500">Nhà tổ chức</span>
                 {pendingOrganizers > 0 && (
                   <Badge variant="secondary" className="ml-auto text-[10px]">
                     {pendingOrganizers} chờ duyệt
@@ -224,7 +224,7 @@ export function AdminDashboardContent() {
                 <span className="text-xs font-medium text-zinc-500">Sự kiện đang mở</span>
                 {activeEvents > 0 && (
                   <Badge variant="default" className="ml-auto text-[10px]">
-                    Live
+                    Đang hoạt động
                   </Badge>
                 )}
               </div>
@@ -253,7 +253,7 @@ export function AdminDashboardContent() {
                 <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-violet-500/10 text-violet-600">
                   <ArrowLeftRight className="h-4 w-4" />
                 </div>
-                <span className="text-xs font-medium text-zinc-500">Resale</span>
+                <span className="text-xs font-medium text-zinc-500">Mua bán lại</span>
                 {activeListings > 0 && (
                   <Badge variant="secondary" className="ml-auto text-[10px]">
                     {activeListings} đang bán
@@ -262,7 +262,7 @@ export function AdminDashboardContent() {
               </div>
               <p className="mt-2 text-2xl font-bold text-zinc-900">{formatCurrency(totalResaleRevenue)}</p>
               <p className="mt-1 text-xs text-zinc-500">
-                {listings.length} listings · {resaleTransactions.length} giao dịch
+                {listings.length} tin đăng · {resaleTransactions.length} giao dịch
               </p>
             </div>
           </div>
