@@ -295,10 +295,6 @@ export function CreateResaleContent({
             </div>
           )}
 
-          {selectedTicketsMeta.isFree && selectedTicketIds.length > 0 && (
-            <p className="text-sm text-zinc-600">Vé miễn phí — không cần nhập giá bán.</p>
-          )}
-
           <div className="space-y-2">
             <label className="text-sm font-medium text-zinc-700">Mô tả (tuỳ chọn)</label>
             <Textarea

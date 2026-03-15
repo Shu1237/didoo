@@ -211,63 +211,63 @@ export function CreateTicketTypesForm({ eventId }: { eventId: string }) {
                       </p>
                     )}
                   </div>
-                  {saleType === "free" ? (
-                    <div className="space-y-2">
-                      <Label>Số vé free tối đa / người *</Label>
-                      <Input
-                        type="number"
-                        min={1}
-                        placeholder="1"
-                        {...register(`items.${i}.maxTicketsPerUser`, { valueAsNumber: true })}
-                        className={errors.items?.[i]?.maxTicketsPerUser ? "border-destructive" : ""}
+                  <div className="space-y-2">
+                    <Label>Mô tả</Label>
+                    <Input
+                      placeholder="Mô tả ngắn về loại vé"
+                      {...register(`items.${i}.description`)}
+                    />
+                  </div>
+                </div>
+                {saleType === "free" ? (
+                  <div className="space-y-2">
+                    <Label>Số vé free tối đa / người *</Label>
+                    <Input
+                      type="number"
+                      min={1}
+                      placeholder="1"
+                      {...register(`items.${i}.maxTicketsPerUser`, { valueAsNumber: true })}
+                      className={errors.items?.[i]?.maxTicketsPerUser ? "border-destructive" : ""}
+                    />
+                    {errors.items?.[i]?.maxTicketsPerUser && (
+                      <p className="text-sm text-destructive">
+                        {errors.items[i]?.maxTicketsPerUser?.message}
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <Checkbox
+                        id={`enable-max-${i}`}
+                        checked={watch(`items.${i}.enableMaxTicketsPerUser`) ?? false}
+                        onCheckedChange={(checked) => {
+                          setValue(`items.${i}.enableMaxTicketsPerUser`, !!checked);
+                          if (!checked) setValue(`items.${i}.maxTicketsPerUser`, null);
+                        }}
                       />
-                      {errors.items?.[i]?.maxTicketsPerUser && (
-                        <p className="text-sm text-destructive">
-                          {errors.items[i]?.maxTicketsPerUser?.message}
-                        </p>
-                      )}
+                      <Label htmlFor={`enable-max-${i}`} className="cursor-pointer font-normal">
+                        Giới hạn số vé mỗi người
+                      </Label>
                     </div>
-                  ) : (
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2 pt-6">
-                        <Checkbox
-                          id={`enable-max-${i}`}
-                          checked={watch(`items.${i}.enableMaxTicketsPerUser`) ?? false}
-                          onCheckedChange={(checked) => {
-                            setValue(`items.${i}.enableMaxTicketsPerUser`, !!checked);
-                            if (!checked) setValue(`items.${i}.maxTicketsPerUser`, null);
-                          }}
+                    {(watch(`items.${i}.enableMaxTicketsPerUser`) ?? false) && (
+                      <div className="mt-2">
+                        <Input
+                          type="number"
+                          min={1}
+                          placeholder="Ví dụ: 5"
+                          {...register(`items.${i}.maxTicketsPerUser`, { valueAsNumber: true })}
+                          className={errors.items?.[i]?.maxTicketsPerUser ? "border-destructive" : ""}
                         />
-                        <Label htmlFor={`enable-max-${i}`} className="cursor-pointer font-normal">
-                          Giới hạn số vé mỗi người
-                        </Label>
+                        {errors.items?.[i]?.maxTicketsPerUser && (
+                          <p className="text-sm text-destructive mt-1">
+                            {errors.items[i]?.maxTicketsPerUser?.message}
+                          </p>
+                        )}
                       </div>
-                      {(watch(`items.${i}.enableMaxTicketsPerUser`) ?? false) && (
-                        <div className="mt-2">
-                          <Input
-                            type="number"
-                            min={1}
-                            placeholder="Ví dụ: 5"
-                            {...register(`items.${i}.maxTicketsPerUser`, { valueAsNumber: true })}
-                            className={errors.items?.[i]?.maxTicketsPerUser ? "border-destructive" : ""}
-                          />
-                          {errors.items?.[i]?.maxTicketsPerUser && (
-                            <p className="text-sm text-destructive mt-1">
-                              {errors.items[i]?.maxTicketsPerUser?.message}
-                            </p>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-                <div className="space-y-2">
-                  <Label>Mô tả</Label>
-                  <Input
-                    placeholder="Mô tả ngắn về loại vé"
-                    {...register(`items.${i}.description`)}
-                  />
-                </div>
+                    )}
+                  </div>
+                )}
               </div>
             );
             })}

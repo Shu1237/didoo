@@ -206,19 +206,28 @@ export function EditTicketTypeForm({
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="availableQuantity">Số lượng còn lại *</Label>
+              <Label htmlFor="description">Mô tả</Label>
               <Input
-                id="availableQuantity"
-                type="number"
-                min={0}
-                placeholder="0"
-                {...register("availableQuantity", { valueAsNumber: true })}
-                className={errors.availableQuantity ? "border-destructive" : ""}
+                id="description"
+                placeholder="Mô tả ngắn về loại vé"
+                {...register("description")}
               />
-              {errors.availableQuantity && (
-                <p className="text-sm text-destructive">{errors.availableQuantity.message}</p>
-              )}
             </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="availableQuantity">Số lượng còn lại *</Label>
+            <Input
+              id="availableQuantity"
+              type="number"
+              min={0}
+              placeholder="0"
+              {...register("availableQuantity", { valueAsNumber: true })}
+              className={errors.availableQuantity ? "border-destructive" : ""}
+            />
+            {errors.availableQuantity && (
+              <p className="text-sm text-destructive">{errors.availableQuantity.message}</p>
+            )}
           </div>
 
           {saleType === "free" ? (
@@ -268,15 +277,6 @@ export function EditTicketTypeForm({
               )}
             </div>
           )}
-
-          <div className="space-y-2">
-            <Label htmlFor="description">Mô tả</Label>
-            <Input
-              id="description"
-              placeholder="Mô tả ngắn về loại vé"
-              {...register("description")}
-            />
-          </div>
 
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="flex gap-2">
