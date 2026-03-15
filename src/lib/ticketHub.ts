@@ -1,5 +1,5 @@
 import * as signalR from "@microsoft/signalr";
-import { envconfig } from "../../config";
+import { envconfig } from "../config";
 import { useSessionStore } from "../stores/sesionStore";
 
 /**

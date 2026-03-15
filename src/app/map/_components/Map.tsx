@@ -7,7 +7,7 @@ import maplibregl from 'maplibre-gl';
 import Image from 'next/image';
 import { Event } from '@/types/event';
 import { Spinner } from '@/components/ui/spinner';
-import { envconfig } from '../../../../config';
+import { envconfig } from '../../../config';
 
 
 // User location pin - địa điểm hiện tại

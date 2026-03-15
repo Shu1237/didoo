@@ -1,6 +1,6 @@
 
 import { NextResponse } from 'next/server';
-import envconfig from '../../../../config';
+import envconfig from '../../../config';
 
 export async function POST(request: Request) {
     try {

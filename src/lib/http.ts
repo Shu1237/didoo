@@ -1,6 +1,6 @@
 import { authRequest } from "@/apiRequest/authService";
 import { useSessionStore } from "@/stores/sesionStore";
-import { envconfig } from "../../config";
+import { envconfig } from "../config";
 import { ResponseData, ResponseError } from "@/types/base";
 import { toast } from "sonner";
 import { EntityError, HttpError } from "@/lib/errors";

@@ -11,7 +11,7 @@ import { Event } from "@/types/event";
 import { useGetEvents } from "@/hooks/useEvent";
 import { EventStatus } from "@/utils/enum";
 import { useLocationContext } from "@/contexts/locationContext";
-import { envconfig } from "../../../config";
+import { envconfig } from "../../config";
 const AnimatedDoubleArrow = ({
   direction,
   isAnimating,

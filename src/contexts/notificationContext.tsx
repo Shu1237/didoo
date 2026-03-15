@@ -102,9 +102,7 @@ export const NotificationProvider = observer(({ children }: { children: ReactNod
           const upperType = n.type.toUpperCase();
           const skipToast =
             upperType.includes("BOOKINGSUCCESS") ||
-            upperType.includes("RESALESUCCESS") ||
-            upperType.includes("ORGANIZERVERIFY") ||
-            upperType.includes("VERIFYORGANIZER");
+            upperType.includes("RESALESUCCESS");
           if (!skipToast) {
             toast.success(n.title, { description: n.message });
           }
