@@ -40,9 +40,11 @@ function toQuery(params: Record<string, string | string[] | undefined>) {
     q.isDeleted = false;
   }
   if (params.name && typeof params.name === "string") q.name = params.name;
-  if (params.categoryId && typeof params.categoryId === "string") q.categoryId = params.categoryId;
-  if (params.organizerId && typeof params.organizerId === "string") q.organizerId = params.organizerId;
-  if (params.status && params.status !== "") q.status = Number(params.status);
+  if (params.categoryId && typeof params.categoryId === "string" && params.categoryId !== "all") q.categoryId = params.categoryId;
+  if (params.organizerId && typeof params.organizerId === "string" && params.organizerId !== "all") q.organizerId = params.organizerId;
+  if (params.status && params.status !== "" && params.status !== "all") q.status = Number(params.status) as EventStatus;
+  if (params.startTime && typeof params.startTime === "string") q.startTime = params.startTime;
+  if (params.endTime && typeof params.endTime === "string") q.endTime = params.endTime;
   if (params.isDescending !== undefined) q.isDescending = params.isDescending === "true";
   return q;
 }
