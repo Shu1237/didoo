@@ -27,7 +27,7 @@ import { toast } from "sonner";
 import EventLocation from "./EventLocation";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
-
+import { useSessionStore } from "@/stores/sesionStore";
 interface EventDetailContentProps {
   event: Event;
   ticketTypes: TicketType[];
@@ -66,7 +66,7 @@ export default function EventDetailContent({
 }: EventDetailContentProps) {
   const { data: orgData } = useGetOrganizer(event.organizer?.id || "");
   const organizer = orgData?.data;
-
+  const { user } = useSessionStore();
   const minPrice =
     ticketTypes.length > 0
       ? Math.min(...ticketTypes.map((t) => Number(t.price || 0)))
@@ -270,14 +270,26 @@ export default function EventDetailContent({
 
               {ticketTypes.length > 0 ? (
                 event.status === EventStatus.OPENED ? (
-                  <Button
-                    asChild
-                    className="h-12 w-full rounded-xl bg-primary hover:bg-primary/90 text-white font-bold"
-                  >
-                    <Link href={`/events/${event.id}/booking`}>
-                      Mua vé ngay
-                    </Link>
-                  </Button>
+                  user ? (
+                    <Button
+                      asChild
+                      className="h-12 w-full rounded-xl bg-primary hover:bg-primary/90 text-white font-bold"
+                    >
+                      <Link href={`/events/${event.id}/booking`}>
+                        <ShoppingCart className="mr-2 h-4 w-4" />
+                        Mua vé ngay
+                      </Link>
+                    </Button>
+                  ) : (
+                    <Button
+                      asChild
+                      className="h-12 w-full rounded-xl bg-primary hover:bg-primary/90 text-white font-bold"
+                    >
+                      <Link href={`/login?redirect=${encodeURIComponent(`/events/${event.id}/booking`)}`}>
+                        Đăng nhập ngay
+                      </Link>
+                    </Button>
+                  )
                 ) : (
                   <div className="flex h-12 w-full items-center justify-center rounded-xl border border-zinc-200 bg-zinc-50 text-center">
                     <p className="text-sm font-medium text-zinc-500">

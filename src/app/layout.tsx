@@ -46,7 +46,7 @@ export default async function RootLayout({
           <AuthProvider initialAccessToken={accessToken?.value || null} initialRefreshToken={refreshToken?.value || null}>
             <LocationProvider>
               <QueryClientProviderWrapper>
-              {/* <NotificationProvider> */}
+                <NotificationProvider>
                 <ThemeProvider
                   attribute="class"
                   defaultTheme="system"
@@ -56,7 +56,7 @@ export default async function RootLayout({
                   {children}
                   <Toaster richColors position="top-center" />
                 </ThemeProvider>
-              {/* </NotificationProvider> */}
+                </NotificationProvider>
               </QueryClientProviderWrapper>
             </LocationProvider>
           </AuthProvider>

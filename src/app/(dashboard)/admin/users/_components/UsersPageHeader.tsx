@@ -1,6 +1,7 @@
 "use client";
 
 import { SectionHeader } from "@/components/base/SectionHeader";
+import { KEY } from "@/utils/constant";
 
 export function UsersPageHeader() {
   return (
@@ -9,6 +10,7 @@ export function UsersPageHeader() {
       subtitle="Quản lý tài khoản người dùng"
       createHref="/admin/users/create"
       createLabel="Tạo người dùng"
+      refetchQueryKeys={[KEY.users]}
     />
   );
 }

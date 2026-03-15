@@ -12,29 +12,40 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useNotificationContextOptional } from "@/contexts/notificationContext";
-import { useGetNotifications } from "@/hooks/useOperation";
+import { useGetMyNotifications } from "@/hooks/useOperation";
 import { useSessionStore } from "@/stores/sesionStore";
 
 export function NotificationBell() {
   const ctx = useNotificationContextOptional();
   const notifications = ctx?.notifications ?? [];
   const user = useSessionStore((state) => state.user);
-  const { data: apiRes } = useGetNotifications(
-    { pageNumber: 1, pageSize: 10, isRead: false, userId: user?.UserId },
+  const { data: apiRes } = useGetMyNotifications(
+    { pageNumber: 1, pageSize: 10, isRead: false },
     { enabled: !!user?.UserId }
   );
   const apiItems = apiRes?.data?.items ?? [];
-  const unreadCount = apiItems.length + notifications.length;
+  // Dedupe theo nội dung: title+message+type (createdAt/relatedId có thể khác giữa API vs SignalR)
+  const toKey = (t: string, m: string, ty: string) => `${t}|${m}|${ty}`;
+  const seenKeys = new Set<string>();
   const displayItems = [
-    ...notifications.map((n) => ({ ...n, source: "realtime" as const })),
     ...apiItems.map((n) => ({
       title: n.title ?? "",
       message: n.message ?? "",
-      type: (n as { type?: string }).type ?? "",
-      relatedId: n.event?.id ?? (n as { relatedId?: string }).relatedId ?? null,
+      type: n.type ?? "",
+      relatedId: n.relatedId ?? n.event?.id ?? null,
+      createdAt: n.createdAt ?? "",
       source: "api" as const,
     })),
-  ].slice(0, 10);
+    ...notifications.map((n) => ({ ...n, source: "realtime" as const })),
+  ]
+    .filter((item) => {
+      const k = toKey(item.title, item.message, item.type ?? "");
+      if (seenKeys.has(k)) return false;
+      seenKeys.add(k);
+      return true;
+    })
+    .slice(0, 10);
+  const unreadCount = displayItems.length;
 
   return (
     <DropdownMenu>

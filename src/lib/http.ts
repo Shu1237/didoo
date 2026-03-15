@@ -129,6 +129,15 @@ class TokenRefreshInterceptor {
 
 const tokenInterceptor = new TokenRefreshInterceptor();
 
+/** Dùng cho SignalR/WebSocket khi gặp 401 - refresh token rồi retry connection */
+export async function refreshTokenForReconnect(): Promise<string | null> {
+    try {
+        return await tokenInterceptor.refreshToken();
+    } catch {
+        return null;
+    }
+}
+
 async function httpRequest<T>(
     method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH",
     url: string,

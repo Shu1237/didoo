@@ -16,7 +16,7 @@ import {
 } from "recharts";
 import { useGetMe } from "@/hooks/useAuth";
 import { useOrganizerStats } from "@/hooks/useEvent";
-import { useGetBookings, useGetResales, useGetResaleTransactions } from "@/hooks/useBooking";
+import { useGetBookings } from "@/hooks/useBooking";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -24,8 +24,9 @@ import { EventStatus } from "@/utils/enum";
 import {
   DollarSign,
   Ticket,
+  CalendarDays,
+  CalendarClock,
   ArrowLeftRight,
-  Gem,
   TrendingUp,
   Calendar,
   Plus,
@@ -66,15 +67,6 @@ export function OrganizerDashboardContent() {
     { pageNumber: 1, pageSize: 500, isDescending: true },
     { enabled: !!organizerId }
   );
-  const { data: resaleRes } = useGetResales(
-    { pageNumber: 1, pageSize: 200, isDescending: true },
-    { enabled: !!organizerId }
-  );
-  const { data: resaleTransactionsRes } = useGetResaleTransactions(
-    { pageNumber: 1, pageSize: 200, isDescending: true },
-    { enabled: !!organizerId }
-  );
-
   const eventIdSet = useMemo(() => new Set(events.map((e) => e.id)), [events]);
   const myBookings = useMemo(
     () => (bookingsRes?.data.items ?? []).filter((b) => eventIdSet.has(b.eventId)),
@@ -92,15 +84,18 @@ export function OrganizerDashboardContent() {
     () => paidBookings.reduce((sum, b) => sum + Number(b.amount || 0), 0),
     [paidBookings]
   );
-  const myResaleTransactions = resaleTransactionsRes?.data.items ?? [];
-  const completedResaleTransactions = myResaleTransactions.filter((t) =>
-    /paid|success|completed/i.test(String(t.status ?? ""))
+  const openedEventCount = useMemo(
+    () => events.filter((e) => Number(e.status) === EventStatus.OPENED).length,
+    [events]
   );
-  const resaleVolume = useMemo(
-    () => completedResaleTransactions.reduce((s, t) => s + Number(t.cost || 0), 0),
-    [completedResaleTransactions]
-  );
-  const tradeCount = myResaleTransactions.length;
+  const upcomingPublishedCount = useMemo(() => {
+    const now = new Date();
+    return events.filter(
+      (e) =>
+        Number(e.status) === EventStatus.PUBLISHED &&
+        new Date(e.startTime ?? 0) > now
+    ).length;
+  }, [events]);
 
   const kpiCards = useMemo(
     () => [
@@ -119,21 +114,21 @@ export function OrganizerDashboardContent() {
         trend: "up" as const,
       },
       {
-        title: "Khối lượng Resale",
-        value: formatCurrency(resaleVolume),
-        change: "+15.4% phí bản quyền",
-        icon: ArrowLeftRight,
+        title: "Tổng sự kiện đang mở",
+        value: formatNumber(openedEventCount),
+        change: "Tổng sự kiện đang mở",
+        icon: CalendarDays,
         trend: "up" as const,
       },
       {
-        title: "Chỉ số Trade",
-        value: formatNumber(tradeCount),
-        change: "+5.7% tương tác",
-        icon: Gem,
+        title: "Tổng sự kiện sắp tới",
+        value: formatNumber(upcomingPublishedCount),
+        change: "Tổng sự kiện sắp tới",
+        icon: CalendarClock,
         trend: "up" as const,
       },
     ],
-    [myRevenue, ticketsSold, resaleVolume, tradeCount, stats]
+    [myRevenue, ticketsSold, openedEventCount, upcomingPublishedCount, stats]
   );
 
   const recentEvents = useMemo(() => {

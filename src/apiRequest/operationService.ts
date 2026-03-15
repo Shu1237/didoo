@@ -2,7 +2,32 @@ import http from "@/lib/http";
 import { ENDPOINT_CLIENT } from "@/utils/endpoint";
 import { CheckInGetListQuery, CheckIn, NotificationGetListQuery, Notification } from "@/types/operation";
 import { CheckInCreateBody, CheckInUpdateBody, NotificationCreateBody, NotificationUpdateBody } from "@/schemas/operation";
-import { PaginatedData } from "@/types/base";
+import { PaginatedData, ResponseData } from "@/types/base";
+
+/** BE OperationService trả data là mảng phẳng, FE expect data.items. Normalize để tương thích. */
+async function getNotificationList(
+  url: string,
+  params?: NotificationGetListQuery
+): Promise<ResponseData<PaginatedData<Notification>>> {
+  const res = await http.get<PaginatedData<Notification> | Notification[]>(url, { query: params || {} });
+  const rawData = res.data;
+  if (!rawData) {
+    return { ...res, data: { totalItems: 0, pageNumber: 1, pageSize: 10, totalPages: 0, items: [] } };
+  }
+  if (Array.isArray(rawData)) {
+    return {
+      ...res,
+      data: {
+        totalItems: rawData.length,
+        pageNumber: params?.pageNumber ?? 1,
+        pageSize: params?.pageSize ?? 10,
+        totalPages: Math.ceil(rawData.length / (params?.pageSize ?? 10)) || 1,
+        items: rawData as Notification[],
+      },
+    };
+  }
+  return res as ResponseData<PaginatedData<Notification>>;
+}
 
 export const checkInRequest = {
   getList: (params?: CheckInGetListQuery) =>
@@ -16,9 +41,9 @@ export const checkInRequest = {
 
 export const notificationRequest = {
   getList: (params?: NotificationGetListQuery) =>
-    http.get<PaginatedData<Notification>>(ENDPOINT_CLIENT.NOTIFICATIONS, { query: params || {} }),
+    getNotificationList(ENDPOINT_CLIENT.NOTIFICATIONS, params),
   getMyList: (params?: NotificationGetListQuery) =>
-    http.get<PaginatedData<Notification>>(ENDPOINT_CLIENT.NOTIFICATIONS_ME, { query: params || {} }),
+    getNotificationList(ENDPOINT_CLIENT.NOTIFICATIONS_ME, params),
   getById: (id: string) => http.get<Notification>(ENDPOINT_CLIENT.NOTIFICATION_DETAIL(id)),
   create: (body: NotificationCreateBody) => http.post<Notification>(ENDPOINT_CLIENT.NOTIFICATIONS, body),
   update: (id: string, body: NotificationUpdateBody) =>

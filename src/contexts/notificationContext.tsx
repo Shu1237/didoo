@@ -9,6 +9,7 @@ import {
 } from "react";
 import * as signalR from "@microsoft/signalr";
 import { createNotificationHubConnection } from "@/lib/notificationHub";
+import { refreshTokenForReconnect } from "@/lib/http";
 import { useSessionStore } from "@/stores/sesionStore";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
@@ -30,6 +31,21 @@ interface NotificationContextType {
 }
 
 const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
+
+/** Dedupe: tránh Strict Mode / double-mount gây sự kiện bắn 2 lần */
+const lastNotificationRef = { key: "", ts: 0 };
+const DEDUPE_MS = 800;
+
+function isDuplicate(title: string, message: string, createdAt: string): boolean {
+  const key = `${title}|${message}|${createdAt}`;
+  const now = Date.now();
+  if (lastNotificationRef.key === key && now - lastNotificationRef.ts < DEDUPE_MS) {
+    return true;
+  }
+  lastNotificationRef.key = key;
+  lastNotificationRef.ts = now;
+  return false;
+}
 
 export const NotificationProvider = observer(({ children }: { children: ReactNode }) => {
   const accessToken = useSessionStore((state) => state.accessToken);
@@ -71,8 +87,6 @@ export const NotificationProvider = observer(({ children }: { children: ReactNod
         conn.on("ReceiveNotification", (data: RealtimeNotification) => {
           if (!isMounted) return;
 
-          console.log("[Notification] Received notification:", data);
-
           const payload = data as any;
           const n: RealtimeNotification = {
             title: payload.title ?? payload.Title ?? "",
@@ -82,11 +96,20 @@ export const NotificationProvider = observer(({ children }: { children: ReactNod
             createdAt: payload.createdAt ?? payload.CreatedAt ?? new Date().toISOString(),
           };
 
+          if (isDuplicate(n.title, n.message, n.createdAt)) return;
+
           addNotification(n);
-          toast.success(n.title, { description: n.message });
+          const upperType = n.type.toUpperCase();
+          const skipToast =
+            upperType.includes("BOOKINGSUCCESS") ||
+            upperType.includes("RESALESUCCESS") ||
+            upperType.includes("ORGANIZERVERIFY") ||
+            upperType.includes("VERIFYORGANIZER");
+          if (!skipToast) {
+            toast.success(n.title, { description: n.message });
+          }
 
           // Specific handling for business types - Normalize to UPPERCASE for matching
-          const upperType = n.type.toUpperCase();
 
           // 4 real-time areas: TICKET, BOOKING, RESALE, VERIFYORGANIZER
           if (upperType.includes("TICKET")) {
@@ -103,8 +126,31 @@ export const NotificationProvider = observer(({ children }: { children: ReactNod
           }
 
           if (upperType.includes("ORGANIZERVERIFY") || upperType.includes("VERIFYORGANIZER")) {
-            // Refresh "me" to update role/dashboard link
-            queryClient.invalidateQueries({ queryKey: KEY.users });
+            // isOrganizer nằm trong JWT - cần refresh token để lấy token mới với IsOrgainizer: true
+            // Nếu không refresh, middleware sẽ chặn user vào /organizer vì token cũ vẫn là false
+            (async () => {
+              try {
+                const newToken = await refreshTokenForReconnect();
+                if (newToken) {
+                  // Token mới đã được decode và update session store (user.IsOrgainizer = true)
+                  await queryClient.invalidateQueries({ queryKey: KEY.users });
+                  await queryClient.refetchQueries({ queryKey: KEY.users });
+                  await queryClient.invalidateQueries({ queryKey: KEY.organizers });
+                  await queryClient.refetchQueries({ queryKey: KEY.organizers });
+                } else {
+                  // Refresh thất bại - vẫn refresh user/organizer data (fallback)
+                  await queryClient.invalidateQueries({ queryKey: KEY.users });
+                  await queryClient.refetchQueries({ queryKey: KEY.users });
+                  await queryClient.invalidateQueries({ queryKey: KEY.organizers });
+                  await queryClient.refetchQueries({ queryKey: KEY.organizers });
+                }
+              } catch {
+                await queryClient.invalidateQueries({ queryKey: KEY.users });
+                await queryClient.refetchQueries({ queryKey: KEY.users });
+                await queryClient.invalidateQueries({ queryKey: KEY.organizers });
+                await queryClient.refetchQueries({ queryKey: KEY.organizers });
+              }
+            })();
           }
 
           queryClient.invalidateQueries({ queryKey: KEY.notifications });
@@ -120,28 +166,43 @@ export const NotificationProvider = observer(({ children }: { children: ReactNod
       } catch (err: unknown) {
         if (!isMounted) return;
 
-        // Reset to allow retry
-        isStartedRef.current = false;
-
         const e = err as { name?: string; message?: string };
+        const msg = (e?.message || "").toLowerCase();
+        const is401 = msg.includes("401") || msg.includes("phiên đăng nhập đã hết hạn");
+
+        if (is401 && useSessionStore.getState().refreshToken) {
+          isStartedRef.current = false;
+          if (conn) {
+            conn.stop().catch(() => {});
+            conn = null;
+          }
+          setNotificationConnection(false);
+          try {
+            const newToken = await refreshTokenForReconnect();
+            if (newToken && isMounted) {
+              startConnection();
+              return;
+            }
+          } catch {
+            // Refresh failed - user sẽ bị redirect login
+          }
+        }
+
+        isStartedRef.current = false;
         const isAbort =
           e?.name === "AbortError" ||
-          e?.message?.includes("stopped during negotiation") ||
-          e?.message?.includes("The connection was stopped") ||
-          e?.message?.includes("WebSocket") ||
-          e?.message?.includes("negotiate") ||
-          e?.message?.includes("Failed to negotiate") ||
-          e?.message?.includes("Aborted");
-
-        // Log error details for debugging
-        console.log(`[NotificationHub] Connection failed: ${e?.name || "Unknown error"} - ${e?.message || "No message"}`);
+          msg.includes("stopped during negotiation") ||
+          msg.includes("the connection was stopped") ||
+          msg.includes("websocket") ||
+          msg.includes("negotiate") ||
+          msg.includes("failed to negotiate") ||
+          msg.includes("aborted");
 
         if (!isAbort) {
-          console.error("NotificationHub connection error:", err);
+          console.log(`[NotificationHub] Connection failed: ${e?.name || "Unknown"} - ${e?.message || ""}`);
         }
         setNotificationConnection(false);
 
-        // Retry after 5 seconds
         setTimeout(() => {
           if (isMounted && useSessionStore.getState().accessToken) {
             startConnection();

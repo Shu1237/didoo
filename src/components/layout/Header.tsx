@@ -9,10 +9,14 @@ import { Button } from "@/components/ui/button";
 import {
   LogOut,
   LayoutDashboard,
-  Search,
   ArrowUpRight,
   User as UserIcon,
+  Calendar,
+  Menu,
+  MapPin,
+  Ticket,
 } from "lucide-react";
+import { NotificationBell } from "@/components/layout/NotificationBell";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,9 +25,25 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
 import { Roles } from "@/utils/enum";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfileWithOrganizer } from "@/hooks/useProfileWithOrganizer";
+import { cn } from "@/lib/utils";
+
+const MAIN_NAV_ITEMS = [
+  { href: "/home", label: "Trang chủ", icon: LayoutDashboard },
+  { href: "/events", label: "Sự kiện", icon: Calendar },
+  { href: "/map", label: "Bản đồ", icon: MapPin },
+  { href: "/resale", label: "Vé bán lại", icon: Ticket },
+] as const;
+
 const Header = () => {
   const user = useSessionStore((state) => state.user);
   const { isVerifiedOrganizer } = useProfileWithOrganizer();
@@ -42,6 +62,8 @@ const Header = () => {
     await logout.mutateAsync({ userId: user.UserId });
   };
 
+  // Ảnh 1: User chưa đăng kí hoặc đã đăng kí nhưng PENDING → KHÔNG hiện Bảng điều khiển
+  // Ảnh 2: Khi sự kiện OrganizerVerify bắn tới (admin đã duyệt) → HIỆN Bảng điều khiển trong dropdown
   const showDashboard = () => {
     if (!user) return false;
     if (user.Role === Roles.ADMIN) return true;
@@ -54,6 +76,8 @@ const Header = () => {
     if (isVerifiedOrganizer) return "/organizer/dashboard";
     return null;
   };
+
+  const dashboardLink = getDashboardLink();
 
   const isActive = (path: string) =>
     pathname === path || pathname?.startsWith(path + "/");
@@ -85,26 +109,67 @@ const Header = () => {
               </span>
             </Link>
 
+            {/* Desktop nav */}
             <nav className="hidden md:flex items-center gap-0.5 bg-zinc-100/80 p-1 rounded-xl border border-zinc-200/60">
-              <NavItem
-                href="/home"
-                active={isActive("/home")}
-                label="Trang chủ"
-              />
-              <NavItem
-                href="/events"
-                active={isActive("/events")}
-                label="Sự kiện"
-              />
-              <NavItem href="/map" active={isActive("/map")} label="Bản đồ" />
-              <NavItem href="/resale" active={isActive("/resale")} label="Vé bán lại" />
+              {MAIN_NAV_ITEMS.map((item) => (
+                <NavItem
+                  key={item.href}
+                  href={item.href}
+                  active={isActive(item.href)}
+                  label={item.label}
+                />
+              ))}
             </nav>
+
+            {/* Mobile nav - Drawer */}
+            <Drawer direction="left">
+              <DrawerTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="md:hidden h-10 w-10 rounded-xl"
+                  aria-label="Mở menu"
+                >
+                  <Menu className="h-5 w-5" />
+                </Button>
+              </DrawerTrigger>
+              <DrawerContent className="h-full w-[280px] max-w-[85vw] rounded-none">
+                <DrawerHeader className="border-b border-zinc-200">
+                  <DrawerTitle className="flex items-center gap-2">
+                    <Image src="/DiDoo.png" alt="DiDoo" width={32} height={32} className="rounded-lg" />
+                    DiDoo
+                  </DrawerTitle>
+                </DrawerHeader>
+                <nav className="flex flex-col p-4 gap-1">
+                  {MAIN_NAV_ITEMS.map((item) => {
+                    const Icon = item.icon;
+                    return (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        className={cn(
+                          "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-colors min-h-[44px]",
+                          isActive(item.href)
+                            ? "bg-primary/10 text-primary"
+                            : "text-zinc-600 hover:bg-zinc-100"
+                        )}
+                      >
+                        <Icon className="h-5 w-5 shrink-0" />
+                        {item.label}
+                      </Link>
+                    );
+                  })}
+                </nav>
+              </DrawerContent>
+            </Drawer>
 
             <div className="flex items-center gap-2">
               {user ? (
+                <>
+                  <NotificationBell />
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button className="bg-primary hover:bg-primary/90 text-white rounded-xl px-5 h-9 text-sm font-semibold shadow-md shadow-primary/20 transition-all">
+                    <Button className="bg-primary hover:bg-primary/90 text-white rounded-xl px-5 h-10 min-h-[44px] text-sm font-semibold shadow-md shadow-primary/20 transition-all">
                       Tài khoản
                     </Button>
                   </DropdownMenuTrigger>
@@ -127,13 +192,13 @@ const Header = () => {
                         <span>Hồ sơ</span>
                       </Link>
                     </DropdownMenuItem>
-                    {showDashboard() && getDashboardLink() && (
+                    {showDashboard() && dashboardLink && (
                       <DropdownMenuItem
                         className="rounded-lg cursor-pointer focus:bg-zinc-50"
                         asChild
                       >
                         <Link
-                          href={getDashboardLink()!}
+                          href={dashboardLink}
                           className="flex items-center gap-2.5 px-2 py-2"
                         >
                           <LayoutDashboard className="w-4 h-4" />
@@ -151,9 +216,10 @@ const Header = () => {
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
+                </>
               ) : (
                 <Link href="/login">
-                  <Button className="rounded-xl px-5 h-9 text-sm font-semibold flex items-center gap-2 bg-zinc-900 hover:bg-zinc-800 text-white shadow-md transition-all">
+                  <Button className="rounded-xl px-5 h-10 min-h-[44px] text-sm font-semibold flex items-center gap-2 bg-zinc-900 hover:bg-zinc-800 text-white shadow-md transition-all">
                     Đặt vé
                     <ArrowUpRight className="w-4 h-4" />
                   </Button>

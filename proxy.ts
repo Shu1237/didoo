@@ -30,8 +30,7 @@ export async function proxy(request: NextRequest) {
     const cookieStore = await cookies()
     const accessToken = cookieStore.get('accessToken')?.value;
     const refreshToken = cookieStore.get('refreshToken')?.value;
-    console.log('accessToken', accessToken);
-    console.log('refreshToken', refreshToken);
+
 
     const isPublic =
         publicPaths.some(path => pathname.startsWith(path)) ||
@@ -76,9 +75,15 @@ export async function proxy(request: NextRequest) {
                 const userRole = user.Role as Roles;
 
                 if (!allowedRoles.includes(userRole)) {
-                    // Unauthorized Access
-                    // You might want to redirect to            // Invalid token -> redirect to login
-                    return NextResponse.redirect(new URL('/login', request.url)); // Ensure /unauthorized exists or use a generic error page
+                    return NextResponse.redirect(new URL('/login', request.url));
+                }
+
+                // /organizer: USER phải có isOrganizer = true mới được phép truy cập
+                if (matchedPath === '/organizer' && userRole === Roles.USER) {
+                    const isOrganizer = String(user.IsOrganizer ?? '').toLowerCase() === 'true';
+                    if (!isOrganizer) {
+                        return NextResponse.redirect(new URL('/home', request.url));
+                    }
                 }
             }
 

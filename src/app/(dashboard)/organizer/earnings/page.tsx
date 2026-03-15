@@ -1,6 +1,8 @@
 import { Suspense } from "react";
 import { SectionFallback } from "@/components/base/SectionFallback";
+import { PageHeaderWithRefetch } from "@/components/base/PageHeaderWithRefetch";
 import { OrganizerEarningsContent } from "./_components/OrganizerEarningsContent";
+import { KEY } from "@/utils/constant";
 
 type PageProps = {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -11,10 +13,11 @@ export default async function OrganizerEarningsPage({ searchParams }: PageProps)
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 lg:text-3xl">Ví & Doanh thu</h1>
-        <p className="mt-1 text-sm text-zinc-500">Thống kê doanh thu từ sự kiện</p>
-      </div>
+      <PageHeaderWithRefetch
+        title="Ví & Doanh thu"
+        subtitle="Thống kê doanh thu từ sự kiện"
+        queryKeys={[KEY.bookings, KEY.payments]}
+      />
 
       <Suspense key={JSON.stringify(params)} fallback={<SectionFallback type="cards" cards={4} />}>
         <OrganizerEarningsContent params={params} />

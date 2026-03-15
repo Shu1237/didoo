@@ -1,6 +1,7 @@
 "use client";
 
 import { SectionHeader } from "@/components/base/SectionHeader";
+import { KEY } from "@/utils/constant";
 
 export function OrganizerEventsPageHeader() {
   return (
@@ -9,6 +10,7 @@ export function OrganizerEventsPageHeader() {
       subtitle="Quản lý sự kiện của bạn"
       createHref="/organizer/events/create"
       createLabel="Tạo sự kiện"
+      refetchQueryKeys={[KEY.events]}
     />
   );
 }

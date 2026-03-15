@@ -3,7 +3,6 @@
 import { motion } from "framer-motion";
 import { EventCard } from "./EventCard";
 import { EventsEmptyState } from "./EventsEmptyState";
-import { EventsCtaBanner } from "./EventsCtaBanner";
 import { BasePagination } from "@/components/base/BasePagination";
 import {
   Select,
