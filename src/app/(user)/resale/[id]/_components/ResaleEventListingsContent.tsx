@@ -6,7 +6,6 @@ import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { 
   ChevronLeft, 
-  Ticket, 
   Calendar, 
   MapPin, 
   Search, 
@@ -318,16 +317,10 @@ export function ResaleEventListingsContent({
                   </div>
 
                   <h3 className="text-xl font-bold text-zinc-900 mb-4 line-clamp-1">
-                    {listing.description || "Khu A, hàng 12"}
+                    {listing.description || "Vé bán lại cho sự kiện"}
                   </h3>
-
+                  
                   <div className="space-y-3 mb-8 flex-1">
-                    <div className="flex items-center gap-3 text-zinc-600">
-                      <div className="w-8 h-8 rounded-lg bg-zinc-50 flex items-center justify-center">
-                        <Ticket className="h-4 w-4 text-[#FF8A3D]" />
-                      </div>
-                      <span className="text-sm font-medium">Ghế 104, 105 (liền kề)</span>
-                    </div>
                     <div className="flex items-center gap-3 text-zinc-600">
                       <div className="w-8 h-8 rounded-lg bg-zinc-50 flex items-center justify-center">
                         <Info className="h-4 w-4 text-[#FF8A3D]" />
@@ -340,18 +333,23 @@ export function ResaleEventListingsContent({
                     <div>
                       <p className="text-[10px] font-bold text-zinc-400 uppercase mb-1">Tổng cho {qty} vé</p>
                       <p className="text-2xl font-black text-zinc-900 leading-none">
-                        {Number(listing.askingPrice ?? 0).toLocaleString("vi-VN")}đ
+                        {Number(listing.askingPrice ?? 0) === 0 ? "Miễn phí" : `${Number(listing.askingPrice).toLocaleString("vi-VN")}đ`}
                       </p>
+                      {exceedsMax && (
+                        <p className="mt-2 text-xs font-medium text-amber-600">
+                          Bạn đã đạt giới hạn vé cho loại vé này
+                        </p>
+                      )}
                     </div>
                     {exceedsMax ? (
                       <Button
                         disabled
-                        className="bg-zinc-200 text-zinc-500 font-bold rounded-xl px-6 cursor-not-allowed"
+                        className="bg-zinc-200 text-zinc-500 font-bold rounded-xl px-6 cursor-not-allowed min-h-[44px] min-w-[88px]"
                       >
-                        Vượt giới hạn vé/người
+                        Mua ngay
                       </Button>
                     ) : (
-                      <Button asChild className="bg-[#FF8A3D] hover:bg-[#E67A2E] text-white font-bold rounded-xl px-6">
+                      <Button asChild className="bg-[#FF8A3D] hover:bg-[#E67A2E] text-white font-bold rounded-xl px-6 min-h-[44px] min-w-[88px]">
                         <Link href={`/resale/${eventId}/trade-booking/${listing.id}`}>
                           Mua ngay
                         </Link>

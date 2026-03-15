@@ -17,6 +17,25 @@ import type { TicketListing, TicketType } from "@/types/ticket";
 const FALLBACK_IMAGE =
   "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=800";
 
+function getTicketTypeGroups(
+  listing: TicketListing,
+  ticketTypes: TicketType[]
+): { name: string; count: number; price: number }[] {
+  const tickets = listing.ticket ?? [];
+  const ttById = new Map(ticketTypes.map((tt) => [tt.id, tt]));
+  const countByTtId = new Map<string, number>();
+  for (const t of tickets) {
+    const ttId = t.ticketTypeId;
+    if (!ttId) continue;
+    countByTtId.set(ttId, (countByTtId.get(ttId) ?? 0) + 1);
+  }
+  return Array.from(countByTtId.entries()).map(([ttId, count]) => ({
+    name: ttById.get(ttId)?.name ?? "Loại vé",
+    count,
+    price: Number(ttById.get(ttId)?.price ?? 0),
+  }));
+}
+
 function wouldExceedMaxTicketsPerUser(
   listing: TicketListing,
   ticketTypes: TicketType[],
@@ -72,6 +91,7 @@ export default function TradeBookingListingDetailPage({
       ? wouldExceedMaxTicketsPerUser(listing, ticketTypes, ownedCountByTicketType)
       : false;
   const isAvailable = isAvailableFromApi && !exceedsMax;
+  const ticketTypeGroups = listing ? getTicketTypeGroups(listing, ticketTypes) : [];
 
   if (isEventLoading || isListingLoading || isValidateLoading) return <Loading />;
 
@@ -126,7 +146,7 @@ export default function TradeBookingListingDetailPage({
                   {(event.locations?.[0]?.name || event.locations?.[0]?.address) && (
                     <span className="flex items-center gap-2">
                       <MapPin className="h-4 w-4" />
-                      {event.locations[0].name || event.locations[0].address}
+                      {event.locations[0].address ||'Liên hệ người tổ chức'}
                     </span>
                   )}
                 </div>
@@ -138,14 +158,25 @@ export default function TradeBookingListingDetailPage({
                 <Ticket className="h-5 w-5 text-primary" />
                 Thông tin vé
               </h2>
-              <p className="mt-4 text-sm text-zinc-600">
-                {listing.description || "Vé bán lại cho sự kiện. Liên hệ người bán nếu cần thêm thông tin."}
-              </p>
-              {!isAvailable && (
+              <div className="mt-4 space-y-2">
+                {ticketTypeGroups.length > 0 ? (
+                  ticketTypeGroups.map((g, i) => (
+                    <div key={i} className="flex items-center justify-between gap-4">
+                      <p className="text-sm font-medium text-zinc-700">
+                        {g.name} × {g.count}
+                      </p>
+                      <p className="text-sm font-semibold text-zinc-900 shrink-0">
+                        {g.price * g.count === 0 ? "Miễn phí" : `${(g.price * g.count).toLocaleString("vi-VN")}đ`}
+                      </p>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-sm text-zinc-500">Thông tin loại vé đang cập nhật</p>
+                )}
+              </div>
+              {!isAvailable && !exceedsMax && (
                 <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
-                  {exceedsMax
-                    ? "Mua thêm vé này sẽ vượt quá giới hạn số vé mỗi người cho loại vé này. Vui lòng chọn vé khác."
-                    : "Vé này không còn khả dụng để mua. Vui lòng chọn vé khác."}
+                  Vé này không còn khả dụng để mua. Vui lòng chọn vé khác.
                 </div>
               )}
             </div>
@@ -155,9 +186,13 @@ export default function TradeBookingListingDetailPage({
             <div className="sticky top-24 rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
               <h2 className="text-lg font-bold text-zinc-900">Chi tiết giá</h2>
               <p className="mt-4 text-3xl font-black text-primary">
-                {Number(listing.askingPrice || 0).toLocaleString("vi-VN")}đ
+                {Number(listing.askingPrice || 0) === 0 ? "Miễn phí" : `${Number(listing.askingPrice).toLocaleString("vi-VN")}đ`}
               </p>
-              <p className="mt-1 text-sm text-zinc-500">Giá bán lại từ bên bán</p>
+              {exceedsMax && (
+                <p className="mt-2 text-sm font-medium text-amber-600">
+                  Bạn đã đạt giới hạn vé cho loại vé này
+                </p>
+              )}
 
               <div className="mt-6 rounded-xl border border-primary/20 bg-primary/5 p-4 text-sm text-primary">
                 <p className="flex items-center gap-2 font-semibold">
@@ -169,18 +204,24 @@ export default function TradeBookingListingDetailPage({
                 </p>
               </div>
 
-              <Button
-                asChild
-                disabled={!isAvailable}
-                className="mt-6 h-14 w-full rounded-xl text-base font-semibold"
-              >
-                <Link href={`/resale/${id}/trade-booking/${listingId}/confirm`}>
+              {isAvailable ? (
+                <Button asChild className="mt-6 h-14 w-full rounded-xl text-base font-semibold">
+                  <Link href={`/resale/${id}/trade-booking/${listingId}/confirm`}>
+                    Mua vé ngay
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Link>
+                </Button>
+              ) : (
+                <Button
+                  disabled
+                  className="mt-6 h-14 w-full rounded-xl text-base font-semibold bg-zinc-200 text-zinc-500 cursor-not-allowed"
+                >
                   Mua vé ngay
                   <ArrowRight className="ml-2 h-5 w-5" />
-                </Link>
-              </Button>
+                </Button>
+              )}
 
-              {!isAvailable && (
+              {!isAvailable && !exceedsMax && (
                 <p className="mt-3 text-center text-sm text-zinc-500">
                   Vé đã được bán hoặc không còn khả dụng
                 </p>
