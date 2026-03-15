@@ -7,8 +7,6 @@ export function EventsPageHeader() {
     <SectionHeader
       title="Sự kiện"
       subtitle="Quản lý sự kiện hệ thống"
-      createHref="/admin/events/create"
-      createLabel="Tạo sự kiện"
     />
   );
 }

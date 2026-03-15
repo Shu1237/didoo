@@ -212,6 +212,7 @@ export function EditEventForm({ eventId }: { eventId: string }) {
         TicketMapUrl: data.TicketMapUrl,
         AgeRestriction: data.AgeRestriction,
         CategoryId: data.CategoryId,
+        OrganizerId: event?.organizer?.id ?? (event as any).organizerId,
         Locations: data.Locations,
       };
       await update.mutateAsync({ id: eventId, body: payload });
