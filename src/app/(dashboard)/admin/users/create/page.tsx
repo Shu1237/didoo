@@ -3,6 +3,7 @@ import { SectionHeader } from "@/components/base/SectionHeader";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { CreateUserForm } from "./_components/CreateUserForm";
+import { KEY } from "@/utils/constant";
 
 export default function AdminCreateUserPage() {
   return (
@@ -16,6 +17,7 @@ export default function AdminCreateUserPage() {
         <SectionHeader
           title="Tạo người dùng"
           subtitle="Thêm tài khoản người dùng mới"
+          refetchQueryKeys={[KEY.users]}
         />
       </div>
 

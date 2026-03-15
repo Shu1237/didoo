@@ -273,23 +273,29 @@ export function AdminEventDetailContent({ eventId }: { eventId: string }) {
             <h2 className="text-lg font-semibold">Loại vé</h2>
           </CardHeader>
           <CardContent>
-            <div className="rounded-2xl border border-zinc-200">
+            <div className="overflow-x-auto rounded-2xl border border-zinc-200">
               <Table>
                 <TableHeader>
                   <TableRow className="border-zinc-200 hover:bg-transparent">
                     <TableHead>Tên</TableHead>
                     <TableHead>Giá</TableHead>
+                    <TableHead>Số vé tối đa/người</TableHead>
                     <TableHead>Tổng số</TableHead>
                     <TableHead>Còn lại</TableHead>
+                    <TableHead className="hidden sm:table-cell">Mô tả</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {ticketTypes.map((tt) => (
                     <TableRow key={tt.id} className="border-zinc-100">
                       <TableCell className="font-medium">{tt.name}</TableCell>
-                      <TableCell>{formatCurrency(tt.price)}</TableCell>
+                      <TableCell>{Number(tt.price ?? 0) === 0 ? "Miễn phí" : formatCurrency(tt.price ?? 0)}</TableCell>
+                      <TableCell>{tt.maxTicketsPerUser ?? "Không giới hạn"}</TableCell>
                       <TableCell>{tt.totalQuantity}</TableCell>
                       <TableCell>{tt.availableQuantity}</TableCell>
+                      <TableCell className="max-w-[200px] truncate hidden sm:table-cell text-zinc-500">
+                        {tt.description || "—"}
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

@@ -119,12 +119,20 @@ export function AdminCreateEventForm() {
 
   const onSubmit = async (data: EventCreateBody) => {
     if (!data.OrganizerId) return;
+
+    const formatTime = (time?: string) => {
+      if (!time) return undefined;
+      return time.length === 5 ? `${time}:00` : time;
+    };
+
     try {
       const payload: EventCreateBody = {
         ...data,
         OrganizerId: data.OrganizerId,
         StartTime: data.StartTime instanceof Date ? data.StartTime : new Date(data.StartTime as string),
         EndTime: data.EndTime instanceof Date ? data.EndTime : new Date(data.EndTime as string),
+        OpenTime: formatTime(data.OpenTime),
+        ClosedTime: formatTime(data.ClosedTime),
       };
       const event = await create.mutateAsync(payload) as { id?: string };
       const eventId = event?.id;

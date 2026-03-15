@@ -1,31 +1,22 @@
 "use client";
 
-import { useMemo, useState, type SVGProps } from "react";
+import { useMemo, type SVGProps } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { 
   ChevronLeft, 
-  Ticket, 
   Calendar, 
   MapPin, 
-  Search, 
   ChevronRight,
   ShieldCheck,
   Info
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import BaseFilter, { FilterConfig } from "@/components/base/BaseFilter";
 import type { Event } from "@/types/event";
-import type { TicketListing } from "@/types/ticket";
+import type { TicketListing, TicketType } from "@/types/ticket";
 
 const FALLBACK_IMAGE =
   "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=2000&auto=format&fit=crop";
@@ -34,6 +25,8 @@ interface ResaleEventListingsContentProps {
   eventId: string;
   event: Event;
   listings: TicketListing[];
+  ticketTypes: TicketType[];
+  ownedCountByTicketType: Map<string, number>;
 }
 
 type ListingWithQuantity = TicketListing & {
@@ -41,19 +34,64 @@ type ListingWithQuantity = TicketListing & {
   totalQuantity?: number;
 };
 
+function wouldExceedMaxTicketsPerUser(
+  listing: TicketListing,
+  ticketTypes: TicketType[],
+  ownedCountByTicketType: Map<string, number>
+): boolean {
+  const tickets = listing.ticket ?? [];
+  const ttById = new Map(ticketTypes.map((tt) => [tt.id, tt]));
+
+  for (const t of tickets) {
+    const ttId = t.ticketTypeId;
+    if (!ttId) continue;
+    const tt = ttById.get(ttId);
+    const maxPerUser = tt?.maxTicketsPerUser;
+    if (maxPerUser == null || Number(maxPerUser) <= 0) continue;
+
+    const listingCountForType = tickets.filter((x) => x.ticketTypeId === ttId).length;
+    const owned = ownedCountByTicketType.get(ttId) ?? 0;
+    if (listingCountForType + owned > Number(maxPerUser)) return true;
+  }
+  return false;
+}
+
 export function ResaleEventListingsContent({
   eventId,
   event,
   listings,
+  ticketTypes,
+  ownedCountByTicketType,
 }: ResaleEventListingsContentProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const [localSearch, setLocalSearch] = useState(searchParams.get("search") ?? "");
-  const [localQuantity, setLocalQuantity] = useState(searchParams.get("quantity") ?? "all");
-  const [localMinPrice, setLocalMinPrice] = useState(searchParams.get("fromPrice") ?? "");
-  const [localMaxPrice, setLocalMaxPrice] = useState(searchParams.get("toPrice") ?? "");
+  const filters: FilterConfig[] = useMemo(
+    () => [
+      { key: "search", label: "Tìm kiếm", type: "text", placeholder: "Khu vực, hàng hoặc ghế..." },
+      {
+        key: "quantity",
+        label: "SỐ LƯỢNG",
+        type: "select",
+        options: [
+          { label: "Bất kỳ", value: "all" },
+          { label: "1 vé", value: "1" },
+          { label: "2 vé", value: "2" },
+          { label: "4 vé", value: "4" },
+        ],
+      },
+      {
+        key: "priceRange",
+        label: "Khoảng giá",
+        type: "numberRange",
+        rangeKeys: ["fromPrice", "toPrice"],
+        numberRangeVariant: "inputs",
+        rangeLabels: ["Giá thấp nhất", "Giá cao nhất"],
+      },
+    ],
+    []
+  );
 
   const pageNumber = Math.max(1, Number(searchParams.get("pageNumber") ?? 1));
   const pageSize = 9; // Grid of 3x3
@@ -84,21 +122,6 @@ export function ResaleEventListingsContent({
   const totalItems = filteredListings.length;
   const totalPages = Math.ceil(totalItems / pageSize);
   const pagedListings = filteredListings.slice((pageNumber - 1) * pageSize, pageNumber * pageSize);
-
-  const minPrice = useMemo(() => {
-    if (listings.length === 0) return 0;
-    return Math.min(...listings.map(l => Number(l.askingPrice ?? 0)));
-  }, [listings]);
-
-  const handleApplyFilters = () => {
-    const params = new URLSearchParams(searchParams.toString());
-    if (localSearch) params.set("search", localSearch); else params.delete("search");
-    if (localQuantity && localQuantity !== "all") params.set("quantity", localQuantity); else params.delete("quantity");
-    if (localMinPrice) params.set("fromPrice", localMinPrice); else params.delete("fromPrice");
-    if (localMaxPrice) params.set("toPrice", localMaxPrice); else params.delete("toPrice");
-    params.set("pageNumber", "1");
-    router.push(`${pathname}?${params.toString()}`);
-  };
 
   const handlePageChange = (p: number) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -175,74 +198,8 @@ export function ResaleEventListingsContent({
       </section>
 
       {/* Filter Bar */}
-      <section className="mx-auto max-w-7xl px-4 mb-10">
-        <div className="bg-card p-4 rounded-xl shadow-sm border border-border flex flex-col lg:flex-row items-end gap-4">
-          <div className="flex flex-col sm:flex-row flex-1 w-full gap-4">
-            <div className="flex-1 space-y-2">
-              <label className="text-sm font-medium text-foreground px-1">Tìm kiếm</label>
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
-                <Input 
-                  value={localSearch}
-                  onChange={(e) => setLocalSearch(e.target.value)}
-                  placeholder="Khu vực, hàng hoặc ghế..."
-                  className="pl-10 h-10 w-full"
-                />
-              </div>
-            </div>
-
-            <div className="w-full lg:w-48 space-y-2">
-              <label className="text-sm font-medium text-foreground px-1">SỐ LƯỢNG</label>
-              <Select value={localQuantity} onValueChange={setLocalQuantity}>
-                <SelectTrigger className="h-10">
-                  <SelectValue placeholder="1 vé" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Bất kỳ</SelectItem>
-                  <SelectItem value="1">1 vé</SelectItem>
-                  <SelectItem value="2">2 vé</SelectItem>
-                  <SelectItem value="4">4 vé</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="w-full lg:w-40 space-y-2">
-              <label className="text-sm font-medium text-foreground px-1">GIÁ THẤP NHẤT</label>
-              <div className="relative">
-                <Input 
-                  type="number"
-                  value={localMinPrice}
-                  onChange={(e) => setLocalMinPrice(e.target.value)}
-                  placeholder="0"
-                  className="h-10 w-full pr-8"
-                />
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-zinc-400">đ</span>
-              </div>
-            </div>
-
-            <div className="w-full lg:w-40 space-y-2">
-              <label className="text-sm font-medium text-foreground px-1">GIÁ CAO NHẤT</label>
-              <div className="relative">
-                <Input 
-                  type="number"
-                  value={localMaxPrice}
-                  onChange={(e) => setLocalMaxPrice(e.target.value)}
-                  placeholder="20.000"
-                  className="h-10 w-full pr-8"
-                />
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-zinc-400">đ</span>
-              </div>
-            </div>
-          </div>
-
-          <Button 
-            onClick={handleApplyFilters}
-            variant="secondary"
-            className="w-full lg:w-32 h-10"
-          >
-            Lọc
-          </Button>
-        </div>
+      <section className="mx-auto max-w-7xl px-4 mt-6 mb-10">
+        <BaseFilter filters={filters} />
       </section>
 
       {/* Listings Section */}
@@ -275,6 +232,7 @@ export function ResaleEventListingsContent({
               const lq = listing as ListingWithQuantity;
               const qty = Number(listing.ticket?.length ?? lq.quantity ?? lq.totalQuantity ?? 1);
               const isVerified = true; // Mock constant based on design
+              const exceedsMax = wouldExceedMaxTicketsPerUser(listing, ticketTypes, ownedCountByTicketType);
 
               return (
                 <div key={listing.id} className="bg-white rounded-3xl border border-zinc-100 p-6 flex flex-col h-full shadow-sm hover:shadow-md transition-shadow">
@@ -291,16 +249,10 @@ export function ResaleEventListingsContent({
                   </div>
 
                   <h3 className="text-xl font-bold text-zinc-900 mb-4 line-clamp-1">
-                    {listing.description || "Khu A, hàng 12"}
+                    {listing.description || "Vé bán lại cho sự kiện"}
                   </h3>
-
+                  
                   <div className="space-y-3 mb-8 flex-1">
-                    <div className="flex items-center gap-3 text-zinc-600">
-                      <div className="w-8 h-8 rounded-lg bg-zinc-50 flex items-center justify-center">
-                        <Ticket className="h-4 w-4 text-[#FF8A3D]" />
-                      </div>
-                      <span className="text-sm font-medium">Ghế 104, 105 (liền kề)</span>
-                    </div>
                     <div className="flex items-center gap-3 text-zinc-600">
                       <div className="w-8 h-8 rounded-lg bg-zinc-50 flex items-center justify-center">
                         <Info className="h-4 w-4 text-[#FF8A3D]" />
@@ -313,14 +265,28 @@ export function ResaleEventListingsContent({
                     <div>
                       <p className="text-[10px] font-bold text-zinc-400 uppercase mb-1">Tổng cho {qty} vé</p>
                       <p className="text-2xl font-black text-zinc-900 leading-none">
-                        {Number(listing.askingPrice ?? 0).toLocaleString("vi-VN")}đ
+                        {Number(listing.askingPrice ?? 0) === 0 ? "Miễn phí" : `${Number(listing.askingPrice).toLocaleString("vi-VN")}đ`}
                       </p>
+                      {exceedsMax && (
+                        <p className="mt-2 text-xs font-medium text-amber-600">
+                          Bạn đã đạt giới hạn vé cho loại vé này
+                        </p>
+                      )}
                     </div>
-                    <Button asChild className="bg-[#FF8A3D] hover:bg-[#E67A2E] text-white font-bold rounded-xl px-6">
-                      <Link href={`/resale/${eventId}/trade-booking/${listing.id}`}>
+                    {exceedsMax ? (
+                      <Button
+                        disabled
+                        className="bg-zinc-200 text-zinc-500 font-bold rounded-xl px-6 cursor-not-allowed min-h-[44px] min-w-[88px]"
+                      >
                         Mua ngay
-                      </Link>
-                    </Button>
+                      </Button>
+                    ) : (
+                      <Button asChild className="bg-[#FF8A3D] hover:bg-[#E67A2E] text-white font-bold rounded-xl px-6 min-h-[44px] min-w-[88px]">
+                        <Link href={`/resale/${eventId}/trade-booking/${listing.id}`}>
+                          Mua ngay
+                        </Link>
+                      </Button>
+                    )}
                   </div>
                 </div>
               );

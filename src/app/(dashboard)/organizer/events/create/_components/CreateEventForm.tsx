@@ -11,6 +11,8 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { DatePicker } from "@/components/ui/date-picker";
+import { TimePicker } from "@/components/ui/time-picker";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
@@ -169,49 +171,10 @@ export function CreateEventForm() {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-      {/* Top row: Banner (3), Thumbnail (7) */}
+      {/* Top row: Thumbnail (trái), Banner (phải) - giữ nguyên format design */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-[3fr_7fr]">
         <div className="space-y-2">
-          <Label>Banner</Label>
-          <div
-            onClick={() => !isUploading && bannerInputRef.current?.click()}
-            className={`relative flex h-[200px] w-full cursor-pointer items-center justify-center overflow-hidden rounded-xl border-2 border-dashed border-zinc-200 bg-zinc-50 transition-colors ${
-              isUploading ? "cursor-not-allowed opacity-70" : "hover:border-zinc-300 hover:bg-zinc-100"
-            }`}
-          >
-            <input
-              ref={bannerInputRef}
-              type="file"
-              accept="image/*"
-              className="hidden"
-              disabled={isUploading}
-              onChange={(e) => {
-                const f = e.target.files?.[0];
-                if (f) handleFileUpload(f, "banner");
-                e.target.value = "";
-              }}
-            />
-            {uploadingType === "banner" && (
-              <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/80">
-                <Loader2 className="h-10 w-10 animate-spin text-zinc-600" />
-              </div>
-            )}
-            {bannerPreview ? (
-              <img
-                src={bannerPreview}
-                alt="Banner preview"
-                className="h-full w-full object-cover"
-              />
-            ) : (
-              <div className="flex flex-col items-center gap-2 text-zinc-500">
-                <ImagePlus className="h-10 w-10" />
-                <span className="text-sm">Tải lên banner</span>
-              </div>
-            )}
-          </div>
-        </div>
-        <div className="space-y-2">
-          <Label>Thumbnail</Label>
+          <Label>Ảnh đại diện</Label>
           <div
             onClick={() => !isUploading && thumbnailInputRef.current?.click()}
             className={`relative flex h-[200px] w-full cursor-pointer items-center justify-center overflow-hidden rounded-xl border-2 border-dashed border-zinc-200 bg-zinc-50 transition-colors ${
@@ -220,6 +183,7 @@ export function CreateEventForm() {
           >
             <input
               ref={thumbnailInputRef}
+              name="thumbnail"
               type="file"
               accept="image/*"
               className="hidden"
@@ -238,13 +202,53 @@ export function CreateEventForm() {
             {thumbnailPreview ? (
               <img
                 src={thumbnailPreview}
-                alt="Thumbnail preview"
+                alt="Ảnh đại diện"
                 className="h-full w-full object-cover"
               />
             ) : (
               <div className="flex flex-col items-center gap-2 text-zinc-500">
                 <ImagePlus className="h-10 w-10" />
-                <span className="text-sm">Tải lên thumbnail</span>
+                <span className="text-sm">Tải lên ảnh đại diện</span>
+              </div>
+            )}
+          </div>
+        </div>
+        <div className="space-y-2">
+          <Label>Ảnh bìa</Label>
+          <div
+            onClick={() => !isUploading && bannerInputRef.current?.click()}
+            className={`relative flex h-[200px] w-full cursor-pointer items-center justify-center overflow-hidden rounded-xl border-2 border-dashed border-zinc-200 bg-zinc-50 transition-colors ${
+              isUploading ? "cursor-not-allowed opacity-70" : "hover:border-zinc-300 hover:bg-zinc-100"
+            }`}
+          >
+            <input
+              ref={bannerInputRef}
+              name="banner"
+              type="file"
+              accept="image/*"
+              className="hidden"
+              disabled={isUploading}
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                if (f) handleFileUpload(f, "banner");
+                e.target.value = "";
+              }}
+            />
+            {uploadingType === "banner" && (
+              <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/80">
+                <Loader2 className="h-10 w-10 animate-spin text-zinc-600" />
+              </div>
+            )}
+            {bannerPreview ? (
+              <img
+                src={bannerPreview}
+                alt="Ảnh bìa"
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <div className="flex flex-col items-center gap-2 text-zinc-500">
+                <ImagePlus className="h-10 w-10" />
+                <span className="text-sm">Tải lên ảnh bìa</span>
               </div>
             )}
           </div>
@@ -322,24 +326,32 @@ export function CreateEventForm() {
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="StartTime">Thời gian bắt đầu *</Label>
-              <Input
+              <Label htmlFor="StartTime">Ngày bắt đầu *</Label>
+              <DatePicker
                 id="StartTime"
-                type="datetime-local"
-                {...register("StartTime")}
-                className={errors.StartTime ? "border-destructive" : ""}
+                value={((): Date | undefined => {
+                  const v = watch("StartTime");
+                  return v instanceof Date ? v : undefined;
+                })()}
+                onChange={(d) => setValue("StartTime", d as Date)}
+                placeholder="Chọn ngày bắt đầu"
+                error={!!errors.StartTime}
               />
               {errors.StartTime && (
                 <p className="text-sm text-destructive">{String(errors.StartTime.message ?? "")}</p>
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="EndTime">Thời gian kết thúc *</Label>
-              <Input
+              <Label htmlFor="EndTime">Ngày kết thúc *</Label>
+              <DatePicker
                 id="EndTime"
-                type="datetime-local"
-                {...register("EndTime")}
-                className={errors.EndTime ? "border-destructive" : ""}
+                value={((): Date | undefined => {
+                  const v = watch("EndTime");
+                  return v instanceof Date ? v : undefined;
+                })()}
+                onChange={(d) => setValue("EndTime", d as Date)}
+                placeholder="Chọn ngày kết thúc"
+                error={!!errors.EndTime}
               />
               {errors.EndTime && (
                 <p className="text-sm text-destructive">{String(errors.EndTime.message ?? "")}</p>
@@ -349,21 +361,21 @@ export function CreateEventForm() {
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="OpenTime">Giờ mở cửa </Label>
-              <Input
+              <Label htmlFor="OpenTime">Giờ mở cửa</Label>
+              <TimePicker
                 id="OpenTime"
-                type="time"
+                value={watch("OpenTime") || ""}
+                onChange={(v) => setValue("OpenTime", v)}
                 placeholder="HH:mm"
-                {...register("OpenTime")}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="ClosedTime">Giờ đóng cửa </Label>
-              <Input
+              <Label htmlFor="ClosedTime">Giờ đóng cửa</Label>
+              <TimePicker
                 id="ClosedTime"
-                type="time"
+                value={watch("ClosedTime") || ""}
+                onChange={(v) => setValue("ClosedTime", v)}
                 placeholder="HH:mm"
-                {...register("ClosedTime")}
               />
             </div>
           </div>

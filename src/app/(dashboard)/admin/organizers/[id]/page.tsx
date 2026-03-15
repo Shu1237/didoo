@@ -1,9 +1,8 @@
 import { Suspense } from "react";
 import { SectionFallback } from "@/components/base/SectionFallback";
+import { DetailPageHeader } from "@/components/base/DetailPageHeader";
 import { OrganizerDetailContent } from "./_components/OrganizerDetailContent";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { KEY } from "@/utils/constant";
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -14,19 +13,12 @@ export default async function AdminOrganizerDetailPage({ params }: PageProps) {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" asChild>
-          <Link href="/admin/organizers">
-            <ArrowLeft className="h-4 w-4" />
-          </Link>
-        </Button>
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 lg:text-3xl">
-            Chi tiết organizer
-          </h1>
-          <p className="mt-1 text-sm text-zinc-500">Thông tin nhà tổ chức</p>
-        </div>
-      </div>
+      <DetailPageHeader
+        title="Chi tiết organizer"
+        subtitle="Thông tin nhà tổ chức"
+        backHref="/admin/organizers"
+        queryKeys={[KEY.organizers]}
+      />
 
       <Suspense fallback={<SectionFallback type="cards" cards={2} />}>
         <OrganizerDetailContent id={id} />

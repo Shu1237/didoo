@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Event } from "@/types/event";
 import { getDistanceKm } from "@/utils/helper";
 import { useLocationContext } from "@/contexts/locationContext";
-import envconfig from "../../../../../../config";
+import envconfig from "../../../../../config";
 
 interface EventLocationProps {
   event: Event;

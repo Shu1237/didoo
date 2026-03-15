@@ -17,7 +17,8 @@ export function useProfileWithOrganizer() {
   const { data: orgRes, isLoading: isOrgLoading } = useGetOrganizer(organizerId ?? "");
 
   const organizer = orgRes?.data ?? null;
-  const isVerifiedOrganizer = organizer?.status === OrganizerStatus.VERIFIED;
+  const statusNum = organizer?.status != null ? Number(organizer.status) : null;
+  const isVerifiedOrganizer = statusNum === OrganizerStatus.VERIFIED;
   const isLoading = isProfileLoading || (!!organizerId && isOrgLoading);
 
   return {

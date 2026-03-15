@@ -13,7 +13,14 @@ import {
 } from "@/components/ui/table";
 import { BasePagination } from "@/components/base/BasePagination";
 import { Badge } from "@/components/ui/badge";
-import { BookingStatus } from "@/utils/enum";
+import { BookingStatus, BookingTypeStatus } from "@/utils/enum";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 function toQuery(params: Record<string, string | string[] | undefined>) {
   const q: Record<string, string | number | boolean> = {};
@@ -22,7 +29,12 @@ function toQuery(params: Record<string, string | string[] | undefined>) {
   q.pageNumber = pageNumber;
   q.pageSize = pageSize;
   q.status = params.status && params.status !== "" ? Number(params.status) : BookingStatus.PAID;
-  if (params.isDescending !== undefined) q.isDescending = params.isDescending === "true";
+  if (params.bookingType && params.bookingType !== "all") q.bookingType = Number(params.bookingType);
+  if (params.isDescending !== undefined) {
+    q.isDescending = params.isDescending === "true";
+  } else {
+    q.isDescending = true;
+  }
   return q;
 }
 
@@ -100,8 +112,59 @@ export function RevenueContent({ params }: { params: Record<string, string | str
       </div>
 
       <Card className="border-zinc-200">
-        <CardHeader>
+        <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="text-lg font-semibold text-zinc-900">Giao dịch gần đây</h2>
+          <div className="flex flex-wrap items-center gap-2">
+            <Select
+              value={searchParams.get("status") || String(BookingStatus.PAID)}
+              onValueChange={(v) => updateParam("status", v)}
+            >
+              <SelectTrigger className="w-[160px]">
+                <SelectValue placeholder="Trạng thái" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={String(BookingStatus.PENDING)}>Chờ thanh toán</SelectItem>
+                <SelectItem value={String(BookingStatus.PAID)}>Đã thanh toán</SelectItem>
+                <SelectItem value={String(BookingStatus.CANCELLED)}>Đã hủy</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Select
+              value={searchParams.get("bookingType") || "all"}
+              onValueChange={(v) => {
+                if (v === "all") {
+                  const p = new URLSearchParams(searchParams.toString());
+                  p.delete("bookingType");
+                  p.set("pageNumber", "1");
+                  router.push(`${pathname}?${p.toString()}`);
+                } else {
+                  updateParam("bookingType", v);
+                }
+              }}
+            >
+              <SelectTrigger className="w-[160px]">
+                <SelectValue placeholder="Loại đơn" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Tất cả loại đơn</SelectItem>
+                <SelectItem value={String(BookingTypeStatus.NORMAL)}>Mua vé thường</SelectItem>
+                <SelectItem value={String(BookingTypeStatus.TRADE_PURCHASE)}>Mua vé Resale</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Select
+              value={searchParams.get("isDescending") !== "false" ? "true" : "false"}
+              onValueChange={(v) => updateParam("isDescending", v)}
+            >
+              <SelectTrigger className="w-[160px]">
+                <SelectValue placeholder="Sắp xếp" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="true">Mới nhất</SelectItem>
+                <SelectItem value="false">Cũ nhất</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </CardHeader>
         <CardContent>
           <div className="rounded-2xl border border-zinc-200 overflow-hidden">

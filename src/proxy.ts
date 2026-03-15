@@ -1,9 +1,8 @@
-
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { Roles} from '@/utils/enum';
 import { cookies } from 'next/headers'
-import { JWTUserType, Role } from '@/types/auth';
+import { JWTUserType } from '@/types/auth';
 import { decodeJWT } from '@/lib/utils';
 
 // Define public routes that don't require authentication
@@ -30,8 +29,7 @@ export async function proxy(request: NextRequest) {
     const cookieStore = await cookies()
     const accessToken = cookieStore.get('accessToken')?.value;
     const refreshToken = cookieStore.get('refreshToken')?.value;
-    console.log('accessToken', accessToken);
-    console.log('refreshToken', refreshToken);
+
 
     const isPublic =
         publicPaths.some(path => pathname.startsWith(path)) ||
@@ -76,9 +74,16 @@ export async function proxy(request: NextRequest) {
                 const userRole = user.Role as Roles;
 
                 if (!allowedRoles.includes(userRole)) {
-                    // Unauthorized Access
-                    // You might want to redirect to            // Invalid token -> redirect to login
-                    return NextResponse.redirect(new URL('/login', request.url)); // Ensure /unauthorized exists or use a generic error page
+                    return NextResponse.redirect(new URL('/login', request.url));
+                }
+
+                    // /organizer: USER phải có IsOrganizer = true mới được phép truy cập
+                    if (matchedPath === '/organizer' && userRole === Roles.USER) {
+                        const raw = user?.IsOrganizer ??  '';
+                        const isOrganizer = String(raw).toLowerCase() === 'true' ;
+                        if (!isOrganizer) {
+                            return NextResponse.redirect(new URL('/home', request.url));
+                        }
                 }
             }
 
@@ -93,9 +98,8 @@ export async function proxy(request: NextRequest) {
     }
 
     // Case 3: No Access Token (or stripped above), but has Refresh Token.
-    // Allow request to proceed. 
-    // Layout will receive [null, refreshToken].
-    // AuthContext will trigger Case 3 logic to fetch new access token.
+    // Cho phép request đi qua - AuthContext sẽ refresh token. Sau khi refresh, token mới (có IsOrganizer)
+    // sẽ được set vào cookie. User có thể cần reload hoặc navigate lại nếu đang cố vào /organizer.
     return NextResponse.next();
 }
 

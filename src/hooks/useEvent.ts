@@ -130,10 +130,13 @@ export const useOrganizer = () => {
     const queryClient = useQueryClient();
     const create = useMutation({
         mutationFn: async (body: OrganizerCreateBody) => (await organizerRequest.create(body)).data,
-        onSuccess: () => {
+        onSuccess: async () => {
             toast.success("Organizer created successfully");
-            queryClient.invalidateQueries({ queryKey: KEY.organizers });
-            queryClient.invalidateQueries({ queryKey: KEY.users });
+            // Thứ tự: user detail trước (có organizerId), rồi mới organizer detail
+            await queryClient.invalidateQueries({ queryKey: KEY.users });
+            await queryClient.refetchQueries({ queryKey: KEY.users });
+            await queryClient.invalidateQueries({ queryKey: KEY.organizers });
+            await queryClient.refetchQueries({ queryKey: KEY.organizers });
         },
     });
     const update = useMutation({

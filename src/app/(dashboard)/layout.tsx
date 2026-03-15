@@ -12,9 +12,12 @@ export default async function DashboardLayout({
 }) {
   const cookieStore = await cookies();
   const accessToken = cookieStore.get("accessToken")?.value;
+  const refreshToken = cookieStore.get("refreshToken")?.value;
 
+  // Có refreshToken nhưng chưa có accessToken → AuthContext sẽ refresh, cho phép render
   if (!accessToken) {
-    redirect("/login");
+    if (!refreshToken) redirect("/login");
+    return <DashboardShell userRole={Roles.USER}>{children}</DashboardShell>;
   }
 
   let userRole: string;

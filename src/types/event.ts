@@ -2,6 +2,12 @@ import { CategoryStatus, EventStatus, InteractionType, OrganizerStatus } from "@
 import { BasePaginationQuery } from "./base";
 import { TicketType } from "./ticket";
 
+/** Khoảng thời gian sự kiện - gộp startTime và endTime */
+export interface EventDateRange {
+    startTime?: string;
+    endTime?: string;
+}
+
 /** Match BE EventGetListQuery */
 export interface EventGetListQuery extends BasePaginationQuery {
     name?: string;
@@ -9,6 +15,7 @@ export interface EventGetListQuery extends BasePaginationQuery {
     subtitle?: string;
     description?: string;
     tags?: string;
+    /** Gộp: ngày bắt đầu và kết thúc */
     startTime?: string;
     endTime?: string;
     openTime?: string;
@@ -17,6 +24,9 @@ export interface EventGetListQuery extends BasePaginationQuery {
     categoryId?: string;
     organizerId?: string;
     ageRestriction?: number;
+    /** Resale: filter theo khoảng giá (nếu BE hỗ trợ) */
+    fromPrice?: number;
+    toPrice?: number;
     hasCategory?: boolean;
     hasOrganizer?: boolean;
     hasLocations?: boolean;

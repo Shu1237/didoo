@@ -1,14 +1,17 @@
 import { Suspense } from "react";
 import { SectionFallback } from "@/components/base/SectionFallback";
+import { PageHeaderWithRefetch } from "@/components/base/PageHeaderWithRefetch";
 import { AdminProfileContent } from "./_components/AdminProfileContent";
+import { KEY } from "@/utils/constant";
 
 export default function AdminProfilePage() {
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 lg:text-3xl">Hồ sơ</h1>
-        <p className="mt-1 text-sm text-zinc-500">Thông tin tài khoản admin</p>
-      </div>
+      <PageHeaderWithRefetch
+        title="Hồ sơ"
+        subtitle="Thông tin tài khoản admin"
+        queryKeys={[KEY.users]}
+      />
 
       <Suspense fallback={<SectionFallback type="cards" cards={2} />}>
         <AdminProfileContent />

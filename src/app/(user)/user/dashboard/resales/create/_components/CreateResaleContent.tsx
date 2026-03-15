@@ -18,22 +18,27 @@ export interface TicketForResale {
   id: string;
   status?: string | number;
   event?: { id?: string };
-  ticketType?: { name?: string; price?: number };
+  ticketType?: { id?: string; name?: string; price?: number };
+  ticketTypeId?: string;
 }
+
+type TicketGroupFree = { ticketTypeId: string; name: string; tickets: TicketForResale[] };
+type TicketGroupPaid = { ticketTypeId: string; name: string; price: number; tickets: TicketForResale[] };
 
 interface CreateResaleContentProps {
   currentEvents: Event[];
   ownedCountByEvent: Map<string, number>;
   selectedEventId: string;
-  ticketsOfSelectedEvent: TicketForResale[];
+  ticketsByTypeInEvent: { free: TicketGroupFree[]; paid: TicketGroupPaid[] };
   selectedTicketIds: string[];
+  selectedTicketsMeta: { sameType: boolean; isFree: boolean; ticketTypeName: string };
   formValues: { askingPrice: number; description: string };
   formErrors: { ticketIds?: { message?: string }; askingPrice?: { message?: string } };
   hasOwnedTicketsForSelectedEvent: boolean;
   isPending: boolean;
   onSelectEvent: (eventId: string) => void;
   onToggleTicket: (ticketId: string) => void;
-  onChooseMany: () => void;
+  onChooseMany: (ticketTypeId: string) => void;
   onClearAll: () => void;
   onFormChange: (field: "askingPrice" | "description", value: number | string) => void;
   onSubmit: () => void;
@@ -43,8 +48,9 @@ export function CreateResaleContent({
   currentEvents,
   ownedCountByEvent,
   selectedEventId,
-  ticketsOfSelectedEvent,
+  ticketsByTypeInEvent,
   selectedTicketIds,
+  selectedTicketsMeta,
   formValues,
   formErrors,
   hasOwnedTicketsForSelectedEvent,
@@ -61,7 +67,9 @@ export function CreateResaleContent({
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-zinc-900">Đăng vé bán lại</h1>
-          <p className="mt-1 text-zinc-600">Vui lòng chọn vé bạn muốn bán lại và nhập giá bán mong muốn.</p>
+          <p className="mt-1 text-zinc-600">
+            Chọn vé cùng loại để đăng bán. Vé trả phí cần nhập giá; vé miễn phí không cần.
+          </p>
         </div>
         <Button variant="outline" asChild>
           <Link href="/user/dashboard/resales">
@@ -126,8 +134,22 @@ export function CreateResaleContent({
       </Card>
 
       <Card className="border-zinc-200">
-        <CardHeader>
-          <h2 className="text-xl font-semibold text-zinc-900">Vé của tôi</h2>
+        <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <h2 className="text-xl font-semibold text-zinc-900">Vé của tôi</h2>
+            <p className="mt-1 text-sm text-zinc-500">Chỉ được chọn vé cùng loại trong một đơn bán lại.</p>
+          </div>
+          {hasOwnedTicketsForSelectedEvent && selectedTicketIds.length > 0 && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="shrink-0 border-zinc-300 text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900"
+              onClick={onClearAll}
+            >
+              Xóa tất cả ({selectedTicketIds.length})
+            </Button>
+          )}
         </CardHeader>
         <CardContent className="space-y-4">
           {!selectedEventId ? (
@@ -138,46 +160,110 @@ export function CreateResaleContent({
             </p>
           ) : (
             <>
-              <div className="flex flex-wrap gap-2">
-                <Button type="button" variant="outline" size="sm" onClick={onChooseMany}>
-                  Chọn nhiều
-                </Button>
-                <Button type="button" variant="outline" size="sm" onClick={onClearAll}>
-                  Xóa tất cả
-                </Button>
-              </div>
+              {ticketsByTypeInEvent.free.length > 0 && (
+                <div className="space-y-3">
+                  <h3 className="text-sm font-semibold text-zinc-700">Vé miễn phí</h3>
+                  {ticketsByTypeInEvent.free.map((group) => (
+                    <div key={group.ticketTypeId} className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-medium text-zinc-600">
+                          {group.name} ({group.tickets.length} vé)
+                        </span>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 text-xs"
+                          onClick={() => onChooseMany(group.ticketTypeId)}
+                        >
+                          Chọn tất cả
+                        </Button>
+                      </div>
+                      <div className="space-y-2">
+                        {group.tickets.map((ticket) => {
+                          const checked = selectedTicketIds.includes(ticket.id);
+                          const shortId = `#TKT-${ticket.id.replace(/-/g, "").slice(-6)}`;
+                          return (
+                            <label
+                              key={ticket.id}
+                              className={`flex cursor-pointer items-center gap-4 rounded-xl border p-3 transition-all hover:shadow-sm ${checked ? "border-primary bg-primary/5" : "border-zinc-200 bg-white hover:border-zinc-300"}`}
+                            >
+                              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-emerald-500 text-white">
+                                <TicketIcon className="h-5 w-5" />
+                              </div>
+                              <div className="min-w-0 flex-1 space-y-1">
+                                <p className="text-sm font-medium text-zinc-900">ID: {shortId}</p>
+                                <p className="text-xs text-zinc-600">Hạng vé: {group.name}</p>
+                                <Badge className="bg-emerald-500/90 text-[10px] font-medium text-white">
+                                  MIỄN PHÍ
+                                </Badge>
+                              </div>
+                              <Checkbox checked={checked} onCheckedChange={() => onToggleTicket(ticket.id)} />
+                            </label>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
 
-              <div className="space-y-3">
-                {ticketsOfSelectedEvent.map((ticket) => {
-                  const checked = selectedTicketIds.includes(ticket.id);
-                  const shortId = `#TKT-${ticket.id.replace(/-/g, "").slice(-6)}`;
-                  return (
-                    <label
-                      key={ticket.id}
-                      className={`flex cursor-pointer items-center gap-4 rounded-xl border p-3 transition-all hover:shadow-sm ${checked ? "border-primary bg-primary/5" : "border-zinc-200 bg-white hover:border-zinc-300"}`}
-                    >
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary text-white">
-                        <TicketIcon className="h-5 w-5" />
+              {ticketsByTypeInEvent.paid.length > 0 && (
+                <div className="space-y-3">
+                  <h3 className="text-sm font-semibold text-zinc-700">Vé trả phí</h3>
+                  {ticketsByTypeInEvent.paid.map((group) => (
+                    <div key={group.ticketTypeId} className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-medium text-zinc-600">
+                          {group.name} · {group.price.toLocaleString("vi-VN")}đ ({group.tickets.length} vé)
+                        </span>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 text-xs"
+                          onClick={() => onChooseMany(group.ticketTypeId)}
+                        >
+                          Chọn tất cả
+                        </Button>
                       </div>
-                      <div className="min-w-0 flex-1 space-y-1">
-                        <p className="text-sm font-medium text-zinc-900">ID: {shortId}</p>
-                        <p className="text-xs text-zinc-600">Hạng vé: {ticket.ticketType?.name || "N/A"}</p>
-                        <div className="flex flex-wrap items-center gap-2">
-                          <Badge className="bg-emerald-500/90 text-[10px] font-medium text-white">
-                            CÓ SẴN
-                          </Badge>
-                          <span className="text-xs text-zinc-600">
-                            Giá gốc: {Number(ticket.ticketType?.price || 0).toLocaleString("vi-VN")}đ
-                          </span>
-                        </div>
+                      <div className="space-y-2">
+                        {group.tickets.map((ticket) => {
+                          const checked = selectedTicketIds.includes(ticket.id);
+                          const shortId = `#TKT-${ticket.id.replace(/-/g, "").slice(-6)}`;
+                          return (
+                            <label
+                              key={ticket.id}
+                              className={`flex cursor-pointer items-center gap-4 rounded-xl border p-3 transition-all hover:shadow-sm ${checked ? "border-primary bg-primary/5" : "border-zinc-200 bg-white hover:border-zinc-300"}`}
+                            >
+                              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary text-white">
+                                <TicketIcon className="h-5 w-5" />
+                              </div>
+                              <div className="min-w-0 flex-1 space-y-1">
+                                <p className="text-sm font-medium text-zinc-900">ID: {shortId}</p>
+                                <p className="text-xs text-zinc-600">Hạng vé: {group.name}</p>
+                                <div className="flex flex-wrap items-center gap-2">
+                                  <Badge className="bg-emerald-500/90 text-[10px] font-medium text-white">
+                                    CÓ SẴN
+                                  </Badge>
+                                  <span className="text-xs text-zinc-600">
+                                    Giá gốc: {group.price.toLocaleString("vi-VN")}đ
+                                  </span>
+                                </div>
+                              </div>
+                              <Checkbox checked={checked} onCheckedChange={() => onToggleTicket(ticket.id)} />
+                            </label>
+                          );
+                        })}
                       </div>
-                      <div className="shrink-0">
-                        <Checkbox checked={checked} onCheckedChange={() => onToggleTicket(ticket.id)} />
-                      </div>
-                    </label>
-                  );
-                })}
-              </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {!selectedTicketsMeta.sameType && selectedTicketIds.length > 1 && (
+                <p className="text-sm text-amber-600">Vé phải cùng loại. Vui lòng bỏ chọn vé khác loại.</p>
+              )}
             </>
           )}
 
@@ -192,20 +278,22 @@ export function CreateResaleContent({
           <h2 className="text-xl font-semibold text-zinc-900">Thông tin bán lại</h2>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-zinc-700">Giá bán mong muốn (VNĐ)</label>
-            <Input
-              type="number"
-              min={0}
-              value={formValues.askingPrice ?? 0}
-              onChange={(e) =>
-                onFormChange("askingPrice", Number(e.target.value || 0))
-              }
-            />
-            {formErrors.askingPrice?.message ? (
-              <p className="text-sm text-rose-600">{String(formErrors.askingPrice.message)}</p>
-            ) : null}
-          </div>
+          {!selectedTicketsMeta.isFree && selectedTicketIds.length > 0 && (
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-zinc-700">Giá bán mong muốn (VNĐ)</label>
+              <Input
+                type="number"
+                min={0}
+                value={formValues.askingPrice ?? 0}
+                onChange={(e) =>
+                  onFormChange("askingPrice", Number(e.target.value || 0))
+                }
+              />
+              {formErrors.askingPrice?.message ? (
+                <p className="text-sm text-rose-600">{String(formErrors.askingPrice.message)}</p>
+              ) : null}
+            </div>
+          )}
 
           <div className="space-y-2">
             <label className="text-sm font-medium text-zinc-700">Mô tả (tuỳ chọn)</label>
@@ -225,7 +313,8 @@ export function CreateResaleContent({
                 isPending ||
                 !selectedEventId ||
                 !hasOwnedTicketsForSelectedEvent ||
-                selectedTicketIds.length === 0
+                selectedTicketIds.length === 0 ||
+                !selectedTicketsMeta.sameType
               }
             >
               {isPending ? (

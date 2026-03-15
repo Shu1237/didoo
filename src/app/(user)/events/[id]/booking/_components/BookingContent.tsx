@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef } from "react";
 import Link from "next/link";
 import { ArrowUpRight, ChevronLeft, HelpCircle, Minus, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -20,6 +21,7 @@ interface BookingContentProps {
   realtimeAvailability: Record<string, number>;
   maxPerUser: (tt: TicketType) => number | null;
   maxAllowed: (tt: TicketType) => number;
+  ownedCountByTicketType: Map<string, number>;
   onQuantityChange: (tt: TicketType, delta: number) => void;
   onGoToConfirm: () => void;
 }
@@ -33,6 +35,7 @@ export function BookingContent({
   realtimeAvailability,
   maxPerUser,
   maxAllowed,
+  ownedCountByTicketType,
   onQuantityChange,
   onGoToConfirm,
 }: BookingContentProps) {
@@ -41,16 +44,27 @@ export function BookingContent({
     soldOut,
     isSelected,
     limit,
+    ownedCount,
   }: {
     tt: TicketType;
     soldOut: boolean;
     isSelected: boolean;
     limit: number;
+    ownedCount: number;
   }) => {
+    const lastClickRef = useRef(0);
+
+    const handleQuantityClick = (delta: number) => {
+      const now = Date.now();
+      if (now - lastClickRef.current < 300) return;
+      lastClickRef.current = now;
+      onQuantityChange(tt, delta);
+    };
     const total = tt.totalQuantity ?? 0;
     const avail = realtimeAvailability[tt.id] ?? Math.max(0, Number(tt.availableQuantity ?? 0));
     const sold = total - avail;
     const cap = maxPerUser(tt);
+    const limitReached = cap != null && ownedCount >= cap;
 
     return (
       <div
@@ -79,6 +93,14 @@ export function BookingContent({
                 {cap != null && ` · Tối đa ${cap} vé/người`}
               </span>
             )}
+            {cap != null && ownedCount > 0 && (
+              <p className="mt-1 text-xs font-medium text-primary">
+                Bạn đã mua: {ownedCount}/{cap} vé
+                {limitReached && (
+                  <span className="ml-1 text-amber-600">· Đã đủ số lượng</span>
+                )}
+              </p>
+            )}
             {soldOut && (
               <span className="mt-2 inline-block text-xs font-medium text-rose-600">
                 Hết vé
@@ -95,9 +117,9 @@ export function BookingContent({
           <div className="mt-6 flex items-center gap-2">
             <button
               type="button"
-              onClick={() => onQuantityChange(tt, -1)}
+              onClick={() => handleQuantityClick(-1)}
               disabled={!isSelected || (selected?.quantity ?? 0) <= 0}
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-zinc-200 text-zinc-600 transition hover:bg-zinc-100 disabled:opacity-50"
+              className="flex h-9 w-9 min-h-[36px] min-w-[36px] items-center justify-center rounded-full border border-zinc-200 text-zinc-600 transition hover:bg-zinc-100 disabled:opacity-50"
             >
               <Minus className="h-4 w-4" />
             </button>
@@ -106,15 +128,20 @@ export function BookingContent({
             </span>
             <button
               type="button"
-              onClick={() => onQuantityChange(tt, 1)}
-              disabled={isSelected && (selected?.quantity ?? 0) >= limit}
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-zinc-200 text-zinc-600 transition hover:bg-zinc-100 disabled:opacity-50"
+              onClick={() => handleQuantityClick(1)}
+              disabled={(isSelected && (selected?.quantity ?? 0) >= limit) || limitReached}
+              className="flex h-9 w-9 min-h-[36px] min-w-[36px] items-center justify-center rounded-full border border-zinc-200 text-zinc-600 transition hover:bg-zinc-100 disabled:opacity-50"
             >
               <Plus className="h-4 w-4" />
             </button>
-            {!isSelected && (
+            {!isSelected && !limitReached && (
               <span className="ml-2 text-xs text-zinc-500">
                 Chỉ được chọn 1 loại vé
+              </span>
+            )}
+            {limitReached && (
+              <span className="ml-2 text-xs font-medium text-amber-600">
+                Đã đủ số lượng vé
               </span>
             )}
           </div>
@@ -206,6 +233,7 @@ export function BookingContent({
                   const soldOut = avail <= 0;
                   const isSelected = selected?.ticketTypeId === tt.id;
                   const limit = maxAllowed(tt);
+                  const ownedCount = ownedCountByTicketType.get(tt.id) ?? 0;
                   return (
                     <TicketCard
                       key={tt.id}
@@ -213,6 +241,7 @@ export function BookingContent({
                       soldOut={soldOut}
                       isSelected={isSelected}
                       limit={limit}
+                      ownedCount={ownedCount}
                     />
                   );
                 })}

@@ -10,6 +10,8 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { DatePicker } from "@/components/ui/date-picker";
+import { TimePicker } from "@/components/ui/time-picker";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
@@ -29,17 +31,17 @@ import { z } from "zod";
 const eventUpdateFormSchema = eventUpdateSchema.extend({
   Locations: z.array(locationSchema).min(1),
 });
+
 type EventUpdateFormValues = z.input<typeof eventUpdateFormSchema>;
 type EventLocationForm = EventUpdateFormValues["Locations"][number];
 
-function formatDateTimeLocal(s: string | undefined) {
-  if (!s) return "";
+function parseToDate(s: string | undefined): Date | undefined {
+  if (!s) return undefined;
   try {
     const d = new Date(s);
-    const pad = (n: number) => String(n).padStart(2, "0");
-    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    return isNaN(d.getTime()) ? undefined : d;
   } catch {
-    return "";
+    return undefined;
   }
 }
 
@@ -114,39 +116,39 @@ export function EditEventForm({ eventId }: { eventId: string }) {
     if (event) {
       const locations: EventLocationForm[] = event.locations?.length
         ? event.locations.map((loc) => ({
-            Address: loc.address ?? "",
-            Province: loc.province ?? "",
-            District: loc.district ?? "",
-            Ward: loc.ward ?? "",
-            Zipcode: loc.zipcode ?? "",
-            Latitude: loc.latitude ?? 0,
-            Longitude: loc.longitude ?? 0,
-            ContactEmail: loc.contactEmail ?? "",
-            ContactPhone: loc.contactPhone ?? "",
-          }))
+          Address: loc.address ?? "",
+          Province: loc.province ?? "",
+          District: loc.district ?? "",
+          Ward: loc.ward ?? "",
+          Zipcode: loc.zipcode ?? "",
+          Latitude: loc.latitude ?? 0,
+          Longitude: loc.longitude ?? 0,
+          ContactEmail: loc.contactEmail ?? "",
+          ContactPhone: loc.contactPhone ?? "",
+        }))
         : [
-            {
-              Address: "",
-              Province: "",
-              District: "",
-              Ward: "",
-              Zipcode: "",
-              Latitude: 0,
-              Longitude: 0,
-              ContactEmail: "",
-              ContactPhone: "",
-            },
-          ];
+          {
+            Address: "",
+            Province: "",
+            District: "",
+            Ward: "",
+            Zipcode: "",
+            Latitude: 0,
+            Longitude: 0,
+            ContactEmail: "",
+            ContactPhone: "",
+          },
+        ];
       reset({
         Name: event.name,
         Slug: event.slug,
         Subtitle: event.subtitle ?? "",
         Description: event.description,
         Status: Number(event.status) as EventStatus,
-        CategoryId: event.category?.id ?? (event as { categoryId?: string }).categoryId ?? "",
+        CategoryId: event.category?.id ?? (event as any).categoryId ?? "",
         AgeRestriction: event.ageRestriction ?? 0,
-        StartTime: event.startTime ? formatDateTimeLocal(event.startTime) : undefined,
-        EndTime: event.endTime ? formatDateTimeLocal(event.endTime) : undefined,
+        StartTime: parseToDate(event.startTime),
+        EndTime: parseToDate(event.endTime),
         OpenTime: formatTime(event.openTime),
         ClosedTime: formatTime(event.closedTime),
         ThumbnailUrl: event.thumbnailUrl ?? "",
@@ -180,8 +182,8 @@ export function EditEventForm({ eventId }: { eventId: string }) {
         setValue("TicketMapUrl", url);
         setTicketMapPreview(URL.createObjectURL(file));
       }
-    } catch {
-      // handleErrorApi in useMedia
+    } catch (err) {
+      console.error(err);
     } finally {
       setUploadingType(null);
     }
@@ -190,28 +192,27 @@ export function EditEventForm({ eventId }: { eventId: string }) {
   const isUploading = !!uploadingType;
 
   const onSubmit = async (data: EventUpdateFormValues) => {
-    const formatTime = (time?: string) => {
+    const formatTimeToString = (time?: string) => {
       if (!time) return undefined;
       return time.length === 5 ? `${time}:00` : time;
     };
     try {
-      // Get OrganizerId from event
-      const organizerId = event?.organizer?.id;
       const payload = {
         Name: data.Name,
         Slug: data.Slug,
         Subtitle: data.Subtitle,
         Description: data.Description,
-        StartTime: data.StartTime instanceof Date ? data.StartTime : data.StartTime ? new Date(data.StartTime as string) : undefined,
-        EndTime: data.EndTime instanceof Date ? data.EndTime : data.EndTime ? new Date(data.EndTime as string) : undefined,
-        OpenTime: formatTime(data.OpenTime),
-        ClosedTime: formatTime(data.ClosedTime),
+        Status: data.Status,
+        StartTime: data.StartTime ? new Date(data.StartTime as any).toISOString() : undefined,
+        EndTime: data.EndTime ? new Date(data.EndTime as any).toISOString() : undefined,
+        OpenTime: formatTimeToString(data.OpenTime),
+        ClosedTime: formatTimeToString(data.ClosedTime),
         ThumbnailUrl: data.ThumbnailUrl,
         BannerUrl: data.BannerUrl,
         TicketMapUrl: data.TicketMapUrl,
         AgeRestriction: data.AgeRestriction,
         CategoryId: data.CategoryId,
-        OrganizerId: organizerId,
+        OrganizerId: event?.organizer?.id ?? (event as any).organizerId,
         Locations: data.Locations,
       };
       await update.mutateAsync({ id: eventId, body: payload });
@@ -233,53 +234,18 @@ export function EditEventForm({ eventId }: { eventId: string }) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-      {/* Top row: Banner (3), Thumbnail (7) - giống Create */}
+      {/* Thumbnail (trái), Banner (phải) - giữ nguyên format design */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-[3fr_7fr]">
         <div className="space-y-2">
-          <Label>Banner</Label>
-          <div
-            onClick={() => !isUploading && bannerInputRef.current?.click()}
-            className={`relative flex h-[200px] w-full cursor-pointer items-center justify-center overflow-hidden rounded-xl border-2 border-dashed border-zinc-200 bg-zinc-50 transition-colors ${
-              isUploading ? "cursor-not-allowed opacity-70" : "hover:border-zinc-300 hover:bg-zinc-100"
-            }`}
-          >
-            <input
-              ref={bannerInputRef}
-              type="file"
-              accept="image/*"
-              className="hidden"
-              disabled={isUploading}
-              onChange={(e) => {
-                const f = e.target.files?.[0];
-                if (f) handleFileUpload(f, "banner");
-                e.target.value = "";
-              }}
-            />
-            {uploadingType === "banner" && (
-              <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/80">
-                <Loader2 className="h-10 w-10 animate-spin text-zinc-600" />
-              </div>
-            )}
-            {bannerPreview ? (
-              <img src={bannerPreview} alt="Banner" className="h-full w-full object-cover" />
-            ) : (
-              <div className="flex flex-col items-center gap-2 text-zinc-500">
-                <ImagePlus className="h-10 w-10" />
-                <span className="text-sm">Tải lên banner</span>
-              </div>
-            )}
-          </div>
-        </div>
-        <div className="space-y-2">
-          <Label>Thumbnail</Label>
+          <Label>Ảnh đại diện</Label>
           <div
             onClick={() => !isUploading && thumbnailInputRef.current?.click()}
-            className={`relative flex h-[200px] w-full cursor-pointer items-center justify-center overflow-hidden rounded-xl border-2 border-dashed border-zinc-200 bg-zinc-50 transition-colors ${
-              isUploading ? "cursor-not-allowed opacity-70" : "hover:border-zinc-300 hover:bg-zinc-100"
-            }`}
+            className={`relative flex h-[200px] w-full cursor-pointer items-center justify-center overflow-hidden rounded-xl border-2 border-dashed border-zinc-200 bg-zinc-50 transition-colors ${isUploading ? "cursor-not-allowed opacity-70" : "hover:border-zinc-300 hover:bg-zinc-100"
+              }`}
           >
             <input
               ref={thumbnailInputRef}
+              name="thumbnail"
               type="file"
               accept="image/*"
               className="hidden"
@@ -296,18 +262,53 @@ export function EditEventForm({ eventId }: { eventId: string }) {
               </div>
             )}
             {thumbnailPreview ? (
-              <img src={thumbnailPreview} alt="Thumbnail" className="h-full w-full object-cover" />
+              <img src={thumbnailPreview} alt="Ảnh đại diện" className="h-full w-full object-cover" />
             ) : (
               <div className="flex flex-col items-center gap-2 text-zinc-500">
                 <ImagePlus className="h-10 w-10" />
-                <span className="text-sm">Tải lên thumbnail</span>
+                <span className="text-sm">Tải lên ảnh đại diện</span>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label>Ảnh bìa</Label>
+          <div
+            onClick={() => !isUploading && bannerInputRef.current?.click()}
+            className={`relative flex h-[200px] w-full cursor-pointer items-center justify-center overflow-hidden rounded-xl border-2 border-dashed border-zinc-200 bg-zinc-50 transition-colors ${isUploading ? "cursor-not-allowed opacity-70" : "hover:border-zinc-300 hover:bg-zinc-100"
+              }`}
+          >
+            <input
+              ref={bannerInputRef}
+              name="banner"
+              type="file"
+              accept="image/*"
+              className="hidden"
+              disabled={isUploading}
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                if (f) handleFileUpload(f, "banner");
+                e.target.value = "";
+              }}
+            />
+            {uploadingType === "banner" && (
+              <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/80">
+                <Loader2 className="h-10 w-10 animate-spin text-zinc-600" />
+              </div>
+            )}
+            {bannerPreview ? (
+              <img src={bannerPreview} alt="Ảnh bìa" className="h-full w-full object-cover" />
+            ) : (
+              <div className="flex flex-col items-center gap-2 text-zinc-500">
+                <ImagePlus className="h-10 w-10" />
+                <span className="text-sm">Tải lên ảnh bìa</span>
               </div>
             )}
           </div>
         </div>
       </div>
 
-      {/* Thông tin cơ bản */}
       <Card className="border-zinc-200">
         <CardHeader>
           <h2 className="text-lg font-semibold text-zinc-900">Thông tin cơ bản</h2>
@@ -318,31 +319,25 @@ export function EditEventForm({ eventId }: { eventId: string }) {
               <Label htmlFor="Name">Tên sự kiện *</Label>
               <Input
                 id="Name"
-                placeholder="Ví dụ: AI Conference 2026"
                 {...register("Name")}
                 className={errors.Name ? "border-destructive" : ""}
               />
-              {errors.Name && <p className="text-sm text-destructive">{String(errors.Name.message ?? "")}</p>}
+              {errors.Name && <p className="text-sm text-destructive">{errors.Name.message}</p>}
             </div>
             <div className="space-y-2">
               <Label htmlFor="Slug">Slug *</Label>
               <Input
                 id="Slug"
-                placeholder="ai-conference-2026"
                 {...register("Slug")}
                 className={errors.Slug ? "border-destructive" : ""}
               />
-              {errors.Slug && <p className="text-sm text-destructive">{String(errors.Slug.message ?? "")}</p>}
+              {errors.Slug && <p className="text-sm text-destructive">{errors.Slug.message}</p>}
             </div>
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="Subtitle">Phụ đề</Label>
-            <Input
-              id="Subtitle"
-              placeholder="Mô tả ngắn hiển thị bên dưới tên"
-              {...register("Subtitle")}
-            />
+            <Input id="Subtitle" {...register("Subtitle")} />
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
@@ -369,62 +364,37 @@ export function EditEventForm({ eventId }: { eventId: string }) {
                   ))}
                 </SelectContent>
               </Select>
-              {errors.CategoryId && (
-                <p className="text-sm text-destructive">{String(errors.CategoryId.message ?? "")}</p>
-              )}
             </div>
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label>Trạng thái</Label>
-              <Select
-                value={watch("Status") != null ? String(watch("Status")) : undefined}
-                onValueChange={(v) => setValue("Status", Number(v) as EventStatus)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Chọn trạng thái" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={String(EventStatus.DRAFT)}>Nháp</SelectItem>
-                  <SelectItem value={String(EventStatus.PUBLISHED)}>Đã duyệt</SelectItem>
-                  <SelectItem value={String(EventStatus.CANCELLED)}>Đã hủy</SelectItem>
-                  <SelectItem value={String(EventStatus.OPENED)}>Đang mở</SelectItem>
-                  <SelectItem value={String(EventStatus.CLOSED)}>Đã đóng</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="AgeRestriction">Độ tuổi tối thiểu</Label>
-              <Input
-                id="AgeRestriction"
-                type="number"
-                min={0}
-                {...register("AgeRestriction", { valueAsNumber: true })}
-              />
-            </div>
-          </div>
-
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-2">
-              <Label htmlFor="StartTime">Thời gian bắt đầu *</Label>
-              <Input
-                id="StartTime"
-                type="datetime-local"
-                {...register("StartTime")}
-                className={errors.StartTime ? "border-destructive" : ""}
+              <Label>Ngày bắt đầu *</Label>
+              <DatePicker
+                value={((): Date | undefined => {
+                  const v = watch("StartTime");
+                  if (v instanceof Date) return v;
+                  return v ? parseToDate(String(v)) : undefined;
+                })()}
+                onChange={(d) => setValue("StartTime", d as Date)}
+                placeholder="Chọn ngày bắt đầu"
+                error={!!errors.StartTime}
               />
               {errors.StartTime && (
                 <p className="text-sm text-destructive">{String(errors.StartTime.message ?? "")}</p>
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="EndTime">Thời gian kết thúc *</Label>
-              <Input
-                id="EndTime"
-                type="datetime-local"
-                {...register("EndTime")}
-                className={errors.EndTime ? "border-destructive" : ""}
+              <Label>Ngày kết thúc *</Label>
+              <DatePicker
+                value={((): Date | undefined => {
+                  const v = watch("EndTime");
+                  if (v instanceof Date) return v;
+                  return v ? parseToDate(String(v)) : undefined;
+                })()}
+                onChange={(d) => setValue("EndTime", d as Date)}
+                placeholder="Chọn ngày kết thúc"
+                error={!!errors.EndTime}
               />
               {errors.EndTime && (
                 <p className="text-sm text-destructive">{String(errors.EndTime.message ?? "")}</p>
@@ -434,160 +404,22 @@ export function EditEventForm({ eventId }: { eventId: string }) {
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="OpenTime">Giờ mở cửa </Label>
-              <Input
-                id="OpenTime"
-                type="time"
+              <Label>Giờ mở cửa</Label>
+              <TimePicker
+                value={watch("OpenTime") || ""}
+                onChange={(v) => setValue("OpenTime", v)}
                 placeholder="HH:mm"
-                {...register("OpenTime")}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="ClosedTime">Giờ đóng cửa </Label>
-              <Input
-                id="ClosedTime"
-                type="time"
+              <Label>Giờ đóng cửa</Label>
+              <TimePicker
+                value={watch("ClosedTime") || ""}
+                onChange={(v) => setValue("ClosedTime", v)}
                 placeholder="HH:mm"
-                {...register("ClosedTime")}
               />
             </div>
           </div>
-        </CardContent>
-      </Card>
-
-      {/* Mô tả & Sơ đồ ghế */}
-      <Card className="border-zinc-200">
-        <CardHeader>
-          <h2 className="text-lg font-semibold text-zinc-900">Mô tả & Sơ đồ ghế</h2>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="Description">Mô tả *</Label>
-            <Textarea
-              id="Description"
-              placeholder="Mô tả chi tiết về sự kiện"
-              rows={6}
-              {...register("Description")}
-              className={errors.Description ? "border-destructive" : ""}
-            />
-            {errors.Description && (
-              <p className="text-sm text-destructive">{String(errors.Description.message ?? "")}</p>
-            )}
-          </div>
-
-          <div className="space-y-2">
-            <Label>Ảnh sơ đồ ghế </Label>
-            <div
-              onClick={() => !isUploading && ticketMapInputRef.current?.click()}
-              className={`relative flex aspect-video w-full max-w-lg cursor-pointer items-center justify-center overflow-hidden rounded-xl border-2 border-dashed border-zinc-200 bg-zinc-50 transition-colors ${
-                isUploading ? "cursor-not-allowed opacity-70" : "hover:border-zinc-300 hover:bg-zinc-100"
-              }`}
-            >
-              <input
-                ref={ticketMapInputRef}
-                type="file"
-                accept="image/*"
-                className="hidden"
-                disabled={isUploading}
-                onChange={(e) => {
-                  const f = e.target.files?.[0];
-                  if (f) handleFileUpload(f, "ticketMap");
-                  e.target.value = "";
-                }}
-              />
-              {uploadingType === "ticketMap" && (
-                <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/80">
-                  <Loader2 className="h-10 w-10 animate-spin text-zinc-600" />
-                </div>
-              )}
-              {ticketMapPreview ? (
-                <img
-                  src={ticketMapPreview}
-                  alt="Sơ đồ ghế"
-                  className="h-full w-full object-contain"
-                />
-              ) : (
-                <div className="flex flex-col items-center gap-2 text-zinc-500">
-                  <Upload className="h-10 w-10" />
-                  <span className="text-sm">Tải lên ảnh sơ đồ ghế</span>
-                </div>
-              )}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Địa điểm */}
-      <Card className="border-zinc-200">
-        <CardHeader>
-          <h2 className="text-lg font-semibold text-zinc-900">Địa điểm *</h2>
-          <p className="text-sm text-zinc-500">Ít nhất một địa điểm</p>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {fields.map((field, i) => (
-            <div key={field.id} className="space-y-4 rounded-xl border border-zinc-200 p-4">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-zinc-600">Địa điểm {i + 1}</span>
-                {fields.length > 1 && (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 text-destructive hover:text-destructive"
-                    onClick={() => remove(i)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                )}
-              </div>
-              <div className="space-y-2">
-                <Label>Địa chỉ *</Label>
-                <AddressAutocompleteInput
-                  value={watch(`Locations.${i}.Address`)}
-                  onChange={(result) => {
-                    setValue(`Locations.${i}.Address`, result.address);
-                    setValue(`Locations.${i}.Latitude`, result.latitude);
-                    setValue(`Locations.${i}.Longitude`, result.longitude);
-                    // Populate province/district/ward from Mapbox
-                    if (result.province) setValue(`Locations.${i}.Province`, result.province);
-                    if (result.district) setValue(`Locations.${i}.District`, result.district);
-                    if (result.ward) setValue(`Locations.${i}.Ward`, result.ward);
-                  }}
-                  placeholder="Tìm địa chỉ (gõ để gợi ý)"
-                  error={!!errors.Locations?.[i]?.Address}
-                />
-                {errors.Locations?.[i]?.Address && (
-                  <p className="text-sm text-destructive">{String(errors.Locations[i]?.Address?.message ?? "")}</p>
-                )}
-              </div>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <Label>Tỉnh/Thành phố *</Label>
-                  <Input placeholder="Ví dụ: Hồ Chí Minh" {...register(`Locations.${i}.Province`)} />
-                </div>
-                <div className="space-y-2">
-                  <Label>Quận/Huyện *</Label>
-                  <Input placeholder="Ví dụ: Quận 1" {...register(`Locations.${i}.District`)} />
-                </div>
-                <div className="space-y-2">
-                  <Label>Phường/Xã *</Label>
-                  <Input placeholder="Ví dụ: Bến Nghé" {...register(`Locations.${i}.Ward`)} />
-                </div>
-                <div className="space-y-2">
-                  <Label>Mã bưu điện </Label>
-                  <Input placeholder="Ví dụ: 700000" {...register(`Locations.${i}.Zipcode`)} />
-                </div>
-                <div className="space-y-2">
-                  <Label>Email liên hệ</Label>
-                  <Input placeholder="contact@example.com" {...register(`Locations.${i}.ContactEmail`)} />
-                </div>
-                <div className="space-y-2">
-                  <Label>SĐT liên hệ</Label>
-                  <Input placeholder="0912345678" {...register(`Locations.${i}.ContactPhone`)} />
-                </div>
-              </div>
-            </div>
-          ))}
         </CardContent>
       </Card>
 
@@ -595,7 +427,7 @@ export function EditEventForm({ eventId }: { eventId: string }) {
         <Button type="button" variant="outline" asChild>
           <Link href="/admin/events">Hủy</Link>
         </Button>
-        <Button type="submit" disabled={update.isPending}>
+        <Button type="submit" disabled={update.isPending || isUploading}>
           {update.isPending ? "Đang cập nhật..." : "Cập nhật"}
         </Button>
       </div>

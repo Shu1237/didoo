@@ -1,58 +1,84 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import * as signalR from "@microsoft/signalr";
 import { createTicketHubConnection } from "@/lib/ticketHub";
 import { toast } from "sonner";
-import { useSessionStore } from "@/stores/sesionStore";
+import { updateTicketAvailability, setTicketConnectionStatus } from "@/stores/ticketStore";
+
+/** Payload từ BE: ReceiveZoneUpdate - ASP.NET serialize camelCase */
+type ZoneUpdatePayload = {
+  ticketTypeId: string;
+  remainingCount: number;
+};
 
 export const useTicketHub = (eventId: string) => {
   const [connection, setConnection] = useState<signalR.HubConnection | null>(null);
-  const [realtimeAvailability, setRealtimeAvailability] = useState<Record<string, number>>({});
-  const [lockedTickets, setLockedTickets] = useState<Record<string, { userId: string, quantity: number }>>({});
+  const isStartedRef = useRef(false);
 
-  const token = useSessionStore((state) => state.accessToken);
+  const selectTicket = useCallback(
+    async (ticketTypeId: string, quantityChange: number) => {
+      if (!connection || connection.state !== signalR.HubConnectionState.Connected || !eventId) return;
+      try {
+        await connection.invoke("SelectTicket", eventId, ticketTypeId, quantityChange);
+      } catch (err) {
+        console.error("SignalR SelectTicket error:", err);
+        toast.error("Không thể cập nhật vé. Vui lòng thử lại.");
+      }
+    },
+    [eventId, connection]
+  );
 
   useEffect(() => {
-    // SignalR temporarily disabled as per user request
-    /*
-    if (!eventId || !token) return;
+    if (!eventId) return;
 
     let isMounted = true;
     let conn: signalR.HubConnection | null = null;
 
     const startConnection = async () => {
+      if (isStartedRef.current) return;
+      isStartedRef.current = true;
+
       try {
         conn = createTicketHubConnection();
-        
-        // Setup listeners before starting
-        // Backend uses "ReceiveZoneUpdate" with payload { TicketTypeId, RemainingCount }
-        conn.on("ReceiveZoneUpdate", (data: { ticketTypeId: string, remainingCount: number }) => {
+
+        conn.on("ReceiveZoneUpdate", (data: ZoneUpdatePayload) => {
           if (!isMounted) return;
-          console.log("SignalR: Received Zone Update", data);
-          setRealtimeAvailability((prev) => ({
-            ...prev,
-            [data.ticketTypeId]: data.remainingCount,
-          }));
+          // Handle both camelCase and PascalCase just in case
+          const id = data.ticketTypeId ?? (data as any).TicketTypeId;
+          const count = data.remainingCount ?? (data as any).RemainingCount;
+          if (id != null && typeof count === "number") {
+            updateTicketAvailability(eventId, id, count);
+          }
+        });
+
+        conn.on("ReceiveTicketUpdateFailed", (ticketTypeId: string, errorMessage: string) => {
+          if (!isMounted) return;
+          toast.error(errorMessage || "Không thể chọn thêm vé. Vé có thể đã hết.");
         });
 
         await conn.start();
-        
+
         if (!isMounted) {
-          await conn.stop();
+          await conn.stop().catch(() => {});
           return;
         }
 
-        console.log(`SignalR Connected to Ticket Hub for event: ${eventId}`);
         await conn.invoke("JoinEventGroup", eventId);
+        setConnection(conn);
+        setTicketConnectionStatus(true);
+      } catch (err: unknown) {
+        if (!isMounted) return;
+        isStartedRef.current = false;
         
-        if (isMounted) {
-          setConnection(conn);
+        const e = err as { name?: string; message?: string };
+        const isAbort = e?.name === "AbortError" || e?.message?.includes("stopped during negotiation");
+
+        // Log error details for debugging
+        console.log(`[TicketHub] Connection failed: ${e?.name || "Unknown error"} - ${e?.message || "No message"}`);
+
+        if (!isAbort) {
+          console.error("SignalR TicketHub connection error:", err);
         }
-      } catch (err: any) {
-        if (err.name === "AbortError" || err.message?.includes("stopped during negotiation")) {
-          console.log("SignalR: Connection intentionally stopped (likely due to unmount/re-render).");
-        } else {
-          console.error("SignalR Connection Error: ", err);
-        }
+        setTicketConnectionStatus(false);
       }
     };
 
@@ -60,26 +86,23 @@ export const useTicketHub = (eventId: string) => {
 
     return () => {
       isMounted = false;
-      if (conn && conn.state !== signalR.HubConnectionState.Disconnected) {
-        conn.stop().catch(() => {});
+      isStartedRef.current = false;
+      if (conn) {
+        const c = conn;
+        if (c.state !== signalR.HubConnectionState.Disconnected) {
+          c.invoke("LeaveEventGroup", eventId)
+           .catch(() => {})
+           .finally(() => {
+             c.stop().catch(() => {});
+           });
+        }
+        setTicketConnectionStatus(false);
       }
     };
-    */
-  }, [eventId, token]);
-
-  const lockTickets = async (ticketTypeId: string, quantity: number) => {
-    // SignalR temporarily disabled
-  };
-
-  const unlockTickets = async (ticketTypeId: string) => {
-    // SignalR temporarily disabled
-  };
+  }, [eventId]);
 
   return {
-    realtimeAvailability,
-    lockedTickets,
-    lockTickets,
-    unlockTickets,
+    selectTicket,
     isConnected: connection?.state === signalR.HubConnectionState.Connected,
   };
 };

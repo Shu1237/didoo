@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import CustomHeroCarousel from './CustomHeroCarousel';
 import Image from 'next/image';
+import Link from 'next/link';
 
 export default function HeroSection({ events: initialEvents }: { events: Event[] }) {
     // Quản lý danh sách sự kiện, phần tử đầu tiên (index 0) luôn là ảnh nền active
@@ -111,14 +112,18 @@ export default function HeroSection({ events: initialEvents }: { events: Event[]
                                     className="flex gap-4"
                                 >
                                     <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                                        <Button className="h-14 px-10 rounded-full bg-white text-black font-bold uppercase hover:bg-gray-200 transition-colors shadow-lg">
+                                      <Link href={`/events/${activeEvent.id}/booking`}> 
+                                      <Button className="h-14 px-10 rounded-full bg-white text-black font-bold uppercase hover:bg-gray-200 transition-colors shadow-lg">
                                             Get Tickets
                                         </Button>
+                                      </Link>
                                     </motion.div>
                                     <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                                        <Link href={`/events/${activeEvent.id}`}> 
                                         <Button variant="outline" className="h-14 px-8 rounded-full !bg-white/10 !text-white !border-2 !border-white/50 backdrop-blur-md uppercase font-bold hover:!bg-white/30 hover:!border-white transition-colors shadow-lg">
                                             More Info
                                         </Button>
+                                        </Link>
                                     </motion.div>
                                 </motion.div>
                             </motion.div>

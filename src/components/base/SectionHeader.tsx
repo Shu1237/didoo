@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import Link from "next/link";
+import { RefetchButton } from "./RefetchButton";
 
 type SectionHeaderProps = {
   title: string;
@@ -11,9 +12,18 @@ type SectionHeaderProps = {
   createHref?: string;
   createOnClick?: () => void;
   createLabel?: string;
+  /** Query keys để invalidate khi bấm Làm mới (trừ overview) */
+  refetchQueryKeys?: readonly (readonly string[])[];
 };
 
-export function SectionHeader({ title, subtitle, createHref, createOnClick, createLabel = "Tạo mới" }: SectionHeaderProps) {
+export function SectionHeader({
+  title,
+  subtitle,
+  createHref,
+  createOnClick,
+  createLabel = "Tạo mới",
+  refetchQueryKeys,
+}: SectionHeaderProps) {
   const createButton = createHref ? (
     <Button asChild size="sm" className="rounded-xl">
       <Link href={createHref}>
@@ -28,13 +38,24 @@ export function SectionHeader({ title, subtitle, createHref, createOnClick, crea
     </Button>
   ) : null;
 
+  const refetchButton = refetchQueryKeys?.length ? (
+    <RefetchButton queryKeys={refetchQueryKeys} />
+  ) : null;
+
+  const actions = (
+    <div className="flex shrink-0 items-center gap-2">
+      {refetchButton}
+      {createButton}
+    </div>
+  );
+
   return (
     <div className="flex flex-1 items-center justify-between gap-4">
       <div className="min-w-0">
         <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 lg:text-3xl">{title}</h1>
         {subtitle && <p className="mt-1 text-sm text-zinc-500">{subtitle}</p>}
       </div>
-      {createButton && <div className="shrink-0">{createButton}</div>}
+      {(refetchButton || createButton) && actions}
     </div>
   );
 }

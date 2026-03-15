@@ -24,7 +24,8 @@ const FALLBACK_ORGANIZER_IMAGE =
   "https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=2070&auto=format&fit=crop";
 
 function getStatusLabel(status: EventStatus) {
-  if (status === EventStatus.PUBLISHED || status === EventStatus.OPENED) return "Đang mở";
+  if (status === EventStatus.OPENED) return "Đang mở bán";
+  if (status === EventStatus.PUBLISHED) return "Đã công bố";
   if (status === EventStatus.CLOSED) return "Đã đóng";
   if (status === EventStatus.CANCELLED) return "Đã hủy";
   return "Sắp diễn ra";

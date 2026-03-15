@@ -1,6 +1,6 @@
 import { authRequest } from "@/apiRequest/authService";
 import { useSessionStore } from "@/stores/sesionStore";
-import { envconfig } from "../../config";
+import { envconfig } from "../config";
 import { ResponseData, ResponseError } from "@/types/base";
 import { toast } from "sonner";
 import { EntityError, HttpError } from "@/lib/errors";
@@ -128,6 +128,15 @@ class TokenRefreshInterceptor {
 }
 
 const tokenInterceptor = new TokenRefreshInterceptor();
+
+/** Dùng cho SignalR/WebSocket khi gặp 401 - refresh token rồi retry connection */
+export async function refreshTokenForReconnect(): Promise<string | null> {
+    try {
+        return await tokenInterceptor.refreshToken();
+    } catch {
+        return null;
+    }
+}
 
 async function httpRequest<T>(
     method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH",

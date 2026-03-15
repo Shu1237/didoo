@@ -73,5 +73,8 @@ export interface Notification {
     event?: NotificationEvent;
     title?: string;
     message?: string;
-    isRead: boolean;
+    type?: string;
+    relatedId?: string | null;
+    isRead?: boolean;
+    createdAt?: string;
 }

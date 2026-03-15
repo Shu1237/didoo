@@ -7,6 +7,7 @@ import Loading from "@/components/loading";
 import BaseFilter, { FilterConfig } from "@/components/base/BaseFilter";
 import { EventsPageHero } from "./_components/EventsPageHero";
 import { EventsContent } from "./_components/EventsContent";
+import { EventStatus } from "@/utils/enum";
 
 type SortBy = "featured" | "date" | "name";
 
@@ -18,6 +19,7 @@ export default function EventsPage() {
   const name = searchParams.get("name") ?? "";
   const categoryIdParam = searchParams.get("categoryId");
   const categoryId = categoryIdParam && categoryIdParam.trim() ? categoryIdParam : "all";
+  const statusParam = searchParams.get("status");
   const startTimeParam = searchParams.get("startTime");
   const endTimeParam = searchParams.get("endTime");
   const sortBy = (searchParams.get("sortBy") as SortBy) ?? "featured";
@@ -36,17 +38,18 @@ export default function EventsPage() {
       hasLocations: true,
       isDeleted: false,
       ...(name && { name }),
-      ...(categoryId !== "all" && { categoryId }),
+      ...(categoryId && categoryId !== "all" && { categoryId }),
+      ...(statusParam && statusParam !== "all" && { status: Number(statusParam) as EventStatus }),
       ...(startTimeParam && { startTime: startTimeParam }),
       ...(endTimeParam && { endTime: endTimeParam }),
       isDescending: true,
     }),
-    [pageNumber, pageSize, name, categoryId, startTimeParam, endTimeParam]
+    [pageNumber, pageSize, name, categoryId, statusParam, startTimeParam, endTimeParam]
   );
 
   const { data: eventsResponse, isLoading: isEventsLoading } = useGetEvents(query);
   const { data: categoriesResponse, isLoading: isCategoriesLoading } =
-    useGetCategories({ pageSize: 20 });
+    useGetCategories({ pageSize: 100 });
 
   const eventsData = eventsResponse?.data;
   const events = eventsData?.items ?? [];
@@ -76,10 +79,26 @@ export default function EventsPage() {
       key: "categoryId",
       label: "Danh mục",
       type: "select",
-      options: [{ label: "Tất cả", value: "" }, ...allCategories.map((c) => ({ label: c.name, value: c.id }))],
+      options: [{ label: "Tất cả", value: "all" }, ...allCategories.map((c) => ({ label: c.name, value: c.id }))],
     },
-    { key: "startTime", label: "Ngày bắt đầu", type: "date" },
-    { key: "endTime", label: "Ngày kết thúc", type: "date" },
+    {
+      key: "status",
+      label: "Trạng thái",
+      type: "select",
+      options: [
+        { label: "Tất cả", value: "all" },
+        { label: "Sắp mở", value: String(EventStatus.PUBLISHED) },
+        { label: "Đang mở bán", value: String(EventStatus.OPENED) },
+      ],
+    },
+    {
+      key: "dateRange",
+      label: "Khoảng thời gian",
+      type: "dateRange",
+      rangeKeys: ["startTime", "endTime"],
+      placeholder: "Từ ngày - Đến ngày",
+      className: "min-w-[220px]",
+    },
   ];
 
   const updateParam = (key: string, value: string) => {

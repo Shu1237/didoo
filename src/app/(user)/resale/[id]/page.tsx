@@ -5,8 +5,10 @@ import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 import Loading from "@/components/loading";
 import { Button } from "@/components/ui/button";
+import { useGetMe } from "@/hooks/useAuth";
 import { useGetEvent } from "@/hooks/useEvent";
-import { useGetTicketListings } from "@/hooks/useTicket";
+import { useGetTicketListings, useGetTicketTypes } from "@/hooks/useTicket";
+import { useOwnedTicketsCountByTicketType } from "@/hooks/useOwnedTicketsByEvent";
 import { TicketListingStatus } from "@/utils/enum";
 import { ResaleEventListingsContent } from "./_components/ResaleEventListingsContent";
 
@@ -29,14 +31,23 @@ export default function ResaleEventListingsPage({
     [id]
   );
 
+  const { data: userRes } = useGetMe();
   const { data: eventRes, isLoading: isEventLoading } = useGetEvent(id);
   const { data: listingsRes, isLoading: isListingsLoading } = useGetTicketListings(
     listingQuery,
     { enabled: !!id }
   );
+  const { data: ticketTypesRes } = useGetTicketTypes(
+    { eventId: id, pageNumber: 1, pageSize: 100 },
+    { enabled: !!id }
+  );
+  const ownedCountByTicketType = useOwnedTicketsCountByTicketType(id, userRes?.data?.id, {
+    enabled: !!id && !!userRes?.data?.id,
+  });
 
   const event = eventRes?.data;
   const listings = listingsRes?.data?.items ?? [];
+  const ticketTypes = ticketTypesRes?.data?.items ?? [];
 
   if (isEventLoading || isListingsLoading) return <Loading />;
 
@@ -54,6 +65,12 @@ export default function ResaleEventListingsPage({
   }
 
   return (
-    <ResaleEventListingsContent eventId={id} event={event} listings={listings} />
+    <ResaleEventListingsContent
+      eventId={id}
+      event={event}
+      listings={listings}
+      ticketTypes={ticketTypes}
+      ownedCountByTicketType={ownedCountByTicketType}
+    />
   );
 }

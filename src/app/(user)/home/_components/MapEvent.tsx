@@ -11,7 +11,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { getDistanceKm } from "@/utils/helper";
 import { Event } from "@/types/event";
 import { useLocationContext } from "@/contexts/locationContext";
-import envconfig from "../../../../../config";
+import envconfig from "../../../../config";
 
 const GOONG_API_KEY = "1kLRnoD5VyIe5cexVMp6fWAEMcAF0LyZSuA7hss5";
 

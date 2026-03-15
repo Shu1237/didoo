@@ -8,7 +8,7 @@ export type JWTUserType = {
     FullName: string;
     Email: string;
     Role: string;
-    IsOrgainizer: string;
+    IsOrganizer: string;
     nbf: number;
     exp: number;
     iat: number;

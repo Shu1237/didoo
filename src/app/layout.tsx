@@ -6,6 +6,7 @@ import QueryClientProviderWrapper from "@/components/QueryClientProviderWrapper"
 import { cookies } from "next/headers";
 import { AuthProvider } from "@/contexts/authContext";
 import { LocationProvider } from "@/contexts/locationContext";
+import { NotificationProvider } from "@/contexts/notificationContext";
 import { Toaster } from "sonner";
 import GoogleAuthProvider from "@/components/GoogleAuthProvider";
 
@@ -45,6 +46,7 @@ export default async function RootLayout({
           <AuthProvider initialAccessToken={accessToken?.value || null} initialRefreshToken={refreshToken?.value || null}>
             <LocationProvider>
               <QueryClientProviderWrapper>
+                <NotificationProvider>
                 <ThemeProvider
                   attribute="class"
                   defaultTheme="system"
@@ -54,6 +56,7 @@ export default async function RootLayout({
                   {children}
                   <Toaster richColors position="top-center" />
                 </ThemeProvider>
+                </NotificationProvider>
               </QueryClientProviderWrapper>
             </LocationProvider>
           </AuthProvider>

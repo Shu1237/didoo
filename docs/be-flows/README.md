@@ -19,6 +19,7 @@ Pham vi da bo qua theo yeu cau:
 9. `09-ticket-listing-lifecycle.md` - Vong doi ticket listing
 10. `10-event-engagement.md` - Favorite, interaction, review
 11. `11-operations-checkin-notification.md` - Check-in va notification (trang thai hien tai)
+12. `12-overview-analytics-rbac.md` - Overview/Analytics endpoints va phan quyen RBAC (pages + API)
 
 ## Luu y chung khi tich hop
 
