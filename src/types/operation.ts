@@ -78,3 +78,66 @@ export interface Notification {
     isRead?: boolean;
     createdAt?: string;
 }
+
+export interface ChartDataItem {
+    name: string;
+    sales: number;
+    capacity: number;
+    occupancy: number;
+}
+
+export interface RecentEventItem {
+    id: string;
+    name: string;
+    startTime?: string;
+    status: string;
+    revenue: number;
+    soldCount: number;
+    totalCapacity: number;
+    occupancyPercent: number;
+}
+
+export interface RevenueTrendItem {
+    date: string;
+    revenue: number;
+    orders: number;
+}
+
+export interface OrderStatusBreakdownItem {
+    status: string;
+    count: number;
+    percent: number;
+}
+
+export interface AdminOverviewResponse {
+    totalUsers: number;
+    usersGrowthPercent: number;
+    totalOrganizers: number;
+    pendingOrganizers: number;
+    totalEvents: number;
+    activeEvents: number;
+    pendingEvents: number;
+    totalRevenue: number;
+    avgOrderValue: number;
+    revenueGrowthPercent: number;
+    totalResaleRevenue: number;
+    activeListings: number;
+    totalListings: number;
+    totalResaleTransactions: number;
+    revenueTrend: RevenueTrendItem[];
+    orderStatusBreakdown: OrderStatusBreakdownItem[];
+}
+
+export interface OrganizerOverviewResponse {
+    organizerId: string;
+    totalRevenue: number;
+    revenueGrowthPercent: number;
+    ticketsSold: number;
+    ticketsSoldGrowthPercent: number;
+    occupancyRate: number;
+    occupancyGrowthPercent: number;
+    openedEventsCount: number;
+    upcomingPublishedCount: number;
+    chartData: ChartDataItem[];
+    recentEvents: RecentEventItem[];
+}

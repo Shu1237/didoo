@@ -110,22 +110,6 @@ export default function ProfileForm() {
     <>
       {tab === 'general' && (
         <div className="flex flex-col h-full animate-in fade-in slide-in-from-bottom-4 duration-500">
-          <div className="p-8 md:p-10 border-b border-slate-100">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-sky-50 text-sky-600">
-                <UserRound className="h-5 w-5" />
-              </div>
-              <div>
-                <h2 className="text-2xl font-black tracking-tight text-slate-900">
-                  Thông tin hồ sơ
-                </h2>
-                <p className="text-sm font-medium text-slate-500 mt-0.5">
-                  Cập nhật thông tin cơ bản và quản lý tài khoản của bạn.
-                </p>
-              </div>
-            </div>
-          </div>
-
           <div className="p-8 md:p-10 bg-white flex-1">
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">

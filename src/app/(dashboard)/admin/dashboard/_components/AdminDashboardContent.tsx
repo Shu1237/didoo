@@ -15,10 +15,7 @@ import {
   YAxis,
 } from "recharts";
 import { useQuery } from "@tanstack/react-query";
-import { useGetUsers } from "@/hooks/useAuth";
-import { useGetOrganizers, useGetEvents } from "@/hooks/useEvent";
-import { useGetTicketListings } from "@/hooks/useTicket";
-import { useGetResaleTransactions } from "@/hooks/useBooking";
+import { useGetAdminOverview } from "@/hooks/useOperation";
 import { bookingRequest } from "@/apiRequest/bookingService";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -38,7 +35,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { EventStatus, OrganizerStatus, BookingStatus } from "@/utils/enum";
 import {
   Users,
   Building2,
@@ -51,105 +47,57 @@ import {
   Eye,
   ArrowLeftRight,
 } from "lucide-react";
-import { Roles } from "@/utils/enum";
+
 const formatNumber = (n: number) => new Intl.NumberFormat("vi-VN").format(n);
 const formatCurrency = (n: number) => `${formatNumber(Math.round(n))}₫`;
 
 const CHART_COLORS = ["#EA580C", "#0D9488", "#7C3AED", "#059669", "#DC2626"];
 
 export function AdminDashboardContent() {
-  const { data: usersRes } = useGetUsers({ pageSize: 1, roleId: Roles.USER });
-  const { data: organizersRes } = useGetOrganizers({ pageSize: 1 });
-  const { data: pendingOrgRes } = useGetOrganizers({ pageSize: 1, status: OrganizerStatus.PENDING });
-  const { data: eventsRes } = useGetEvents({ pageSize: 1 });
-  const { data: openedRes } = useGetEvents({ pageSize: 1, status: EventStatus.OPENED });
-  const { data: publishedRes } = useGetEvents({ pageSize: 1, status: EventStatus.PUBLISHED });
-  const { data: pendingEventsRes } = useGetEvents({ pageSize: 1, status: EventStatus.DRAFT });
-  const { data: bookingsRes } = useQuery({
-    queryKey: ["admin-dashboard-bookings"],
+  const { data: overviewRes, isLoading: isOverviewLoading } = useGetAdminOverview({ period: "30d" });
+  const overview = overviewRes?.data;
+
+  const { data: recentBookingsRes } = useQuery({
+    queryKey: ["admin-dashboard-recent-bookings"],
     queryFn: async () => {
-      const [all, paid] = await Promise.all([
-        bookingRequest.getList({ pageNumber: 1, pageSize: 500 }),
-        bookingRequest.getList({ pageNumber: 1, pageSize: 500, status: BookingStatus.PAID }),
-      ]);
-      return { all: all.data.items, paid: paid.data.items };
+      const res = await bookingRequest.getList({ pageNumber: 1, pageSize: 15, isDescending: true });
+      return res.data.items;
     },
   });
 
-  // Resale data
-  const { data: listingsRes } = useGetTicketListings({ pageNumber: 1, pageSize: 500 });
-  const { data: transactionsRes } = useGetResaleTransactions({ pageNumber: 1, pageSize: 500 });
-  const listings = listingsRes?.data?.items ?? [];
-  const resaleTransactions = transactionsRes?.data?.items ?? [];
-  const activeListings = listings.filter((l) => l.status === 1 || l.status === 3).length; // ACTIVE status
-  const totalResaleRevenue = resaleTransactions.reduce((sum, tx) => sum + (Number(tx.cost) || 0), 0);
-  const totalUsers = usersRes?.data?.totalItems ?? 0;
-  const totalOrganizers = organizersRes?.data?.totalItems ?? 0;
-  const pendingOrganizers = pendingOrgRes?.data?.totalItems ?? 0;
-  const totalEvents = eventsRes?.data?.totalItems ?? 0;
-  const activeEvents = (openedRes?.data?.totalItems ?? 0) + (publishedRes?.data?.totalItems ?? 0);
-  const pendingEvents = pendingEventsRes?.data?.totalItems ?? 0;
-  const allBookings = bookingsRes?.all ?? [];
-  const paidBookings = bookingsRes?.paid ?? [];
-  const totalRevenue = paidBookings.reduce((s, b) => s + (Number(b.totalPrice) || 0), 0);
-  const avgOrder = paidBookings.length > 0 ? totalRevenue / paidBookings.length : 0;
+  const recentTransactions = recentBookingsRes || [];
+
   const orderStatusData = useMemo(() => {
-    const paid = allBookings.filter((b) => {
-      const s = String(b.status ?? "").toLowerCase();
-      return s === "2" || s === "paid" || s.includes("success");
-    }).length;
-    const pending = allBookings.filter((b) => {
-      const s = String(b.status ?? "").toLowerCase();
-      return s === "1" || s.includes("pending");
-    }).length;
-    const cancelled = allBookings.filter((b) => {
-      const s = String(b.status ?? "").toLowerCase();
-      return s === "3" || s.includes("cancel");
-    }).length;
-    const total = paid + pending + cancelled || 1;
-    return [
-      { name: "Đã thanh toán", value: paid, percent: Math.round((paid / total) * 100), fill: CHART_COLORS[3] },
-      { name: "Chờ thanh toán", value: pending, percent: Math.round((pending / total) * 100), fill: CHART_COLORS[0] },
-      { name: "Đã hủy", value: cancelled, percent: Math.round((cancelled / total) * 100), fill: CHART_COLORS[4] },
-    ].filter((d) => d.value > 0);
-  }, [allBookings]);
+    if (!overview?.orderStatusBreakdown) return [];
+    return overview.orderStatusBreakdown.map((item, index) => {
+      let fill = CHART_COLORS[0];
+      const s = String(item.status ?? "").toLowerCase();
+      if (s === "2" || s.includes("paid") || s.includes("success")) fill = CHART_COLORS[3];
+      else if (s === "1" || s.includes("pending")) fill = CHART_COLORS[0];
+      else if (s === "3" || s.includes("cancel")) fill = CHART_COLORS[4];
+      
+      let name = item.status;
+      if (s === "2" || s.includes("paid") || s.includes("success")) name = "Đã thanh toán";
+      else if (s === "1" || s.includes("pending")) name = "Chờ thanh toán";
+      else if (s === "3" || s.includes("cancel")) name = "Đã hủy";
+
+      return {
+        name: name,
+        value: item.count,
+        percent: item.percent,
+        fill,
+      };
+    }).filter(d => d.value > 0);
+  }, [overview?.orderStatusBreakdown]);
 
   const revenueTrendData = useMemo(() => {
-    const last30Days: { date: string; revenue: number; orders: number }[] = [];
-    const now = new Date();
-    for (let i = 29; i >= 0; i--) {
-      const d = new Date(now);
-      d.setDate(d.getDate() - i);
-      const key = d.toISOString().slice(0, 10);
-      last30Days.push({
-        date: key,
-        revenue: 0,
-        orders: 0,
-      });
-    }
-    const map = new Map(last30Days.map((d) => [d.date, d]));
-    for (const b of paidBookings) {
-      const createdAt = b.paidAt || b.createdAt;
-      if (!createdAt) continue;
-      const key = createdAt.slice(0, 10);
-      const entry = map.get(key);
-      if (entry) {
-        entry.revenue += Number(b.totalPrice) || 0;
-        entry.orders += 1;
-      }
-    }
-    return last30Days;
-  }, [paidBookings]);
-
-  const recentTransactions = useMemo(() => {
-    return [...allBookings]
-      .sort((a, b) => {
-        const da = new Date(a.paidAt || a.createdAt || 0).getTime();
-        const db = new Date(b.paidAt || b.createdAt || 0).getTime();
-        return db - da;
-      })
-      .slice(0, 15);
-  }, [allBookings]);
+    if (!overview?.revenueTrend) return [];
+    return overview.revenueTrend.map(r => ({
+      date: r.date,
+      revenue: r.revenue,
+      orders: r.orders
+    }));
+  }, [overview?.revenueTrend]);
 
   const getInitials = (name: string) => {
     return name
@@ -165,9 +113,13 @@ export function AdminDashboardContent() {
     const s = String(status ?? "").toLowerCase();
     if (s === "2" || s.includes("paid") || s.includes("success")) return { label: "HOÀN TẤT", variant: "default" as const };
     if (s === "1" || s.includes("pending")) return { label: "CHỜ XỬ LÝ", variant: "secondary" as const };
-    if (s === "3" || s.includes("cancel")) return { label: "ĐÃ HỦY", variant: "destructive" as const };
+    if (s === "3" || s.includes("cancel")) return { label: "Đã hủy", variant: "destructive" as const };
     return { label: "CHỜ XỬ LÝ", variant: "secondary" as const };
   };
+
+  if (isOverviewLoading) {
+     return <div className="py-12 text-center text-sm text-zinc-500">Đang tải dữ liệu...</div>;
+  }
 
   return (
     <div className="min-w-0 space-y-6">
@@ -194,10 +146,10 @@ export function AdminDashboardContent() {
                 </div>
                 <span className="text-xs font-medium text-zinc-500">Người dùng</span>
               </div>
-              <p className="mt-2 text-2xl font-bold text-zinc-900">{formatNumber(totalUsers)}</p>
+              <p className="mt-2 text-2xl font-bold text-zinc-900">{formatNumber(overview?.totalUsers || 0)}</p>
               <p className="mt-1 flex items-center gap-1 text-xs text-emerald-600">
                 <TrendingUp className="h-3 w-3" />
-                +12.5% so với tháng trước
+                +{overview?.usersGrowthPercent || 12.5}% so với tháng trước
               </p>
             </div>
 
@@ -207,13 +159,13 @@ export function AdminDashboardContent() {
                   <Building2 className="h-4 w-4" />
                 </div>
                 <span className="text-xs font-medium text-zinc-500">Nhà tổ chức</span>
-                {pendingOrganizers > 0 && (
+                {(overview?.pendingOrganizers ?? 0) > 0 && (
                   <Badge variant="secondary" className="ml-auto text-[10px]">
-                    {pendingOrganizers} chờ duyệt
+                    {overview?.pendingOrganizers} chờ duyệt
                   </Badge>
                 )}
               </div>
-              <p className="mt-2 text-2xl font-bold text-zinc-900">{formatNumber(totalOrganizers)}</p>
+              <p className="mt-2 text-2xl font-bold text-zinc-900">{formatNumber(overview?.totalOrganizers || 0)}</p>
             </div>
 
             <div className="rounded-xl border border-zinc-100 bg-zinc-50/50 p-4">
@@ -222,15 +174,15 @@ export function AdminDashboardContent() {
                   <Calendar className="h-4 w-4" />
                 </div>
                 <span className="text-xs font-medium text-zinc-500">Sự kiện đang mở</span>
-                {activeEvents > 0 && (
+                {(overview?.activeEvents ?? 0) > 0 && (
                   <Badge variant="default" className="ml-auto text-[10px]">
                     Đang hoạt động
                   </Badge>
                 )}
               </div>
-              <p className="mt-2 text-2xl font-bold text-zinc-900">{formatNumber(activeEvents)}</p>
+              <p className="mt-2 text-2xl font-bold text-zinc-900">{formatNumber(overview?.activeEvents || 0)}</p>
               <p className="mt-1 text-xs text-zinc-500">
-                {totalEvents} tổng · {pendingEvents} chờ duyệt
+                {overview?.totalEvents || 0} tổng · {overview?.pendingEvents || 0} chờ duyệt
               </p>
             </div>
 
@@ -241,10 +193,10 @@ export function AdminDashboardContent() {
                 </div>
                 <span className="text-xs font-medium text-zinc-500">Doanh thu</span>
               </div>
-              <p className="mt-2 text-2xl font-bold text-zinc-900">{formatCurrency(totalRevenue)}</p>
+              <p className="mt-2 text-2xl font-bold text-zinc-900">{formatCurrency(overview?.totalRevenue || 0)}</p>
               <p className="mt-1 flex items-center gap-1 text-xs text-emerald-600">
                 <TrendingUp className="h-3 w-3" />
-                TB: {formatCurrency(avgOrder)}/đơn
+                TB: {formatCurrency(overview?.avgOrderValue || 0)}/đơn
               </p>
             </div>
 
@@ -254,15 +206,15 @@ export function AdminDashboardContent() {
                   <ArrowLeftRight className="h-4 w-4" />
                 </div>
                 <span className="text-xs font-medium text-zinc-500">Mua bán lại</span>
-                {activeListings > 0 && (
+                {(overview?.activeListings ?? 0) > 0 && (
                   <Badge variant="secondary" className="ml-auto text-[10px]">
-                    {activeListings} đang bán
+                    {overview?.activeListings} đang bán
                   </Badge>
                 )}
               </div>
-              <p className="mt-2 text-2xl font-bold text-zinc-900">{formatCurrency(totalResaleRevenue)}</p>
+              <p className="mt-2 text-2xl font-bold text-zinc-900">{formatCurrency(overview?.totalResaleRevenue || 0)}</p>
               <p className="mt-1 text-xs text-zinc-500">
-                {listings.length} tin đăng · {resaleTransactions.length} giao dịch
+                {overview?.totalListings || 0} tin đăng · {overview?.totalResaleTransactions || 0} giao dịch
               </p>
             </div>
           </div>
@@ -275,7 +227,7 @@ export function AdminDashboardContent() {
         <Card className="min-w-0 border-zinc-200 lg:col-span-2">
           <CardHeader>
             <CardTitle>Xu hướng doanh thu</CardTitle>
-            <CardDescription>30 ngày gần nhất</CardDescription>
+            <CardDescription>30 ngày qua</CardDescription>
           </CardHeader>
           <CardContent className="min-w-0">
             <div className="h-[280px] min-h-0 w-full min-w-0 overflow-hidden">
@@ -324,7 +276,7 @@ export function AdminDashboardContent() {
         <Card className="min-w-0 border-zinc-200">
           <CardHeader>
             <CardTitle>Trạng thái đơn hàng</CardTitle>
-            <CardDescription>{formatNumber(allBookings.length)} đơn tổng</CardDescription>
+            <CardDescription>Phân bổ trạng thái</CardDescription>
           </CardHeader>
           <CardContent className="min-w-0">
             <div className="flex h-[240px] min-w-0 items-center justify-center">
@@ -383,7 +335,7 @@ export function AdminDashboardContent() {
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
             <CardTitle>Giao dịch gần đây</CardTitle>
-            <CardDescription>Dữ liệu {formatNumber(allBookings.length)} giao dịch mới nhất</CardDescription>
+            <CardDescription>Dữ liệu {recentTransactions.length} giao dịch mới nhất</CardDescription>
           </div>
           <Link href="/admin/revenue">
             <Button variant="ghost" size="sm">

@@ -3,6 +3,7 @@ import { ENDPOINT_CLIENT } from "@/utils/endpoint";
 import { CheckInGetListQuery, CheckIn, NotificationGetListQuery, Notification } from "@/types/operation";
 import { CheckInCreateBody, CheckInUpdateBody, NotificationCreateBody, NotificationUpdateBody } from "@/schemas/operation";
 import { PaginatedData, ResponseData } from "@/types/base";
+import { AdminOverviewResponse, OrganizerOverviewResponse } from "@/types/operation";
 
 /** BE OperationService trả data là mảng phẳng, FE expect data.items. Normalize để tương thích. */
 async function getNotificationList(
@@ -51,4 +52,11 @@ export const notificationRequest = {
   markAsRead: (id: string) => http.patch<Partial<Notification>>(ENDPOINT_CLIENT.NOTIFICATION_MARK_READ(id), {}),
   delete: (id: string) => http.delete<null>(ENDPOINT_CLIENT.NOTIFICATION_DETAIL(id)),
   restore: (id: string) => http.patch<null>(ENDPOINT_CLIENT.NOTIFICATION_DETAIL(id), {}),
+};
+
+export const analyticsRequest = {
+  getAdminOverview: (params?: { fromDate?: string; toDate?: string; period?: string }) =>
+    http.get<AdminOverviewResponse>(ENDPOINT_CLIENT.ANALYTICS_ADMIN_OVERVIEW, { query: params }),
+  getOrganizerOverview: (params?: { organizerId?: string; period?: string }) =>
+    http.get<OrganizerOverviewResponse>(ENDPOINT_CLIENT.ANALYTICS_ORGANIZER_OVERVIEW, { query: params }),
 };

@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { checkInRequest, notificationRequest } from "@/apiRequest/operationService";
+import { checkInRequest, notificationRequest, analyticsRequest } from "@/apiRequest/operationService";
 
 
 import { KEY, QUERY_KEY } from "@/utils/constant";
@@ -83,3 +83,15 @@ export const useNotification = () => {
   });
   return { create, update, markAsRead, deleteNotification, restore };
 };
+
+export const useGetAdminOverview = (params?: { fromDate?: string; toDate?: string; period?: string }, options?: { enabled?: boolean }) => useQuery({
+  queryKey: ["adminOverview", params],
+  queryFn: () => analyticsRequest.getAdminOverview(params),
+  enabled: options?.enabled ?? true,
+});
+
+export const useGetOrganizerOverview = (params?: { organizerId?: string; period?: string }, options?: { enabled?: boolean }) => useQuery({
+  queryKey: ["organizerOverview", params],
+  queryFn: () => analyticsRequest.getOrganizerOverview(params),
+  enabled: options?.enabled ?? true,
+});
