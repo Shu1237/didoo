@@ -111,4 +111,8 @@ export const ENDPOINT_CLIENT = {
     // Check-ins
     CHECKINS: '/api/checkins',
     CHECKIN_DETAIL: (id: string) => `/api/checkins/${id}`,
+
+    // Analytics
+    ANALYTICS_ADMIN_OVERVIEW: '/api/analytics/admin/overview',
+    ANALYTICS_ORGANIZER_OVERVIEW: '/api/analytics/organizer/overview',
 }

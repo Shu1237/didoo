@@ -7,13 +7,13 @@ import Barcode from "react-barcode";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import Loading from "@/components/loading";
-import { useGetEvent } from "@/hooks/useEvent";
-import { useGetMe } from "@/hooks/useAuth";
 import { useGetTickets } from "@/hooks/useTicket";
-import { Ticket as TicketData } from "@/types/ticket";
-import { CalendarDays, Clock, MapPin, QrCode, Ticket as TicketIcon } from "lucide-react";
+import { Ticket as TicketData, TicketType as TicketTypeData } from "@/types/ticket";
+import { Event as EventData } from "@/types/event";
+import { CalendarDays, Clock, QrCode, Ticket as TicketIcon } from "lucide-react";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
+import { useSessionStore } from "@/stores/sesionStore";
 
 const FALLBACK_IMAGE =
   "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=2070&auto=format&fit=crop";
@@ -21,9 +21,11 @@ const FALLBACK_IMAGE =
 type TicketCardView = {
   id: string;
   eventId: string;
-  status: string;
+  status: number;
   totalPrice: number;
   createdAt: string;
+  event?: Partial<EventData>;
+  ticketType?: Partial<TicketTypeData>;
 };
 
 type TicketsListProps = {
@@ -31,59 +33,56 @@ type TicketsListProps = {
   sortBy?: string;
 };
 
-function getStatusStyle(status: string) {
-  const normalized = status?.toLowerCase() || "";
-  if (normalized === "1" || normalized.includes("ready") || normalized.includes("available")) {
-    return { label: "Sẵn sàng", className: "bg-emerald-500/10 text-emerald-600 border-emerald-200" };
+function getStatusStyle(status: number) {
+  switch (status) {
+    case 1:
+      return { label: "Sẵn sàng", className: "bg-emerald-500/10 text-emerald-600 border-emerald-200" };
+    case 2:
+      return { label: "Đã dùng", className: "bg-zinc-500/10 text-zinc-600 border-zinc-200" };
+    case 3:
+      return { label: "Không khả dụng", className: "bg-rose-500/10 text-rose-600 border-rose-200" };
+    case 4:
+      return { label: "Đang khóa", className: "bg-amber-500/10 text-amber-600 border-amber-200" };
+    default:
+      return { label: "Không xác định", className: "bg-zinc-500/10 text-zinc-600 border-zinc-200" };
   }
-  if (normalized === "4" || normalized.includes("lock")) {
-    return { label: "Đang khóa", className: "bg-amber-500/10 text-amber-600 border-amber-200" };
-  }
-  if (normalized === "3" || normalized.includes("unavailable")) {
-    return { label: "Không khả dụng", className: "bg-rose-500/10 text-rose-600 border-rose-200" };
-  }
-  if (normalized === "2" || normalized.includes("used") || normalized.includes("sold")) {
-    return { label: "Đã dùng", className: "bg-zinc-500/10 text-zinc-600 border-zinc-200" };
-  }
-  return { label: "Không xác định", className: "bg-zinc-500/10 text-zinc-600 border-zinc-200" };
 }
 
 export default function TicketsList({ statusFilter = "all", sortBy = "newest" }: TicketsListProps) {
-  const { data: userRes, isLoading: isUserLoading } = useGetMe();
-  const user = userRes?.data;
-
+  const { user } = useSessionStore()
   const {
     data: ticketsRes,
     isLoading: isTicketsLoading,
     isError,
   } = useGetTickets(
     {
-      ownerId: user?.id,
+      ownerId: user?.UserId,
       pageNumber: 1,
       pageSize: 200,
       isDescending: true,
       hasEvent: true,
       hasType: true,
     },
-    { enabled: !!user?.id }
+    { enabled: !!user?.UserId }
   );
 
   const tickets = ticketsRes?.data.items || [];
   const ticketCards: TicketCardView[] = tickets.map((ticket: TicketData) => ({
     id: ticket.id,
     eventId: ticket.event?.id || "",
-    status: String(ticket.status ?? ""),
+    status: ticket.status,
     totalPrice: Number(ticket.ticketType?.price || 0),
     createdAt: ticket.createdAt || "",
+    event: ticket.event,
+    ticketType: ticket.ticketType,
   }));
 
   const filteredCards = ticketCards.filter((item) => {
     if (statusFilter === "all") return true;
-    const s = item.status.toLowerCase();
-    if (statusFilter === "ready") return s === "1" || s.includes("ready") || s.includes("available");
-    if (statusFilter === "locked") return s === "4" || s.includes("lock");
-    if (statusFilter === "unavailable") return s === "3" || s.includes("unavailable");
-    if (statusFilter === "used") return s === "2" || s.includes("used") || s.includes("sold");
+    if (statusFilter === "ready") return item.status === 1;
+    if (statusFilter === "locked") return item.status === 4;
+    if (statusFilter === "unavailable") return item.status === 3;
+    if (statusFilter === "used") return item.status === 2;
     return true;
   });
 
@@ -94,7 +93,7 @@ export default function TicketsList({ statusFilter = "all", sortBy = "newest" }:
     return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
   });
 
-  if (isUserLoading || isTicketsLoading) return <Loading />;
+  if (isTicketsLoading) return <Loading />;
 
   if (isError) {
     return (
@@ -130,13 +129,11 @@ export default function TicketsList({ statusFilter = "all", sortBy = "newest" }:
 }
 
 function TicketCard({ ticket }: { ticket: TicketCardView }) {
-  const { data: eventRes } = useGetEvent(ticket.eventId);
-  const event = eventRes?.data;
-  const status = getStatusStyle(ticket.status || "");
+  const event = ticket.event;
+  const status = getStatusStyle(ticket.status);
   const [showBarcode, setShowBarcode] = useState(false);
 
   const eventDate = event?.startTime ? new Date(event.startTime) : new Date();
-  const location = event?.locations?.[0]?.name || event?.locations?.[0]?.address || "Trực tuyến / Sẽ cập nhật";
 
   return (
     <article className="group overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm transition-all hover:border-primary/30 hover:shadow-md">
@@ -162,7 +159,9 @@ function TicketCard({ ticket }: { ticket: TicketCardView }) {
 
       <div className="flex items-center justify-center gap-4 border-y border-dashed border-zinc-200 bg-zinc-50/50 py-3">
         <div className="h-px flex-1 bg-zinc-200" />
-        <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Vé điện tử</span>
+        <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">
+          {ticket.ticketType?.name || "Vé điện tử"}
+        </span>
         <div className="h-px flex-1 bg-zinc-200" />
       </div>
 
@@ -177,10 +176,6 @@ function TicketCard({ ticket }: { ticket: TicketCardView }) {
             <span>
               {event?.openTime || "Sẽ cập nhật"} - {event?.closedTime || "Sẽ cập nhật"}
             </span>
-          </div>
-          <div className="flex items-start gap-2 text-sm text-zinc-600">
-            <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-zinc-400" />
-            <span className="line-clamp-2">{location}</span>
           </div>
           <div className="flex items-center justify-between border-t border-zinc-100 pt-3">
             <span className="text-sm text-zinc-500">Giá vé</span>

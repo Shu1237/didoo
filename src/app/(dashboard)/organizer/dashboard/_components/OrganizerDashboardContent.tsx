@@ -15,8 +15,7 @@ import {
   YAxis,
 } from "recharts";
 import { useGetMe } from "@/hooks/useAuth";
-import { useOrganizerStats } from "@/hooks/useEvent";
-import { useGetBookings } from "@/hooks/useBooking";
+import { useGetOrganizerOverview } from "@/hooks/useOperation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -31,14 +30,6 @@ import {
   Calendar,
   Plus,
 } from "lucide-react";
-
-const statusLabels: Record<EventStatus, string> = {
-  [EventStatus.DRAFT]: "Nháp",
-  [EventStatus.PUBLISHED]: "Đã duyệt",
-  [EventStatus.CANCELLED]: "Đã hủy",
-  [EventStatus.OPENED]: "Đang mở",
-  [EventStatus.CLOSED]: "Đã đóng",
-};
 
 const formatNumber = (n: number) => new Intl.NumberFormat("vi-VN").format(n);
 const formatCurrency = (n: number) => {
@@ -62,99 +53,50 @@ const FALLBACK_IMAGE =
 export function OrganizerDashboardContent() {
   const { data: meRes } = useGetMe();
   const organizerId = meRes?.data?.organizerId ?? undefined;
-  const { stats, chartData, events, isLoading } = useOrganizerStats(organizerId);
-  const { data: bookingsRes } = useGetBookings(
-    { pageNumber: 1, pageSize: 500, isDescending: true },
+  
+  const { data: overviewRes, isLoading } = useGetOrganizerOverview(
+    { organizerId, period: "30d" },
     { enabled: !!organizerId }
   );
-  const eventIdSet = useMemo(() => new Set(events.map((e) => e.id)), [events]);
-  const myBookings = useMemo(
-    () => (bookingsRes?.data.items ?? []).filter((b) => eventIdSet.has(b.eventId)),
-    [bookingsRes?.data.items, eventIdSet]
-  );
-  const paidBookings = useMemo(
-    () => myBookings.filter((b) => /paid|success|2/i.test(String(b.status ?? ""))),
-    [myBookings]
-  );
-  const myRevenue = useMemo(
-    () => paidBookings.reduce((sum, b) => sum + Number(b.totalPrice || 0), 0),
-    [paidBookings]
-  );
-  const ticketsSold = useMemo(
-    () => paidBookings.reduce((sum, b) => sum + Number(b.amount || 0), 0),
-    [paidBookings]
-  );
-  const openedEventCount = useMemo(
-    () => events.filter((e) => Number(e.status) === EventStatus.OPENED).length,
-    [events]
-  );
-  const upcomingPublishedCount = useMemo(() => {
-    const now = new Date();
-    return events.filter(
-      (e) =>
-        Number(e.status) === EventStatus.PUBLISHED &&
-        new Date(e.startTime ?? 0) > now
-    ).length;
-  }, [events]);
+  
+  const overview = overviewRes?.data;
 
   const kpiCards = useMemo(
     () => [
       {
-        title: "Tổng doanh số",
-        value: formatCurrency(myRevenue),
-        change: "+12.5% so với tháng trước",
+        title: "Tổng doanh thu",
+        value: formatCurrency(overview?.totalRevenue || 0),
+        change: `+${overview?.revenueGrowthPercent || 0}% so với kỳ trước`,
         icon: DollarSign,
         trend: "up" as const,
       },
       {
         title: "Vé đã bán",
-        value: formatNumber(ticketsSold),
-        change: stats[1]?.change ? `${stats[1].change} tỉ lệ lấp đầy` : "—",
+        value: formatNumber(overview?.ticketsSold || 0),
+        change: `+${overview?.ticketsSoldGrowthPercent || 0}% so với kỳ trước`,
         icon: Ticket,
         trend: "up" as const,
       },
       {
-        title: "Tổng sự kiện đang mở",
-        value: formatNumber(openedEventCount),
-        change: "Tổng sự kiện đang mở",
+        title: "Sự kiện đang mở",
+        value: formatNumber(overview?.openedEventsCount || 0),
+        change: "Đang mở bán",
         icon: CalendarDays,
         trend: "up" as const,
       },
       {
-        title: "Tổng sự kiện sắp tới",
-        value: formatNumber(upcomingPublishedCount),
-        change: "Tổng sự kiện sắp tới",
+        title: "Sự kiện sắp tới",
+        value: formatNumber(overview?.upcomingPublishedCount || 0),
+        change: "Đã duyệt, sắp diễn ra",
         icon: CalendarClock,
         trend: "up" as const,
       },
     ],
-    [myRevenue, ticketsSold, openedEventCount, upcomingPublishedCount, stats]
+    [overview]
   );
 
-  const recentEvents = useMemo(() => {
-    const now = new Date();
-    return events
-      .sort((a, b) => new Date(b.startTime).getTime() - new Date(a.startTime).getTime())
-      .slice(0, 3)
-      .map((e) => {
-        const eventRevenue = paidBookings
-          .filter((b) => b.eventId === e.id)
-          .reduce((s, b) => s + Number(b.totalPrice || 0), 0);
-        const sold = paidBookings
-          .filter((b) => b.eventId === e.id)
-          .reduce((s, b) => s + Number(b.amount || 0), 0);
-        const total = Math.max(sold, 50);
-        const percent = total > 0 ? Math.min(100, Math.round((sold / total) * 100)) : 0;
-        let statusBadge: "LIVE" | "SẮP DIỄN RA" | "ĐÃ KẾT THÚC" = "SẮP DIỄN RA";
-        if (e.status === EventStatus.OPENED || e.status === EventStatus.PUBLISHED) {
-          const endTime = new Date(e.endTime || e.startTime);
-          statusBadge = endTime >= now ? "LIVE" : "ĐÃ KẾT THÚC";
-        } else if (e.status === EventStatus.CLOSED || e.status === EventStatus.CANCELLED) {
-          statusBadge = "ĐÃ KẾT THÚC";
-        }
-        return { ...e, eventRevenue, percent, statusBadge };
-      });
-  }, [events, paidBookings]);
+  const chartData = overview?.chartData || [];
+  const recentEvents = overview?.recentEvents || [];
 
   if (isLoading || !organizerId) {
     return (
@@ -181,7 +123,7 @@ export function OrganizerDashboardContent() {
           <div>
             <CardTitle className="text-xl">Tổng quan tổ chức</CardTitle>
             <CardDescription>
-              Hiệu suất bán vé và hoạt động thị trường thứ cấp
+              Hiệu suất bán vé và hoạt động tổ chức sự kiện
             </CardDescription>
           </div>
           <div className="flex items-center gap-2">
@@ -226,8 +168,8 @@ export function OrganizerDashboardContent() {
         {/* Doanh thu vé mỗi ngày */}
         <Card className="min-w-0 border-zinc-200 lg:col-span-2">
           <CardHeader>
-            <CardTitle>Doanh thu vé mỗi ngày</CardTitle>
-            <CardDescription>7 ngày qua</CardDescription>
+            <CardTitle>Biểu đồ bán vé</CardTitle>
+            <CardDescription>30 ngày qua</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="h-[220px] min-h-0 w-full min-w-0 overflow-hidden">
@@ -240,7 +182,7 @@ export function OrganizerDashboardContent() {
                     axisLine={false}
                     tickMargin={8}
                   />
-                  <YAxis tickLine={false} axisLine={false} tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} />
+                  <YAxis tickLine={false} axisLine={false} tickFormatter={(v) => `${(v).toFixed(0)}`} />
                   <Tooltip
                     content={({ active, payload }) =>
                       active && payload?.[0] ? (
@@ -260,15 +202,15 @@ export function OrganizerDashboardContent() {
           </CardContent>
         </Card>
 
-        {/* Tăng trưởng doanh thu */}
+        {/* Tăng trưởng tỷ lệ lấp đầy */}
         <Card className="min-w-0 border-zinc-200">
           <CardHeader>
-            <CardTitle>Tăng trưởng doanh thu</CardTitle>
-            <CardDescription>Sự ổn định của thị trường resale</CardDescription>
+            <CardTitle>Tỷ lệ lấp đầy</CardTitle>
+            <CardDescription>Trung bình các sự kiện</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="mb-2 text-2xl font-bold text-primary">
-              {stats[3]?.change ?? "+0%"}
+              {overview?.occupancyRate || 0}%
             </div>
             <div className="h-[180px] min-h-0 w-full min-w-0 overflow-hidden">
               <ResponsiveContainer width="100%" height="100%" minWidth={0}>
@@ -313,7 +255,7 @@ export function OrganizerDashboardContent() {
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
             <CardTitle>Sự kiện hoạt động gần đây</CardTitle>
-            <CardDescription>Tối đa 3 sự kiện mới nhất</CardDescription>
+            <CardDescription>Các sự kiện đang diễn ra hoặc bán vé tốt</CardDescription>
           </div>
           <Link href="/organizer/events">
             <Button variant="ghost" size="sm">
@@ -325,7 +267,21 @@ export function OrganizerDashboardContent() {
         <CardContent>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {recentEvents.length > 0 ? (
-              recentEvents.map((e) => (
+              recentEvents.map((e) => {
+                let statusBadge = "SẮP DIỄN RA";
+                const now = new Date();
+                const startTime = e.startTime ? new Date(e.startTime) : null;
+                const status = Number(e.status);
+                
+                if (status === EventStatus.OPENED || status === EventStatus.PUBLISHED) {
+                    if (startTime && startTime <= now) {
+                        statusBadge = "LIVE";
+                    }
+                } else if (status === EventStatus.CLOSED || status === EventStatus.CANCELLED) {
+                    statusBadge = "ĐÃ KẾT THÚC";
+                }
+                
+                return (
                 <Link
                   key={e.id}
                   href={`/organizer/events/${e.id}`}
@@ -333,7 +289,7 @@ export function OrganizerDashboardContent() {
                 >
                   <div className="relative aspect-[4/3] w-full bg-zinc-100">
                     <Image
-                      src={e.thumbnailUrl || e.bannerUrl || FALLBACK_IMAGE}
+                      src={FALLBACK_IMAGE}
                       alt={e.name}
                       fill
                       className="object-cover transition group-hover:scale-105"
@@ -342,21 +298,21 @@ export function OrganizerDashboardContent() {
                     <div className="absolute right-2 top-2">
                       <Badge
                         variant={
-                          e.statusBadge === "LIVE"
+                          statusBadge === "LIVE"
                             ? "default"
-                            : e.statusBadge === "SẮP DIỄN RA"
+                            : statusBadge === "SẮP DIỄN RA"
                               ? "secondary"
                               : "outline"
                         }
                         className={
-                          e.statusBadge === "LIVE"
+                          statusBadge === "LIVE"
                             ? "bg-emerald-500"
-                            : e.statusBadge === "SẮP DIỄN RA"
+                            : statusBadge === "SẮP DIỄN RA"
                               ? "bg-primary"
                               : ""
                         }
                       >
-                        {e.statusBadge}
+                        {statusBadge}
                       </Badge>
                     </div>
                   </div>
@@ -371,20 +327,21 @@ export function OrganizerDashboardContent() {
                         <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-zinc-200">
                           <div
                             className="h-full rounded-full bg-primary"
-                            style={{ width: `${e.percent}%` }}
+                            style={{ width: `${e.occupancyPercent}%` }}
                           />
                         </div>
                         <span className="text-xs font-medium text-zinc-600">
-                          {e.percent}% vé đã bán
+                          {e.occupancyPercent}% vé đã bán
                         </span>
                       </div>
                       <span className="text-sm font-semibold text-zinc-900">
-                        {formatCurrency(e.eventRevenue)}
+                        {formatCurrency(e.revenue)}
                       </span>
                     </div>
                   </div>
                 </Link>
-              ))
+                );
+              })
             ) : (
               <p className="col-span-full py-8 text-center text-sm text-zinc-500">
                 Chưa có sự kiện nào
@@ -396,3 +353,4 @@ export function OrganizerDashboardContent() {
     </div>
   );
 }
+
