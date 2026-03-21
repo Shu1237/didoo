@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Plus_Jakarta_Sans } from 'next/font/google'
+import { Inter, Plus_Jakarta_Sans, Playfair_Display } from 'next/font/google'
 import "./globals.css";
 import { ThemeProvider } from "next-themes";
 import QueryClientProviderWrapper from "@/components/QueryClientProviderWrapper";
@@ -23,6 +23,13 @@ const plusJakarta = Plus_Jakarta_Sans({
   variable: '--font-heading',
 })
 
+// Playfair Display specifically imported with Vietnamese subset to fix broken diacritics
+const playfair = Playfair_Display({
+  subsets: ['latin', 'vietnamese'],
+  display: 'swap',
+  variable: '--font-playfair',
+})
+
 export const metadata: Metadata = {
   title: "DiDoo",
   description: "DiDoo website",
@@ -40,7 +47,7 @@ export default async function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${inter.variable} ${plusJakarta.variable} antialiased`}
+        className={`${inter.variable} ${plusJakarta.variable} ${playfair.variable} antialiased`}
       >
         <GoogleAuthProvider>
           <AuthProvider initialAccessToken={accessToken?.value || null} initialRefreshToken={refreshToken?.value || null}>

@@ -1,15 +1,14 @@
 "use client";
 
-import HeroSection from "@/app/(user)/home/_components/HeroSection";
-import { SpecialEvents } from "@/app/(user)/home/_components/SpecialEvents";
-import { AboutSection } from "@/app/(user)/home/_components/AboutSection";
-import { TrendingEvents } from "@/app/(user)/home/_components/TrendingEvents";
-import { MonthOverview } from "@/app/(user)/home/_components/MonthOverview";
 import { useGetEvents, useGetCategories, useGetOrganizers } from "@/hooks/useEvent";
 import Loading from "@/components/loading";
 import { EventStatus, OrganizerStatus } from "@/utils/enum";
-import CategorySection from "./_components/CategorySection";
-import BecomeOrganizerSection from "./_components/BecomeOrganizerSection";
+
+import HeroTextSection from "./_components/HeroTextSection";
+import GroupsSection from "./_components/GroupsSection";
+import BannerTextSection from "./_components/BannerTextSection";
+import ScheduleSection from "./_components/ScheduleSection";
+import CtaSection from "./_components/CtaSection";
 
 export default function Home() {
   const { data: openedEventsResponse, isLoading: isOpenedLoading, isError: isOpenedError } = useGetEvents({
@@ -45,21 +44,21 @@ export default function Home() {
 
   const openedEvents = openedEventsResponse?.data.items || [];
   const publishedEvents = publishedEventsResponse?.data.items || [];
-  const categories = categoriesResponse?.data.items || [];
   const organizers = organizersResponse?.data.items || [];
+  
   const heroEvents = openedEvents.length > 0 ? openedEvents : publishedEvents;
+  const heroEvent = heroEvents[0] || null;
 
   return (
-    <div className="min-h-screen bg-zinc-50 text-zinc-900">
-      <HeroSection events={heroEvents.slice(0, 5)} />
-
-      <CategorySection openedEvents={openedEvents.slice(0, 6)} />
-
-      <SpecialEvents events={publishedEvents} />
-      <AboutSection categories={categories} />
-      <TrendingEvents organizers={organizers} />
-      <MonthOverview categories={categories} />
-      <BecomeOrganizerSection />
+    <div 
+      className="bg-[#0a0a0a] text-zinc-100 min-h-screen selection:bg-white selection:text-black"
+      style={{ fontFamily: "var(--font-playfair), ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif" }}
+    >
+      <HeroTextSection event={heroEvent} />
+      <GroupsSection events={openedEvents.slice(0, 3)} />
+      <BannerTextSection />
+      <ScheduleSection events={publishedEvents} />
+      <CtaSection />
     </div>
   );
 }
