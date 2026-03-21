@@ -65,16 +65,20 @@ export const AuthProvider = ({
                     }
 
                     const newAccessToken = result.data.accessToken;
-
-
+                    // Backend có thể rotate refresh token — đồng bộ giống http.ts performRefresh
+                    const newRefreshToken =
+                        result.data.refreshToken ?? initialRefreshToken;
 
                     // Step 1: Set vào Zustand store
-                    setSession({ accessToken: newAccessToken, refreshToken: initialRefreshToken });
+                    setSession({
+                        accessToken: newAccessToken,
+                        refreshToken: newRefreshToken,
+                    });
 
-                    // Step 2: Đồng bộ access_token mới vào cookies thông qua API route
+                    // Step 2: Đồng bộ token vào cookies (httpOnly) qua API route
                     await authRequest.refreshTokenServer({
                         accessToken: newAccessToken,
-                        refreshToken: initialRefreshToken
+                        refreshToken: newRefreshToken,
                     });
 
 

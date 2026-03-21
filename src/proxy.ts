@@ -14,7 +14,13 @@ const publicPaths = [
   '/confirm',
   '/api/login',
   '/api/logout',
-  '/api/refresh_token',
+  '/api/refresh_token',        // root → redirect /home
+  '/home',       // Trang chủ
+  '/events',     // Danh sách + chi tiết sự kiện (e.g. /events/[id])
+  '/organizers', // Trang organizer (e.g. /organizers/[id])
+  '/resale',     // Danh sách + chi tiết vé bán lại (e.g. /resale/[id], trade-booking)
+  '/map',   
+  '/',
 ];
 
 // Define role-based route access - Map URL prefixes to allowed roles
