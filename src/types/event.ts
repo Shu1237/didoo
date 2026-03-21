@@ -27,6 +27,9 @@ export interface EventGetListQuery extends BasePaginationQuery {
     /** Resale: filter theo khoảng giá (nếu BE hỗ trợ) */
     fromPrice?: number;
     toPrice?: number;
+    latitude?: number;
+    longitude?: number;
+    distance?: number;
     hasCategory?: boolean;
     hasOrganizer?: boolean;
     hasLocations?: boolean;
