@@ -23,9 +23,7 @@ export const authRequest = {
   logoutClient: (data: LogoutInput) => http.post(ENDPOINT_CLIENT.LOGOUT, data),
   logoutServer: () => http.post(ENDPOINT_SERVER.LOGOUT, undefined, { baseURL: "" }),
   refreshTokenClient: (body: RefreshInput) =>
-    http.post<{ accessToken: string; refreshToken: string }>(ENDPOINT_CLIENT.REFRESH, body, {
-      skipAuth: true,
-    }),
+    http.post<{ accessToken: string; refreshToken: string }>(ENDPOINT_CLIENT.REFRESH, body),
   refreshTokenServer: (body: { accessToken: string; refreshToken: string }) =>
     http.post<{ accessToken: string; refreshToken: string }>(ENDPOINT_SERVER.REFRESH, body, {
       baseURL: "",
