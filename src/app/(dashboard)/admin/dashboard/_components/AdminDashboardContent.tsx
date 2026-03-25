@@ -118,102 +118,102 @@ export function AdminDashboardContent() {
   };
 
   if (isOverviewLoading) {
-     return <div className="py-12 text-center text-sm text-zinc-500">Đang tải dữ liệu...</div>;
+     return <div className="py-12 text-center text-sm text-muted-foreground">Đang tải dữ liệu...</div>;
   }
 
   return (
     <div className="min-w-0 space-y-6">
       {/* System Overview */}
-      <Card className="min-w-0 border-zinc-200">
+      <Card className="min-w-0 border-border">
         <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <CardTitle className="text-xl">Tổng quan hệ thống</CardTitle>
-            <CardDescription>
+            <CardTitle className="text-xl text-foreground">Tổng quan hệ thống</CardTitle>
+            <CardDescription className="text-muted-foreground">
               Hiệu suất và thống kê thời gian thực — {new Date().toLocaleDateString("vi-VN", { dateStyle: "long" })}
             </CardDescription>
           </div>
-          <Button size="sm" className="w-fit bg-primary hover:bg-primary/90">
+          <Button size="sm" className="w-fit bg-primary hover:bg-primary/90 text-primary-foreground">
             <Download className="mr-2 h-4 w-4" />
             Xuất báo cáo
           </Button>
         </CardHeader>
         <CardContent>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-            <div className="rounded-xl border border-zinc-100 bg-zinc-50/50 p-4">
+            <div className="rounded-xl border border-border bg-muted/30 p-4">
               <div className="flex items-center gap-2">
                 <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
                   <Users className="h-4 w-4" />
                 </div>
-                <span className="text-xs font-medium text-zinc-500">Người dùng</span>
+                <span className="text-xs font-medium text-muted-foreground">Người dùng</span>
               </div>
-              <p className="mt-2 text-2xl font-bold text-zinc-900">{formatNumber(overview?.totalUsers || 0)}</p>
-              <p className="mt-1 flex items-center gap-1 text-xs text-emerald-600">
+              <p className="mt-2 text-2xl font-bold text-foreground">{formatNumber(overview?.totalUsers || 0)}</p>
+              <p className="mt-1 flex items-center gap-1 text-xs text-emerald-500">
                 <TrendingUp className="h-3 w-3" />
                 +{overview?.usersGrowthPercent || 12.5}% so với tháng trước
               </p>
             </div>
 
-            <div className="rounded-xl border border-zinc-100 bg-zinc-50/50 p-4">
+            <div className="rounded-xl border border-border bg-muted/30 p-4">
               <div className="flex items-center gap-2">
                 <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
                   <Building2 className="h-4 w-4" />
                 </div>
-                <span className="text-xs font-medium text-zinc-500">Nhà tổ chức</span>
+                <span className="text-xs font-medium text-muted-foreground">Nhà tổ chức</span>
                 {(overview?.pendingOrganizers ?? 0) > 0 && (
-                  <Badge variant="secondary" className="ml-auto text-[10px]">
+                  <Badge variant="secondary" className="ml-auto text-[10px] bg-muted text-muted-foreground border-border">
                     {overview?.pendingOrganizers} chờ duyệt
                   </Badge>
                 )}
               </div>
-              <p className="mt-2 text-2xl font-bold text-zinc-900">{formatNumber(overview?.totalOrganizers || 0)}</p>
+              <p className="mt-2 text-2xl font-bold text-foreground">{formatNumber(overview?.totalOrganizers || 0)}</p>
             </div>
 
-            <div className="rounded-xl border border-zinc-100 bg-zinc-50/50 p-4">
+            <div className="rounded-xl border border-border bg-muted/30 p-4">
               <div className="flex items-center gap-2">
                 <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
                   <Calendar className="h-4 w-4" />
                 </div>
-                <span className="text-xs font-medium text-zinc-500">Sự kiện đang mở</span>
+                <span className="text-xs font-medium text-muted-foreground">Sự kiện đang mở</span>
                 {(overview?.activeEvents ?? 0) > 0 && (
                   <Badge variant="default" className="ml-auto text-[10px]">
                     Đang hoạt động
                   </Badge>
                 )}
               </div>
-              <p className="mt-2 text-2xl font-bold text-zinc-900">{formatNumber(overview?.activeEvents || 0)}</p>
-              <p className="mt-1 text-xs text-zinc-500">
+              <p className="mt-2 text-2xl font-bold text-foreground">{formatNumber(overview?.activeEvents || 0)}</p>
+              <p className="mt-1 text-xs text-muted-foreground">
                 {overview?.totalEvents || 0} tổng · {overview?.pendingEvents || 0} chờ duyệt
               </p>
             </div>
 
-            <div className="rounded-xl border border-zinc-100 bg-zinc-50/50 p-4">
+            <div className="rounded-xl border border-border bg-muted/30 p-4">
               <div className="flex items-center gap-2">
                 <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
                   <DollarSign className="h-4 w-4" />
                 </div>
-                <span className="text-xs font-medium text-zinc-500">Doanh thu</span>
+                <span className="text-xs font-medium text-muted-foreground">Doanh thu</span>
               </div>
-              <p className="mt-2 text-2xl font-bold text-zinc-900">{formatCurrency(overview?.totalRevenue || 0)}</p>
-              <p className="mt-1 flex items-center gap-1 text-xs text-emerald-600">
+              <p className="mt-2 text-2xl font-bold text-foreground">{formatCurrency(overview?.totalRevenue || 0)}</p>
+              <p className="mt-1 flex items-center gap-1 text-xs text-emerald-500">
                 <TrendingUp className="h-3 w-3" />
                 TB: {formatCurrency(overview?.avgOrderValue || 0)}/đơn
               </p>
             </div>
 
-            <div className="rounded-xl border border-zinc-100 bg-zinc-50/50 p-4">
+            <div className="rounded-xl border border-border bg-muted/30 p-4">
               <div className="flex items-center gap-2">
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-violet-500/10 text-violet-600">
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-violet-500/10 text-violet-500">
                   <ArrowLeftRight className="h-4 w-4" />
                 </div>
-                <span className="text-xs font-medium text-zinc-500">Mua bán lại</span>
+                <span className="text-xs font-medium text-muted-foreground">Mua bán lại</span>
                 {(overview?.activeListings ?? 0) > 0 && (
-                  <Badge variant="secondary" className="ml-auto text-[10px]">
+                  <Badge variant="secondary" className="ml-auto text-[10px] bg-muted text-muted-foreground border-border">
                     {overview?.activeListings} đang bán
                   </Badge>
                 )}
               </div>
-              <p className="mt-2 text-2xl font-bold text-zinc-900">{formatCurrency(overview?.totalResaleRevenue || 0)}</p>
-              <p className="mt-1 text-xs text-zinc-500">
+              <p className="mt-2 text-2xl font-bold text-foreground">{formatCurrency(overview?.totalResaleRevenue || 0)}</p>
+              <p className="mt-1 text-xs text-muted-foreground">
                 {overview?.totalListings || 0} tin đăng · {overview?.totalResaleTransactions || 0} giao dịch
               </p>
             </div>
@@ -224,10 +224,10 @@ export function AdminDashboardContent() {
       {/* Charts row */}
       <div className="grid min-w-0 gap-6 lg:grid-cols-3">
         {/* Revenue Trend */}
-        <Card className="min-w-0 border-zinc-200 lg:col-span-2">
+        <Card className="min-w-0 border-border">
           <CardHeader>
-            <CardTitle>Xu hướng doanh thu</CardTitle>
-            <CardDescription>30 ngày qua</CardDescription>
+            <CardTitle className="text-foreground">Xu hướng doanh thu</CardTitle>
+            <CardDescription className="text-muted-foreground">30 ngày qua</CardDescription>
           </CardHeader>
           <CardContent className="min-w-0">
             <div className="h-[280px] min-h-0 w-full min-w-0 overflow-hidden">
@@ -239,22 +239,23 @@ export function AdminDashboardContent() {
                       <stop offset="100%" stopColor="#EA580C" stopOpacity={0} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e4e4e7" />
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
                   <XAxis
                     dataKey="date"
                     tickLine={false}
                     axisLine={false}
+                    stroke="hsl(var(--muted-foreground))"
                     tickFormatter={(v) => new Date(v).toLocaleDateString("vi-VN", { day: "2-digit", month: "short" })}
                   />
-                  <YAxis tickLine={false} axisLine={false} tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} />
+                  <YAxis tickLine={false} axisLine={false} stroke="hsl(var(--muted-foreground))" tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} />
                   <Tooltip
                     content={({ active, payload, label }) =>
                       active && payload?.[0] ? (
-                        <div className="rounded-lg border border-zinc-200 bg-white px-3 py-2 shadow-md">
-                          <p className="text-xs text-zinc-500">
+                        <div className="rounded-lg border border-border bg-card px-3 py-2 shadow-md">
+                          <p className="text-xs text-muted-foreground">
                             {label ? new Date(label).toLocaleDateString("vi-VN", { dateStyle: "long" }) : ""}
                           </p>
-                          <p className="font-semibold text-zinc-900">{formatCurrency(Number(payload[0].value) || 0)}</p>
+                          <p className="font-semibold text-foreground">{formatCurrency(Number(payload[0].value) || 0)}</p>
                         </div>
                       ) : null
                     }
@@ -273,10 +274,10 @@ export function AdminDashboardContent() {
         </Card>
 
         {/* Order Status */}
-        <Card className="min-w-0 border-zinc-200">
+        <Card className="min-w-0 border-border bg-card">
           <CardHeader>
-            <CardTitle>Trạng thái đơn hàng</CardTitle>
-            <CardDescription>Phân bổ trạng thái</CardDescription>
+            <CardTitle className="text-foreground">Trạng thái đơn hàng</CardTitle>
+            <CardDescription className="text-muted-foreground">Phân bổ trạng thái</CardDescription>
           </CardHeader>
           <CardContent className="min-w-0">
             <div className="flex h-[240px] min-w-0 items-center justify-center">
@@ -299,9 +300,9 @@ export function AdminDashboardContent() {
                     <Tooltip
                       content={({ active, payload }) =>
                         active && payload?.[0] ? (
-                          <div className="rounded-lg border border-zinc-200 bg-white px-3 py-2 shadow-md">
-                            <p className="font-medium text-zinc-900">{payload[0].payload.name}</p>
-                            <p className="text-sm text-zinc-600">
+                          <div className="rounded-lg border border-border bg-card px-3 py-2 shadow-md">
+                            <p className="font-medium text-foreground">{payload[0].payload.name}</p>
+                            <p className="text-sm text-muted-foreground">
                               {payload[0].value} đơn ({payload[0].payload.percent}%)
                             </p>
                           </div>
@@ -311,7 +312,7 @@ export function AdminDashboardContent() {
                   </PieChart>
                 </ResponsiveContainer>
               ) : (
-                <p className="text-sm text-zinc-500">Chưa có dữ liệu đơn hàng</p>
+                <p className="text-sm text-muted-foreground">Chưa có dữ liệu đơn hàng</p>
               )}
             </div>
             {orderStatusData.length > 0 && (
@@ -319,7 +320,7 @@ export function AdminDashboardContent() {
                 {orderStatusData.map((d, i) => (
                   <div key={i} className="flex items-center gap-2">
                     <div className="h-2 w-2 rounded-full" style={{ backgroundColor: d.fill }} />
-                    <span className="text-xs text-zinc-600">
+                    <span className="text-xs text-muted-foreground">
                       {d.name}: {d.percent}%
                     </span>
                   </div>
@@ -331,30 +332,30 @@ export function AdminDashboardContent() {
       </div>
 
       {/* Giao dịch gần đây - Table */}
-      <Card className="min-w-0 border-zinc-200">
+      <Card className="min-w-0 border-border">
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
-            <CardTitle>Giao dịch gần đây</CardTitle>
-            <CardDescription>Dữ liệu {recentTransactions.length} giao dịch mới nhất</CardDescription>
+            <CardTitle className="text-foreground">Giao dịch gần đây</CardTitle>
+            <CardDescription className="text-muted-foreground">Dữ liệu {recentTransactions.length} giao dịch mới nhất</CardDescription>
           </div>
           <Link href="/admin/revenue">
-            <Button variant="ghost" size="sm">
+            <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
               Xem tất cả
               <ArrowRight className="ml-1 h-4 w-4" />
             </Button>
           </Link>
         </CardHeader>
         <CardContent>
-          <div className="overflow-x-auto rounded-xl border border-zinc-200">
+          <div className="overflow-x-auto rounded-xl border border-border">
             {recentTransactions.length > 0 ? (
               <Table>
                 <TableHeader>
-                  <TableRow className="border-zinc-200 hover:bg-transparent">
-                    <TableHead className="font-semibold text-zinc-600">MÃ ĐƠN</TableHead>
-                    <TableHead className="font-semibold text-zinc-600">KHÁCH HÀNG</TableHead>
-                    <TableHead className="font-semibold text-zinc-600">NGÀY ĐẶT</TableHead>
-                    <TableHead className="font-semibold text-zinc-600">GIÁ TRỊ</TableHead>
-                    <TableHead className="font-semibold text-zinc-600">TRẠNG THÁI</TableHead>
+                  <TableRow className="border-border hover:bg-transparent">
+                    <TableHead className="font-semibold text-muted-foreground">MÃ ĐƠN</TableHead>
+                    <TableHead className="font-semibold text-muted-foreground">KHÁCH HÀNG</TableHead>
+                    <TableHead className="font-semibold text-muted-foreground">NGÀY ĐẶT</TableHead>
+                    <TableHead className="font-semibold text-muted-foreground">GIÁ TRỊ</TableHead>
+                    <TableHead className="font-semibold text-muted-foreground">TRẠNG THÁI</TableHead>
                     <TableHead className="w-12" />
                   </TableRow>
                 </TableHeader>
@@ -362,21 +363,21 @@ export function AdminDashboardContent() {
                   {recentTransactions.map((b) => {
                     const statusInfo = getStatusLabel(b.status);
                     return (
-                      <TableRow key={b.id} className="border-zinc-100">
-                        <TableCell className="font-mono text-zinc-700">
+                      <TableRow key={b.id} className="border-border hover:bg-muted/30 transition-colors">
+                        <TableCell className="font-mono text-muted-foreground">
                           #DH-{b.id.replace(/-/g, "").slice(-6).toUpperCase()}
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-3">
-                            <Avatar className="h-8 w-8 border border-zinc-200">
+                            <Avatar className="h-8 w-8 border border-border">
                               <AvatarFallback className="bg-primary/10 text-xs font-medium text-primary">
                                 {getInitials(b.fullname || "")}
                               </AvatarFallback>
                             </Avatar>
-                            <span className="font-medium text-zinc-900">{b.fullname || "—"}</span>
+                            <span className="font-medium text-foreground">{b.fullname || "—"}</span>
                           </div>
                         </TableCell>
-                        <TableCell className="text-zinc-600">
+                        <TableCell className="text-muted-foreground">
                           {b.paidAt || b.createdAt
                             ? new Date(b.paidAt || b.createdAt!).toLocaleDateString("vi-VN", {
                                 day: "2-digit",
@@ -385,11 +386,13 @@ export function AdminDashboardContent() {
                               })
                             : "—"}
                         </TableCell>
-                        <TableCell className="font-semibold text-zinc-900">
+                        <TableCell className="font-semibold text-foreground">
                           {formatCurrency(Number(b.totalPrice) || 0)}
                         </TableCell>
                         <TableCell>
-                          <Badge variant={statusInfo.variant}>{statusInfo.label}</Badge>
+                          <Badge variant={statusInfo.variant} className={statusInfo.variant === "secondary" ? "bg-muted text-muted-foreground border-border" : ""}>
+                            {statusInfo.label}
+                          </Badge>
                         </TableCell>
                         <TableCell>
                           <DropdownMenu>
@@ -414,7 +417,7 @@ export function AdminDashboardContent() {
                 </TableBody>
               </Table>
             ) : (
-              <div className="py-12 text-center text-sm text-zinc-500">Chưa có giao dịch</div>
+              <div className="py-12 text-center text-sm text-muted-foreground">Chưa có giao dịch</div>
             )}
           </div>
         </CardContent>

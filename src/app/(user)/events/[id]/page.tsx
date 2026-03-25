@@ -32,9 +32,9 @@ export default function DetailEventPage({ params }: { params: Promise<{ id: stri
 
   if (!detailEvent) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-zinc-50">
+      <div className="flex min-h-screen items-center justify-center bg-background">
         <div className="text-center">
-          <p className="font-medium text-zinc-600">Không tìm thấy sự kiện</p>
+          <p className="font-medium text-muted-foreground">Không tìm thấy sự kiện</p>
           <a
             href="/events"
             className="mt-4 inline-block font-semibold text-primary hover:underline"
@@ -48,9 +48,9 @@ export default function DetailEventPage({ params }: { params: Promise<{ id: stri
 
   if ((detailEvent.status as number) === EventStatus.DRAFT) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-zinc-50">
+      <div className="flex min-h-screen items-center justify-center bg-background">
         <div className="text-center">
-          <p className="font-medium text-zinc-600">Sự kiện chưa được công bố.</p>
+          <p className="font-medium text-muted-foreground">Sự kiện chưa được công bố.</p>
           <a
             href="/events"
             className="mt-4 inline-block font-semibold text-primary hover:underline"
@@ -63,7 +63,7 @@ export default function DetailEventPage({ params }: { params: Promise<{ id: stri
   }
 
   return (
-    <main className="min-h-screen bg-zinc-50 text-zinc-900">
+    <main className="min-h-screen bg-background text-foreground">
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
         <div className="absolute -top-24 left-0 h-96 w-96 rounded-full bg-primary/5 blur-[100px]" />
         <div className="absolute top-1/3 right-0 h-80 w-80 rounded-full bg-primary/5 blur-[80px]" />

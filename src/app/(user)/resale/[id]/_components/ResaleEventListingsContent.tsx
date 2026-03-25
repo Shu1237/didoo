@@ -130,21 +130,21 @@ export function ResaleEventListingsContent({
   };
 
   return (
-    <main className="min-h-screen bg-[#F8F9FA] pb-20 pt-20">
+    <main className="min-h-screen bg-background pb-20 pt-20">
       {/* Breadcrumbs */}
       <div className="mx-auto max-w-7xl px-4 py-4">
-        <nav className="flex items-center gap-2 text-sm text-zinc-500">
+        <nav className="flex items-center gap-2 text-sm text-muted-foreground">
           <Link href="/" className="hover:text-primary transition-colors">Trang chủ</Link>
           <ChevronRight className="h-3 w-3" />
           <Link href="/resale" className="hover:text-primary transition-colors">Vé bán lại</Link>
           <ChevronRight className="h-3 w-3" />
-          <span className="font-medium text-zinc-900">{event.name} - Vé bán lại</span>
+          <span className="font-medium text-foreground">{event.name} - Vé bán lại</span>
         </nav>
       </div>
 
       {/* Hero Section */}
       <section className="mx-auto max-w-7xl px-4">
-        <div className="relative h-[320px] w-full overflow-hidden rounded-[32px] shadow-2xl">
+        <div className="relative h-[280px] md:h-[320px] w-full overflow-hidden rounded-[24px] md:rounded-[32px] shadow-2xl">
           <Image
             src={event.bannerUrl || FALLBACK_IMAGE}
             alt={event.name}
@@ -156,29 +156,25 @@ export function ResaleEventListingsContent({
           
           <div className="absolute bottom-10 left-10 right-10 flex items-end justify-between">
             <div className="space-y-4">
-              <Badge className="bg-[#FF8A3D] hover:bg-[#FF8A3D] text-white px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border-none">
+              <Badge className="bg-[#FF8A3D] hover:bg-[#FF8A3D] text-white px-2 md:px-3 py-1 rounded-full text-[9px] md:text-[10px] font-bold uppercase tracking-wider border-none">
                 TRUNG TÂM BÁN LẠI CHÍNH THỨC
               </Badge>
-              <h1 className="text-4xl md:text-5xl font-bold text-white tracking-tight">
+              <h1 className="text-2xl sm:text-4xl md:text-5xl font-black text-white tracking-tight leading-tight">
                 {event.name}
               </h1>
-              <div className="flex flex-wrap items-center gap-6 text-zinc-200">
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-2 md:gap-6 text-zinc-200 text-xs md:text-base">
                 <div className="flex items-center gap-2">
-                  <Calendar className="h-5 w-5 text-[#FF8A3D]" />
-                  <span className="font-medium">
+                  <Calendar className="h-4 w-4 md:h-5 md:w-5 text-[#FF8A3D]" />
+                  <span className="font-semibold">
                     {event.startTime ? new Date(event.startTime).toLocaleDateString("vi-VN", {
                       month: "short",
                       day: "numeric",
                     }) : "Sẽ cập nhật"}
-                    {event.endTime && ` - ${new Date(event.endTime).toLocaleDateString("vi-VN", {
-                      day: "numeric",
-                      year: "numeric"
-                    })}`}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <MapPin className="h-5 w-5 text-[#FF8A3D]" />
-                  <span className="font-medium">
+                  <MapPin className="h-4 w-4 md:h-5 md:w-5 text-[#FF8A3D]" />
+                  <span className="font-semibold line-clamp-1">
                     {event.locations?.[0]?.name || "Địa điểm sẽ cập nhật"}
                   </span>
                 </div>
@@ -206,25 +202,25 @@ export function ResaleEventListingsContent({
       <section className="mx-auto max-w-7xl px-4 mt-12">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-2">
-            <h2 className="text-xl font-bold text-zinc-900">Vé đang bán</h2>
-            <Badge variant="secondary" className="bg-[#FFF4ED] text-[#FF8A3D] border-none font-medium">
+            <h2 className="text-lg md:text-xl font-bold text-foreground">Vé đang bán</h2>
+            <Badge variant="secondary" className="bg-primary/10 text-primary border-none font-bold text-[10px] md:text-xs">
               {totalItems} kết quả
             </Badge>
           </div>
           
-          <div className="flex items-center gap-2 text-sm font-medium text-zinc-500">
-            <span>Sắp xếp:</span>
-            <button className="text-zinc-900 flex items-center gap-1 hover:text-primary transition-colors">
+          <div className="flex items-center gap-2 text-xs md:text-sm font-bold text-muted-foreground">
+            <span className="hidden sm:inline">Sắp xếp:</span>
+            <button className="text-foreground flex items-center gap-1 hover:text-primary transition-colors">
               Giá thấp nhất
-              <ChevronDown className="h-4 w-4" />
+              <ChevronDown className="h-3 w-3 md:h-4 md:w-4" />
             </button>
           </div>
         </div>
 
         {pagedListings.length === 0 ? (
-          <div className="text-center py-20 bg-white rounded-3xl border border-dashed border-zinc-200">
-            <Info className="h-12 w-12 text-zinc-300 mx-auto mb-4" />
-            <p className="text-zinc-500 font-medium">Không có vé phù hợp bộ lọc đã chọn.</p>
+          <div className="text-center py-20 bg-card rounded-3xl border border-dashed border-border">
+            <Info className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
+            <p className="text-muted-foreground font-medium">Không có vé phù hợp bộ lọc đã chọn.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -235,40 +231,40 @@ export function ResaleEventListingsContent({
               const exceedsMax = wouldExceedMaxTicketsPerUser(listing, ticketTypes, ownedCountByTicketType);
 
               return (
-                <div key={listing.id} className="bg-white rounded-3xl border border-zinc-100 p-6 flex flex-col h-full shadow-sm hover:shadow-md transition-shadow">
+                <div key={listing.id} className="bg-card rounded-3xl border border-border p-6 flex flex-col h-full shadow-sm hover:shadow-md transition-shadow">
                   <div className="flex items-start justify-between mb-4">
-                    <div className="text-[10px] font-bold text-zinc-400 tracking-wider">
+                    <div className="text-[9px] md:text-[10px] font-bold text-muted-foreground/50 tracking-wider">
                       MÃ TIN: #{listing.id.slice(-8).toUpperCase()}
                     </div>
                     {isVerified && (
-                      <Badge className="bg-[#E7F9EF] text-[#2ECC71] hover:bg-[#E7F9EF] border-none text-[10px] font-bold rounded-full px-2 py-0.5 flex items-center gap-1">
+                      <Badge className="bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 border-none text-[9px] md:text-[10px] font-bold rounded-full px-2 py-0.5 flex items-center gap-1">
                         <ShieldCheck className="h-3 w-3" />
                         ĐÃ XÁC MINH
                       </Badge>
                     )}
                   </div>
 
-                  <h3 className="text-xl font-bold text-zinc-900 mb-4 line-clamp-1">
+                  <h3 className="text-lg md:text-xl font-black text-foreground mb-4 line-clamp-1">
                     {listing.description || "Vé bán lại cho sự kiện"}
                   </h3>
                   
                   <div className="space-y-3 mb-8 flex-1">
-                    <div className="flex items-center gap-3 text-zinc-600">
-                      <div className="w-8 h-8 rounded-lg bg-zinc-50 flex items-center justify-center">
-                        <Info className="h-4 w-4 text-[#FF8A3D]" />
+                    <div className="flex items-center gap-3 text-muted-foreground">
+                      <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center">
+                        <Info className="h-4 w-4 text-primary" />
                       </div>
                       <span className="text-sm font-medium">Chuyển vé điện tử qua email</span>
                     </div>
                   </div>
 
-                  <div className="flex items-end justify-between pt-6 border-t border-zinc-50">
+                  <div className="flex items-end justify-between pt-6 border-t border-border/50">
                     <div>
-                      <p className="text-[10px] font-bold text-zinc-400 uppercase mb-1">Tổng cho {qty} vé</p>
-                      <p className="text-2xl font-black text-zinc-900 leading-none">
-                        {Number(listing.askingPrice ?? 0) === 0 ? "Miễn phí" : `${Number(listing.askingPrice).toLocaleString("vi-VN")}đ`}
-                      </p>
+                    <p className="text-[9px] md:text-[10px] font-bold text-muted-foreground/50 uppercase mb-1">Tổng cho {qty} vé</p>
+                    <p className="text-xl md:text-2xl font-black text-foreground leading-none">
+                      {Number(listing.askingPrice ?? 0) === 0 ? "Miễn phí" : `${Number(listing.askingPrice).toLocaleString("vi-VN")}đ`}
+                    </p>
                       {exceedsMax && (
-                        <p className="mt-2 text-xs font-medium text-amber-600">
+                        <p className="mt-2 text-xs font-medium text-amber-500">
                           Bạn đã đạt giới hạn vé cho loại vé này
                         </p>
                       )}
@@ -276,12 +272,12 @@ export function ResaleEventListingsContent({
                     {exceedsMax ? (
                       <Button
                         disabled
-                        className="bg-zinc-200 text-zinc-500 font-bold rounded-xl px-6 cursor-not-allowed min-h-[44px] min-w-[88px]"
+                        className="bg-muted text-muted-foreground font-bold rounded-xl px-6 cursor-not-allowed min-h-[44px] min-w-[88px]"
                       >
                         Mua ngay
                       </Button>
                     ) : (
-                      <Button asChild className="bg-[#FF8A3D] hover:bg-[#E67A2E] text-white font-bold rounded-xl px-6 min-h-[44px] min-w-[88px]">
+                      <Button asChild className="bg-primary hover:bg-primary/90 text-white font-bold rounded-xl px-4 md:px-6 h-10 md:h-11 min-w-[80px] md:min-w-[88px] text-xs md:text-sm">
                         <Link href={`/resale/${eventId}/trade-booking/${listing.id}`}>
                           Mua ngay
                         </Link>
@@ -301,7 +297,7 @@ export function ResaleEventListingsContent({
               <button 
                 onClick={() => handlePageChange(pageNumber - 1)}
                 disabled={pageNumber === 1}
-                className="w-10 h-10 flex items-center justify-center rounded-xl border border-zinc-200 text-zinc-400 hover:bg-zinc-50 disabled:opacity-30 transition-colors"
+                className="w-10 h-10 flex items-center justify-center rounded-xl border border-border text-muted-foreground hover:bg-muted disabled:opacity-30 transition-colors"
               >
                 <ChevronLeft className="h-4 w-4" />
               </button>
@@ -311,7 +307,7 @@ export function ResaleEventListingsContent({
                   // Basic pagination logic to show limited numbers
                   if (totalPages > 7) {
                     if (p > 3 && p < totalPages - 1 && Math.abs(p - pageNumber) > 1) {
-                      if (p === 4 || p === totalPages - 2) return <span key={p} className="text-zinc-400">...</span>;
+                      if (p === 4 || p === totalPages - 2) return <span key={p} className="text-muted-foreground/50">...</span>;
                       return null;
                     }
                   }
@@ -322,8 +318,8 @@ export function ResaleEventListingsContent({
                       onClick={() => handlePageChange(p)}
                       className={`w-10 h-10 flex items-center justify-center rounded-xl font-bold transition-all ${
                         pageNumber === p 
-                          ? "bg-[#FF8A3D] text-white shadow-lg shadow-primary/20" 
-                          : "text-zinc-600 hover:bg-zinc-100"
+                          ? "bg-primary text-white shadow-lg shadow-primary/20" 
+                          : "text-muted-foreground hover:bg-muted"
                       }`}
                     >
                       {p}
@@ -335,7 +331,7 @@ export function ResaleEventListingsContent({
               <button 
                 onClick={() => handlePageChange(pageNumber + 1)}
                 disabled={pageNumber === totalPages}
-                className="w-10 h-10 flex items-center justify-center rounded-xl border border-zinc-200 text-zinc-400 hover:bg-zinc-50 disabled:opacity-30 transition-colors"
+                className="w-10 h-10 flex items-center justify-center rounded-xl border border-border text-muted-foreground hover:bg-muted disabled:opacity-30 transition-colors"
               >
                 <ChevronRight className="h-4 w-4" />
               </button>

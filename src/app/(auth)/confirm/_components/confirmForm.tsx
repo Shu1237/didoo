@@ -52,12 +52,12 @@ export default function ConfirmForm({ resetKey }: { resetKey?: string }) {
 
   if (!resetKey) {
     return (
-      <div className="w-full max-w-md bg-white rounded-2xl border border-zinc-200 shadow-xl p-8 text-center">
-        <div className="h-16 w-16 rounded-full bg-rose-100 flex items-center justify-center text-rose-500 mx-auto mb-6">
+      <div className="w-full max-w-md bg-card rounded-2xl border border-border shadow-xl p-8 text-center">
+        <div className="h-16 w-16 rounded-full bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center text-rose-500 mx-auto mb-6">
           <Lock className="h-8 w-8" />
         </div>
-        <h2 className="text-xl font-bold text-zinc-900 mb-3">Link không hợp lệ</h2>
-        <p className="text-zinc-600 text-sm mb-6">
+        <h2 className="text-xl font-bold text-foreground mb-3">Link không hợp lệ</h2>
+        <p className="text-muted-foreground text-sm mb-6">
           Link thiếu mã bảo mật hoặc đã được sử dụng. Vui lòng yêu cầu link mới.
         </p>
         <Button asChild className="w-full h-12 rounded-xl font-semibold">
@@ -71,7 +71,7 @@ export default function ConfirmForm({ resetKey }: { resetKey?: string }) {
     <motion.div
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      className="grid grid-cols-1 lg:grid-cols-2 w-full max-w-5xl bg-white rounded-2xl border border-zinc-200 shadow-xl overflow-hidden lg:min-h-[420px]"
+      className="grid grid-cols-1 lg:grid-cols-2 w-full max-w-5xl bg-card rounded-2xl border border-border shadow-xl overflow-hidden lg:min-h-[420px]"
     >
       <div className="p-6 sm:p-8 lg:p-10">
         <AnimatePresence mode="wait">
@@ -85,20 +85,20 @@ export default function ConfirmForm({ resetKey }: { resetKey?: string }) {
               <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary mb-6">
                 <ShieldCheck className="h-6 w-6" />
               </div>
-              <h1 className="text-2xl font-bold text-zinc-900">Đặt lại mật khẩu</h1>
-              <p className="mt-1 text-zinc-600 text-sm mb-6">Nhập mật khẩu mới bên dưới.</p>
+              <h1 className="text-2xl font-bold text-foreground">Đặt lại mật khẩu</h1>
+              <p className="mt-1 text-muted-foreground text-sm mb-6">Nhập mật khẩu mới bên dưới.</p>
 
               <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
                 <input type="hidden" {...register("key")} />
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-zinc-700">Mật khẩu mới</label>
+                  <label className="text-sm font-medium text-foreground/80">Mật khẩu mới</label>
                   <div className="relative">
                     <Input
                       type={showPassword ? "text" : "password"}
                       placeholder="••••••••"
                       {...register("password")}
-                      className={`h-11 rounded-xl border-zinc-200 bg-zinc-50 pr-11 ${errors.password ? "border-rose-300" : ""}`}
+                      className={`h-11 rounded-xl border-border bg-muted/50 pr-11 ${errors.password ? "border-rose-300" : ""}`}
                     />
                     <button
                       type="button"
@@ -112,13 +112,13 @@ export default function ConfirmForm({ resetKey }: { resetKey?: string }) {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-zinc-700">Xác nhận mật khẩu mới</label>
+                  <label className="text-sm font-medium text-foreground/80">Xác nhận mật khẩu mới</label>
                   <div className="relative">
                     <Input
                       type={showConfirmPassword ? "text" : "password"}
                       placeholder="••••••••"
                       {...register("confirmPassword")}
-                      className={`h-11 rounded-xl border-zinc-200 bg-zinc-50 pr-11 ${errors.confirmPassword ? "border-rose-300" : ""}`}
+                      className={`h-11 rounded-xl border-border bg-muted/50 pr-11 ${errors.confirmPassword ? "border-rose-300" : ""}`}
                     />
                     <button
                       type="button"
@@ -151,11 +151,11 @@ export default function ConfirmForm({ resetKey }: { resetKey?: string }) {
               animate={{ opacity: 1, scale: 1 }}
               className="text-center py-4"
             >
-              <div className="mx-auto h-16 w-16 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 mb-6">
+              <div className="mx-auto h-16 w-16 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600 mb-6">
                 <ShieldCheck className="h-8 w-8" />
               </div>
-              <h2 className="text-2xl font-bold text-zinc-900 mb-2">Hoàn tất!</h2>
-              <p className="text-zinc-600 text-sm mb-8 max-w-xs mx-auto">
+              <h2 className="text-2xl font-bold text-foreground mb-2">Hoàn tất!</h2>
+              <p className="text-muted-foreground text-sm mb-8 max-w-xs mx-auto">
                 Mật khẩu đã được đặt lại thành công. Đăng nhập bằng mật khẩu mới.
               </p>
 
@@ -180,7 +180,7 @@ export default function ConfirmForm({ resetKey }: { resetKey?: string }) {
         </AnimatePresence>
       </div>
 
-      <div className="hidden lg:flex flex-col justify-center p-10 bg-zinc-900 text-white min-h-[420px]">
+      <div className="hidden lg:flex flex-col justify-center p-10 bg-zinc-900 border-l border-border/10 text-white min-h-[420px]">
         <h2 className="text-2xl font-bold leading-tight">
           Sắp xong rồi!
           <br />

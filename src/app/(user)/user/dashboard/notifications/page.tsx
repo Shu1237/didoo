@@ -107,9 +107,9 @@ export default function NotificationsPage() {
   if (!user && !meRes?.data) {
     return (
       <div className="flex min-h-[40vh] items-center justify-center">
-        <Card className="max-w-md border-zinc-200">
+        <Card className="max-w-md border-border bg-card">
           <CardContent className="p-8 text-center">
-            <p className="text-zinc-600">Vui lòng đăng nhập để xem thông báo.</p>
+            <p className="text-muted-foreground">Vui lòng đăng nhập để xem thông báo.</p>
             <Button asChild className="mt-4">
               <Link href="/login">Đăng nhập</Link>
             </Button>
@@ -122,14 +122,14 @@ export default function NotificationsPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-zinc-900">Thông báo</h1>
+        <h1 className="text-2xl font-bold text-foreground">Thông báo</h1>
       </div>
 
-      <Card className="border-zinc-200">
+      <Card className="border-border bg-card shadow-sm">
         <CardHeader>
           <div className="flex items-center gap-2">
-            <Bell className="h-5 w-5 text-zinc-600" />
-            <span className="font-semibold text-zinc-900">Thông báo của tôi</span>
+            <Bell className="h-5 w-5 text-muted-foreground" />
+            <span className="font-semibold text-foreground">Thông báo của tôi</span>
           </div>
         </CardHeader>
         <CardContent>
@@ -138,22 +138,22 @@ export default function NotificationsPage() {
             onValueChange={(v) => setStatusTab(v as StatusTab)}
             className="w-full"
           >
-            <TabsList className="mb-4 grid w-full max-w-xs grid-cols-2 rounded-xl bg-zinc-100 p-1">
-              <TabsTrigger value="unread" className="rounded-lg data-[state=active]:bg-white data-[state=active]:text-zinc-900 data-[state=active]:shadow-sm">
+            <TabsList className="mb-4 grid w-full max-w-xs grid-cols-2 rounded-xl bg-muted p-1">
+              <TabsTrigger value="unread" className="rounded-lg data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:shadow-sm">
                 Chưa đọc
               </TabsTrigger>
-              <TabsTrigger value="read" className="rounded-lg data-[state=active]:bg-white data-[state=active]:text-zinc-900 data-[state=active]:shadow-sm">
+              <TabsTrigger value="read" className="rounded-lg data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:shadow-sm">
                 Đã đọc
               </TabsTrigger>
             </TabsList>
 
             <TabsContent value="unread" className="mt-0">
               {isUnreadLoading && unreadItems.length === 0 ? (
-                <div className="py-12 text-center text-zinc-500">Đang tải...</div>
+                <div className="py-12 text-center text-muted-foreground font-medium">Đang tải...</div>
               ) : unreadItems.length === 0 ? (
-                <div className="py-12 text-center text-zinc-500">Chưa có thông báo chưa đọc</div>
+                <div className="py-12 text-center text-muted-foreground font-medium">Chưa có thông báo chưa đọc</div>
               ) : (
-                <ul className="divide-y divide-zinc-200">
+                <ul className="divide-y divide-border">
                   {unreadItems.map((item) => (
                     <li key={item.id}>
                       <Link
@@ -162,8 +162,8 @@ export default function NotificationsPage() {
                         className="flex gap-4 rounded-lg bg-primary/5 p-4 transition hover:bg-primary/10"
                       >
                         <div className="min-w-0 flex-1">
-                          <p className="font-medium text-zinc-900">{item.title}</p>
-                          <p className="mt-1 text-sm text-zinc-600">{item.message}</p>
+                          <p className="font-semibold text-foreground">{item.title}</p>
+                          <p className="mt-1 text-sm text-muted-foreground font-medium">{item.message}</p>
                         </div>
                         {!item.id.startsWith("rt-") && (
                           <Button
@@ -187,20 +187,20 @@ export default function NotificationsPage() {
 
             <TabsContent value="read" className="mt-0">
               {isReadLoading && readItems.length === 0 ? (
-                <div className="py-12 text-center text-zinc-500">Đang tải...</div>
+                <div className="py-12 text-center text-muted-foreground font-medium">Đang tải...</div>
               ) : readItems.length === 0 ? (
-                <div className="py-12 text-center text-zinc-500">Chưa có thông báo đã đọc</div>
+                <div className="py-12 text-center text-muted-foreground font-medium">Chưa có thông báo đã đọc</div>
               ) : (
-                <ul className="divide-y divide-zinc-200">
+                <ul className="divide-y divide-border">
                   {readItems.map((item) => (
                     <li key={item.id}>
                       <Link
                         href={getLink(item)}
-                        className="flex gap-4 rounded-lg p-4 transition hover:bg-zinc-50"
+                        className="flex gap-4 rounded-lg p-4 transition hover:bg-muted"
                       >
                         <div className="min-w-0 flex-1">
-                          <p className="font-medium text-zinc-600">{item.title}</p>
-                          <p className="mt-1 text-sm text-zinc-500">{item.message}</p>
+                          <p className="font-semibold text-muted-foreground">{item.title}</p>
+                          <p className="mt-1 text-sm text-muted-foreground/80 font-medium">{item.message}</p>
                         </div>
                       </Link>
                     </li>

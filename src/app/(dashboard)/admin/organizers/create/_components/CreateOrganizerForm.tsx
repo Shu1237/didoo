@@ -64,9 +64,9 @@ export function CreateOrganizerForm() {
   };
 
   return (
-    <Card className="border-zinc-200">
+    <Card className="border-border bg-card">
       <CardHeader>
-        <h2 className="text-lg font-semibold text-zinc-900">Thông tin organizer</h2>
+        <h2 className="text-lg font-semibold text-foreground">Thông tin organizer</h2>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">

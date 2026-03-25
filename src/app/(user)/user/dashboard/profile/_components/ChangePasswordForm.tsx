@@ -72,8 +72,8 @@ export default function ChangePasswordForm() {
         error={form.formState.errors.password?.message}
       />
 
-      <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3">
-        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+      <div className="rounded-2xl border border-border bg-muted/50 p-3">
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
           Quy tắc mật khẩu
         </p>
         <ul className="mt-2 space-y-1.5 text-xs font-medium">
@@ -131,21 +131,21 @@ function PasswordField({
 }) {
   return (
     <div className="space-y-1.5">
-      <label className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">{label}</label>
+      <label className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">{label}</label>
       <div className="relative">
-        <LockKeyhole className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+        <LockKeyhole className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/60" />
         <Input
           type={typeVisible ? "text" : "password"}
           placeholder={placeholder}
           {...register(fieldName)}
-          className={`h-11 rounded-xl border-slate-200 bg-white pl-10 pr-10 ${
+          className={`h-11 rounded-xl border-border bg-card pl-10 pr-10 ${
             error ? "border-rose-300 ring-1 ring-rose-200" : ""
           }`}
         />
         <button
           type="button"
           onClick={onToggleVisible}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
         >
           {typeVisible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
         </button>
@@ -157,8 +157,8 @@ function PasswordField({
 
 function RuleItem({ ok, label }: { ok: boolean; label: string }) {
   return (
-    <li className={`flex items-center gap-2 ${ok ? "text-emerald-700" : "text-slate-500"}`}>
-      <span className={`h-1.5 w-1.5 rounded-full ${ok ? "bg-emerald-500" : "bg-slate-300"}`} />
+    <li className={`flex items-center gap-2 ${ok ? "text-emerald-500" : "text-muted-foreground"}`}>
+      <span className={`h-1.5 w-1.5 rounded-full ${ok ? "bg-emerald-500" : "bg-muted-foreground/30"}`} />
       {label}
     </li>
   );

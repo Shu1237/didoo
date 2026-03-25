@@ -86,10 +86,10 @@ export function BasePagination({
                                 value={itemsPerPage.toString()}
                                 onValueChange={(val) => onPageSizeChange(Number(val))}
                             >
-                                <SelectTrigger className="h-9 w-[70px] bg-white border-zinc-200 rounded-xl focus:ring-1 focus:ring-zinc-400 font-medium">
+                                <SelectTrigger className="h-9 w-[70px] bg-card border-border rounded-xl focus:ring-1 focus:ring-primary font-medium">
                                     <SelectValue placeholder={itemsPerPage.toString()} />
                                 </SelectTrigger>
-                                <SelectContent className="rounded-xl border-zinc-100 shadow-xl">
+                                <SelectContent className="rounded-xl border-border shadow-xl">
                                     {pageSizeOptions.map((size) => (
                                         <SelectItem key={size} value={size.toString()} className="text-xs font-medium">
                                             {size}

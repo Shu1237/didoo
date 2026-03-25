@@ -84,9 +84,9 @@ export function TradeBookingConfirmForm({
 
   if (!event || !listing) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-zinc-50 px-4">
-        <div className="max-w-lg rounded-2xl border border-zinc-200 bg-white p-8 text-center shadow-sm">
-          <p className="text-zinc-600">Không tìm thấy dữ liệu tin đăng bán lại.</p>
+      <main className="flex min-h-screen items-center justify-center bg-background px-4">
+        <div className="max-w-lg rounded-2xl border border-border bg-card p-8 text-center shadow-sm">
+          <p className="text-muted-foreground">Không tìm thấy dữ liệu tin đăng bán lại.</p>
           <Button asChild className="mt-4 rounded-xl">
             <Link href={`/resale/${eventId}`}>Quay lại danh sách tin đăng</Link>
           </Button>
@@ -97,9 +97,9 @@ export function TradeBookingConfirmForm({
 
   if (!user) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-zinc-50 px-4">
-        <div className="max-w-lg rounded-2xl border border-zinc-200 bg-white p-8 text-center shadow-sm">
-          <p className="text-zinc-600">Bạn cần đăng nhập để tiếp tục mua vé bán lại.</p>
+      <main className="flex min-h-screen items-center justify-center bg-background px-4">
+        <div className="max-w-lg rounded-2xl border border-border bg-card p-8 text-center shadow-sm">
+          <p className="text-muted-foreground">Bạn cần đăng nhập để tiếp tục mua vé bán lại.</p>
           <Button asChild className="mt-4 rounded-xl">
             <Link href={`/login?redirect=/resale/${eventId}/trade-booking/${listingId}/confirm`}>Đăng nhập</Link>
           </Button>
@@ -111,21 +111,21 @@ export function TradeBookingConfirmForm({
   const isUnavailable = validateData && validateData.isAvailable === false;
 
   return (
-    <main className="min-h-screen bg-zinc-50 px-4 pb-16 pt-28">
+    <main className="min-h-screen bg-background px-4 pb-16 pt-28">
       <div className="mx-auto max-w-5xl">
         <Link
           href={`/resale/${eventId}/trade-booking/${listingId}`}
-          className="mb-6 inline-flex items-center gap-2 rounded-xl border border-zinc-200 bg-white px-4 py-2 text-sm font-medium text-zinc-700 transition hover:bg-zinc-50"
+          className="mb-6 inline-flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-2 text-sm font-medium text-muted-foreground transition hover:bg-muted"
         >
           <ChevronLeft className="h-4 w-4" />
           Quay lại chi tiết vé
         </Link>
 
         {isUnavailable && (
-          <Card className="mb-6 border-amber-300 bg-amber-50">
-            <CardContent className="flex items-start gap-3 p-4 text-amber-800">
+          <Card className="mb-6 border-amber-500/20 bg-amber-500/10">
+            <CardContent className="flex items-start gap-3 p-4 text-amber-600 dark:text-amber-500">
               <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0" />
-              <p className="text-sm">
+              <p className="text-sm font-medium">
                 Tin đăng này không còn khả dụng để mua. Vui lòng quay lại chọn tin đăng khác.
               </p>
             </CardContent>
@@ -134,20 +134,20 @@ export function TradeBookingConfirmForm({
 
         <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-6 lg:grid-cols-12">
           <section className="space-y-5 lg:col-span-7">
-            <Card className="border-zinc-200">
+            <Card className="border-border bg-card">
               <CardHeader>
-                <h1 className="text-2xl font-bold text-zinc-900">Xác nhận mua vé</h1>
-                <p className="text-sm text-zinc-600">Sự kiện: {event.name}</p>
+                <h1 className="text-2xl font-bold text-foreground">Xác nhận mua vé</h1>
+                <p className="text-sm text-muted-foreground">Sự kiện: {event.name}</p>
               </CardHeader>
               <CardContent className="space-y-4">
                 <input type="hidden" {...form.register("listingId")} />
                 <input type="hidden" {...form.register("buyerUserId")} />
 
                 <div>
-                  <label className="text-sm font-medium text-zinc-700">Họ tên</label>
+                  <label className="text-sm font-medium text-muted-foreground">Họ tên</label>
                   <input
                     {...form.register("fullname")}
-                    className="mt-1 h-11 w-full rounded-xl border border-zinc-200 px-3 text-sm outline-none focus:border-primary"
+                    className="mt-1 h-11 w-full rounded-xl border border-border bg-muted/50 px-3 text-sm outline-none focus:border-primary transition-colors"
                     placeholder="Nhập họ tên"
                   />
                   {form.formState.errors.fullname?.message && (
@@ -156,10 +156,10 @@ export function TradeBookingConfirmForm({
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium text-zinc-700">Email</label>
+                  <label className="text-sm font-medium text-muted-foreground">Email</label>
                   <input
                     {...form.register("email")}
-                    className="mt-1 h-11 w-full rounded-xl border border-zinc-200 px-3 text-sm outline-none focus:border-primary"
+                    className="mt-1 h-11 w-full rounded-xl border border-border bg-muted/50 px-3 text-sm outline-none focus:border-primary transition-colors"
                     placeholder="Nhập email"
                   />
                   {form.formState.errors.email?.message && (
@@ -168,10 +168,10 @@ export function TradeBookingConfirmForm({
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium text-zinc-700">Số điện thoại</label>
+                  <label className="text-sm font-medium text-muted-foreground">Số điện thoại</label>
                   <input
                     {...form.register("phone")}
-                    className="mt-1 h-11 w-full rounded-xl border border-zinc-200 px-3 text-sm outline-none focus:border-primary"
+                    className="mt-1 h-11 w-full rounded-xl border border-border bg-muted/50 px-3 text-sm outline-none focus:border-primary transition-colors"
                     placeholder="Nhập số điện thoại"
                   />
                 </div>
@@ -180,21 +180,21 @@ export function TradeBookingConfirmForm({
           </section>
 
           <aside className="lg:col-span-5">
-            <div className="sticky top-24 rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
-              <h2 className="text-xl font-bold text-zinc-900">Thông tin tin đăng</h2>
+            <div className="sticky top-24 rounded-2xl border border-border bg-card p-6 shadow-sm">
+              <h2 className="text-xl font-bold text-foreground">Thông tin tin đăng</h2>
               <div className="mt-4 space-y-2 text-sm">
-                <p className="text-zinc-600">
-                  Mã tin đăng: <span className="font-semibold text-zinc-900">{listing.id}</span>
+                <p className="text-muted-foreground">
+                  Mã tin đăng: <span className="font-semibold text-foreground">{listing.id}</span>
                 </p>
-                <p className="text-zinc-600">
+                <p className="text-muted-foreground">
                   Giá bán lại:{" "}
-                  <span className="text-lg font-bold text-zinc-900">
+                  <span className="text-lg font-bold text-foreground">
                     {Number(listing.askingPrice || 0).toLocaleString("vi-VN")}đ
                   </span>
                 </p>
-                <p className="text-zinc-600">
+                <p className="text-muted-foreground">
                   Trạng thái validate:{" "}
-                  <span className="font-semibold text-zinc-900">
+                  <span className="font-semibold text-foreground">
                     {isUnavailable ? "Không khả dụng" : "Có thể giao dịch"}
                   </span>
                 </p>
@@ -205,7 +205,7 @@ export function TradeBookingConfirmForm({
                   <ShieldCheck className="h-4 w-4" />
                   Quy trình mua lại an toàn
                 </p>
-                <p className="mt-1 text-zinc-600">
+                <p className="mt-1 text-muted-foreground/80 font-medium">
                   Kiểm tra tin đăng → tạo đơn mua lại → nhận kết quả thanh toán → chuyển quyền sở hữu vé.
                 </p>
               </div>

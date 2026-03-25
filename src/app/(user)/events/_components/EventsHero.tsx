@@ -45,23 +45,23 @@ export default function EventsHero({
           </div>
 
           <div className="space-y-4">
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight text-zinc-900">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight text-foreground">
               Tìm sự kiện
               <span className="block text-primary mt-1">phù hợp với bạn</span>
             </h1>
-            <p className="max-w-xl text-lg text-zinc-600">
+            <p className="max-w-xl text-lg text-muted-foreground">
               Khám phá sự kiện sắp diễn ra. Từ concert đến hội nghị, đặt vé dễ dàng.
             </p>
           </div>
 
           <div className="grid grid-cols-2 gap-4 max-w-sm">
-            <div className="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm">
-              <p className="text-xs font-medium text-zinc-500">Sự kiện</p>
-              <p className="text-2xl font-bold text-zinc-900">{totalEvents}</p>
+            <div className="rounded-xl border border-border bg-card p-4 shadow-sm">
+              <p className="text-xs font-medium text-muted-foreground">Sự kiện</p>
+              <p className="text-2xl font-bold text-foreground">{totalEvents}</p>
             </div>
-            <div className="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm">
-              <p className="text-xs font-medium text-zinc-500">Danh mục</p>
-              <p className="text-2xl font-bold text-zinc-900">{totalCategories}</p>
+            <div className="rounded-xl border border-border bg-card p-4 shadow-sm">
+              <p className="text-xs font-medium text-muted-foreground">Danh mục</p>
+              <p className="text-2xl font-bold text-foreground">{totalCategories}</p>
             </div>
           </div>
 
@@ -86,7 +86,7 @@ export default function EventsHero({
         >
           {featuredEvent ? (
             <Link href={`/events/${featuredEvent.id}`} className="group block">
-              <div className="relative overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-xl">
+              <div className="relative overflow-hidden rounded-2xl border border-border bg-card shadow-xl">
                 <div className="relative aspect-[4/5] overflow-hidden">
                   <Image
                     src={
@@ -98,9 +98,9 @@ export default function EventsHero({
                     fill
                     className="object-cover transition-transform duration-500 group-hover:scale-105"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-zinc-900/90 via-zinc-900/20 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-foreground/90 via-foreground/20 to-transparent" />
 
-                  <span className="absolute top-4 left-4 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-zinc-900">
+                  <span className="absolute top-4 left-4 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-foreground">
                     Nổi bật
                   </span>
 
@@ -108,7 +108,7 @@ export default function EventsHero({
                     <h2 className="line-clamp-2 text-2xl font-bold text-white">
                       {featuredEvent.name}
                     </h2>
-                    <div className="flex flex-col gap-2 text-sm text-zinc-200">
+                    <div className="flex flex-col gap-2 text-sm text-muted-foreground">
                       <div className="flex items-center gap-2">
                         <CalendarDays className="h-4 w-4 shrink-0" />
                         {featuredDate}
@@ -125,8 +125,8 @@ export default function EventsHero({
               </div>
             </Link>
           ) : (
-            <div className="rounded-2xl border border-dashed border-zinc-300 bg-zinc-50 p-12 text-center">
-              <p className="text-zinc-600 font-medium">Chưa có sự kiện nổi bật.</p>
+            <div className="rounded-2xl border border-dashed border-border bg-muted p-12 text-center">
+              <p className="text-muted-foreground font-medium">Chưa có sự kiện nổi bật.</p>
             </div>
           )}
         </motion.div>

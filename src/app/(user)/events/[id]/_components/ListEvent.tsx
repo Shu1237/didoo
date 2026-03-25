@@ -16,20 +16,20 @@ export default function ListEvent({ title, eventData, relatedEvent }: ListEventP
   if (!eventData?.length) return null;
 
   return (
-    <section className="space-y-6 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm md:p-7">
+    <section className="space-y-6 rounded-3xl border border-border bg-card p-5 shadow-sm md:p-7">
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
             {relatedEvent ? "Related Events" : "Khuyen nghi"}
           </p>
-          <h2 className="text-2xl font-bold tracking-tight text-slate-900 md:text-3xl">
+          <h2 className="text-2xl font-bold tracking-tight text-foreground md:text-3xl">
             {title}
           </h2>
         </div>
         <Button
           asChild
           variant="outline"
-          className="h-10 rounded-full border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
+          className="h-10 rounded-full border-border bg-card text-foreground hover:bg-muted"
         >
           <Link href="/events">
             Xem them

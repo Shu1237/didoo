@@ -8,37 +8,37 @@ interface OrganizerStatsProps {
 
 export function OrganizerStats({ eventCount }: OrganizerStatsProps) {
   return (
-    <div className="mt-8 grid grid-cols-3 gap-4">
-      <div className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
+    <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4 px-4 sm:px-0">
+      <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
         <div className="flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
-            <Ticket className="h-6 w-6" />
+          <div className="flex h-10 w-10 md:h-12 md:w-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
+            <Ticket className="h-5 w-5 md:h-6 md:w-6" />
           </div>
           <div>
-            <p className="text-2xl font-bold text-zinc-900">{eventCount}</p>
-            <p className="text-xs font-medium text-zinc-500">Sự kiện</p>
+            <p className="text-xl md:text-2xl font-black text-foreground leading-tight">{eventCount}</p>
+            <p className="text-[10px] md:text-xs font-bold uppercase tracking-wider text-muted-foreground">Sự kiện</p>
           </div>
         </div>
       </div>
-      <div className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
+      <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
         <div className="flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
-            <Users className="h-6 w-6" />
+          <div className="flex h-10 w-10 md:h-12 md:w-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
+            <Users className="h-5 w-5 md:h-6 md:w-6" />
           </div>
           <div>
-            <p className="text-2xl font-bold text-zinc-900">—</p>
-            <p className="text-xs font-medium text-zinc-500">Người theo dõi</p>
+            <p className="text-xl md:text-2xl font-black text-foreground leading-tight">—</p>
+            <p className="text-[10px] md:text-xs font-bold uppercase tracking-wider text-muted-foreground">Người theo dõi</p>
           </div>
         </div>
       </div>
-      <div className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
+      <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
         <div className="flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
-            <Star className="h-6 w-6" />
+          <div className="flex h-10 w-10 md:h-12 md:w-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
+            <Star className="h-5 w-5 md:h-6 md:w-6" />
           </div>
           <div>
-            <p className="text-2xl font-bold text-zinc-900">—</p>
-            <p className="text-xs font-medium text-zinc-500">Đánh giá</p>
+            <p className="text-xl md:text-2xl font-black text-foreground leading-tight">—</p>
+            <p className="text-[10px] md:text-xs font-bold uppercase tracking-wider text-muted-foreground">Đánh giá</p>
           </div>
         </div>
       </div>

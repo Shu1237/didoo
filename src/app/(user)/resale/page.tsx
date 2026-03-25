@@ -89,7 +89,7 @@ export default function ResalePage() {
   if (isEventsLoading || isCategoriesLoading) return <Loading />;
 
   return (
-    <div className="min-h-screen bg-[#F8F9FA] pb-20 pt-20">
+    <div className="min-h-screen bg-background pb-20 pt-20">
       <ResalePageContent
         events={events}
         totalItems={totalItems}

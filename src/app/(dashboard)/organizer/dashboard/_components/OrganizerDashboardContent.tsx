@@ -102,12 +102,12 @@ export function OrganizerDashboardContent() {
     return (
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {[1, 2, 3, 4].map((i) => (
-          <Card key={i} className="border-zinc-200">
+          <Card key={i} className="border-border">
             <CardHeader className="pb-2">
-              <div className="h-4 w-24 animate-pulse rounded bg-zinc-200" />
+              <div className="h-4 w-24 animate-pulse rounded bg-muted" />
             </CardHeader>
             <CardContent>
-              <div className="h-8 w-16 animate-pulse rounded bg-zinc-200" />
+              <div className="h-8 w-16 animate-pulse rounded bg-muted" />
             </CardContent>
           </Card>
         ))}
@@ -118,20 +118,20 @@ export function OrganizerDashboardContent() {
   return (
     <div className="min-w-0 space-y-6">
       {/* Organizer Overview */}
-      <Card className="min-w-0 border-zinc-200">
+      <Card className="min-w-0 border-border">
         <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <CardTitle className="text-xl">Tổng quan tổ chức</CardTitle>
-            <CardDescription>
+            <CardTitle className="text-xl text-foreground">Tổng quan tổ chức</CardTitle>
+            <CardDescription className="text-muted-foreground">
               Hiệu suất bán vé và hoạt động tổ chức sự kiện
             </CardDescription>
           </div>
           <div className="flex items-center gap-2">
-            <Badge variant="outline" className="gap-1">
+            <Badge variant="outline" className="gap-1 border-border text-muted-foreground">
               <Calendar className="h-3.5 w-3.5" />
               30 ngày qua
             </Badge>
-            <Button size="sm" className="bg-primary hover:bg-primary/90" asChild>
+            <Button size="sm" className="bg-primary hover:bg-primary/90 text-white" asChild>
               <Link href="/organizer/events/create">
                 <Plus className="mr-2 h-4 w-4" />
                 Tạo sự kiện mới
@@ -144,16 +144,16 @@ export function OrganizerDashboardContent() {
             {kpiCards.map((kpi, i) => (
               <div
                 key={i}
-                className="rounded-xl border border-zinc-100 bg-zinc-50/50 p-4"
+                className="rounded-xl border border-border bg-muted/30 p-4"
               >
                 <div className="flex items-center gap-2">
                   <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
                     <kpi.icon className="h-4 w-4" />
                   </div>
-                  <span className="text-xs font-medium text-zinc-500">{kpi.title}</span>
+                  <span className="text-xs font-semibold text-muted-foreground">{kpi.title}</span>
                 </div>
-                <p className="mt-2 text-2xl font-bold text-zinc-900">{kpi.value}</p>
-                <p className="mt-1 flex items-center gap-1 text-xs text-emerald-600">
+                <p className="mt-2 text-2xl font-bold text-foreground">{kpi.value}</p>
+                <p className="mt-1 flex items-center gap-1 text-xs text-emerald-500 font-medium">
                   <TrendingUp className="h-3 w-3" />
                   {kpi.change}
                 </p>
@@ -166,36 +166,42 @@ export function OrganizerDashboardContent() {
       {/* Charts row */}
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Doanh thu vé mỗi ngày */}
-        <Card className="min-w-0 border-zinc-200 lg:col-span-2">
+        <Card className="min-w-0 border-border lg:col-span-2">
           <CardHeader>
-            <CardTitle>Biểu đồ bán vé</CardTitle>
-            <CardDescription>30 ngày qua</CardDescription>
+            <CardTitle className="text-foreground">Biểu đồ bán vé</CardTitle>
+            <CardDescription className="text-muted-foreground">30 ngày qua</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="h-[220px] min-h-0 w-full min-w-0 overflow-hidden">
               <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                 <BarChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e4e4e7" />
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
                   <XAxis
                     dataKey="name"
                     tickLine={false}
                     axisLine={false}
                     tickMargin={8}
+                    tick={{ fill: "var(--muted-foreground)", fontSize: 12 }}
                   />
-                  <YAxis tickLine={false} axisLine={false} tickFormatter={(v) => `${(v).toFixed(0)}`} />
+                  <YAxis 
+                    tickLine={false} 
+                    axisLine={false} 
+                    tickFormatter={(v) => `${(v).toFixed(0)}`}
+                    tick={{ fill: "var(--muted-foreground)", fontSize: 12 }}
+                  />
                   <Tooltip
                     content={({ active, payload }) =>
                       active && payload?.[0] ? (
-                        <div className="rounded-lg border border-zinc-200 bg-white px-3 py-2 shadow-md">
-                          <p className="font-medium text-zinc-900">{payload[0].payload.name}</p>
-                          <p className="text-sm text-zinc-600">
+                        <div className="rounded-xl border border-border bg-card px-3 py-2 shadow-xl">
+                          <p className="font-bold text-foreground">{payload[0].payload.name}</p>
+                          <p className="text-sm font-semibold text-primary">
                             {formatNumber(Number(payload[0].value) || 0)} vé
                           </p>
                         </div>
                       ) : null
                     }
                   />
-                  <Bar dataKey="sales" fill="#EA580C" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="sales" fill="var(--primary)" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -203,10 +209,10 @@ export function OrganizerDashboardContent() {
         </Card>
 
         {/* Tăng trưởng tỷ lệ lấp đầy */}
-        <Card className="min-w-0 border-zinc-200">
+        <Card className="min-w-0 border-border">
           <CardHeader>
-            <CardTitle>Tỷ lệ lấp đầy</CardTitle>
-            <CardDescription>Trung bình các sự kiện</CardDescription>
+            <CardTitle className="text-foreground">Tỷ lệ lấp đầy</CardTitle>
+            <CardDescription className="text-muted-foreground">Trung bình các sự kiện</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="mb-2 text-2xl font-bold text-primary">
@@ -217,19 +223,25 @@ export function OrganizerDashboardContent() {
                 <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                   <defs>
                     <linearGradient id="orgRevenueGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#EA580C" stopOpacity={0.3} />
-                      <stop offset="100%" stopColor="#EA580C" stopOpacity={0} />
+                      <stop offset="0%" stopColor="var(--primary)" stopOpacity={0.3} />
+                      <stop offset="100%" stopColor="var(--primary)" stopOpacity={0} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e4e4e7" />
-                  <XAxis dataKey="name" tickLine={false} axisLine={false} tickMargin={8} />
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
+                  <XAxis 
+                    dataKey="name" 
+                    tickLine={false} 
+                    axisLine={false} 
+                    tickMargin={8} 
+                    tick={{ fill: "var(--muted-foreground)", fontSize: 12 }}
+                  />
                   <YAxis tickLine={false} axisLine={false} hide />
                   <Tooltip
                     content={({ active, payload }) =>
                       active && payload?.[0] ? (
-                        <div className="rounded-lg border border-zinc-200 bg-white px-3 py-2 shadow-md">
-                          <p className="font-medium text-zinc-900">{payload[0].payload.name}</p>
-                          <p className="text-sm text-zinc-600">
+                        <div className="rounded-xl border border-border bg-card px-3 py-2 shadow-xl">
+                          <p className="font-bold text-foreground">{payload[0].payload.name}</p>
+                          <p className="text-sm font-semibold text-primary">
                             {formatNumber(Number(payload[0].value) || 0)} vé
                           </p>
                         </div>
@@ -239,7 +251,7 @@ export function OrganizerDashboardContent() {
                   <Area
                     type="monotone"
                     dataKey="sales"
-                    stroke="#EA580C"
+                    stroke="var(--primary)"
                     strokeWidth={2}
                     fill="url(#orgRevenueGradient)"
                   />
@@ -251,14 +263,14 @@ export function OrganizerDashboardContent() {
       </div>
 
       {/* Sự kiện hoạt động gần đây */}
-      <Card className="min-w-0 border-zinc-200">
+      <Card className="min-w-0 border-border">
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
-            <CardTitle>Sự kiện hoạt động gần đây</CardTitle>
-            <CardDescription>Các sự kiện đang diễn ra hoặc bán vé tốt</CardDescription>
+            <CardTitle className="text-foreground">Sự kiện hoạt động gần đây</CardTitle>
+            <CardDescription className="text-muted-foreground">Các sự kiện đang diễn ra hoặc bán vé tốt</CardDescription>
           </div>
           <Link href="/organizer/events">
-            <Button variant="ghost" size="sm">
+            <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
               Xem tất cả sự kiện
               <ArrowLeftRight className="ml-1 h-4 w-4" />
             </Button>
@@ -285,9 +297,9 @@ export function OrganizerDashboardContent() {
                 <Link
                   key={e.id}
                   href={`/organizer/events/${e.id}`}
-                  className="group overflow-hidden rounded-xl border border-zinc-200 transition hover:border-primary/50 hover:shadow-md"
+                  className="group overflow-hidden rounded-xl border border-border bg-card transition hover:border-primary/50 hover:shadow-xl"
                 >
-                  <div className="relative aspect-[4/3] w-full bg-zinc-100">
+                  <div className="relative aspect-[4/3] w-full bg-muted">
                     <Image
                       src={FALLBACK_IMAGE}
                       alt={e.name}
@@ -317,24 +329,24 @@ export function OrganizerDashboardContent() {
                     </div>
                   </div>
                   <div className="p-3">
-                    <p className="font-semibold text-zinc-900 truncate">{e.name}</p>
-                    <p className="mt-1 flex items-center gap-1 text-xs text-zinc-500">
+                    <p className="font-bold text-foreground truncate">{e.name}</p>
+                    <p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground font-medium">
                       <Calendar className="h-3.5 w-3.5" />
                       {formatDate(e.startTime)}
                     </p>
                     <div className="mt-2 flex items-center justify-between gap-2">
                       <div className="flex flex-1 items-center gap-2">
-                        <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-zinc-200">
+                        <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-muted">
                           <div
                             className="h-full rounded-full bg-primary"
                             style={{ width: `${e.occupancyPercent}%` }}
                           />
                         </div>
-                        <span className="text-xs font-medium text-zinc-600">
-                          {e.occupancyPercent}% vé đã bán
+                        <span className="text-xs font-bold text-muted-foreground">
+                          {e.occupancyPercent}%
                         </span>
                       </div>
-                      <span className="text-sm font-semibold text-zinc-900">
+                      <span className="text-sm font-bold text-foreground">
                         {formatCurrency(e.revenue)}
                       </span>
                     </div>
@@ -343,7 +355,7 @@ export function OrganizerDashboardContent() {
                 );
               })
             ) : (
-              <p className="col-span-full py-8 text-center text-sm text-zinc-500">
+              <p className="col-span-full py-8 text-center text-sm font-medium text-muted-foreground">
                 Chưa có sự kiện nào
               </p>
             )}

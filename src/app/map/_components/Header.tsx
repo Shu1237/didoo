@@ -115,7 +115,7 @@ export default function MapHeader() {
             <Button
               id="date"
               variant={"outline"}
-              className={`h-8 px-3 text-xs rounded-full border border-border/50 whitespace-nowrap shadow-sm ${dateRange?.from ? "bg-primary/10 border-primary/30 text-primary font-medium" : "bg-background hover:bg-background/80 font-normal"
+              className={`h-8 px-3 text-xs rounded-full border border-border/50 whitespace-nowrap shadow-sm ${dateRange?.from ? "bg-primary/10 border-primary/30 text-primary font-medium" : "bg-card hover:bg-muted font-normal"
                 }`}
             >
               {dateRange?.from ? (
@@ -131,7 +131,7 @@ export default function MapHeader() {
               )}
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-auto p-0 rounded-xl border-border/50 backdrop-blur-xl bg-background/95 shadow-xl" align="start">
+          <PopoverContent className="w-auto p-0 rounded-xl border-border/50 backdrop-blur-xl bg-card/95 shadow-xl" align="start">
             <Calendar
               initialFocus
               mode="range"
@@ -149,13 +149,13 @@ export default function MapHeader() {
           <DropdownMenuTrigger asChild>
             <Button
               variant="outline"
-              className={`h-8 px-3 text-xs rounded-full border border-border/50 whitespace-nowrap shadow-sm ${categoryId ? "bg-primary/10 border-primary/30 text-primary font-medium" : "bg-background hover:bg-background/80 font-normal"
+              className={`h-8 px-3 text-xs rounded-full border border-border/50 whitespace-nowrap shadow-sm ${categoryId ? "bg-primary/10 border-primary/30 text-primary font-medium" : "bg-card hover:bg-muted font-normal"
                 }`}
             >
               {categoryId ? categories.find((c) => c.id === categoryId)?.name ?? "Loại" : "Loại"}
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-56 overflow-hidden rounded-xl border-border/50 backdrop-blur-xl bg-background/95">
+          <DropdownMenuContent align="start" className="w-56 overflow-hidden rounded-xl border-border/50 backdrop-blur-xl bg-card/95">
             <DropdownMenuItem
               onClick={() => updateParams({ categoryId: "" })}
               className={`focus:bg-primary/10 focus:text-primary cursor-pointer my-1 rounded-lg ${!categoryId ? "text-primary font-medium bg-primary/5" : ""}`}
@@ -179,7 +179,7 @@ export default function MapHeader() {
           <DropdownMenuTrigger asChild>
             <Button
               variant="outline"
-              className={`h-8 px-3 text-xs rounded-full border border-border/50 whitespace-nowrap shadow-sm ${status ? "bg-primary/10 border-primary/30 text-primary font-medium" : "bg-background hover:bg-background/80 font-normal"
+              className={`h-8 px-3 text-xs rounded-full border border-border/50 whitespace-nowrap shadow-sm ${status ? "bg-primary/10 border-primary/30 text-primary font-medium" : "bg-card hover:bg-muted font-normal"
                 }`}
             >
               {status === String(EventStatus.OPENED)
@@ -189,7 +189,7 @@ export default function MapHeader() {
                   : "Trạng thái"}
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-48 overflow-hidden rounded-xl border-border/50 backdrop-blur-xl bg-background/95">
+          <DropdownMenuContent align="start" className="w-48 overflow-hidden rounded-xl border-border/50 backdrop-blur-xl bg-card/95">
             <DropdownMenuItem
               onClick={() => updateParams({ status: "" })}
               className={`focus:bg-primary/10 focus:text-primary cursor-pointer my-1 rounded-lg ${!status ? "text-primary font-medium bg-primary/5" : ""}`}
@@ -221,7 +221,7 @@ export default function MapHeader() {
               <ArrowUpDown className="ml-1.5 w-3 h-3" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-48 overflow-hidden rounded-xl border-border/50 backdrop-blur-xl bg-background/95">
+          <DropdownMenuContent align="start" className="w-48 overflow-hidden rounded-xl border-border/50 backdrop-blur-xl bg-card/95">
             {sortOptions.map((opt) => (
               <DropdownMenuItem
                 key={opt.value}

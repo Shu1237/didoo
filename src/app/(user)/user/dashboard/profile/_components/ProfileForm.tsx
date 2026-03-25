@@ -100,8 +100,8 @@ export default function ProfileForm() {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-[420px] items-center justify-center rounded-3xl border border-slate-200 bg-white">
-        <Loader2 className="h-7 w-7 animate-spin text-sky-700" />
+      <div className="flex min-h-[420px] items-center justify-center rounded-3xl border border-border bg-card">
+        <Loader2 className="h-7 w-7 animate-spin text-primary" />
       </div>
     );
   }
@@ -110,14 +110,14 @@ export default function ProfileForm() {
     <>
       {tab === 'general' && (
         <div className="flex flex-col h-full animate-in fade-in slide-in-from-bottom-4 duration-500">
-          <div className="p-8 md:p-10 bg-white flex-1">
+          <div className="p-4 sm:p-8 md:p-10 bg-card flex-1">
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <Field label="Địa chỉ email">
                   <Input
                     value={user?.email || ""}
                     disabled
-                    className="h-11 rounded-xl border-slate-200 bg-slate-50 text-slate-700"
+                    className="h-11 rounded-xl border-border bg-muted/50 text-muted-foreground"
                   />
                 </Field>
 
@@ -125,7 +125,7 @@ export default function ProfileForm() {
                   <Input
                     value={user?.role?.name || "Người dùng"}
                     disabled
-                    className="h-11 rounded-xl border-slate-200 bg-slate-50 text-slate-700"
+                    className="h-11 rounded-xl border-border bg-muted/50 text-muted-foreground"
                   />
                 </Field>
 
@@ -133,7 +133,7 @@ export default function ProfileForm() {
                   <Input
                     {...form.register("FullName")}
                     placeholder="Nhập họ và tên"
-                    className="h-11 rounded-xl border-slate-200 bg-white"
+                    className="h-11 rounded-xl border-border bg-card"
                   />
                 </Field>
 
@@ -143,9 +143,9 @@ export default function ProfileForm() {
                       <Button
                         type="button"
                         variant="outline"
-                        className="h-11 w-full justify-start rounded-xl border-slate-200 bg-white px-3 text-left text-sm font-medium text-slate-700"
+                        className="h-11 w-full justify-start rounded-xl border-border bg-card px-3 text-left text-sm font-medium text-foreground"
                       >
-                        <CalendarDays className="mr-2 h-4 w-4 text-slate-400" />
+                        <CalendarDays className="mr-2 h-4 w-4 text-muted-foreground" />
                         {(() => {
                           const selectedDate = parseProfileDate(form.watch("DateOfBirth"));
                           return selectedDate ? format(selectedDate, "dd/MM/yyyy") : "Chọn ngày sinh";
@@ -195,37 +195,37 @@ export default function ProfileForm() {
 
       {tab === 'security' && (
         <div className="flex flex-col h-full animate-in fade-in slide-in-from-bottom-4 duration-500">
-          <div className="p-8 md:p-10 border-b border-slate-100">
+          <div className="p-4 sm:p-8 md:p-10 border-b border-border/50">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-500">
                 <ShieldCheck className="h-5 w-5" />
               </div>
               <div>
-                <h2 className="text-2xl font-black tracking-tight text-slate-900">
+                <h2 className="text-2xl font-black tracking-tight text-foreground">
                   Cài đặt bảo mật
                 </h2>
-                <p className="text-sm font-medium text-slate-500 mt-0.5">
+                <p className="text-sm font-medium text-muted-foreground mt-0.5">
                   Quản lý mật khẩu và tăng cường bảo mật tài khoản.
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="p-8 md:p-10 bg-white flex-1">
+          <div className="p-4 sm:p-8 md:p-10 bg-card flex-1">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Dialog>
                 <DialogTrigger asChild>
-                  <button className="flex flex-col items-center justify-center gap-4 rounded-3xl border-2 border-slate-100 bg-white p-10 py-16 shadow-sm transition-all hover:border-sky-200 hover:shadow-md hover:bg-sky-50/50 outline-none group">
-                    <div className="rounded-full bg-slate-50 p-4 group-hover:bg-white group-hover:scale-110 transition-transform">
-                      <KeyRound className="h-8 w-8 text-slate-700 group-hover:text-sky-600" />
+                  <button className="flex flex-col items-center justify-center gap-4 rounded-3xl border-2 border-border bg-card p-6 md:p-10 py-10 md:py-16 shadow-sm transition-all hover:border-primary/40 hover:shadow-md hover:bg-muted/50 outline-none group">
+                    <div className="rounded-full bg-muted p-4 group-hover:bg-card group-hover:scale-110 transition-transform">
+                      <KeyRound className="h-8 w-8 text-foreground group-hover:text-primary" />
                     </div>
-                    <span className="text-lg font-bold text-slate-900">Đổi mật khẩu</span>
-                    <p className="text-sm font-medium text-slate-500 text-center max-w-[200px]">Cập nhật thông tin đăng nhập an toàn.</p>
+                    <span className="text-lg font-bold text-foreground">Đổi mật khẩu</span>
+                    <p className="text-sm font-medium text-muted-foreground text-center max-w-[200px]">Cập nhật thông tin đăng nhập an toàn.</p>
                   </button>
                 </DialogTrigger>
-                <DialogContent className="max-h-[90vh] overflow-y-auto rounded-3xl border border-slate-200 bg-white p-6 md:p-7">
-                  <DialogTitle className="text-2xl font-bold text-slate-900">Cập nhật mật khẩu</DialogTitle>
-                  <DialogDescription className="text-sm text-slate-600">
+                <DialogContent className="max-h-[90vh] overflow-y-auto rounded-3xl border border-border bg-card p-6 md:p-7">
+                  <DialogTitle className="text-2xl font-bold text-foreground">Cập nhật mật khẩu</DialogTitle>
+                  <DialogDescription className="text-sm text-muted-foreground">
                     Dùng mật khẩu mạnh hơn để tăng bảo mật.
                   </DialogDescription>
                   <div className="mt-5">
@@ -236,17 +236,17 @@ export default function ProfileForm() {
 
               <Dialog>
                 <DialogTrigger asChild>
-                  <button className="flex flex-col items-center justify-center gap-4 rounded-3xl border-2 border-slate-100 bg-white p-10 py-16 shadow-sm transition-all hover:border-sky-200 hover:shadow-md hover:bg-sky-50/50 outline-none group">
-                    <div className="rounded-full bg-slate-50 p-4 group-hover:bg-white group-hover:scale-110 transition-transform">
-                      <Mail className="h-8 w-8 text-slate-700 group-hover:text-sky-600" />
+                  <button className="flex flex-col items-center justify-center gap-4 rounded-3xl border-2 border-border bg-card p-6 md:p-10 py-10 md:py-16 shadow-sm transition-all hover:border-primary/40 hover:shadow-md hover:bg-muted/50 outline-none group">
+                    <div className="rounded-full bg-muted p-4 group-hover:bg-card group-hover:scale-110 transition-transform">
+                      <Mail className="h-8 w-8 text-foreground group-hover:text-primary" />
                     </div>
-                    <span className="text-lg font-bold text-slate-900">Đổi email</span>
-                    <p className="text-sm font-medium text-slate-500 text-center max-w-[200px]">Cập nhật email tài khoản của bạn.</p>
+                    <span className="text-lg font-bold text-foreground">Đổi email</span>
+                    <p className="text-sm font-medium text-muted-foreground text-center max-w-[200px]">Cập nhật email tài khoản của bạn.</p>
                   </button>
                 </DialogTrigger>
-                <DialogContent className="max-h-[90vh] overflow-y-auto rounded-3xl border border-slate-200 bg-white p-6 md:p-7">
-                  <DialogTitle className="text-2xl font-bold text-slate-900">Cập nhật email</DialogTitle>
-                  <DialogDescription className="text-sm text-slate-600">
+                <DialogContent className="max-h-[90vh] overflow-y-auto rounded-3xl border border-border bg-card p-6 md:p-7">
+                  <DialogTitle className="text-2xl font-bold text-foreground">Cập nhật email</DialogTitle>
+                  <DialogDescription className="text-sm text-muted-foreground">
                     Hệ thống sẽ gửi OTP để xác nhận email mới.
                   </DialogDescription>
                   <div className="mt-5">
@@ -273,7 +273,7 @@ function Field({
 }) {
   return (
     <div className="space-y-1.5">
-      <label className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">{label}</label>
+      <label className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">{label}</label>
       {children}
       {error && <p className="text-xs font-medium text-rose-600">{error}</p>}
     </div>

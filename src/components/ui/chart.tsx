@@ -78,17 +78,17 @@ export function ChartTooltipContent({
 }: ChartTooltipContentProps) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="rounded-lg border border-zinc-200 bg-white px-3 py-2 shadow-md">
+    <div className="rounded-lg border border-border bg-background px-3 py-2 shadow-md">
       {label && (
-        <p className="mb-1 text-xs font-medium text-zinc-500">
+        <p className="mb-1 text-xs font-medium text-muted-foreground">
           {labelFormatter ? labelFormatter(label) : label}
         </p>
       )}
       <div className="space-y-1">
         {payload.map((entry) => (
           <div key={entry.dataKey} className="flex items-center justify-between gap-4 text-sm">
-            <span className="text-zinc-600">{entry.name ?? entry.dataKey}</span>
-            <span className="font-medium text-zinc-900">
+            <span className="text-muted-foreground">{entry.name ?? entry.dataKey}</span>
+            <span className="font-medium text-foreground">
               {nameFormatter ? nameFormatter(entry.name ?? "", entry.value ?? 0) : entry.value}
             </span>
           </div>

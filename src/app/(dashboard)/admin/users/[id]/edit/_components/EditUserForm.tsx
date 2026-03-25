@@ -77,19 +77,19 @@ export function EditUserForm({ id }: { id: string }) {
 
   if (isLoading || !user) {
     return (
-      <Card className="border-zinc-200">
+      <Card className="border-border bg-card">
         <CardContent className="flex items-center justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-zinc-400" />
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </CardContent>
       </Card>
     );
   }
 
   return (
-    <Card className="border-zinc-200">
+    <Card className="border-border bg-card">
       <CardHeader>
-        <h2 className="text-lg font-semibold text-zinc-900">Thông tin người dùng</h2>
-        <p className="text-sm text-zinc-500">Email: {user.email}</p>
+        <h2 className="text-lg font-semibold text-foreground">Thông tin người dùng</h2>
+        <p className="text-sm text-muted-foreground">Email: {user.email}</p>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -119,13 +119,13 @@ export function EditUserForm({ id }: { id: string }) {
               <select
                 id="Gender"
                 {...register("Gender", { valueAsNumber: true })}
-                className={`h-10 w-full rounded-md border bg-background px-3 text-sm ${
-                  errors.Gender ? "border-destructive" : "border-input"
-                }`}
+                className={`h-10 w-full rounded-md border bg-muted/50 px-3 text-sm ${
+                  errors.Gender ? "border-destructive text-destructive" : "border-border text-foreground"
+                } focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring`}
               >
-                <option value={Gender.MALE}>Nam</option>
-                <option value={Gender.FEMALE}>Nữ</option>
-                <option value={Gender.OTHER}>Khác</option>
+                <option value={Gender.MALE} className="bg-card">Nam</option>
+                <option value={Gender.FEMALE} className="bg-card">Nữ</option>
+                <option value={Gender.OTHER} className="bg-card">Khác</option>
               </select>
               {errors.Gender && (
                 <p className="text-sm text-destructive">{String(errors.Gender.message ?? "")}</p>

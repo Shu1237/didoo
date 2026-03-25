@@ -47,23 +47,23 @@ export function EventsContent({
   return (
     <div className="min-w-0">
 
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-        <div />
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-zinc-500 font-medium">Sắp xếp:</span>
+      <div className="flex items-center justify-between gap-4 mb-6">
+        <div className="hidden sm:block" />
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+          <span className="text-xs sm:text-sm text-muted-foreground font-bold uppercase tracking-wider whitespace-nowrap">Sắp xếp:</span>
           <Select
             value={sortBy}
             onValueChange={(value) => onSortChange(value as SortBy)}
           >
             <SelectTrigger
-              className="h-10 w-[170px] rounded-xl border border-zinc-200 bg-white text-sm font-medium text-zinc-900 focus:ring-1 focus:ring-zinc-400"
+              className="h-9 sm:h-10 flex-1 sm:w-[170px] rounded-xl border border-border bg-card text-xs sm:text-sm font-bold text-foreground focus:ring-2 focus:ring-ring transition-all"
             >
               <SelectValue placeholder="Sắp xếp" />
             </SelectTrigger>
-            <SelectContent className="rounded-xl border-zinc-100 shadow-xl">
-              <SelectItem value="featured">Nổi bật</SelectItem>
-              <SelectItem value="date">Theo ngày</SelectItem>
-              <SelectItem value="name">Theo tên</SelectItem>
+            <SelectContent className="rounded-xl border border-border shadow-2xl">
+              <SelectItem value="featured" className="text-xs sm:text-sm font-medium">Nổi bật</SelectItem>
+              <SelectItem value="date" className="text-xs sm:text-sm font-medium">Theo ngày</SelectItem>
+              <SelectItem value="name" className="text-xs sm:text-sm font-medium">Theo tên</SelectItem>
             </SelectContent>
           </Select>
         </div>

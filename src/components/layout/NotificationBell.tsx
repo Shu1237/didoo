@@ -50,8 +50,8 @@ export function NotificationBell() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative h-9 w-9 rounded-xl">
-          <Bell className="h-5 w-5 text-zinc-600" />
+        <Button variant="ghost" size="icon" className="relative h-9 w-9 rounded-xl border border-border/70 bg-card hover:bg-secondary">
+          <Bell className="h-5 w-5 text-muted-foreground" />
           {unreadCount > 0 && (
             <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-rose-500 text-[10px] font-bold text-white">
               {unreadCount > 9 ? "9+" : unreadCount}
@@ -59,9 +59,9 @@ export function NotificationBell() {
           )}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-80 rounded-xl border border-zinc-200 p-2">
+      <DropdownMenuContent align="end" className="w-80 rounded-xl border border-border bg-popover text-popover-foreground p-2">
         <DropdownMenuLabel className="flex items-center justify-between px-2 py-2">
-          <span className="text-sm font-semibold text-zinc-900">Thông báo</span>
+          <span className="text-sm font-semibold text-foreground">Thông báo</span>
           <Link
             href="/user/dashboard/notifications"
             className="text-xs font-medium text-primary hover:underline"
@@ -71,7 +71,7 @@ export function NotificationBell() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         {displayItems.length === 0 ? (
-          <div className="py-8 text-center text-sm text-zinc-500">Chưa có thông báo</div>
+          <div className="py-8 text-center text-sm text-muted-foreground">Chưa có thông báo</div>
         ) : (
           displayItems.map((n, i) => (
             <DropdownMenuItem key={i} asChild>
@@ -87,8 +87,8 @@ export function NotificationBell() {
                 }
                 className="flex flex-col items-start gap-0.5 rounded-lg px-3 py-2.5"
               >
-                <span className="text-sm font-medium text-zinc-900">{n.title}</span>
-                <span className="line-clamp-2 text-xs text-zinc-500">{n.message}</span>
+                <span className="text-sm font-medium text-foreground">{n.title}</span>
+                <span className="line-clamp-2 text-xs text-muted-foreground">{n.message}</span>
               </Link>
             </DropdownMenuItem>
           ))

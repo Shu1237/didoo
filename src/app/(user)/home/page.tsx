@@ -37,7 +37,7 @@ export default function Home() {
   if (isOpenedLoading || isPublishedLoading || isCategoriesLoading || isOrganizersLoading) return <Loading />;
   if ((isOpenedError && isPublishedError) || (!openedEventsResponse && !publishedEventsResponse)) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-zinc-500">
+      <div className="min-h-screen flex items-center justify-center text-muted-foreground">
         Không thể tải dữ liệu. Vui lòng thử lại.
       </div>
     );
@@ -50,7 +50,7 @@ export default function Home() {
   const heroEvents = openedEvents.length > 0 ? openedEvents : publishedEvents;
 
   return (
-    <div className="min-h-screen bg-zinc-50 text-zinc-900">
+    <div className="min-h-screen bg-background text-foreground">
       <HeroSection events={heroEvents.slice(0, 5)} />
 
       <CategorySection openedEvents={openedEvents.slice(0, 6)} />

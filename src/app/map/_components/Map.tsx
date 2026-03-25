@@ -391,7 +391,7 @@ const Map = ({ coordinates, events, isLoading, selectedEvent, setSelectedEvent, 
 
       {/* Route Info Panel - Bên phải */}
       {routeInfo && selectedEvent && (
-        <div className="absolute bottom-20 right-6 bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl px-6 py-4 z-10 border border-gray-200 animate-slide-up">
+        <div className="absolute bottom-20 right-6 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md rounded-2xl shadow-2xl px-6 py-4 z-10 border border-gray-200 dark:border-border/50 animate-slide-up">
           <div className="flex items-center gap-4">
             <div className="bg-gradient-to-br from-blue-500 to-indigo-600 p-3 rounded-xl">
               <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -399,19 +399,19 @@ const Map = ({ coordinates, events, isLoading, selectedEvent, setSelectedEvent, 
               </svg>
             </div>
             <div>
-              <p className="text-sm text-gray-600 font-medium">Lộ trình đến {selectedEvent?.name}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400 font-medium">Lộ trình đến {selectedEvent?.name}</p>
               <div className="flex items-center gap-4 mt-1">
                 <div className="flex items-center gap-1">
                   <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                   </svg>
-                  <span className="text-sm font-bold text-gray-900">{routeInfo?.distance}</span>
+                  <span className="text-sm font-bold text-gray-900 dark:text-white">{routeInfo?.distance}</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                  <span className="text-sm font-bold text-gray-900">{routeInfo?.duration}</span>
+                  <span className="text-sm font-bold text-gray-900 dark:text-white">{routeInfo?.duration}</span>
                 </div>
               </div>
             </div>

@@ -23,9 +23,9 @@ export function OrganizerProfileHeader({
     : "";
 
   return (
-    <div className="-mt-20 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+    <div className="-mt-12 md:-mt-20 flex flex-col gap-6 md:flex-row md:items-end md:justify-between px-4 sm:px-0">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end">
-        <div className="relative h-28 w-28 shrink-0 overflow-hidden rounded-full border-4 border-white bg-white shadow-xl md:h-36 md:w-36">
+        <div className="relative h-28 w-28 shrink-0 overflow-hidden rounded-full border-4 border-background bg-card shadow-xl md:h-36 md:w-36">
           <Image
             src={organizer.logoUrl || FALLBACK_LOGO}
             alt={organizer.name}
@@ -35,7 +35,7 @@ export function OrganizerProfileHeader({
         </div>
         <div className="pb-1">
           <div className="flex flex-wrap items-center gap-3">
-            <h1 className="text-2xl font-bold text-zinc-900 md:text-3xl lg:text-4xl">
+            <h1 className="text-2xl font-bold text-foreground md:text-3xl lg:text-4xl">
               {organizer.name}
             </h1>
             {organizer.isVerified && (
@@ -45,18 +45,18 @@ export function OrganizerProfileHeader({
               </span>
             )}
           </div>
-          <p className="mt-2 text-sm text-zinc-500">
+          <p className="mt-2 text-sm text-muted-foreground font-medium">
             {organizer.address && `${organizer.address} • `}
             {joinedLabel}
           </p>
         </div>
       </div>
-      <div className="flex items-center gap-3">
-        <Button className="rounded-xl font-semibold">Theo dõi</Button>
+      <div className="flex items-center gap-3 w-full sm:w-auto">
+        <Button className="flex-1 sm:flex-initial rounded-xl font-bold h-11 px-8">Theo dõi</Button>
         <button
           type="button"
           onClick={onShare}
-          className="flex h-11 w-11 items-center justify-center rounded-xl border border-zinc-200 bg-white text-zinc-600 transition hover:bg-zinc-50"
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-border bg-card text-muted-foreground transition hover:bg-muted hover:text-foreground shadow-sm"
           aria-label="Chia sẻ"
         >
           <Share2 className="h-5 w-5" />

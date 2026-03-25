@@ -58,23 +58,23 @@ export default function DashboardHeader() {
   };
 
   return (
-    <header className="flex h-14 shrink-0 items-center justify-between border-b border-zinc-200 px-6 bg-white">
-      <nav className="flex items-center gap-2 text-sm text-zinc-600">
+    <header className="flex h-14 shrink-0 items-center justify-between border-b border-border px-6 bg-card">
+      <nav className="flex items-center gap-2 text-sm text-muted-foreground">
         
       </nav> 
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="flex items-center gap-2 rounded-xl">
-            <Avatar className="h-8 w-8 border border-zinc-200">
+            <Avatar className="h-8 w-8 border border-border">
               <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.FullName}`} />
-              <AvatarFallback className="bg-zinc-100 text-zinc-700 text-sm">{user?.FullName?.[0] || "U"}</AvatarFallback>
+              <AvatarFallback className="bg-muted text-foreground text-sm">{user?.FullName?.[0] || "U"}</AvatarFallback>
             </Avatar>
-            <span className="hidden sm:inline text-sm font-medium text-zinc-700">{user?.FullName}</span>
-            <ChevronDown className="h-4 w-4 text-zinc-500" />
+            <span className="hidden sm:inline text-sm font-medium text-foreground">{user?.FullName}</span>
+            <ChevronDown className="h-4 w-4 text-muted-foreground" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-48 rounded-xl border-zinc-200 mt-2">
+        <DropdownMenuContent align="end" className="w-48 rounded-xl border border-border bg-popover text-popover-foreground mt-2">
           <DropdownMenuItem asChild>
             <Link href="/home" className="flex items-center gap-2">
               <User className="h-4 w-4" />

@@ -63,18 +63,18 @@ export function EditOrganizerForm({ id }: { id: string }) {
 
   if (isLoading || !organizer) {
     return (
-      <Card className="border-zinc-200">
+      <Card className="border-border bg-card">
         <CardContent className="flex items-center justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-zinc-400" />
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </CardContent>
       </Card>
     );
   }
 
   return (
-    <Card className="border-zinc-200">
+    <Card className="border-border bg-card">
       <CardHeader>
-        <h2 className="text-lg font-semibold text-zinc-900">Thông tin organizer</h2>
+        <h2 className="text-lg font-semibold text-foreground">Thông tin organizer</h2>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">

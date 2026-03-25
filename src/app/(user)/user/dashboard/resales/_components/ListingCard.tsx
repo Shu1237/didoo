@@ -49,9 +49,9 @@ export function ListingCard({
   };
 
   return (
-    <Card className="overflow-hidden border-zinc-200">
+    <Card className="overflow-hidden border-border bg-card shadow-sm transition-all hover:border-primary/30 hover:shadow-md">
       <div className="flex flex-col sm:flex-row sm:gap-2">
-        <div className="relative h-40 w-full shrink-0 overflow-hidden bg-zinc-100 sm:ml-4 sm:h-auto sm:w-44">
+        <div className="relative h-40 w-full shrink-0 overflow-hidden bg-muted sm:ml-4 sm:h-auto sm:w-44">
           {event?.thumbnailUrl ? (
             <Image
               src={event.thumbnailUrl}
@@ -61,7 +61,7 @@ export function ListingCard({
               sizes="(max-width: 640px) 100vw, 176px"
             />
           ) : (
-            <div className="flex h-full w-full items-center justify-center text-xs text-zinc-400">
+            <div className="flex h-full w-full items-center justify-center text-xs text-muted-foreground">
               <Ticket className="mr-1 h-4 w-4" />
               Hình sự kiện
             </div>
@@ -70,11 +70,11 @@ export function ListingCard({
         <div className="flex flex-1 flex-col justify-between gap-3 p-4">
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0 space-y-1">
-              <p className="text-xs font-medium uppercase tracking-wide text-amber-600">Vé bán lại</p>
-              <p className="line-clamp-1 text-sm font-semibold text-zinc-900">
+              <p className="text-xs font-semibold uppercase tracking-wide text-amber-500">Vé bán lại</p>
+              <p className="line-clamp-1 text-sm font-bold text-foreground">
                 {event?.name || "Đang tải sự kiện..."}
               </p>
-              <p className="text-xs text-zinc-500">
+              <p className="text-xs text-muted-foreground font-medium">
                 Mã niêm yết: <span className="font-mono">{listing.id.slice(0, 10)}...</span>
               </p>
             </div>
@@ -83,37 +83,37 @@ export function ListingCard({
                 {statusView.label}
               </Badge>
               <div className="text-right">
-                <p className="text-[11px] uppercase tracking-wide text-zinc-500">Giá đăng</p>
-                <p className="text-2xl font-bold leading-none text-amber-600">
+                <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Giá đăng</p>
+                <p className="text-2xl font-black leading-none text-primary">
                   {Number(listing.askingPrice || 0).toLocaleString("vi-VN")}đ
                 </p>
               </div>
             </div>
           </div>
 
-          {listing.description && <p className="line-clamp-1 text-xs text-zinc-600">{listing.description}</p>}
+          {listing.description && <p className="line-clamp-1 text-xs text-muted-foreground font-medium">{listing.description}</p>}
 
           <div className="grid gap-3 sm:grid-cols-4">
             <div>
-              <p className="text-xs text-zinc-500">Ngày</p>
-              <p className="mt-1 flex items-center gap-1 text-sm font-semibold text-zinc-900">
-                <CalendarDays className="h-3.5 w-3.5" />
+              <p className="text-xs font-semibold uppercase tracking-tight text-muted-foreground">Ngày</p>
+              <p className="mt-1 flex items-center gap-1 text-sm font-bold text-foreground">
+                <CalendarDays className="h-3.5 w-3.5 text-muted-foreground" />
                 {event?.startTime
                   ? new Date(event.startTime).toLocaleDateString("vi-VN")
                   : new Date(listing.createdAt).toLocaleDateString("vi-VN")}
               </p>
             </div>
             <div>
-              <p className="text-xs text-zinc-500">Địa điểm</p>
-              <p className="mt-1 flex items-center gap-1 text-sm font-semibold text-zinc-900">
-                <MapPin className="h-3.5 w-3.5" />
+              <p className="text-xs font-semibold uppercase tracking-tight text-muted-foreground">Địa điểm</p>
+              <p className="mt-1 flex items-center gap-1 text-sm font-bold text-foreground">
+                <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
                 {event?.locations?.[0]?.province || "Đang cập nhật"}
               </p>
             </div>
             <div>
-              <p className="text-xs text-zinc-500">Đăng lúc</p>
-              <p className="mt-1 flex items-center gap-1 text-sm font-semibold text-zinc-900">
-                <Clock4 className="h-3.5 w-3.5" />
+              <p className="text-xs font-semibold uppercase tracking-tight text-muted-foreground">Đăng lúc</p>
+              <p className="mt-1 flex items-center gap-1 text-sm font-bold text-foreground">
+                <Clock4 className="h-3.5 w-3.5 text-muted-foreground" />
                 {new Date(listing.createdAt).toLocaleTimeString("vi-VN", {
                   hour: "2-digit",
                   minute: "2-digit",

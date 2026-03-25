@@ -40,8 +40,12 @@ export function ResaleListingDetailContent({ id }: { id: string }) {
 
   if (!listing) {
     return (
-      <div className="rounded-2xl border border-zinc-200 bg-white p-8 text-center text-zinc-500">
-        Không tìm thấy vé bán lại này.
+      <div className="rounded-2xl border border-border bg-card p-16 text-center shadow-sm">
+        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-muted">
+          <Ticket className="h-8 w-8 text-muted-foreground/50" />
+        </div>
+        <h3 className="text-lg font-semibold text-foreground">Không tìm thấy vé</h3>
+        <p className="mt-2 mx-auto max-w-sm text-muted-foreground">Vé bán lại này không tồn tại hoặc đã bị xóa.</p>
       </div>
     );
   }
@@ -57,12 +61,12 @@ export function ResaleListingDetailContent({ id }: { id: string }) {
 
   const statusClass =
     listing.status === TicketListingStatus.SOLD
-      ? "bg-blue-500/10 text-blue-700 border-blue-200"
+      ? "bg-blue-500/10 text-blue-500 border-blue-500/20"
       : listing.status === TicketListingStatus.ACTIVE
-        ? "bg-emerald-500/10 text-emerald-700 border-emerald-200"
+        ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20"
         : listing.status === TicketListingStatus.CANCELLED
-          ? "bg-rose-500/10 text-rose-700 border-rose-200"
-          : "bg-amber-500/10 text-amber-700 border-amber-200";
+          ? "bg-rose-500/10 text-rose-500 border-rose-500/20"
+          : "bg-amber-500/10 text-amber-500 border-amber-500/20";
 
   const listingTickets = listing.ticket || [];
   const listedQty = listingTickets.length > 0 ? listingTickets.length : 1;
@@ -74,20 +78,20 @@ export function ResaleListingDetailContent({ id }: { id: string }) {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <Button asChild variant="ghost" size="icon" className="rounded-full border border-zinc-200">
+        <Button asChild variant="ghost" size="icon" className="rounded-full border border-border">
           <Link href="/user/dashboard/resales">
             <ArrowLeft className="h-4 w-4" />
           </Link>
         </Button>
         <div>
-          <h1 className="text-xl font-semibold text-zinc-900">Chi tiết vé bán lại</h1>
-          <p className="text-xs text-zinc-500">Mã niêm yết: {listing.id}</p>
+          <h1 className="text-xl font-bold text-foreground">Chi tiết vé bán lại</h1>
+          <p className="text-xs text-muted-foreground font-medium">Mã niêm yết: {listing.id}</p>
         </div>
       </div>
 
-      <Card className="overflow-hidden border-zinc-200">
+      <Card className="overflow-hidden border-border bg-card shadow-sm">
         <div className="flex flex-col sm:flex-row">
-          <div className="relative h-52 w-full shrink-0 bg-zinc-100 sm:h-auto sm:w-64">
+          <div className="relative h-52 w-full shrink-0 bg-muted sm:h-auto sm:w-64">
             {event?.bannerUrl || event?.thumbnailUrl ? (
               <Image
                 src={event?.bannerUrl || event?.thumbnailUrl || ""}
@@ -97,7 +101,7 @@ export function ResaleListingDetailContent({ id }: { id: string }) {
                 sizes="(max-width: 640px) 100vw, 256px"
               />
             ) : (
-              <div className="flex h-full w-full items-center justify-center text-xs text-zinc-400">
+              <div className="flex h-full w-full items-center justify-center text-xs text-muted-foreground">
                 <Ticket className="mr-1 h-4 w-4" />
                 Ảnh sự kiện
               </div>
@@ -106,13 +110,13 @@ export function ResaleListingDetailContent({ id }: { id: string }) {
           <div className="flex flex-1 flex-col justify-between gap-5 p-5">
             <div className="flex items-start justify-between gap-4">
               <div className="space-y-2">
-                <p className="text-xs font-semibold uppercase tracking-wider text-amber-600">
+                <p className="text-xs font-bold uppercase tracking-wider text-amber-500">
                   Vé niêm yết
                 </p>
-                <h2 className="text-xl font-semibold text-zinc-900">
+                <h2 className="text-xl font-bold text-foreground">
                   {event?.name || listing.event?.name || "Sự kiện không xác định"}
                 </h2>
-                <p className="text-xs text-zinc-500">Mã niêm yết: {listing.id}</p>
+                <p className="text-xs text-muted-foreground font-medium">Mã niêm yết: {listing.id}</p>
               </div>
               <Badge variant="outline" className={statusClass}>
                 {statusLabel}
@@ -120,36 +124,36 @@ export function ResaleListingDetailContent({ id }: { id: string }) {
             </div>
 
             <div className="grid gap-3 sm:grid-cols-3">
-              <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-3">
-                <p className="text-xs text-zinc-500">Giá đăng</p>
-                <p className="mt-1 text-xl font-bold text-amber-600">
+              <div className="rounded-xl border border-border bg-muted/30 p-3">
+                <p className="text-xs font-semibold uppercase tracking-tight text-muted-foreground">Giá đăng</p>
+                <p className="mt-1 text-xl font-black text-primary">
                   {formatCurrency(Number(listing.askingPrice || 0))}
                 </p>
               </div>
-              <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-3">
-                <p className="text-xs text-zinc-500">Đã bán ra</p>
-                <p className="mt-1 text-xl font-bold text-zinc-900">{listingTickets.length} vé</p>
+              <div className="rounded-xl border border-border bg-muted/30 p-3">
+                <p className="text-xs font-semibold uppercase tracking-tight text-muted-foreground">Đã bán ra</p>
+                <p className="mt-1 text-xl font-bold text-foreground">{listingTickets.length} vé</p>
               </div>
              
             </div>
 
-            <div className="grid gap-2 text-sm text-zinc-700 sm:grid-cols-2">
+            <div className="grid gap-2 text-sm text-foreground/80 sm:grid-cols-2 font-medium">
               <p className="flex items-center gap-2">
-                <MapPin className="h-4 w-4 text-zinc-500" />
+                <MapPin className="h-4 w-4 text-muted-foreground" />
                 {locationLabel}
               </p>
               <p className="flex items-center gap-2">
-                <CalendarDays className="h-4 w-4 text-zinc-500" />
+                <CalendarDays className="h-4 w-4 text-muted-foreground" />
                 {event?.startTime
                   ? new Date(event.startTime).toLocaleString("vi-VN")
                   : "Đang cập nhật thời gian sự kiện"}
               </p>
               <p className="flex items-center gap-2">
-                <Clock3 className="h-4 w-4 text-zinc-500" />
+                <Clock3 className="h-4 w-4 text-muted-foreground" />
                 Tạo lúc {new Date(listing.createdAt).toLocaleString("vi-VN")}
               </p>
               <p className="flex items-center gap-2">
-                <Activity className="h-4 w-4 text-zinc-500" />
+                <Activity className="h-4 w-4 text-muted-foreground" />
                 Cập nhật:{" "}
                 {listing.updatedAt ? new Date(listing.updatedAt).toLocaleString("vi-VN") : "Chưa có"}
               </p>
@@ -159,37 +163,37 @@ export function ResaleListingDetailContent({ id }: { id: string }) {
       </Card>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <Card className="border-zinc-200">
+        <Card className="border-border bg-card shadow-sm">
           <CardHeader className="pb-2">
-            <h3 className="text-sm font-semibold text-zinc-900">Thông tin vé bán</h3>
+            <h3 className="text-sm font-bold text-foreground">Thông tin vé bán</h3>
           </CardHeader>
           <CardContent className="space-y-3 text-sm">
-            <div className="flex items-center justify-between rounded-lg bg-zinc-50 px-3 py-2">
-              <span className="text-zinc-500">Số lượng niêm yết</span>
-              <span className="font-semibold text-zinc-900">{listedQty} vé</span>
+            <div className="flex items-center justify-between rounded-lg bg-muted/40 px-3 py-2">
+              <span className="text-muted-foreground font-medium">Số lượng niêm yết</span>
+              <span className="font-bold text-foreground">{listedQty} vé</span>
             </div>
-            <div className="flex items-center justify-between rounded-lg bg-zinc-50 px-3 py-2">
-              <span className="text-zinc-500">Loại vé</span>
-              <span className="font-semibold text-zinc-900 text-right">
+            <div className="flex items-center justify-between rounded-lg bg-muted/40 px-3 py-2">
+              <span className="text-muted-foreground font-medium">Loại vé</span>
+              <span className="font-bold text-foreground text-right">
                 {ticketType?.name || firstTicketTypeId || "Đang cập nhật"}
               </span>
             </div>
-            <div className="flex items-center justify-between rounded-lg bg-zinc-50 px-3 py-2">
-              <span className="text-zinc-500">Giá loại vé</span>
-              <span className="font-semibold text-zinc-900">
+            <div className="flex items-center justify-between rounded-lg bg-muted/40 px-3 py-2">
+              <span className="text-muted-foreground font-medium">Giá loại vé</span>
+              <span className="font-bold text-foreground">
                 {ticketType?.price ? formatCurrency(Number(ticketType.price)) : "Đang cập nhật"}
               </span>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border-zinc-200">
+        <Card className="border-border bg-card shadow-sm">
           <CardHeader className="pb-2">
-            <h3 className="text-sm font-semibold text-zinc-900">Mô tả</h3>
+            <h3 className="text-sm font-bold text-foreground">Mô tả</h3>
           </CardHeader>
-          <CardContent className="text-sm text-zinc-700">
-            <div className="rounded-lg border border-zinc-200 p-3">
-              <p>{listing.description || "Không có mô tả."}</p>
+          <CardContent className="text-sm text-foreground/80">
+            <div className="rounded-lg border border-border bg-muted/20 p-3">
+              <p className="font-medium">{listing.description || "Không có mô tả."}</p>
             </div>
           </CardContent>
         </Card>

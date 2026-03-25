@@ -30,7 +30,7 @@ export function EventCard({
   return (
     <Link
       href={href || `/events/${event.id}`}
-      className="block rounded-2xl border border-zinc-200 bg-white overflow-hidden shadow-sm hover:shadow-xl hover:border-primary/20 transition-all duration-300 group"
+      className="block rounded-2xl border border-border bg-card overflow-hidden shadow-sm hover:shadow-xl hover:border-primary/20 transition-all duration-300 group"
     >
       <div className="relative aspect-[4/3] overflow-hidden">
         <Image
@@ -39,19 +39,19 @@ export function EventCard({
           fill
           className="object-cover transition-transform duration-500 group-hover:scale-105"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-zinc-900/90 via-zinc-900/20 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
         <span
           className={`absolute top-3 left-3 rounded-lg px-2.5 py-1 text-[10px] font-bold uppercase text-white ${badgeClassName}`}
         >
           {badge || event.category?.name || "Sự kiện"}
         </span>
         <div className="absolute bottom-0 left-0 right-0 p-4">
-          <div className="flex items-center gap-2 text-xs text-zinc-200 mb-2">
+          <div className="flex items-center gap-2 text-xs text-white/70 mb-2">
             <CalendarDays className="h-3.5 w-3.5" />
             {format(new Date(event.startTime), "EEE, dd MMM • HH:mm", { locale: vi })}
           </div>
           <h3 className="text-lg font-bold text-white line-clamp-2">{event.name}</h3>
-          <div className="flex items-center gap-2 mt-2 text-xs text-zinc-300">
+          <div className="flex items-center gap-2 mt-2 text-xs text-white/60">
             <MapPin className="h-3.5 w-3.5 shrink-0" />
             <span className="line-clamp-1">{location}</span>
           </div>

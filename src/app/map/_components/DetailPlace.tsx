@@ -35,8 +35,8 @@ export default function DetailPlace({ eventData, setSelectedEvent }: DetailPlace
             sizes="112px"
           />
           {eventData.category && (
-            <div className="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md border border-white/20">
-              <span className="text-[10px] font-bold text-white uppercase tracking-wider">
+            <div className="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-background/60 backdrop-blur-md border border-white/20">
+              <span className="text-[10px] font-bold text-foreground uppercase tracking-wider">
                 {eventData.category.name}
               </span>
             </div>

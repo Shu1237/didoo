@@ -51,26 +51,26 @@ export default function DashboardSidebar({ role }: { role: Role }) {
   return (
     <aside
       className={cn(
-        "flex h-full flex-col rounded-2xl border border-zinc-200 bg-white p-3 shadow-sm transition-all duration-200",
+        "flex h-full flex-col rounded-2xl border border-border bg-card p-3 shadow-sm transition-all duration-200",
         collapsed ? "w-[88px]" : "w-[260px]"
       )}
     >
       <div className={cn("mb-4 flex items-center", collapsed ? "justify-center" : "justify-between")}>
         {!collapsed && (
           <Link href={role === "admin" ? "/admin/dashboard" : "/organizer/dashboard"} className="flex items-center gap-2">
-            <div className="h-9 w-9 overflow-hidden rounded-xl border border-zinc-200">
+            <div className="h-9 w-9 overflow-hidden rounded-xl border border-border">
               <Image src="/DiDoo.png" alt="DiDoo" width={36} height={36} className="h-full w-full object-cover" />
             </div>
             <div>
-              <p className="text-[11px] uppercase tracking-wide text-zinc-500">{label}</p>
-              <p className="text-sm font-semibold text-zinc-900">DiDoo</p>
+              <p className="text-[11px] uppercase tracking-wide text-muted-foreground">{label}</p>
+              <p className="text-sm font-semibold text-foreground">DiDoo</p>
             </div>
           </Link>
         )}
         <button
           type="button"
           onClick={() => setCollapsed((prev) => !prev)}
-          className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-200 text-zinc-500 hover:bg-zinc-50"
+          className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-border text-muted-foreground hover:bg-secondary hover:text-foreground"
           aria-label={collapsed ? "Mở sidebar" : "Thu gọn sidebar"}
         >
           {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
@@ -92,7 +92,7 @@ export default function DashboardSidebar({ role }: { role: Role }) {
               className={cn(
                 "flex items-center rounded-xl px-3 py-2.5 text-sm font-medium transition",
                 collapsed ? "justify-center" : "gap-3",
-                active ? "bg-zinc-900 text-white" : "text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900"
+                active ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-secondary hover:text-foreground"
               )}
             >
               <Icon className="h-4 w-4 shrink-0" />
@@ -102,16 +102,16 @@ export default function DashboardSidebar({ role }: { role: Role }) {
         })}
       </nav>
 
-      <div className={cn("mt-auto rounded-2xl border border-zinc-200 bg-zinc-50", collapsed ? "p-2" : "p-3")}>
+      <div className={cn("mt-auto rounded-2xl border border-border bg-secondary/50", collapsed ? "p-2" : "p-3")}>
         <div className={cn("flex items-center", collapsed ? "justify-center" : "gap-2")}>
-          <Avatar className="h-9 w-9 border border-zinc-200">
+          <Avatar className="h-9 w-9 border border-border">
             <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.FullName || label}`} />
-            <AvatarFallback className="bg-zinc-100 text-zinc-700">{user?.FullName?.[0] || label[0]}</AvatarFallback>
+            <AvatarFallback className="bg-muted text-foreground">{user?.FullName?.[0] || label[0]}</AvatarFallback>
           </Avatar>
           {!collapsed && (
             <div className="min-w-0">
-              <p className="truncate text-sm font-semibold text-zinc-900">{user?.FullName || label}</p>
-              <p className="truncate text-xs text-zinc-500">{user?.Email || ""}</p>
+              <p className="truncate text-sm font-semibold text-foreground">{user?.FullName || label}</p>
+              <p className="truncate text-xs text-muted-foreground">{user?.Email || ""}</p>
             </div>
           )}
         </div>

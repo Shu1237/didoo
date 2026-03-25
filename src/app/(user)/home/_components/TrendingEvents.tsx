@@ -16,7 +16,7 @@ export function TrendingEvents({ organizers }: TrendingEventsProps) {
   const duplicated = [...organizers, ...organizers];
 
   return (
-    <section className="py-16 lg:py-24 bg-zinc-50 border-t border-zinc-200 overflow-hidden">
+    <section className="py-12 lg:py-24 bg-muted border-t border-border overflow-hidden">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 mb-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -24,24 +24,24 @@ export function TrendingEvents({ organizers }: TrendingEventsProps) {
           viewport={{ once: true }}
         >
           <span className="text-primary font-semibold text-sm">Đối tác</span>
-          <h2 className="text-3xl sm:text-4xl font-bold text-zinc-900 mt-2">
+          <h2 className="text-3xl sm:text-4xl font-bold text-foreground mt-2">
             Nhà tổ chức nổi bật
           </h2>
-          <p className="mt-3 text-zinc-600 max-w-xl">
+          <p className="mt-3 text-muted-foreground max-w-xl">
             Các đối tác uy tín mang đến những sự kiện chất lượng.
           </p>
         </motion.div>
       </div>
 
       <div className="relative">
-        <div className="absolute top-0 bottom-0 left-0 w-16 bg-gradient-to-r from-zinc-50 to-transparent z-10 pointer-events-none" />
-        <div className="absolute top-0 bottom-0 right-0 w-16 bg-gradient-to-l from-zinc-50 to-transparent z-10 pointer-events-none" />
+        <div className="absolute top-0 bottom-0 left-0 w-16 bg-gradient-to-r from-muted to-transparent z-10 pointer-events-none" />
+        <div className="absolute top-0 bottom-0 right-0 w-16 bg-gradient-to-l from-muted to-transparent z-10 pointer-events-none" />
 
         <div className="animate-marquee flex gap-6 py-4">
           {duplicated.map((org, idx) => (
             <div
               key={`${org.id}-${idx}`}
-              className="shrink-0 w-[260px] sm:w-[280px] group"
+              className="shrink-0 w-[220px] sm:w-[280px] group"
             >
               <div className="relative aspect-square rounded-2xl overflow-hidden bg-white border border-zinc-200 shadow-sm hover:shadow-xl hover:border-primary/20 transition-all duration-300">
                 <Image
@@ -71,7 +71,12 @@ export function TrendingEvents({ organizers }: TrendingEventsProps) {
           100% { transform: translateX(-50%); }
         }
         .animate-marquee {
-          animation: marquee 40s linear infinite;
+          animation: marquee 30s linear infinite;
+        }
+        @media (max-width: 640px) {
+          .animate-marquee {
+            animation: marquee 20s linear infinite;
+          }
         }
       `}</style>
     </section>

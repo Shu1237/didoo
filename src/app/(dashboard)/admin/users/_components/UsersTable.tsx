@@ -72,33 +72,33 @@ export function UsersTable({
 
   return (
     <div className="space-y-4">
-      <div className="rounded-2xl border border-zinc-200 bg-white">
+      <div className="rounded-2xl border border-border bg-card overflow-hidden">
         <Table>
           <TableHeader>
-            <TableRow className="border-zinc-200 hover:bg-transparent">
-              <TableHead className="w-12">Avatar</TableHead>
-              <TableHead>Họ tên</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>SĐT</TableHead>
-              <TableHead>Vai trò</TableHead>
-              <TableHead>Trạng thái</TableHead>
+            <TableRow className="border-border hover:bg-transparent">
+              <TableHead className="w-12 text-muted-foreground">Avatar</TableHead>
+              <TableHead className="text-muted-foreground">Họ tên</TableHead>
+              <TableHead className="text-muted-foreground">Email</TableHead>
+              <TableHead className="text-muted-foreground">SĐT</TableHead>
+              <TableHead className="text-muted-foreground">Vai trò</TableHead>
+              <TableHead className="text-muted-foreground">Trạng thái</TableHead>
               <TableHead className="w-12" />
             </TableRow>
           </TableHeader>
           <TableBody>
             {items.map((u) => (
-              <TableRow key={u.id} className="border-zinc-100">
+              <TableRow key={u.id} className="border-border hover:bg-muted/30 transition-colors">
                 <TableCell>
-                  <Avatar className="h-9 w-9">
+                  <Avatar className="h-9 w-9 border border-border">
                     <AvatarImage src={u.avatarUrl} />
-                    <AvatarFallback className="bg-zinc-100">{u.fullName?.[0]}</AvatarFallback>
+                    <AvatarFallback className="bg-muted text-muted-foreground">{u.fullName?.[0]}</AvatarFallback>
                   </Avatar>
                 </TableCell>
-                <TableCell className="font-medium">{u.fullName}</TableCell>
-                <TableCell className="text-zinc-600">{u.email}</TableCell>
-                <TableCell className="text-zinc-600">{u.phone ?? "—"}</TableCell>
+                <TableCell className="font-medium text-foreground">{u.fullName}</TableCell>
+                <TableCell className="text-muted-foreground">{u.email}</TableCell>
+                <TableCell className="text-muted-foreground">{u.phone ?? "—"}</TableCell>
                 <TableCell>
-                  <Badge variant="outline" className="border-zinc-200">{u.role?.name ?? "—"}</Badge>
+                  <Badge variant="outline" className="border-border text-muted-foreground">{u.role?.name ?? "—"}</Badge>
                 </TableCell>
                 <TableCell>
                   <Badge variant={u.isVerified ? "default" : "secondary"}>

@@ -14,7 +14,7 @@ import { Input } from "../ui/input";
 
 export default function Footer() {
   return (
-    <footer className="relative bg-white border-t border-zinc-200 pt-16 pb-8 overflow-hidden">
+    <footer className="relative bg-background border-t border-border pt-16 pb-8 overflow-hidden">
       <div className="absolute top-0 right-0 w-96 h-96 bg-primary/5 rounded-full blur-[120px] -z-10 pointer-events-none" />
       <div className="absolute bottom-0 left-1/4 w-64 h-64 bg-primary/5 rounded-full blur-[80px] -z-10 pointer-events-none" />
 
@@ -30,22 +30,22 @@ export default function Footer() {
                 className="h-12 w-12 rounded-xl"
                 priority
               />
-              <span className="font-bold text-2xl tracking-tight text-zinc-900">
+              <span className="font-bold text-2xl tracking-tight text-foreground">
                 DiDoo
               </span>
             </Link>
-            <p className="text-zinc-600 leading-relaxed text-sm">
+            <p className="text-muted-foreground leading-relaxed text-sm">
               Khám phá và trải nghiệm những sự kiện tuyệt vời. Cổng vào những
               khoảnh khắc đáng nhớ.
             </p>
             <div className="space-y-3">
-              <h4 className="font-semibold text-sm text-zinc-900">
+              <h4 className="font-semibold text-sm text-foreground">
                 Đăng ký nhận tin
               </h4>
               <div className="flex gap-2">
                 <Input
                   placeholder="Email của bạn"
-                  className="h-10 rounded-xl bg-zinc-50 border-zinc-200 text-zinc-900 placeholder:text-zinc-500 focus-visible:ring-primary/30 focus-visible:border-primary/30"
+                  className="h-10 rounded-xl bg-card border-border text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/30 focus-visible:border-primary/30"
                 />
                 <Button
                   size="icon"
@@ -59,8 +59,8 @@ export default function Footer() {
 
           <div className="lg:col-span-3 grid grid-cols-2 md:grid-cols-3 gap-8">
             <div className="space-y-4">
-              <h3 className="font-semibold text-base text-zinc-900">Về chúng tôi</h3>
-              <ul className="space-y-3 text-zinc-600 text-sm">
+              <h3 className="font-semibold text-base text-foreground">Về chúng tôi</h3>
+              <ul className="space-y-3 text-muted-foreground text-sm">
                 <li>
                   <Link
                     href="#"
@@ -89,8 +89,8 @@ export default function Footer() {
             </div>
 
             <div className="space-y-4">
-              <h3 className="font-semibold text-base text-zinc-900">Hỗ trợ</h3>
-              <ul className="space-y-3 text-zinc-600 text-sm">
+              <h3 className="font-semibold text-base text-foreground">Hỗ trợ</h3>
+              <ul className="space-y-3 text-muted-foreground text-sm">
                 <li>
                   <Link
                     href="#"
@@ -119,8 +119,8 @@ export default function Footer() {
             </div>
 
             <div className="space-y-4">
-              <h3 className="font-semibold text-base text-zinc-900">Liên hệ</h3>
-              <ul className="space-y-4 text-zinc-600 text-sm">
+              <h3 className="font-semibold text-base text-foreground">Liên hệ</h3>
+              <ul className="space-y-4 text-muted-foreground text-sm">
                 <li className="flex items-start gap-3">
                   <MapPin className="w-5 h-5 text-primary shrink-0 mt-0.5" />
                   <span>
@@ -140,29 +140,29 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="pt-8 border-t border-zinc-200 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-sm text-zinc-500">
+        <div className="pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4">
+          <p className="text-sm text-muted-foreground">
             © {new Date().getFullYear()} DiDoo. Bảo lưu mọi quyền.
           </p>
 
           <div className="flex items-center gap-3">
             <Link
               href="#"
-              className="p-2.5 rounded-xl bg-zinc-100 text-zinc-600 hover:bg-primary hover:text-white transition-all duration-300"
+              className="p-2.5 rounded-xl bg-secondary text-muted-foreground hover:bg-primary hover:text-primary-foreground transition-all duration-300"
               aria-label="Facebook"
             >
               <Facebook className="w-5 h-5" />
             </Link>
             <Link
               href="#"
-              className="p-2.5 rounded-xl bg-zinc-100 text-zinc-600 hover:bg-primary hover:text-white transition-all duration-300"
+              className="p-2.5 rounded-xl bg-secondary text-muted-foreground hover:bg-primary hover:text-primary-foreground transition-all duration-300"
               aria-label="Twitter"
             >
               <Twitter className="w-5 h-5" />
             </Link>
             <Link
               href="#"
-              className="p-2.5 rounded-xl bg-zinc-100 text-zinc-600 hover:bg-primary hover:text-white transition-all duration-300"
+              className="p-2.5 rounded-xl bg-secondary text-muted-foreground hover:bg-primary hover:text-primary-foreground transition-all duration-300"
               aria-label="Instagram"
             >
               <Instagram className="w-5 h-5" />

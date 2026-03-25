@@ -90,19 +90,19 @@ export default function EventInfor({ event }: EventInforProps) {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
-          className="relative overflow-hidden rounded-2xl border border-zinc-200 bg-white p-8 shadow-sm"
+          className="relative overflow-hidden rounded-2xl border border-border bg-card p-8 shadow-sm"
         >
           <div className="absolute top-0 right-0 w-64 h-64 -translate-y-1/2 translate-x-1/2 rounded-full bg-primary/5 blur-3xl" />
           <div className="relative">
-            <h2 className="text-2xl font-bold tracking-tight text-zinc-900 md:text-3xl">
+            <h2 className="text-2xl font-bold tracking-tight text-foreground md:text-3xl">
               Thông tin sự kiện
             </h2>
-            <p className="mt-6 whitespace-pre-line text-base leading-relaxed text-zinc-600">
+            <p className="mt-6 whitespace-pre-line text-base leading-relaxed text-muted-foreground">
               {event.description}
             </p>
             {event.subtitle && (
               <div className="mt-6 rounded-xl border border-primary/20 bg-primary/5 px-5 py-4">
-                <p className="text-sm font-medium text-zinc-800">{event.subtitle}</p>
+                <p className="text-sm font-medium text-foreground/90">{event.subtitle}</p>
               </div>
             )}
             {event.tags && event.tags.length > 0 && (
@@ -110,7 +110,7 @@ export default function EventInfor({ event }: EventInforProps) {
                 {event.tags.map((tag, index) => (
                   <span
                     key={`${tag.tagName}-${index}`}
-                    className="rounded-full border border-zinc-200 bg-zinc-50 px-4 py-1.5 text-sm font-medium text-zinc-600 transition-colors hover:border-primary/30 hover:bg-primary/5"
+                    className="rounded-full border border-border bg-muted/30 px-4 py-1.5 text-sm font-medium text-muted-foreground transition-all hover:border-primary/30 hover:bg-primary/5"
                   >
                     #{tag.tagName}
                   </span>
@@ -125,7 +125,7 @@ export default function EventInfor({ event }: EventInforProps) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.1 }}
         >
-          <h3 className="mb-6 text-xs font-bold uppercase tracking-[0.2em] text-zinc-400">
+          <h3 className="mb-6 text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground/60">
             Thông tin nhanh
           </h3>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -135,17 +135,17 @@ export default function EventInfor({ event }: EventInforProps) {
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: 0.15 + i * 0.03 }}
-                className="group relative overflow-hidden rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm transition-all duration-300 hover:border-primary/20 hover:shadow-md"
+                className="group relative overflow-hidden rounded-2xl border border-border bg-card p-5 shadow-sm transition-all duration-300 hover:border-primary/30 hover:shadow-md"
               >
                 <div className="flex items-start gap-4">
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary/15">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary transition-all group-hover:bg-primary/15 group-hover:scale-105">
                     <item.icon className="h-5 w-5" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
+                    <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground/60">
                       {item.label}
                     </p>
-                    <p className="mt-1.5 text-base font-semibold text-zinc-900 leading-snug">
+                    <p className="mt-1.5 text-base font-semibold text-foreground leading-snug">
                       {item.value}
                     </p>
                   </div>
@@ -163,11 +163,11 @@ export default function EventInfor({ event }: EventInforProps) {
           transition={{ duration: 0.4, delay: 0.2 }}
           className="sticky top-24"
         >
-          <p className="mb-4 text-xs font-bold uppercase tracking-[0.2em] text-zinc-400">
+          <p className="mb-4 text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground/60">
             Nhà tổ chức
           </p>
 
-          <div className="group relative overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-lg transition-all duration-300 hover:shadow-xl hover:border-zinc-300">
+          <div className="group relative overflow-hidden rounded-2xl border border-border bg-card shadow-lg transition-all duration-300 hover:shadow-xl hover:border-primary/20">
             <div className="relative h-36 w-full overflow-hidden">
               <Image
                 src={orgImage}
@@ -175,13 +175,13 @@ export default function EventInfor({ event }: EventInforProps) {
                 fill
                 className="object-cover transition-transform duration-500 group-hover:scale-105"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-zinc-900/80 via-zinc-900/20 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent" />
             </div>
 
             <div className="relative px-6 pb-6 pt-6">
               {organizerDetails?.logoUrl && organizerDetails.logoUrl !== orgImage && (
                 <div className="absolute -top-12 left-6">
-                  <div className="relative h-20 w-20 overflow-hidden rounded-2xl border-4 border-white bg-white shadow-lg">
+                  <div className="relative h-20 w-20 overflow-hidden rounded-2xl border-4 border-background bg-background shadow-lg">
                     <Image
                       src={organizerDetails.logoUrl}
                       alt="Logo nhà tổ chức"
@@ -197,18 +197,18 @@ export default function EventInfor({ event }: EventInforProps) {
                   organizerDetails?.logoUrl && organizerDetails.logoUrl !== orgImage ? "mt-6" : ""
                 }
               >
-                <h3 className="text-xl font-bold text-zinc-900 line-clamp-1">
+                <h3 className="text-xl font-bold text-foreground line-clamp-1">
                   {organizerDetails?.name || event.organizer?.name || "Nhà tổ chức"}
                 </h3>
                 {organizerDetails?.isVerified && (
-                  <div className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-primary">
+                  <div className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-primary border border-primary/20">
                     <ShieldCheck className="h-3.5 w-3.5" />
                     Đã xác minh
                   </div>
                 )}
               </div>
 
-              <p className="mt-4 line-clamp-3 text-sm leading-relaxed text-zinc-600">
+              <p className="mt-4 line-clamp-3 text-sm leading-relaxed text-muted-foreground/90">
                 {organizerDetails?.description ||
                   "Nhà tổ chức cung cấp lịch trình, địa điểm và hướng dẫn check-in. Theo dõi để nhận cập nhật sớm nhất."}
               </p>
@@ -222,7 +222,7 @@ export default function EventInfor({ event }: EventInforProps) {
                 </Button>
                 <Button
                   variant="outline"
-                  className="h-12 w-full rounded-xl border-zinc-200 font-medium hover:bg-zinc-50"
+                  className="h-12 w-full rounded-xl border-border font-medium hover:bg-muted"
                 >
                   Theo dõi
                 </Button>

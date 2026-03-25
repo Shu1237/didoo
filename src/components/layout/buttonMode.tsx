@@ -16,15 +16,18 @@ export function ModeToggle() {
     const isDark = theme === "dark"
 
     return (
-        <div
+        <button
+            type="button"
             onClick={() => setTheme(isDark ? "light" : "dark")}
-            className={`theme-toggle ${isDark ? "rotate-dark" : "rotate-light"}`}
+            className={`theme-toggle inline-flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-card text-foreground hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 ${isDark ? "rotate-dark" : "rotate-light"}`}
+            aria-label={isDark ? "Chuyển sang light mode" : "Chuyển sang dark mode"}
+            title={isDark ? "Light mode" : "Dark mode"}
         >
             {isDark ? (
-                <Sun className="theme-icon w-5 h-5 text-yellow-500" />
+                <Sun className="theme-icon h-5 w-5 text-amber-500" />
             ) : (
-                <Moon className="theme-icon w-5 h-5 text-blue-500" />
+                <Moon className="theme-icon h-5 w-5 text-sky-500" />
             )}
-        </div>
+        </button>
     )
 }

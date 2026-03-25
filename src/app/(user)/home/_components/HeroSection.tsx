@@ -41,7 +41,7 @@ export default function HeroSection({ events: initialEvents }: { events: Event[]
     const sliderEvents = eventList.slice(1);
 
     return (
-        <section className="relative w-full h-screen overflow-hidden bg-black">
+        <section className="relative w-full h-[85vh] min-h-[580px] md:h-screen overflow-hidden bg-black">
 
             {/* BACKGROUND LAYER - Hiệu ứng bung từ dưới lên */}
             <div className="absolute inset-0 z-0">
@@ -75,8 +75,8 @@ export default function HeroSection({ events: initialEvents }: { events: Event[]
             </div>
 
             {/* CONTENT LAYER */}
-            <div className="relative z-10 h-full container mx-auto px-6 flex flex-col justify-end pb-24">
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-end">
+            <div className="relative z-10 h-full container mx-auto px-4 sm:px-6 flex flex-col justify-end pb-12 md:pb-24">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-end">
 
                     {/* LEFT CONTENT: Title & Buttons */}
                     <div className="lg:col-span-7 pb-6">
@@ -100,7 +100,7 @@ export default function HeroSection({ events: initialEvents }: { events: Event[]
                                         hidden: { opacity: 0, y: 50, filter: 'blur(10px)' },
                                         visible: { opacity: 1, y: 0, filter: 'blur(0px)', transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } }
                                     }}
-                                    className="text-6xl lg:text-8xl font-black text-white uppercase leading-[0.9] tracking-tighter mb-8 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]"
+                                    className="text-4xl sm:text-6xl lg:text-8xl font-black text-white uppercase leading-[0.9] tracking-tighter mb-6 md:mb-8 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]"
                                 >
                                     {activeEvent.name}
                                 </motion.h1>
@@ -131,7 +131,7 @@ export default function HeroSection({ events: initialEvents }: { events: Event[]
                     </div>
 
                     {/* RIGHT CONTENT: Slider */}
-                    <div className="lg:col-span-5 overflow-visible">
+                    <div className="lg:col-span-5 overflow-visible hidden sm:block">
                         <CustomHeroCarousel
                             events={sliderEvents}
                             onSelect={handleSelectEvent}
