@@ -48,10 +48,10 @@ export default function ForgotPasswordForm() {
     <motion.div
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      className="grid grid-cols-1 lg:grid-cols-2 w-full max-w-5xl bg-white rounded-2xl border border-zinc-200 shadow-xl overflow-hidden lg:min-h-[420px]"
+      className="grid grid-cols-1 lg:grid-cols-2 w-full max-w-5xl bg-card rounded-2xl border border-border shadow-xl overflow-hidden lg:min-h-[420px]"
     >
       <div className="p-6 sm:p-8 lg:p-10">
-        <Link href="/login" className="inline-flex items-center gap-2 text-sm text-zinc-600 hover:text-zinc-900 mb-6">
+        <Link href="/login" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-6">
           <ArrowLeft className="h-4 w-4" />
           Quay lại đăng nhập
         </Link>
@@ -62,10 +62,10 @@ export default function ForgotPasswordForm() {
           </div>
         </div>
 
-        <h1 className="text-2xl font-bold text-zinc-900 text-center">
+        <h1 className="text-2xl font-bold text-foreground text-center">
           {step === 1 ? "Quên mật khẩu?" : "Kiểm tra email"}
         </h1>
-        <p className="mt-2 text-zinc-600 text-sm text-center max-w-sm mx-auto">
+        <p className="mt-2 text-muted-foreground text-sm text-center max-w-sm mx-auto">
           {step === 1
             ? "Nhập email và chúng tôi sẽ gửi link đặt lại mật khẩu."
             : `Đã gửi link đặt lại mật khẩu đến ${email}`}
@@ -82,12 +82,12 @@ export default function ForgotPasswordForm() {
               onSubmit={handleSubmit(onSubmit)}
             >
               <div className="space-y-2">
-                <label className="text-sm font-medium text-zinc-700">Email</label>
+                <label className="text-sm font-medium text-foreground/80">Email</label>
                 <Input
                   type="email"
                   placeholder="example@gmail.com"
                   {...register("email")}
-                  className={`h-11 rounded-xl border-zinc-200 bg-zinc-50 ${errors.email ? "border-rose-300" : ""}`}
+                  className={`h-11 rounded-xl border-border bg-muted/50 ${errors.email ? "border-rose-300" : ""}`}
                 />
                 {errors.email && <p className="text-xs text-rose-600">{errors.email.message}</p>}
               </div>
@@ -111,8 +111,8 @@ export default function ForgotPasswordForm() {
               animate={{ opacity: 1, scale: 1 }}
               className="mt-8 space-y-6"
             >
-              <div className="rounded-2xl border border-zinc-200 bg-zinc-50 p-4">
-                <p className="text-sm text-zinc-600 leading-relaxed">
+              <div className="rounded-2xl border border-border bg-muted/30 p-4">
+                <p className="text-sm text-muted-foreground leading-relaxed">
                   Vui lòng kiểm tra hộp thư và nhấp vào link đặt lại. Link có hiệu lực 30 phút. Nếu không thấy, hãy kiểm tra thư mục spam.
                 </p>
               </div>
@@ -133,7 +133,7 @@ export default function ForgotPasswordForm() {
         </AnimatePresence>
       </div>
 
-      <div className="hidden lg:flex flex-col justify-center p-10 bg-zinc-900 text-white min-h-[420px]">
+      <div className="hidden lg:flex flex-col justify-center p-10 bg-zinc-900 border-l border-border/10 text-white min-h-[420px]">
         <h2 className="text-2xl font-bold leading-tight">
           Bảo mật là ưu tiên
           <br />

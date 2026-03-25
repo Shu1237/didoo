@@ -40,7 +40,7 @@ export default async function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${inter.variable} ${plusJakarta.variable} antialiased`}
+        className={`${inter.variable} ${plusJakarta.variable} bg-background antialiased`}
       >
         <GoogleAuthProvider>
           <AuthProvider initialAccessToken={accessToken?.value || null} initialRefreshToken={refreshToken?.value || null}>

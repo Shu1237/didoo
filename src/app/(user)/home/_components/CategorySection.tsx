@@ -14,7 +14,7 @@ export default function CategorySection({ openedEvents }: CategorySectionProps) 
   const items = openedEvents.slice(0, 3);
 
   return (
-    <section className="py-12 lg:py-16 bg-white">
+    <section className="py-12 lg:py-16 bg-background">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -27,10 +27,10 @@ export default function CategorySection({ openedEvents }: CategorySectionProps) 
               <Sparkles className="h-4 w-4" />
               Đang mở
             </span>
-            <h2 className="mt-2 text-2xl sm:text-3xl font-bold text-zinc-900 tracking-tight">
+            <h2 className="mt-2 text-2xl sm:text-3xl font-bold text-foreground tracking-tight">
               Sự kiện đang mở bán
             </h2>
-            <p className="mt-2 text-zinc-500 text-sm">
+            <p className="mt-2 text-muted-foreground text-sm">
               Theo dõi các sự kiện đang mở để đặt vé ngay hôm nay.
             </p>
           </div>
@@ -63,12 +63,12 @@ export default function CategorySection({ openedEvents }: CategorySectionProps) 
             >
               <Link
                 href={`/events/${event.id}`}
-                className="group block rounded-2xl border border-zinc-200 bg-zinc-50 p-5 transition-all duration-200 hover:border-primary/30 hover:bg-primary/5 hover:shadow-md"
+                className="group block rounded-2xl border border-border bg-muted p-5 transition-all duration-200 hover:border-primary/30 hover:bg-primary/5 hover:shadow-md"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="line-clamp-1 text-sm font-semibold text-zinc-900">{event.name}</p>
-                    <p className="mt-1 text-xs text-zinc-500">
+                    <p className="line-clamp-1 text-sm font-semibold text-foreground">{event.name}</p>
+                    <p className="mt-1 text-xs text-muted-foreground">
                       {event.category?.name || "Sự kiện"}
                     </p>
                   </div>
@@ -76,7 +76,7 @@ export default function CategorySection({ openedEvents }: CategorySectionProps) 
                     ĐANG MỞ
                   </span>
                 </div>
-                <p className="mt-3 flex items-center gap-1 text-xs font-medium text-zinc-600">
+                <p className="mt-3 flex items-center gap-1 text-xs font-medium text-muted-foreground">
                   <CalendarClock className="h-3.5 w-3.5" />
                   {new Date(event.startTime).toLocaleString("vi-VN")}
                 </p>

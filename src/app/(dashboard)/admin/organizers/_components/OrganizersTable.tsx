@@ -83,30 +83,30 @@ export function OrganizersTable({
 
   return (
     <div className="space-y-4">
-      <div className="rounded-2xl border border-zinc-200 bg-white">
+      <div className="rounded-2xl border border-border bg-card overflow-hidden">
         <Table>
           <TableHeader>
-            <TableRow className="border-zinc-200 hover:bg-transparent">
-              <TableHead className="w-12">Logo</TableHead>
-              <TableHead>Tên</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>SĐT</TableHead>
-              <TableHead>Trạng thái</TableHead>
+            <TableRow className="border-border hover:bg-transparent">
+              <TableHead className="w-12 text-muted-foreground">Logo</TableHead>
+              <TableHead className="text-muted-foreground">Tên</TableHead>
+              <TableHead className="text-muted-foreground">Email</TableHead>
+              <TableHead className="text-muted-foreground">SĐT</TableHead>
+              <TableHead className="text-muted-foreground">Trạng thái</TableHead>
               <TableHead className="w-12" />
             </TableRow>
           </TableHeader>
           <TableBody>
             {items.map((o) => (
-              <TableRow key={o.id} className="border-zinc-100">
+              <TableRow key={o.id} className="border-border hover:bg-muted/30 transition-colors">
                 <TableCell>
-                  <Avatar className="h-9 w-9">
+                  <Avatar className="h-9 w-9 border border-border">
                     <AvatarImage src={o.logoUrl} />
-                    <AvatarFallback className="bg-zinc-100">{o.name?.[0]}</AvatarFallback>
+                    <AvatarFallback className="bg-muted text-muted-foreground">{o.name?.[0]}</AvatarFallback>
                   </Avatar>
                 </TableCell>
-                <TableCell className="font-medium">{o.name}</TableCell>
-                <TableCell className="text-zinc-600">{o.email}</TableCell>
-                <TableCell className="text-zinc-600">{o.phone ?? "—"}</TableCell>
+                <TableCell className="font-medium text-foreground">{o.name}</TableCell>
+                <TableCell className="text-muted-foreground">{o.email}</TableCell>
+                <TableCell className="text-muted-foreground">{o.phone ?? "—"}</TableCell>
                 <TableCell>
                   <Badge
                     variant={

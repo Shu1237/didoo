@@ -11,7 +11,7 @@ interface EventActionsProps {
 }
 
 const baseButtonClass =
-  "inline-flex h-12 md:h-14 items-center justify-center gap-2 rounded-2xl border border-slate-300 bg-white/80 backdrop-blur-md px-5 text-sm font-bold uppercase tracking-widest text-slate-700 shadow-sm transition-all hover:border-slate-400 hover:bg-white hover:shadow-md disabled:cursor-not-allowed disabled:opacity-60";
+  "inline-flex h-12 md:h-14 items-center justify-center gap-2 rounded-2xl border border-border bg-card/80 backdrop-blur-md px-5 text-sm font-bold uppercase tracking-widest text-foreground shadow-sm transition-all hover:border-border hover:bg-card hover:shadow-md disabled:cursor-not-allowed disabled:opacity-60"
 
 export default function EventActions({ eventId }: EventActionsProps) {
   const { data: userData } = useGetMe();
@@ -94,7 +94,7 @@ export default function EventActions({ eventId }: EventActionsProps) {
         type="button"
         onClick={handleFavorite}
         disabled={favoriteBusy}
-        className={`${baseButtonClass} w-full sm:w-auto ${isFavorited ? "border-rose-200 bg-rose-50 text-rose-600" : ""}`}
+        className={`${baseButtonClass} w-full sm:w-auto ${isFavorited ? "border-rose-500/50 bg-rose-500/10 text-rose-500" : ""}`}
         title={isFavorited ? "Bỏ yêu thích" : "Yêu thích"}
       >
         <Heart className={`h-4 w-4 md:h-5 md:w-5 ${isFavorited ? "fill-current" : ""}`} />
@@ -105,7 +105,7 @@ export default function EventActions({ eventId }: EventActionsProps) {
         type="button"
         onClick={handleSave}
         disabled={saveBusy}
-        className={`${baseButtonClass} w-full sm:w-auto ${isSaved ? "border-sky-200 bg-sky-50 text-sky-700" : ""}`}
+        className={`${baseButtonClass} w-full sm:w-auto ${isSaved ? "border-sky-500/50 bg-sky-500/10 text-sky-500" : ""}`}
         title={isSaved ? "Bỏ lưu" : "Lưu sự kiện"}
       >
         <Bookmark className={`h-4 w-4 md:h-5 md:w-5 ${isSaved ? "fill-current" : ""}`} />

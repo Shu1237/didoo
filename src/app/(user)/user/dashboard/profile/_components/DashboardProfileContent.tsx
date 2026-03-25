@@ -7,12 +7,12 @@ import ProfileForm from "./ProfileForm";
 
 export default function DashboardProfileContent() {
   return (
-    <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-lg">
+    <div className="overflow-hidden rounded-xl md:rounded-2xl border border-border bg-card shadow-lg mx-2 sm:mx-0">
       <Suspense fallback={<Loading />}>
         <ProfileSidebar />
       </Suspense>
 
-      <div className="border-t border-zinc-100">
+      <div className="border-t border-border/50">
         <Suspense fallback={<Loading />}>
           <ProfileForm />
         </Suspense>

@@ -108,25 +108,25 @@ export default function EventLocation({ event }: EventLocationProps) {
   return (
     <section className="space-y-6">
       <div className="space-y-2">
-        <h2 className="text-2xl font-bold tracking-tight text-zinc-900 md:text-3xl">
+        <h2 className="text-2xl font-bold tracking-tight text-foreground md:text-3xl">
           Địa điểm sự kiện
         </h2>
-        <p className="text-sm text-zinc-600">
+        <p className="text-sm text-muted-foreground">
           Xem vị trí trên bản đồ và chỉ đường.
         </p>
       </div>
 
       <div className="relative w-full group mb-8 md:mb-12">
-        <div className="relative overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm h-[420px] md:h-[480px] w-full">
+        <div className="relative overflow-hidden rounded-2xl border border-border bg-card shadow-sm h-[420px] md:h-[480px] w-full">
           {isGeocoding ? (
             <div className="flex h-full w-full items-center justify-center p-6 text-center">
               <div className="flex flex-col items-center gap-4">
-                <div className="h-8 w-8 animate-spin rounded-full border-4 border-zinc-200 border-t-primary" />
-                <span className="text-zinc-500 font-bold uppercase tracking-widest text-xs">Đang định vị địa điểm...</span>
+                <div className="h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary" />
+                <span className="text-muted-foreground font-bold uppercase tracking-widest text-xs">Đang định vị địa điểm...</span>
               </div>
             </div>
           ) : resolvedLocations.length === 0 ? (
-            <div className="flex h-full w-full items-center justify-center p-6 text-center text-zinc-500 font-bold uppercase tracking-widest text-xs">
+            <div className="flex h-full w-full items-center justify-center p-6 text-center text-muted-foreground font-bold uppercase tracking-widest text-xs">
               Đang cập nhật thông tin địa điểm.
             </div>
           ) : (
@@ -157,7 +157,7 @@ export default function EventLocation({ event }: EventLocationProps) {
                       longitude={lng}
                       anchor="bottom"
                     >
-                      <div className="relative rounded-full border-2 border-white bg-primary p-1 text-white shadow-lg motion-safe:animate-bounce flex items-center justify-center w-10 h-10 overflow-hidden">
+                      <div className="relative rounded-full border-2 border-primary/20 bg-primary p-1 text-white shadow-lg motion-safe:animate-bounce flex items-center justify-center w-10 h-10 overflow-hidden">
                         {categoryIcon ? (
                           <img src={categoryIcon} alt="Biểu tượng vị trí" className="w-full h-full object-cover" />
                         ) : (
@@ -170,19 +170,19 @@ export default function EventLocation({ event }: EventLocationProps) {
 
                 {userLocation && (
                   <Marker latitude={userLocation.lat} longitude={userLocation.lng} anchor="center">
-                    <div className="h-4 w-4 rounded-full border-[3px] border-white bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.5)]" />
+                    <div className="h-4 w-4 rounded-full border-[3px] border-primary/40 bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.5)]" />
                   </Marker>
                 )}
               </Map>
 
               {firstLat && firstLng && (
                 <div
-                  className="absolute inset-0 z-10 cursor-pointer bg-transparent hover:bg-zinc-900/10 transition-colors duration-300"
+                  className="absolute inset-0 z-10 cursor-pointer bg-transparent hover:bg-black/10 dark:hover:bg-white/5 transition-colors duration-300"
                   onClick={() => {
                     router.push(`/map?eventId=${event.id}&lat=${firstLat}&lng=${firstLng}`);
                   }}
                 >
-                  <div className="absolute top-4 left-1/2 -translate-x-1/2 flex items-center gap-2 rounded-xl bg-white/95 px-4 py-2.5 text-sm font-semibold text-zinc-900 shadow-lg opacity-0 transition-opacity duration-300 group-hover:opacity-100 pointer-events-none">
+                  <div className="absolute top-4 left-1/2 -translate-x-1/2 flex items-center gap-2 rounded-xl bg-background/95 border border-border px-4 py-2.5 text-sm font-semibold text-foreground shadow-lg opacity-0 transition-opacity duration-300 group-hover:opacity-100 pointer-events-none">
                     Mở bản đồ
                     <ArrowUpRight className="h-4 w-4" />
                   </div>
@@ -195,11 +195,11 @@ export default function EventLocation({ event }: EventLocationProps) {
         {/* Bottom Right Floating Info Card */}
         {!isGeocoding && resolvedLocations.length > 0 && firstLocation && (
           <div className="absolute bottom-4 left-4 right-4 z-20 md:left-auto md:right-6 md:w-[320px] pointer-events-none">
-            <article className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-lg pointer-events-auto transition-all hover:shadow-xl duration-300">
+            <article className="rounded-2xl border border-border bg-card p-5 shadow-lg pointer-events-auto transition-all hover:shadow-xl duration-300">
               <div className="flex items-start justify-between gap-4 mb-4">
                 <div>
-                  <h3 className="text-lg font-black text-zinc-900 line-clamp-1">{firstLocation.name}</h3>
-                  <p className="mt-1 text-xs text-zinc-500 font-semibold line-clamp-2">{firstLocation.address || "Địa chỉ sẽ cập nhật"}</p>
+                  <h3 className="text-lg font-black text-foreground line-clamp-1">{firstLocation.name}</h3>
+                  <p className="mt-1 text-xs text-muted-foreground font-semibold line-clamp-2">{firstLocation.address || "Địa chỉ sẽ cập nhật"}</p>
                 </div>
                 <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary shadow-inner">
                   <MapPin className="h-4 w-4" />
@@ -207,15 +207,15 @@ export default function EventLocation({ event }: EventLocationProps) {
               </div>
 
               {distance !== null && (
-                <div className="mb-4 flex items-center gap-3 rounded-xl bg-zinc-100/80 p-3">
-                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white shadow-sm text-primary">
+                <div className="mb-4 flex items-center gap-3 rounded-xl bg-muted/80 p-3">
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-card shadow-sm text-primary">
                     <Navigation className="h-3.5 w-3.5" />
                   </span>
                   <div>
-                    <p className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500">
+                    <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground">
                       Khoảng cách ước tính
                     </p>
-                    <p className="text-sm font-black text-zinc-900">{distance.toFixed(1)} km</p>
+                    <p className="text-sm font-black text-foreground">{distance.toFixed(1)} km</p>
                   </div>
                 </div>
               )}
@@ -238,7 +238,7 @@ export default function EventLocation({ event }: EventLocationProps) {
       </div>
 
       {!userLocation && (
-        <p className="text-xs font-medium text-zinc-500 text-center md:text-left mt-2 pl-4">Bật quyền vị trí để xem khoảng cách đến sự kiện.</p>
+        <p className="text-xs font-medium text-muted-foreground text-center md:text-left mt-2 pl-4">Bật quyền vị trí để xem khoảng cách đến sự kiện.</p>
       )}
     </section>
   );

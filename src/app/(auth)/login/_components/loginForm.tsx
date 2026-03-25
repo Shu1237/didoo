@@ -68,15 +68,15 @@ export default function LoginForm() {
     <motion.div
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      className="grid grid-cols-1 lg:grid-cols-2 w-full max-w-5xl bg-white rounded-2xl border border-zinc-200 shadow-xl overflow-hidden lg:min-h-[480px]"
+      className="grid grid-cols-1 lg:grid-cols-2 w-full max-w-5xl bg-card rounded-2xl border border-border shadow-xl overflow-hidden lg:min-h-[480px]"
     >
       <div className="p-6 sm:p-8 lg:p-10">
         {/* <Link href="/home" className="inline-block mb-6 hover:opacity-80 transition-opacity">
           <Image src="/DiDoo.png" alt="DiDoo" width={48} height={48} className="rounded-xl" priority />
         </Link> */}
 
-        <h1 className="text-2xl font-bold text-zinc-900">Chào mừng trở lại</h1>
-        <p className="mt-1 text-zinc-600 text-sm">Nhập thông tin tài khoản để đăng nhập</p>
+        <h1 className="text-2xl font-bold text-foreground">Chào mừng trở lại</h1>
+        <p className="mt-1 text-muted-foreground text-sm">Nhập thông tin tài khoản để đăng nhập</p>
 
         {resetSuccess && (
           <div className="mt-4 p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm">
@@ -92,24 +92,24 @@ export default function LoginForm() {
 
         <form className="mt-6 space-y-4" onSubmit={handleSubmit(onSubmit)}>
           <div className="space-y-2">
-            <label className="text-sm font-medium text-zinc-700">Email</label>
+            <label className="text-sm font-medium text-foreground/80">Email</label>
             <Input
               type="email"
               placeholder="example@gmail.com"
               {...register("email")}
-              className={`h-11 rounded-xl border-zinc-200 bg-zinc-50 ${errors.email ? "border-rose-300" : ""}`}
+              className={`h-11 rounded-xl border-border bg-muted/50 ${errors.email ? "border-rose-300" : ""}`}
             />
             {errors.email && <p className="text-xs text-rose-600">{errors.email.message}</p>}
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-zinc-700">Mật khẩu</label>
+            <label className="text-sm font-medium text-foreground/80">Mật khẩu</label>
             <div className="relative">
               <Input
                 type={showPassword ? "text" : "password"}
                 placeholder="••••••••"
                 {...register("password")}
-                className={`h-11 rounded-xl border-zinc-200 bg-zinc-50 pr-11 ${errors.password ? "border-rose-300" : ""}`}
+                className={`h-11 rounded-xl border-border bg-muted/50 pr-11 ${errors.password ? "border-rose-300" : ""}`}
               />
               <button
                 type="button"
@@ -139,9 +139,9 @@ export default function LoginForm() {
 
         <div className="mt-6">
           <div className="flex items-center gap-3">
-            <div className="h-px flex-1 bg-zinc-200" />
-            <span className="text-xs font-medium text-zinc-500">hoặc</span>
-            <div className="h-px flex-1 bg-zinc-200" />
+            <div className="h-px flex-1 bg-border" />
+            <span className="text-xs font-medium text-muted-foreground">hoặc</span>
+            <div className="h-px flex-1 bg-border" />
           </div>
           <div className="mt-4 flex justify-center">
             <GoogleLogin
@@ -176,7 +176,7 @@ export default function LoginForm() {
           </div>
         </div>
 
-        <p className="mt-6 text-center text-sm text-zinc-600">
+        <p className="mt-6 text-center text-sm text-muted-foreground">
           Chưa có tài khoản?{" "}
           <Link href="/register" className="font-semibold text-primary hover:underline">
             Đăng ký
@@ -184,7 +184,7 @@ export default function LoginForm() {
         </p>
       </div>
 
-      <div className="hidden lg:flex flex-col justify-center p-10 bg-zinc-900 text-white min-h-[480px]">
+      <div className="hidden lg:flex flex-col justify-center p-10 bg-zinc-900 border-l border-border/10 text-white min-h-[480px]">
         <h2 className="text-2xl font-bold leading-tight">
           Khám phá sự kiện
           <br />

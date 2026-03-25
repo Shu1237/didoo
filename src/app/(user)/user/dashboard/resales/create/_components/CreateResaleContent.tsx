@@ -66,8 +66,8 @@ export function CreateResaleContent({
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-zinc-900">Đăng vé bán lại</h1>
-          <p className="mt-1 text-zinc-600">
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">Đăng vé bán lại</h1>
+          <p className="mt-1 text-muted-foreground font-medium">
             Chọn vé cùng loại để đăng bán. Vé trả phí cần nhập giá; vé miễn phí không cần.
           </p>
         </div>
@@ -79,13 +79,13 @@ export function CreateResaleContent({
         </Button>
       </div>
 
-      <Card className="border-zinc-200">
+      <Card className="border-border bg-card shadow-sm">
         <CardHeader>
-          <h2 className="text-xl font-semibold text-zinc-900">Các sự kiện hiện tại</h2>
+          <h2 className="text-xl font-semibold text-foreground">Các sự kiện hiện tại</h2>
         </CardHeader>
         <CardContent className="space-y-3">
           {currentEvents.length === 0 ? (
-            <p className="text-sm text-zinc-600">Bạn chưa có vé phù hợp của sự kiện nào để đăng bán lại.</p>
+            <p className="text-sm text-muted-foreground font-medium">Bạn chưa có vé phù hợp của sự kiện nào để đăng bán lại.</p>
           ) : (
             currentEvents.map((event) => {
               const ownedCount = ownedCountByEvent.get(event.id) || 0;
@@ -93,15 +93,15 @@ export function CreateResaleContent({
               return (
                 <div
                   key={event.id}
-                  className={`overflow-hidden rounded-2xl border ${isActive ? "border-primary" : "border-zinc-200"}`}
+                  className={`overflow-hidden rounded-2xl border ${isActive ? "border-primary" : "border-border shadow-sm"}`}
                 >
                   <div className="grid gap-0 md:grid-cols-[1fr_220px]">
                     <div className="p-4">
-                      <p className="text-[10px] font-semibold uppercase tracking-wide text-zinc-500">
+                      <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
                         Sự kiện hiện tại
                       </p>
-                      <p className="mt-1 text-xl font-semibold text-zinc-900">{event.name}</p>
-                      <p className="mt-1 flex items-center gap-2 text-sm text-zinc-600">
+                      <p className="mt-1 text-xl font-bold text-foreground">{event.name}</p>
+                      <p className="mt-1 flex items-center gap-2 text-sm text-muted-foreground font-medium">
                         <CalendarDays className="h-4 w-4" />
                         {new Date(event.startTime).toLocaleString("vi-VN")}
                       </p>
@@ -133,18 +133,18 @@ export function CreateResaleContent({
         </CardContent>
       </Card>
 
-      <Card className="border-zinc-200">
+      <Card className="border-border bg-card shadow-sm">
         <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <h2 className="text-xl font-semibold text-zinc-900">Vé của tôi</h2>
-            <p className="mt-1 text-sm text-zinc-500">Chỉ được chọn vé cùng loại trong một đơn bán lại.</p>
+            <h2 className="text-xl font-semibold text-foreground">Vé của tôi</h2>
+            <p className="mt-1 text-sm text-muted-foreground font-medium">Chỉ được chọn vé cùng loại trong một đơn bán lại.</p>
           </div>
           {hasOwnedTicketsForSelectedEvent && selectedTicketIds.length > 0 && (
             <Button
               type="button"
               variant="outline"
               size="sm"
-              className="shrink-0 border-zinc-300 text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900"
+              className="shrink-0 border-border text-muted-foreground hover:bg-muted hover:text-foreground"
               onClick={onClearAll}
             >
               Xóa tất cả ({selectedTicketIds.length})
@@ -153,7 +153,7 @@ export function CreateResaleContent({
         </CardHeader>
         <CardContent className="space-y-4">
           {!selectedEventId ? (
-            <p className="text-sm text-zinc-600">Vui lòng chọn sự kiện để hiển thị vé của bạn.</p>
+            <p className="text-sm text-muted-foreground font-medium">Vui lòng chọn sự kiện để hiển thị vé của bạn.</p>
           ) : !hasOwnedTicketsForSelectedEvent ? (
             <p className="text-sm text-rose-600">
               Bạn chưa mua vé phù hợp của sự kiện này hoặc vé đã dùng/hết điều kiện đăng bán.
@@ -162,11 +162,11 @@ export function CreateResaleContent({
             <>
               {ticketsByTypeInEvent.free.length > 0 && (
                 <div className="space-y-3">
-                  <h3 className="text-sm font-semibold text-zinc-700">Vé miễn phí</h3>
+                  <h3 className="text-sm font-semibold text-foreground/80">Vé miễn phí</h3>
                   {ticketsByTypeInEvent.free.map((group) => (
                     <div key={group.ticketTypeId} className="space-y-2">
                       <div className="flex items-center justify-between">
-                        <span className="text-xs font-medium text-zinc-600">
+                        <span className="text-xs font-semibold text-muted-foreground">
                           {group.name} ({group.tickets.length} vé)
                         </span>
                         <Button
@@ -192,8 +192,8 @@ export function CreateResaleContent({
                                 <TicketIcon className="h-5 w-5" />
                               </div>
                               <div className="min-w-0 flex-1 space-y-1">
-                                <p className="text-sm font-medium text-zinc-900">ID: {shortId}</p>
-                                <p className="text-xs text-zinc-600">Hạng vé: {group.name}</p>
+                                <p className="text-sm font-bold text-foreground">ID: {shortId}</p>
+                                <p className="text-xs text-muted-foreground font-medium">Hạng vé: {group.name}</p>
                                 <Badge className="bg-emerald-500/90 text-[10px] font-medium text-white">
                                   MIỄN PHÍ
                                 </Badge>
@@ -210,11 +210,11 @@ export function CreateResaleContent({
 
               {ticketsByTypeInEvent.paid.length > 0 && (
                 <div className="space-y-3">
-                  <h3 className="text-sm font-semibold text-zinc-700">Vé trả phí</h3>
+                  <h3 className="text-sm font-semibold text-foreground/80">Vé trả phí</h3>
                   {ticketsByTypeInEvent.paid.map((group) => (
                     <div key={group.ticketTypeId} className="space-y-2">
                       <div className="flex items-center justify-between">
-                        <span className="text-xs font-medium text-zinc-600">
+                        <span className="text-xs font-semibold text-muted-foreground">
                           {group.name} · {group.price.toLocaleString("vi-VN")}đ ({group.tickets.length} vé)
                         </span>
                         <Button
@@ -240,13 +240,13 @@ export function CreateResaleContent({
                                 <TicketIcon className="h-5 w-5" />
                               </div>
                               <div className="min-w-0 flex-1 space-y-1">
-                                <p className="text-sm font-medium text-zinc-900">ID: {shortId}</p>
-                                <p className="text-xs text-zinc-600">Hạng vé: {group.name}</p>
+                                <p className="text-sm font-bold text-foreground">ID: {shortId}</p>
+                                <p className="text-xs text-muted-foreground font-medium">Hạng vé: {group.name}</p>
                                 <div className="flex flex-wrap items-center gap-2">
                                   <Badge className="bg-emerald-500/90 text-[10px] font-medium text-white">
                                     CÓ SẴN
                                   </Badge>
-                                  <span className="text-xs text-zinc-600">
+                                  <span className="text-xs text-muted-foreground font-medium">
                                     Giá gốc: {group.price.toLocaleString("vi-VN")}đ
                                   </span>
                                 </div>
@@ -273,14 +273,14 @@ export function CreateResaleContent({
         </CardContent>
       </Card>
 
-      <Card className="border-zinc-200">
+      <Card className="border-border bg-card shadow-sm">
         <CardHeader>
-          <h2 className="text-xl font-semibold text-zinc-900">Thông tin bán lại</h2>
+          <h2 className="text-xl font-semibold text-foreground">Thông tin bán lại</h2>
         </CardHeader>
         <CardContent className="space-y-4">
           {!selectedTicketsMeta.isFree && selectedTicketIds.length > 0 && (
             <div className="space-y-2">
-              <label className="text-sm font-medium text-zinc-700">Giá bán mong muốn (VNĐ)</label>
+              <label className="text-sm font-semibold text-foreground/80">Giá bán mong muốn (VNĐ)</label>
               <Input
                 type="number"
                 min={0}
@@ -296,7 +296,7 @@ export function CreateResaleContent({
           )}
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-zinc-700">Mô tả (tuỳ chọn)</label>
+            <label className="text-sm font-semibold text-foreground/80">Mô tả (tuỳ chọn)</label>
             <Textarea
               rows={3}
               value={formValues.description || ""}

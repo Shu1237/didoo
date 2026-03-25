@@ -64,22 +64,22 @@ export function CategoriesTable({
 
   return (
     <div className="space-y-4">
-      <div className="rounded-2xl border border-zinc-200 bg-white">
+      <div className="rounded-2xl border border-border bg-card overflow-hidden">
         <Table>
           <TableHeader>
-            <TableRow className="border-zinc-200 hover:bg-transparent">
-              <TableHead>Tên</TableHead>
-              <TableHead>Slug</TableHead>
-              <TableHead>Mô tả</TableHead>
+            <TableRow className="border-border hover:bg-transparent">
+              <TableHead className="text-muted-foreground">Tên</TableHead>
+              <TableHead className="text-muted-foreground">Slug</TableHead>
+              <TableHead className="text-muted-foreground">Mô tả</TableHead>
               <TableHead className="w-12" />
             </TableRow>
           </TableHeader>
           <TableBody>
             {items.map((c) => (
-              <TableRow key={c.id} className="border-zinc-100">
-                <TableCell className="font-medium">{c.name}</TableCell>
-                <TableCell className="text-zinc-600">{c.slug}</TableCell>
-                <TableCell className="max-w-[200px] truncate text-zinc-600">{c.description ?? "—"}</TableCell>
+              <TableRow key={c.id} className="border-border hover:bg-muted/30 transition-colors">
+                <TableCell className="font-medium text-foreground">{c.name}</TableCell>
+                <TableCell className="text-muted-foreground">{c.slug}</TableCell>
+                <TableCell className="max-w-[200px] truncate text-muted-foreground">{c.description ?? "—"}</TableCell>
                 <TableCell>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>

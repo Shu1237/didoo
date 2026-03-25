@@ -62,8 +62,8 @@ export default function DashboardResalesContent() {
     <div className="space-y-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-zinc-900">Vé bán lại của tôi</h1>
-          <p className="mt-1 text-zinc-600">
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">Vé bán lại của tôi</h1>
+          <p className="mt-1 text-muted-foreground font-medium">
             Quản lý vé đang bán, xem lịch sử giao dịch và người mua vé của bạn.
           </p>
         </div>
@@ -86,10 +86,10 @@ export default function DashboardResalesContent() {
 
         <TabsContent value="listings" className="space-y-4">
           {listings.length === 0 ? (
-            <Card className="border-dashed border-zinc-300">
+            <Card className="border-dashed border-border bg-card shadow-sm">
               <CardContent className="p-10 text-center">
-                <CircleDollarSign className="mx-auto h-10 w-10 text-zinc-400" />
-                <p className="mt-3 text-zinc-600">Bạn chưa đăng vé bán lại nào.</p>
+                <CircleDollarSign className="mx-auto h-10 w-10 text-muted-foreground/40" />
+                <p className="mt-3 text-muted-foreground font-medium">Bạn chưa đăng vé bán lại nào.</p>
                 <Button asChild className="mt-4">
                   <Link href="/user/dashboard/tickets">Đi tới vé của tôi</Link>
                 </Button>
@@ -106,10 +106,10 @@ export default function DashboardResalesContent() {
 
         <TabsContent value="transactions" className="space-y-3">
           {tradeBookings.length === 0 ? (
-            <Card className="border-dashed border-zinc-300">
+            <Card className="border-dashed border-border bg-card shadow-sm">
               <CardContent className="p-10 text-center">
-                <ShoppingBag className="mx-auto h-10 w-10 text-zinc-400" />
-                <p className="mt-3 text-zinc-600">Chưa có giao dịch bán vé nào.</p>
+                <ShoppingBag className="mx-auto h-10 w-10 text-muted-foreground/40" />
+                <p className="mt-3 text-muted-foreground font-medium">Chưa có giao dịch bán vé nào.</p>
               </CardContent>
             </Card>
           ) : (

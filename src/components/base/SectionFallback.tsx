@@ -22,13 +22,13 @@ export function SectionFallback({
   if (type === "table") {
     return (
       <div className={cn("space-y-3", className)}>
-        <div className="flex gap-4 border-b border-zinc-200 pb-3">
+        <div className="flex gap-4 border-b border-border pb-3">
           {Array.from({ length: 5 }).map((_, i) => (
             <Skeleton key={i} className="h-4 flex-1" />
           ))}
         </div>
         {Array.from({ length: rows }).map((_, i) => (
-          <div key={i} className="flex gap-4 py-3 border-b border-zinc-100">
+          <div key={i} className="flex gap-4 py-3 border-b border-border/60">
             <Skeleton className="h-10 w-10 rounded-lg shrink-0" />
             {Array.from({ length: 5 }).map((_, j) => (
               <Skeleton key={j} className="h-4 flex-1" />
@@ -43,7 +43,7 @@ export function SectionFallback({
     return (
       <div className={cn("grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4", className)}>
         {Array.from({ length: cards }).map((_, i) => (
-          <Card key={i} className="border-zinc-200">
+          <Card key={i} className="border border-border">
             <CardHeader className="pb-2">
               <Skeleton className="h-4 w-24" />
             </CardHeader>
@@ -86,7 +86,7 @@ export function SectionFallback({
     return (
       <div className={cn("space-y-2", className)}>
         {Array.from({ length: rows }).map((_, i) => (
-          <div key={i} className="flex items-center gap-3 p-3 rounded-xl border border-zinc-200">
+          <div key={i} className="flex items-center gap-3 p-3 rounded-xl border border-border">
             <Skeleton className="h-10 w-10 rounded-lg shrink-0" />
             <div className="flex-1 space-y-2">
               <Skeleton className="h-4 w-3/4" />

@@ -36,6 +36,7 @@ import { Roles } from "@/utils/enum";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfileWithOrganizer } from "@/hooks/useProfileWithOrganizer";
 import { cn } from "@/lib/utils";
+import { ModeToggle } from "@/components/layout/buttonMode";
 
 const MAIN_NAV_ITEMS = [
   { href: "/home", label: "Trang chủ", icon: LayoutDashboard },
@@ -62,8 +63,6 @@ const Header = () => {
     await logout.mutateAsync({ userId: user.UserId });
   };
 
-  // Ảnh 1: User chưa đăng kí hoặc đã đăng kí nhưng PENDING → KHÔNG hiện Bảng điều khiển
-  // Ảnh 2: Khi sự kiện OrganizerVerify bắn tới (admin đã duyệt) → HIỆN Bảng điều khiển trong dropdown
   const showDashboard = () => {
     if (!user) return false;
     if (user.Role === Roles.ADMIN) return true;
@@ -85,17 +84,18 @@ const Header = () => {
   return (
     <>
       <div
-        className={`fixed left-0 right-0 z-50 flex justify-center px-4 transition-all duration-300 ${isScrolled ? "top-0" : "top-4"}`}
+        className={`fixed left-0 right-0 z-50 flex justify-center px-2 sm:px-4 transition-all duration-300 ${isScrolled ? "top-0" : "top-2 md:top-4"}`}
       >
         <header
-          className="w-full max-w-6xl transition-all duration-300 bg-white/90 backdrop-blur-xl border border-zinc-200/80 shadow-lg shadow-zinc-900/5 rounded-2xl py-2.5 px-6"
+          className="w-full max-w-6xl transition-all duration-300 bg-background/90 backdrop-blur-xl border border-border/80 shadow-lg shadow-black/5 rounded-2xl py-2 px-3 md:px-6 md:py-2.5"
         >
           <div className="flex items-center justify-between h-12">
+            {/* Logo Section */}
             <Link
               href="/home"
-              className="flex items-center gap-2.5 group shrink-0"
+              className="flex items-center gap-2 md:gap-2.5 group shrink-0"
             >
-              <div className="relative h-9 w-9 overflow-hidden rounded-xl shadow-sm ring-1 ring-zinc-200/50">
+              <div className="relative h-8 w-8 md:h-9 md:w-9 overflow-hidden rounded-xl shadow-sm ring-1 ring-border/60">
                 <Image
                   src="/DiDoo.png"
                   alt="DiDoo"
@@ -104,13 +104,13 @@ const Header = () => {
                   className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-105"
                 />
               </div>
-              <span className="font-bold text-xl tracking-tight text-zinc-900">
+              <span className="font-bold text-lg md:text-xl tracking-tight text-foreground hidden xs:block font-heading">
                 DiDoo
               </span>
             </Link>
 
-            {/* Desktop nav */}
-            <nav className="hidden md:flex items-center gap-0.5 bg-zinc-100/80 p-1 rounded-xl border border-zinc-200/60">
+            {/* Desktop Navigation */}
+            <nav className="hidden md:flex items-center gap-0.5 bg-secondary/80 p-1 rounded-xl border border-border/70">
               {MAIN_NAV_ITEMS.map((item) => (
                 <NavItem
                   key={item.href}
@@ -121,109 +121,165 @@ const Header = () => {
               ))}
             </nav>
 
-            {/* Mobile nav - Drawer */}
-            <Drawer direction="left">
-              <DrawerTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="md:hidden h-10 w-10 rounded-xl"
-                  aria-label="Mở menu"
-                >
-                  <Menu className="h-5 w-5" />
-                </Button>
-              </DrawerTrigger>
-              <DrawerContent className="h-full w-[280px] max-w-[85vw] rounded-none">
-                <DrawerHeader className="border-b border-zinc-200">
-                  <DrawerTitle className="flex items-center gap-2">
-                    <Image src="/DiDoo.png" alt="DiDoo" width={32} height={32} className="rounded-lg" />
-                    DiDoo
-                  </DrawerTitle>
-                </DrawerHeader>
-                <nav className="flex flex-col p-4 gap-1">
-                  {MAIN_NAV_ITEMS.map((item) => {
-                    const Icon = item.icon;
-                    return (
-                      <Link
-                        key={item.href}
-                        href={item.href}
-                        className={cn(
-                          "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-colors min-h-[44px]",
-                          isActive(item.href)
-                            ? "bg-primary/10 text-primary"
-                            : "text-zinc-600 hover:bg-zinc-100"
-                        )}
-                      >
-                        <Icon className="h-5 w-5 shrink-0" />
-                        {item.label}
-                      </Link>
-                    );
-                  })}
-                </nav>
-              </DrawerContent>
-            </Drawer>
+            {/* Right Side Icons & Actions */}
+            <div className="flex items-center gap-1 md:gap-2">
+              {/* Desktop Theme Toggle */}
+              <div className="hidden md:flex">
+                <ModeToggle />
+              </div>
 
-            <div className="flex items-center gap-2">
-              {user ? (
-                <>
-                  <NotificationBell />
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button className="bg-primary hover:bg-primary/90 text-white rounded-xl px-5 h-10 min-h-[44px] text-sm font-semibold shadow-md shadow-primary/20 transition-all">
-                      Tài khoản
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent
-                    align="end"
-                    className="w-56 bg-white rounded-xl border border-zinc-200 shadow-xl p-2 mt-3"
-                  >
-                    <DropdownMenuLabel className="text-[10px] uppercase text-zinc-400 font-semibold px-2 py-1.5">
-                      Tài khoản
-                    </DropdownMenuLabel>
-                    <DropdownMenuItem
-                      className="rounded-lg cursor-pointer focus:bg-zinc-50"
-                      asChild
+              {/* Mobile Hamburger Menu (Middle-Right as requested) */}
+              <div className="md:hidden">
+                <Drawer direction="left">
+                  <DrawerTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-9 w-9 rounded-full bg-secondary/50"
+                      aria-label="Mở menu"
                     >
-                      <Link
-                        href="/user/dashboard/profile"
-                        className="flex items-center gap-2.5 px-2 py-2"
-                      >
-                        <UserIcon className="w-4 h-4" />
-                        <span>Hồ sơ</span>
-                      </Link>
-                    </DropdownMenuItem>
-                    {showDashboard() && dashboardLink && (
+                      <Menu className="h-5 w-5" />
+                    </Button>
+                  </DrawerTrigger>
+                  <DrawerContent className="h-full w-[280px] max-w-[85vw] rounded-none">
+                    <DrawerHeader className="border-b border-border text-left">
+                      <DrawerTitle className="flex items-center gap-2 font-heading font-bold">
+                        <Image src="/DiDoo.png" alt="DiDoo" width={32} height={32} className="rounded-lg" />
+                        DiDoo
+                      </DrawerTitle>
+                    </DrawerHeader>
+                    
+                    <nav className="flex flex-col p-4 gap-1">
+                      {MAIN_NAV_ITEMS.map((item) => {
+                        const Icon = item.icon;
+                        return (
+                          <Link
+                            key={item.href}
+                            href={item.href}
+                            className={cn(
+                              "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-bold transition-colors min-h-[44px]",
+                              isActive(item.href)
+                                ? "bg-primary/10 text-primary"
+                                : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+                            )}
+                          >
+                            <Icon className="h-5 w-5 shrink-0" />
+                            {item.label}
+                          </Link>
+                        );
+                      })}
+                    </nav>
+
+                    <div className="mt-auto p-4 border-t border-border space-y-4 bg-muted/30">
+                      <div className="flex items-center justify-between px-2">
+                        <span className="text-sm font-bold text-muted-foreground">Giao diện</span>
+                        <ModeToggle />
+                      </div>
+
+                      {user ? (
+                        <div className="space-y-1">
+                          <Link
+                            href="/user/dashboard/profile"
+                            className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-bold text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
+                          >
+                            <UserIcon className="h-5 w-5" />
+                            Hồ sơ
+                          </Link>
+                          {showDashboard() && dashboardLink && (
+                            <Link
+                              href={dashboardLink}
+                              className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-bold text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
+                            >
+                              <LayoutDashboard className="h-5 w-5" />
+                              Bảng điều khiển
+                            </Link>
+                          )}
+                          <button
+                            onClick={handleLogout}
+                            className="w-full flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-bold text-rose-500 hover:bg-rose-500/10 transition-colors text-left"
+                          >
+                            <LogOut className="h-5 w-5" />
+                            Đăng xuất
+                          </button>
+                        </div>
+                      ) : (
+                        <Button asChild className="w-full h-12 rounded-xl font-bold bg-primary text-white">
+                          <Link href="/login">
+                            Đăng nhập
+                            <ArrowUpRight className="ml-2 h-5 w-5" />
+                          </Link>
+                        </Button>
+                      )}
+                    </div>
+                  </DrawerContent>
+                </Drawer>
+              </div>
+
+              {/* Notification Bell (Always visible, far right on mobile) */}
+              {user && <NotificationBell />}
+
+              {/* Desktop Account / Action Button */}
+              {user ? (
+                <div className="hidden md:block">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button className="bg-primary hover:bg-primary/90 text-white rounded-xl px-5 h-10 text-sm font-bold shadow-md shadow-primary/20 transition-all">
+                        Tài khoản
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                      align="end"
+                      className="w-56 bg-popover text-popover-foreground rounded-xl border border-border shadow-xl p-2 mt-3"
+                    >
+                      <DropdownMenuLabel className="text-[10px] uppercase text-muted-foreground font-semibold px-2 py-1.5">
+                        Quản lý
+                      </DropdownMenuLabel>
                       <DropdownMenuItem
-                        className="rounded-lg cursor-pointer focus:bg-zinc-50"
+                        className="rounded-lg cursor-pointer focus:bg-secondary"
                         asChild
                       >
                         <Link
-                          href={dashboardLink}
+                          href="/user/dashboard/profile"
                           className="flex items-center gap-2.5 px-2 py-2"
                         >
-                          <LayoutDashboard className="w-4 h-4" />
-                          <span>Bảng điều khiển</span>
+                          <UserIcon className="w-4 h-4" />
+                          <span>Hồ sơ cá nhân</span>
                         </Link>
                       </DropdownMenuItem>
-                    )}
-                    <DropdownMenuSeparator className="bg-zinc-200" />
-                    <DropdownMenuItem
-                      onClick={handleLogout}
-                      className="text-rose-600 focus:text-rose-600 focus:bg-rose-50 rounded-lg cursor-pointer flex items-center gap-2.5 px-2 py-2"
-                    >
-                      <LogOut className="w-4 h-4" />
-                      <span className="font-medium">Đăng xuất</span>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-                </>
+                      {showDashboard() && dashboardLink && (
+                        <DropdownMenuItem
+                          className="rounded-lg cursor-pointer focus:bg-secondary"
+                          asChild
+                        >
+                          <Link
+                            href={dashboardLink}
+                            className="flex items-center gap-2.5 px-2 py-2"
+                          >
+                            <LayoutDashboard className="w-4 h-4" />
+                            <span>Bảng điều khiển</span>
+                          </Link>
+                        </DropdownMenuItem>
+                      )}
+                      <DropdownMenuSeparator className="bg-border" />
+                      <DropdownMenuItem
+                        onClick={handleLogout}
+                        className="text-rose-600 focus:text-rose-600 focus:bg-rose-500/10 rounded-lg cursor-pointer flex items-center gap-2.5 px-2 py-2"
+                      >
+                        <LogOut className="w-4 h-4" />
+                        <span className="font-medium">Đăng xuất</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
               ) : (
-                <Link href="/login">
-                  <Button className="rounded-xl px-5 h-10 min-h-[44px] text-sm font-semibold flex items-center gap-2 bg-zinc-900 hover:bg-zinc-800 text-white shadow-md transition-all">
-                    Đặt vé
-                    <ArrowUpRight className="w-4 h-4" />
-                  </Button>
-                </Link>
+                <div className="hidden md:block">
+                  <Link href="/login">
+                    <Button className="rounded-xl px-5 h-10 text-sm font-bold flex items-center gap-1.5 bg-primary hover:bg-primary/90 text-primary-foreground shadow-md transition-all">
+                      Đặt vé
+                      <ArrowUpRight className="w-3.5 h-3.5" />
+                    </Button>
+                  </Link>
+                </div>
               )}
             </div>
           </div>
@@ -244,10 +300,10 @@ const NavItem = ({
 }) => (
   <Link href={href}>
     <div
-      className={`px-4 py-2 text-sm font-medium transition-all rounded-lg ${
+      className={`px-4 py-2 text-sm font-bold transition-all rounded-lg ${
         active
-          ? "bg-white text-primary shadow-sm border border-zinc-200/60"
-          : "text-zinc-600 hover:text-zinc-900 hover:bg-white/60"
+          ? "bg-card text-primary shadow-sm border border-border"
+          : "text-muted-foreground hover:text-foreground hover:bg-card/70"
       }`}
     >
       {label}

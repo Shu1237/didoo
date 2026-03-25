@@ -60,9 +60,9 @@ export default function OrganizerProfilePage({
 
   if (!organizer) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-zinc-50 px-4">
-        <div className="rounded-2xl border border-zinc-200 bg-white p-8 text-center shadow-sm">
-          <p className="text-zinc-600">Không tìm thấy nhà tổ chức.</p>
+      <main className="flex min-h-screen items-center justify-center bg-background px-4">
+        <div className="rounded-2xl border border-border bg-card p-8 text-center shadow-sm">
+          <p className="text-muted-foreground">Không tìm thấy nhà tổ chức.</p>
           <Button asChild className="mt-4 rounded-xl">
             <Link href="/events">Quay lại sự kiện</Link>
           </Button>
@@ -72,7 +72,7 @@ export default function OrganizerProfilePage({
   }
 
   return (
-    <main className="min-h-screen bg-zinc-50 pb-24">
+    <main className="min-h-screen bg-background pb-24">
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
         <div className="absolute -top-24 left-0 h-96 w-96 rounded-full bg-primary/5 blur-[100px]" />
         <div className="absolute top-1/3 right-0 h-80 w-80 rounded-full bg-primary/5 blur-[80px]" />

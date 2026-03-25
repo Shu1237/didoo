@@ -18,7 +18,7 @@ export function SpecialEvents({ events }: SpecialEventsProps) {
     event.locations?.[0]?.name || event.locations?.[0]?.address || "Địa điểm sẽ cập nhật";
 
   return (
-    <section className="py-16 lg:py-24 bg-white">
+    <section className="py-12 lg:py-24 bg-background">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 24 }}
@@ -28,13 +28,13 @@ export function SpecialEvents({ events }: SpecialEventsProps) {
         >
           <div>
             <span className="text-primary font-semibold text-sm">Nổi bật</span>
-            <h2 className="text-3xl sm:text-4xl font-bold text-zinc-900 mt-2">
+            <h2 className="text-3xl sm:text-4xl font-bold text-foreground mt-2">
               Sự kiện sắp diễn ra
             </h2>
           </div>
           <Link
             href="/events"
-            className="inline-flex items-center gap-2 font-semibold text-zinc-600 hover:text-primary transition-colors"
+            className="inline-flex items-center gap-2 font-bold text-sm text-primary md:text-muted-foreground md:hover:text-primary transition-colors"
           >
             Xem tất cả
             <ArrowRight className="w-4 h-4" />
@@ -73,12 +73,12 @@ export function SpecialEvents({ events }: SpecialEventsProps) {
                     <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white leading-tight mb-3">
                       {gridEvents[0].name}
                     </h3>
-                    <div className="flex items-center gap-4 text-white/80 text-sm font-medium">
+                    <div className="flex items-center gap-3 text-white/90 text-xs sm:text-sm font-semibold">
                       <span>
-                        {format(new Date(gridEvents[0].startTime), "dd MMM", { locale: vi })}
+                        {format(new Date(gridEvents[0].startTime), "dd MMM, yyyy", { locale: vi })}
                       </span>
-                      <span className="w-1.5 h-1.5 rounded-full bg-primary" />
-                      <span>{gridEvents[0].category?.name || "Sự kiện"}</span>
+                      <span className="w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_8px_rgba(234,88,12,0.6)]" />
+                      <span className="truncate">{gridEvents[0].category?.name || "Sự kiện"}</span>
                     </div>
                   </div>
                 </div>
@@ -97,9 +97,9 @@ export function SpecialEvents({ events }: SpecialEventsProps) {
               >
                 <Link
                   href={`/events/${event.id}`}
-                  className="flex gap-4 p-4 rounded-2xl bg-zinc-50 border border-zinc-100 hover:border-primary/30 hover:shadow-md transition-all group"
+                  className="flex gap-4 p-4 rounded-2xl bg-muted border border-border/60 hover:border-primary/30 hover:shadow-md transition-all group"
                 >
-                  <div className="w-20 h-20 shrink-0 rounded-xl bg-zinc-200 flex flex-col items-center justify-center text-center group-hover:bg-primary group-hover:text-white transition-colors">
+                  <div className="w-20 h-20 shrink-0 rounded-xl bg-secondary flex flex-col items-center justify-center text-center group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
                     <span className="text-xs font-semibold">
                       {format(new Date(event.startTime), "MMM", { locale: vi })}
                     </span>
@@ -108,13 +108,13 @@ export function SpecialEvents({ events }: SpecialEventsProps) {
                     </span>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <span className="text-xs font-medium text-zinc-500 block mb-1">
+                    <span className="text-xs font-medium text-muted-foreground block mb-1">
                       {event.category?.name || "Sự kiện"}
                     </span>
-                    <h4 className="font-semibold text-zinc-900 line-clamp-2 group-hover:text-primary transition-colors">
+                    <h4 className="font-semibold text-foreground line-clamp-2 group-hover:text-primary transition-colors">
                       {event.name}
                     </h4>
-                    <div className="mt-2 space-y-1.5 text-xs text-zinc-500">
+                    <div className="mt-2 space-y-1.5 text-xs text-muted-foreground">
                       <p className="flex items-center gap-1.5">
                         <CalendarDays className="h-3.5 w-3.5" />
                         {format(new Date(event.startTime), "dd/MM/yyyy HH:mm", { locale: vi })}

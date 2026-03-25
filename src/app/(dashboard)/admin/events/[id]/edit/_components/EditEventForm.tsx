@@ -224,9 +224,9 @@ export function EditEventForm({ eventId }: { eventId: string }) {
 
   if (isLoading || !event) {
     return (
-      <Card className="border-zinc-200">
+      <Card className="border-border bg-card">
         <CardContent className="flex items-center justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-zinc-400" />
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </CardContent>
       </Card>
     );
@@ -240,7 +240,7 @@ export function EditEventForm({ eventId }: { eventId: string }) {
           <Label>Ảnh đại diện</Label>
           <div
             onClick={() => !isUploading && thumbnailInputRef.current?.click()}
-            className={`relative flex h-[200px] w-full cursor-pointer items-center justify-center overflow-hidden rounded-xl border-2 border-dashed border-zinc-200 bg-zinc-50 transition-colors ${isUploading ? "cursor-not-allowed opacity-70" : "hover:border-zinc-300 hover:bg-zinc-100"
+            className={`relative flex h-[200px] w-full cursor-pointer items-center justify-center overflow-hidden rounded-xl border-2 border-dashed border-border bg-muted/30 transition-colors ${isUploading ? "cursor-not-allowed opacity-70" : "hover:border-primary/50 hover:bg-muted/50"
               }`}
           >
             <input
@@ -257,14 +257,14 @@ export function EditEventForm({ eventId }: { eventId: string }) {
               }}
             />
             {uploadingType === "thumbnail" && (
-              <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/80">
-                <Loader2 className="h-10 w-10 animate-spin text-zinc-600" />
+              <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/80">
+                <Loader2 className="h-10 w-10 animate-spin text-primary" />
               </div>
             )}
             {thumbnailPreview ? (
               <img src={thumbnailPreview} alt="Ảnh đại diện" className="h-full w-full object-cover" />
             ) : (
-              <div className="flex flex-col items-center gap-2 text-zinc-500">
+              <div className="flex flex-col items-center gap-2 text-muted-foreground">
                 <ImagePlus className="h-10 w-10" />
                 <span className="text-sm">Tải lên ảnh đại diện</span>
               </div>
@@ -276,7 +276,7 @@ export function EditEventForm({ eventId }: { eventId: string }) {
           <Label>Ảnh bìa</Label>
           <div
             onClick={() => !isUploading && bannerInputRef.current?.click()}
-            className={`relative flex h-[200px] w-full cursor-pointer items-center justify-center overflow-hidden rounded-xl border-2 border-dashed border-zinc-200 bg-zinc-50 transition-colors ${isUploading ? "cursor-not-allowed opacity-70" : "hover:border-zinc-300 hover:bg-zinc-100"
+            className={`relative flex h-[200px] w-full cursor-pointer items-center justify-center overflow-hidden rounded-xl border-2 border-dashed border-border bg-muted/30 transition-colors ${isUploading ? "cursor-not-allowed opacity-70" : "hover:border-primary/50 hover:bg-muted/50"
               }`}
           >
             <input
@@ -293,14 +293,14 @@ export function EditEventForm({ eventId }: { eventId: string }) {
               }}
             />
             {uploadingType === "banner" && (
-              <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/80">
-                <Loader2 className="h-10 w-10 animate-spin text-zinc-600" />
+              <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/80">
+                <Loader2 className="h-10 w-10 animate-spin text-primary" />
               </div>
             )}
             {bannerPreview ? (
               <img src={bannerPreview} alt="Ảnh bìa" className="h-full w-full object-cover" />
             ) : (
-              <div className="flex flex-col items-center gap-2 text-zinc-500">
+              <div className="flex flex-col items-center gap-2 text-muted-foreground">
                 <ImagePlus className="h-10 w-10" />
                 <span className="text-sm">Tải lên ảnh bìa</span>
               </div>
@@ -309,9 +309,9 @@ export function EditEventForm({ eventId }: { eventId: string }) {
         </div>
       </div>
 
-      <Card className="border-zinc-200">
+      <Card className="border-border bg-card">
         <CardHeader>
-          <h2 className="text-lg font-semibold text-zinc-900">Thông tin cơ bản</h2>
+          <h2 className="text-lg font-semibold text-foreground">Thông tin cơ bản</h2>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid gap-4 sm:grid-cols-2">
@@ -347,7 +347,7 @@ export function EditEventForm({ eventId }: { eventId: string }) {
                 value={event.organizer?.name ?? ""}
                 readOnly
                 disabled
-                className="bg-zinc-50 cursor-not-allowed"
+                className="bg-muted cursor-not-allowed border-border text-muted-foreground"
               />
             </div>
             <div className="space-y-2">

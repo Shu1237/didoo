@@ -61,7 +61,7 @@ export default function HeroSection({ event }: HeroSectionProps) {
         <div className="flex flex-col gap-4">
           <div className="flex flex-wrap items-center gap-2">
             {isHot && (
-              <span className="inline-flex rounded-md bg-[#FF8A3D] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white">
+              <span className="inline-flex rounded-md bg-primary px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white shadow-lg shadow-primary/20">
                 Hot event
               </span>
             )}
@@ -76,11 +76,11 @@ export default function HeroSection({ event }: HeroSectionProps) {
 
           <div className="flex flex-wrap items-center gap-x-8 gap-y-3 text-white/90 font-medium">
             <div className="flex items-center gap-2">
-              <CalendarDays className="h-4 w-4 shrink-0 text-[#FF8A3D]" />
+              <CalendarDays className="h-4 w-4 shrink-0 text-primary" />
               <span className="text-sm md:text-base">{dateLabel}</span>
             </div>
             <div className="flex items-center gap-2">
-              <MapPin className="h-4 w-4 shrink-0 text-[#FF8A3D]" />
+              <MapPin className="h-4 w-4 shrink-0 text-primary" />
               <span className="text-sm md:text-base">{locationLabel}</span>
             </div>
           </div>

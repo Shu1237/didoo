@@ -53,9 +53,9 @@ export default function ResaleEventListingsPage({
 
   if (!event) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-zinc-50 px-4">
-        <div className="rounded-2xl border border-zinc-200 bg-white p-8 text-center shadow-sm">
-          <p className="text-zinc-600">Không tìm thấy sự kiện.</p>
+      <main className="flex min-h-screen items-center justify-center bg-background px-4">
+        <div className="rounded-2xl border border-border bg-card p-8 text-center shadow-sm">
+          <p className="text-muted-foreground">Không tìm thấy sự kiện.</p>
           <Button asChild className="mt-4 rounded-xl">
             <Link href="/resale">Quay lại vé bán lại</Link>
           </Button>

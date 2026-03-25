@@ -111,7 +111,7 @@ export default function EventsPage() {
   if (isEventsLoading || isCategoriesLoading) return <Loading />;
 
   return (
-    <div className="min-h-screen bg-zinc-50 pb-20">
+    <div className="min-h-screen bg-background pb-20">
       <EventsPageHero
         totalEvents={totalItems}
         totalCategories={allCategories.length}

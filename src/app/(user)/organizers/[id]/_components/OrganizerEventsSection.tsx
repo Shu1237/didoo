@@ -33,17 +33,17 @@ export function OrganizerEventsSection({
   };
 
   return (
-    <section className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
-      <div className="flex flex-col gap-4 border-b border-zinc-200 pb-4 sm:flex-row sm:items-center sm:justify-between">
-        <h2 className="text-lg font-bold text-zinc-900">Sự kiện</h2>
-        <div className="flex gap-1 rounded-xl bg-zinc-100 p-1 overflow-x-auto">
+    <section className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+      <div className="flex flex-col gap-4 border-b border-border pb-4 sm:flex-row sm:items-center sm:justify-between">
+        <h2 className="text-lg font-bold text-foreground">Sự kiện</h2>
+        <div className="flex gap-1 rounded-xl bg-muted p-1 overflow-x-auto">
           <button
             type="button"
             onClick={() => setEventTab("upcoming")}
-            className={`shrink-0 rounded-lg px-4 py-2 text-sm font-medium transition min-h-[40px] min-w-[20px] ${
+            className={`shrink-0 rounded-lg px-4 py-2 text-sm font-semibold transition min-h-[40px] min-w-[20px] ${
               eventTab === "upcoming"
-                ? "bg-white text-zinc-900 shadow-sm"
-                : "text-zinc-600 hover:text-zinc-900"
+                ? "bg-background text-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground"
             }`}
           >
             Sắp diễn ra
@@ -51,10 +51,10 @@ export function OrganizerEventsSection({
           <button
             type="button"
             onClick={() => setEventTab("opened")}
-            className={`shrink-0 rounded-lg px-4 py-2 text-sm font-medium transition min-h-[40px] min-w-[20px] ${
+            className={`shrink-0 rounded-lg px-4 py-2 text-sm font-semibold transition min-h-[40px] min-w-[20px] ${
               eventTab === "opened"
-                ? "bg-white text-zinc-900 shadow-sm"
-                : "text-zinc-600 hover:text-zinc-900"
+                ? "bg-background text-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground"
             }`}
           >
             Đang mở
@@ -62,10 +62,10 @@ export function OrganizerEventsSection({
           <button
             type="button"
             onClick={() => setEventTab("past")}
-            className={`shrink-0 rounded-lg px-4 py-2 text-sm font-medium transition min-h-[40px] min-w-[20px] ${
+            className={`shrink-0 rounded-lg px-4 py-2 text-sm font-semibold transition min-h-[40px] min-w-[20px] ${
               eventTab === "past"
-                ? "bg-white text-zinc-900 shadow-sm"
-                : "text-zinc-600 hover:text-zinc-900"
+                ? "bg-background text-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground"
             }`}
           >
             Đã qua
@@ -78,7 +78,7 @@ export function OrganizerEventsSection({
           {[1, 2, 3, 4].map((i) => (
             <div
               key={i}
-              className="h-64 animate-pulse rounded-2xl bg-zinc-100"
+              className="h-64 animate-pulse rounded-2xl bg-muted"
             />
           ))}
         </div>
@@ -89,9 +89,9 @@ export function OrganizerEventsSection({
           ))}
         </div>
       ) : (
-        <div className="mt-12 rounded-2xl border border-dashed border-zinc-300 bg-zinc-50 p-12 text-center">
-          <Ticket className="mx-auto h-12 w-12 text-zinc-400" />
-          <p className="mt-4 font-medium text-zinc-600">{getEmptyMessage()}</p>
+        <div className="mt-12 rounded-2xl border border-dashed border-border bg-muted/30 p-12 text-center">
+          <Ticket className="mx-auto h-12 w-12 text-muted-foreground/30" />
+          <p className="mt-4 font-bold text-muted-foreground">{getEmptyMessage()}</p>
         </div>
       )}
     </section>

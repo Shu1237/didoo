@@ -32,13 +32,13 @@ export function TradeBookingCallbackResult({
 
   if (isError || !booking) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-zinc-50 px-4">
-        <div className="w-full max-w-lg rounded-2xl border border-zinc-200 bg-white p-8 text-center shadow-sm">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-rose-100">
-            <AlertCircle className="h-8 w-8 text-rose-600" />
+      <main className="flex min-h-screen items-center justify-center bg-background px-4">
+        <div className="w-full max-w-lg rounded-2xl border border-border bg-card p-8 text-center shadow-sm">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-rose-500/10">
+            <AlertCircle className="h-8 w-8 text-rose-500" />
           </div>
-          <h1 className="text-2xl font-bold text-zinc-900">Không tìm thấy thông tin giao dịch</h1>
-          <p className="mt-2 text-sm text-zinc-600">
+          <h1 className="text-2xl font-bold text-foreground">Không tìm thấy thông tin giao dịch</h1>
+          <p className="mt-2 text-sm text-muted-foreground font-medium">
             Mã booking không hợp lệ hoặc đã hết hạn. Vui lòng kiểm tra lại.
           </p>
           <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -62,13 +62,13 @@ export function TradeBookingCallbackResult({
 
   if (isSuccess) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-zinc-50 px-4">
-        <div className="w-full max-w-lg rounded-2xl border border-zinc-200 bg-white p-8 text-center shadow-sm">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100">
-            <CheckCircle2 className="h-8 w-8 text-emerald-600" />
+      <main className="flex min-h-screen items-center justify-center bg-background px-4">
+        <div className="w-full max-w-lg rounded-2xl border border-border bg-card p-8 text-center shadow-sm">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500/10">
+            <CheckCircle2 className="h-8 w-8 text-emerald-500" />
           </div>
-          <h1 className="text-2xl font-bold text-zinc-900">Mua vé bán lại thành công</h1>
-          <p className="mt-2 text-sm text-zinc-600">
+          <h1 className="text-2xl font-bold text-foreground">Mua vé bán lại thành công</h1>
+          <p className="mt-2 text-sm text-muted-foreground font-medium">
             Giao dịch của bạn đã hoàn tất. Vé sẽ được cập nhật trong khu vực vé của tôi.
           </p>
           <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -91,13 +91,13 @@ export function TradeBookingCallbackResult({
   const reasonMessage = reasonMap[reasonKey] || "Không thể hoàn tất giao dịch mua lại. Vui lòng thử lại.";
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-zinc-50 px-4">
-      <div className="w-full max-w-lg rounded-2xl border border-zinc-200 bg-white p-8 text-center shadow-sm">
-        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-rose-100">
-          <AlertCircle className="h-8 w-8 text-rose-600" />
+    <main className="flex min-h-screen items-center justify-center bg-background px-4">
+      <div className="w-full max-w-lg rounded-2xl border border-border bg-card p-8 text-center shadow-sm">
+        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-rose-500/10">
+          <AlertCircle className="h-8 w-8 text-rose-500" />
         </div>
-        <h1 className="text-2xl font-bold text-zinc-900">Giao dịch mua lại thất bại</h1>
-        <p className="mt-2 text-sm text-zinc-600">{reasonMessage}</p>
+        <h1 className="text-2xl font-bold text-foreground">Giao dịch mua lại thất bại</h1>
+        <p className="mt-2 text-sm text-muted-foreground font-medium">{reasonMessage}</p>
         <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
           <Button asChild className="rounded-xl">
             <Link href={`/resale/${eventId}/trade-booking/${listingId}/confirm`}>

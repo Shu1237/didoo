@@ -9,9 +9,9 @@ const DEFAULT_DESCRIPTION =
 
 export function OrganizerAbout({ description }: OrganizerAboutProps) {
   return (
-    <section className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
-      <h2 className="text-lg font-bold text-zinc-900">Về nhà tổ chức</h2>
-      <p className="mt-4 text-base leading-relaxed text-zinc-600">
+    <section className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+      <h2 className="text-lg font-bold text-foreground">Về nhà tổ chức</h2>
+      <p className="mt-4 text-base leading-relaxed text-muted-foreground font-medium">
         {description || DEFAULT_DESCRIPTION}
       </p>
     </section>

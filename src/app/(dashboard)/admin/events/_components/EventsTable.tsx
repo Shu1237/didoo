@@ -83,9 +83,9 @@ function TicketCell({ eventId }: { eventId: string }) {
 
   return sold > 0 || available > 0 ? (
     <span className="text-xs">
-      <span className="text-green-600 font-medium">{sold}</span>
-      <span className="text-zinc-400"> / </span>
-      <span className="text-zinc-600">{sold + available}</span>
+      <span className="text-emerald-500 font-medium">{sold}</span>
+      <span className="text-muted-foreground"> / </span>
+      <span className="text-muted-foreground">{sold + available}</span>
     </span>
   ) : "—";
 }
@@ -125,37 +125,37 @@ export function EventsTable({ params, onDelete, onApprove, onReject, onRestore, 
 
   return (
     <div className="space-y-4">
-      <div className="rounded-2xl border border-zinc-200 bg-white">
+      <div className="rounded-2xl border border-border bg-card overflow-hidden">
         <Table>
           <TableHeader>
-            <TableRow className="border-zinc-200 hover:bg-transparent">
-              <TableHead className="w-20">Ảnh</TableHead>
-              <TableHead>Tên</TableHead>
-              <TableHead>Danh mục</TableHead>
-              <TableHead>Organizer</TableHead>
-              <TableHead>Ngày bắt đầu</TableHead>
-              <TableHead>Vé</TableHead>
-              <TableHead>Trạng thái</TableHead>
+            <TableRow className="border-border hover:bg-transparent">
+              <TableHead className="w-20 text-muted-foreground">Ảnh</TableHead>
+              <TableHead className="text-muted-foreground">Tên</TableHead>
+              <TableHead className="text-muted-foreground">Danh mục</TableHead>
+              <TableHead className="text-muted-foreground">Organizer</TableHead>
+              <TableHead className="text-muted-foreground">Ngày bắt đầu</TableHead>
+              <TableHead className="text-muted-foreground">Vé</TableHead>
+              <TableHead className="text-muted-foreground">Trạng thái</TableHead>
               <TableHead className="w-12" />
             </TableRow>
           </TableHeader>
           <TableBody>
             {items.map((e) => (
-              <TableRow key={e.id} className="border-zinc-100">
+              <TableRow key={e.id} className="border-border hover:bg-muted/30 transition-colors">
                 <TableCell>
-                  <div className="relative h-12 w-16 overflow-hidden rounded-lg bg-zinc-100">
+                  <div className="relative h-12 w-16 overflow-hidden rounded-lg bg-muted border border-border">
                     {e.thumbnailUrl ? (
                       <Image src={e.thumbnailUrl} alt="" fill className="object-cover" sizes="64px" />
                     ) : (
-                      <div className="flex h-full w-full items-center justify-center text-xs text-zinc-400">—</div>
+                      <div className="flex h-full w-full items-center justify-center text-xs text-muted-foreground">—</div>
                     )}
                   </div>
                 </TableCell>
-                <TableCell className="font-medium">{e.name}</TableCell>
-                <TableCell className="text-zinc-600">{e.category?.name ?? "—"}</TableCell>
-                <TableCell className="text-zinc-600">{e.organizer?.name ?? "—"}</TableCell>
-                <TableCell className="text-zinc-600">{formatDate(e.startTime)}</TableCell>
-                <TableCell className="text-zinc-600">
+                <TableCell className="font-medium text-foreground">{e.name}</TableCell>
+                <TableCell className="text-muted-foreground">{e.category?.name ?? "—"}</TableCell>
+                <TableCell className="text-muted-foreground">{e.organizer?.name ?? "—"}</TableCell>
+                <TableCell className="text-muted-foreground">{formatDate(e.startTime)}</TableCell>
+                <TableCell className="text-muted-foreground">
                   <TicketCell eventId={e.id} />
                 </TableCell>
                 <TableCell>

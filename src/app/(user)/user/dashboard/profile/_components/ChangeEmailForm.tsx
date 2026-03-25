@@ -74,20 +74,20 @@ export default function ChangeEmailForm() {
       <form onSubmit={changeForm.handleSubmit(onSendCode)} className="space-y-4">
         <input type="hidden" {...changeForm.register("userId")} />
 
-        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Email hiện tại</p>
-          <p className="mt-1 text-sm font-semibold text-slate-900">{currentEmail || "Chưa có"}</p>
+        <div className="rounded-2xl border border-border bg-muted/50 p-4">
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">Email hiện tại</p>
+          <p className="mt-1 text-sm font-semibold text-foreground">{currentEmail || "Chưa có"}</p>
         </div>
 
         <div className="space-y-1.5">
-          <label className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Email mới</label>
+          <label className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">Email mới</label>
           <div className="relative">
-            <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/60" />
             <Input
               type="email"
               placeholder="email-moi@example.com"
               {...changeForm.register("newEmail")}
-              className={`h-11 rounded-xl border-slate-200 bg-white pl-10 ${
+              className={`h-11 rounded-xl border-border bg-card pl-10 ${
                 changeForm.formState.errors.newEmail ? "border-rose-300 ring-1 ring-rose-200" : ""
               }`}
             />
@@ -122,18 +122,18 @@ export default function ChangeEmailForm() {
     <form onSubmit={verifyForm.handleSubmit(onVerify)} className="space-y-5">
       <input type="hidden" {...verifyForm.register("userId")} />
 
-      <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
-        <p className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-700">
+      <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 p-4">
+        <p className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-500">
           <CheckCircle2 className="h-4 w-4" />
           OTP đã được gửi
         </p>
-        <p className="mt-1 text-xs text-emerald-700">
-          Vui lòng kiểm tra hộp thư của <span className="font-semibold">{pendingEmail}</span>.
+        <p className="mt-1 text-xs text-emerald-500/80 font-medium">
+          Vui lòng kiểm tra hộp thư của <span className="font-semibold text-emerald-500">{pendingEmail}</span>.
         </p>
       </div>
 
       <div className="space-y-2">
-        <label className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+        <label className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
           Mã xác thực
         </label>
         <InputOTP
@@ -142,15 +142,15 @@ export default function ChangeEmailForm() {
           onChange={(value) => verifyForm.setValue("otp", value, { shouldValidate: true })}
         >
           <InputOTPGroup>
-            <InputOTPSlot index={0} className="h-11 w-10 rounded-xl border-slate-200" />
-            <InputOTPSlot index={1} className="h-11 w-10 rounded-xl border-slate-200" />
-            <InputOTPSlot index={2} className="h-11 w-10 rounded-xl border-slate-200" />
+            <InputOTPSlot index={0} className="h-11 w-10 rounded-xl border-border bg-card" />
+            <InputOTPSlot index={1} className="h-11 w-10 rounded-xl border-border bg-card" />
+            <InputOTPSlot index={2} className="h-11 w-10 rounded-xl border-border bg-card" />
           </InputOTPGroup>
           <InputOTPSeparator />
           <InputOTPGroup>
-            <InputOTPSlot index={3} className="h-11 w-10 rounded-xl border-slate-200" />
-            <InputOTPSlot index={4} className="h-11 w-10 rounded-xl border-slate-200" />
-            <InputOTPSlot index={5} className="h-11 w-10 rounded-xl border-slate-200" />
+            <InputOTPSlot index={3} className="h-11 w-10 rounded-xl border-border bg-card" />
+            <InputOTPSlot index={4} className="h-11 w-10 rounded-xl border-border bg-card" />
+            <InputOTPSlot index={5} className="h-11 w-10 rounded-xl border-border bg-card" />
           </InputOTPGroup>
         </InputOTP>
         {verifyForm.formState.errors.otp && (
@@ -162,7 +162,7 @@ export default function ChangeEmailForm() {
         <button
           type="button"
           onClick={() => setStep(1)}
-          className="text-sm font-semibold text-slate-500 hover:text-slate-700"
+          className="text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors"
         >
           Dùng email khác
         </button>

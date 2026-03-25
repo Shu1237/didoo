@@ -28,8 +28,8 @@ export function OrganizerSocialMedia({
   if (socials.length === 0) return null;
 
   return (
-    <section className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
-      <h2 className="text-lg font-bold text-zinc-900">Mạng xã hội</h2>
+    <section className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+      <h2 className="text-lg font-bold text-foreground">Mạng xã hội</h2>
       <div className="mt-4 flex flex-wrap gap-3">
         {socials.map((s) => (
           <a
@@ -37,7 +37,7 @@ export function OrganizerSocialMedia({
             href={s.url || "#"}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex h-11 w-11 items-center justify-center rounded-xl border border-zinc-200 text-zinc-500 transition hover:border-primary hover:text-primary"
+            className="flex h-11 w-11 items-center justify-center rounded-xl border border-border text-muted-foreground transition hover:border-primary hover:bg-primary/5 hover:text-primary"
             title={s.label}
           >
             <s.icon className="h-5 w-5" />

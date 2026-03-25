@@ -36,13 +36,13 @@ export default function DashboardShell({ userRole, children }: DashboardShellPro
   if (shouldRedirect) return null;
 
   return (
-    <div className="flex h-screen gap-4 overflow-hidden bg-zinc-100 p-4">
+    <div className="flex h-screen gap-4 overflow-hidden bg-background p-4">
       <div className="shrink-0">
         <DashboardSidebar role={role} />
       </div>
-      <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-3xl border border-zinc-200 bg-white shadow-sm">
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-3xl border border-border bg-card shadow-sm">
         <DashboardHeader />
-        <main className="min-h-0 flex-1 overflow-auto bg-zinc-50/70 p-6 lg:p-8">
+        <main className="min-h-0 flex-1 overflow-auto bg-muted/40 p-6 lg:p-8">
           {children}
         </main>
       </div>

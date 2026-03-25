@@ -148,12 +148,12 @@ export function AdminCreateEventForm() {
 
   if (organizers.length === 0) {
     return (
-      <Card className="border-zinc-200">
+      <Card className="border-border bg-card">
         <CardContent className="pt-6">
-          <p className="text-zinc-500">
+          <p className="text-muted-foreground">
             Chưa có organizer nào. Vui lòng tạo organizer trước khi tạo sự kiện.
           </p>
-          <Button variant="outline" className="mt-4" asChild>
+          <Button variant="outline" className="mt-4 border-border text-foreground hover:bg-muted" asChild>
             <Link href="/admin/organizers/create">Tạo organizer</Link>
           </Button>
         </CardContent>
@@ -168,8 +168,8 @@ export function AdminCreateEventForm() {
           <Label>Banner</Label>
           <div
             onClick={() => !isUploading && bannerInputRef.current?.click()}
-            className={`relative flex h-[200px] w-full cursor-pointer items-center justify-center overflow-hidden rounded-xl border-2 border-dashed border-zinc-200 bg-zinc-50 transition-colors ${
-              isUploading ? "cursor-not-allowed opacity-70" : "hover:border-zinc-300 hover:bg-zinc-100"
+            className={`relative flex h-[200px] w-full cursor-pointer items-center justify-center overflow-hidden rounded-xl border-2 border-dashed border-border bg-muted/30 transition-colors ${
+              isUploading ? "cursor-not-allowed opacity-70" : "hover:border-primary/50 hover:bg-muted/50"
             }`}
           >
             <input
@@ -185,14 +185,14 @@ export function AdminCreateEventForm() {
               }}
             />
             {uploadingType === "banner" && (
-              <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/80">
-                <Loader2 className="h-10 w-10 animate-spin text-zinc-600" />
+              <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/80">
+                <Loader2 className="h-10 w-10 animate-spin text-primary" />
               </div>
             )}
             {bannerPreview ? (
               <img src={bannerPreview} alt="Banner" className="h-full w-full object-cover" />
             ) : (
-              <div className="flex flex-col items-center gap-2 text-zinc-500">
+              <div className="flex flex-col items-center gap-2 text-muted-foreground">
                 <ImagePlus className="h-10 w-10" />
                 <span className="text-sm">Tải lên banner</span>
               </div>
@@ -203,8 +203,8 @@ export function AdminCreateEventForm() {
           <Label>Thumbnail</Label>
           <div
             onClick={() => !isUploading && thumbnailInputRef.current?.click()}
-            className={`relative flex h-[200px] w-full cursor-pointer items-center justify-center overflow-hidden rounded-xl border-2 border-dashed border-zinc-200 bg-zinc-50 transition-colors ${
-              isUploading ? "cursor-not-allowed opacity-70" : "hover:border-zinc-300 hover:bg-zinc-100"
+            className={`relative flex h-[200px] w-full cursor-pointer items-center justify-center overflow-hidden rounded-xl border-2 border-dashed border-border bg-muted/30 transition-colors ${
+              isUploading ? "cursor-not-allowed opacity-70" : "hover:border-primary/50 hover:bg-muted/50"
             }`}
           >
             <input
@@ -220,14 +220,14 @@ export function AdminCreateEventForm() {
               }}
             />
             {uploadingType === "thumbnail" && (
-              <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/80">
-                <Loader2 className="h-10 w-10 animate-spin text-zinc-600" />
+              <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/80">
+                <Loader2 className="h-10 w-10 animate-spin text-primary" />
               </div>
             )}
             {thumbnailPreview ? (
               <img src={thumbnailPreview} alt="Thumbnail" className="h-full w-full object-cover" />
             ) : (
-              <div className="flex flex-col items-center gap-2 text-zinc-500">
+              <div className="flex flex-col items-center gap-2 text-muted-foreground">
                 <ImagePlus className="h-10 w-10" />
                 <span className="text-sm">Tải lên thumbnail</span>
               </div>
@@ -236,9 +236,9 @@ export function AdminCreateEventForm() {
         </div>
       </div>
 
-      <Card className="border-zinc-200">
+      <Card className="border-border bg-card">
         <CardHeader>
-          <h2 className="text-lg font-semibold text-zinc-900">Thông tin cơ bản</h2>
+          <h2 className="text-lg font-semibold text-foreground">Thông tin cơ bản</h2>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid gap-4 sm:grid-cols-2">
@@ -363,9 +363,9 @@ export function AdminCreateEventForm() {
         </CardContent>
       </Card>
 
-      <Card className="border-zinc-200">
+      <Card className="border-border bg-card">
         <CardHeader>
-          <h2 className="text-lg font-semibold text-zinc-900">Mô tả & Sơ đồ ghế</h2>
+          <h2 className="text-lg font-semibold text-foreground">Mô tả & Sơ đồ ghế</h2>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
@@ -386,8 +386,8 @@ export function AdminCreateEventForm() {
             <Label>Ảnh sơ đồ ghế </Label>
             <div
               onClick={() => !isUploading && ticketMapInputRef.current?.click()}
-              className={`relative flex aspect-video w-full max-w-lg cursor-pointer items-center justify-center overflow-hidden rounded-xl border-2 border-dashed border-zinc-200 bg-zinc-50 transition-colors ${
-                isUploading ? "cursor-not-allowed opacity-70" : "hover:border-zinc-300 hover:bg-zinc-100"
+              className={`relative flex aspect-video w-full max-w-lg cursor-pointer items-center justify-center overflow-hidden rounded-xl border-2 border-dashed border-border bg-muted/30 transition-colors ${
+                isUploading ? "cursor-not-allowed opacity-70" : "hover:border-primary/50 hover:bg-muted/50"
               }`}
             >
               <input
@@ -403,14 +403,14 @@ export function AdminCreateEventForm() {
                 }}
               />
               {uploadingType === "ticketMap" && (
-                <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/80">
-                  <Loader2 className="h-10 w-10 animate-spin text-zinc-600" />
+                <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/80">
+                  <Loader2 className="h-10 w-10 animate-spin text-primary" />
                 </div>
               )}
               {ticketMapPreview ? (
                 <img src={ticketMapPreview} alt="Sơ đồ ghế" className="h-full w-full object-contain" />
               ) : (
-                <div className="flex flex-col items-center gap-2 text-zinc-500">
+                <div className="flex flex-col items-center gap-2 text-muted-foreground">
                   <Upload className="h-10 w-10" />
                   <span className="text-sm">Tải lên ảnh sơ đồ ghế</span>
                 </div>
@@ -420,16 +420,16 @@ export function AdminCreateEventForm() {
         </CardContent>
       </Card>
 
-      <Card className="border-zinc-200">
+      <Card className="border-border bg-card">
         <CardHeader>
-          <h2 className="text-lg font-semibold text-zinc-900">Địa điểm *</h2>
-          <p className="text-sm text-zinc-500">Ít nhất một địa điểm</p>
+          <h2 className="text-lg font-semibold text-foreground">Địa điểm *</h2>
+          <p className="text-sm text-muted-foreground">Ít nhất một địa điểm</p>
         </CardHeader>
         <CardContent className="space-y-4">
           {fields.map((field, i) => (
-            <div key={field.id} className="space-y-4 rounded-xl border border-zinc-200 p-4">
+            <div key={field.id} className="space-y-4 rounded-xl border border-border p-4 bg-muted/10">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-zinc-600">Địa điểm {i + 1}</span>
+                <span className="text-sm font-medium text-muted-foreground">Địa điểm {i + 1}</span>
                 {fields.length > 1 && (
                   <Button
                     type="button"

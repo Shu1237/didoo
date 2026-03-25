@@ -118,7 +118,7 @@ export default function RegisterForm() {
     <motion.div
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      className="grid grid-cols-1 lg:grid-cols-2 w-full max-w-5xl bg-white rounded-2xl border border-zinc-200 shadow-xl overflow-hidden lg:min-h-[520px]"
+      className="grid grid-cols-1 lg:grid-cols-2 w-full max-w-5xl bg-card rounded-2xl border border-border shadow-xl overflow-hidden lg:min-h-[520px]"
     >
       <div
         className={`p-6 sm:p-8 lg:p-10 ${
@@ -131,10 +131,10 @@ export default function RegisterForm() {
           <Image src="/DiDoo.png" alt="DiDoo" width={48} height={48} className="rounded-xl" priority />
         </Link> */}
 
-        <h1 className="text-2xl font-bold text-zinc-900">
+        <h1 className="text-2xl font-bold text-foreground">
           {step === 1 ? "Tạo tài khoản" : "Xác thực tài khoản"}
         </h1>
-        <p className="mt-1 text-zinc-600 text-sm">
+        <p className="mt-1 text-muted-foreground text-sm">
           {step === 1
             ? "Tham gia và bắt đầu khám phá sự kiện"
             : `Mã OTP đã được gửi đến ${watch("email")}`}
@@ -160,21 +160,21 @@ export default function RegisterForm() {
               <>
                 <div className="grid grid-cols-1 gap-4">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-zinc-700">Họ tên</label>
+                    <label className="text-sm font-medium text-foreground/80">Họ tên</label>
                     <Input
                       placeholder="Nguyễn Văn A"
                       {...registerField("fullName")}
-                      className={`h-11 rounded-xl border-zinc-200 bg-zinc-50 ${errors.fullName ? "border-rose-300" : ""}`}
+                      className={`h-11 rounded-xl border-border bg-muted/50 ${errors.fullName ? "border-rose-300" : ""}`}
                     />
                     {errors.fullName && <p className="text-xs text-rose-600">{errors.fullName.message}</p>}
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-zinc-700">Email</label>
+                    <label className="text-sm font-medium text-foreground/80">Email</label>
                     <Input
                       type="email"
                       placeholder="example@gmail.com"
                       {...registerField("email")}
-                      className={`h-11 rounded-xl border-zinc-200 bg-zinc-50 ${errors.email ? "border-rose-300" : ""}`}
+                      className={`h-11 rounded-xl border-border bg-muted/50 ${errors.email ? "border-rose-300" : ""}`}
                     />
                     {errors.email && <p className="text-xs text-rose-600">{errors.email.message}</p>}
                   </div>
@@ -182,13 +182,13 @@ export default function RegisterForm() {
 
                 <div className="grid grid-cols-1 gap-4">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-zinc-700">Ngày sinh</label>
+                    <label className="text-sm font-medium text-foreground/80">Ngày sinh</label>
                     <Popover>
                       <PopoverTrigger asChild>
                         <Button
                           type="button"
                           variant="outline"
-                          className={`h-11 w-full justify-start rounded-xl border-zinc-200 bg-zinc-50 px-3 text-left font-normal ${
+                          className={`h-11 w-full justify-start rounded-xl border-border bg-muted/50 px-3 text-left font-normal ${
                             errors.dateOfBirth ? "border-rose-300" : ""
                           }`}
                         >
@@ -222,13 +222,13 @@ export default function RegisterForm() {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-zinc-700">Mật khẩu</label>
+                  <label className="text-sm font-medium text-foreground/80">Mật khẩu</label>
                   <div className="relative">
                     <Input
                       type={showPassword ? "text" : "password"}
                       placeholder="••••••••"
                       {...registerField("password")}
-                      className={`h-11 rounded-xl border-zinc-200 bg-zinc-50 pr-11 ${errors.password ? "border-rose-300" : ""}`}
+                      className={`h-11 rounded-xl border-border bg-muted/50 pr-11 ${errors.password ? "border-rose-300" : ""}`}
                     />
                     <button
                       type="button"
@@ -249,13 +249,13 @@ export default function RegisterForm() {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-zinc-700">Xác nhận mật khẩu</label>
+                  <label className="text-sm font-medium text-foreground/80">Xác nhận mật khẩu</label>
                   <div className="relative">
                     <Input
                       type={showConfirmPassword ? "text" : "password"}
                       placeholder="••••••••"
                       {...registerField("confirmPassword")}
-                      className={`h-11 rounded-xl border-zinc-200 bg-zinc-50 pr-11 ${errors.confirmPassword ? "border-rose-300" : ""}`}
+                      className={`h-11 rounded-xl border-border bg-muted/50 pr-11 ${errors.confirmPassword ? "border-rose-300" : ""}`}
                     />
                     <button
                       type="button"
@@ -287,15 +287,15 @@ export default function RegisterForm() {
                     onChange={(value) => setValue("otp", value, { shouldValidate: true })}
                   >
                     <InputOTPGroup className="gap-2">
-                      <InputOTPSlot index={0} className="w-12 h-12 rounded-xl border-zinc-200 text-center text-lg" />
-                      <InputOTPSlot index={1} className="w-12 h-12 rounded-xl border-zinc-200 text-center text-lg" />
-                      <InputOTPSlot index={2} className="w-12 h-12 rounded-xl border-zinc-200 text-center text-lg" />
+                      <InputOTPSlot index={0} className="w-12 h-12 rounded-xl border-border text-center text-lg" />
+                      <InputOTPSlot index={1} className="w-12 h-12 rounded-xl border-border text-center text-lg" />
+                      <InputOTPSlot index={2} className="w-12 h-12 rounded-xl border-border text-center text-lg" />
                     </InputOTPGroup>
                     <InputOTPSeparator />
                     <InputOTPGroup className="gap-2">
-                      <InputOTPSlot index={3} className="w-12 h-12 rounded-xl border-zinc-200 text-center text-lg" />
-                      <InputOTPSlot index={4} className="w-12 h-12 rounded-xl border-zinc-200 text-center text-lg" />
-                      <InputOTPSlot index={5} className="w-12 h-12 rounded-xl border-zinc-200 text-center text-lg" />
+                      <InputOTPSlot index={3} className="w-12 h-12 rounded-xl border-border text-center text-lg" />
+                      <InputOTPSlot index={4} className="w-12 h-12 rounded-xl border-border text-center text-lg" />
+                      <InputOTPSlot index={5} className="w-12 h-12 rounded-xl border-border text-center text-lg" />
                     </InputOTPGroup>
                   </InputOTP>
                 </div>
@@ -341,7 +341,7 @@ export default function RegisterForm() {
           </motion.form>
         </AnimatePresence>
 
-        <p className="mt-6 text-center text-sm text-zinc-600">
+        <p className="mt-6 text-center text-sm text-muted-foreground">
           Đã có tài khoản?{" "}
           <Link href="/login" className="font-semibold text-primary hover:underline">
             Đăng nhập
@@ -349,7 +349,7 @@ export default function RegisterForm() {
         </p>
       </div>
 
-      <div className="hidden lg:flex flex-col justify-center p-10 bg-zinc-900 text-white min-h-[520px]">
+      <div className="hidden lg:flex flex-col justify-center p-10 bg-zinc-900 border-l border-border/10 text-white min-h-[520px]">
         <h2 className="text-2xl font-bold leading-tight">
           Tham gia cộng đồng
           <br />

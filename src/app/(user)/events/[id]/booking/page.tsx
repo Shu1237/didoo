@@ -238,9 +238,9 @@ function EventBookingPageInner({
 
   if (!event) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-zinc-50 px-4">
-        <div className="rounded-2xl border border-zinc-200 bg-white p-8 text-center shadow-sm">
-          <p className="text-zinc-600">Không tìm thấy sự kiện.</p>
+      <main className="flex min-h-screen items-center justify-center bg-background px-4">
+        <div className="rounded-2xl border border-border bg-card p-8 text-center shadow-sm">
+          <p className="text-muted-foreground">Không tìm thấy sự kiện.</p>
           <Button asChild className="mt-4 rounded-xl">
             <Link href="/events">Quay lại danh sách sự kiện</Link>
           </Button>
@@ -253,9 +253,9 @@ function EventBookingPageInner({
 
   if ((event.status as number) !== EventStatus.OPENED) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-zinc-50 px-4">
-        <div className="max-w-md rounded-2xl border border-zinc-200 bg-white p-8 text-center shadow-sm">
-          <p className="text-zinc-600">
+      <main className="flex min-h-screen items-center justify-center bg-background px-4">
+        <div className="max-w-md rounded-2xl border border-border bg-card p-8 text-center shadow-sm">
+          <p className="text-muted-foreground">
             {(event.status as number) === EventStatus.PUBLISHED
               ? "Sự kiện chưa mở bán vé."
               : (event.status as number) === EventStatus.CLOSED
@@ -272,9 +272,9 @@ function EventBookingPageInner({
 
   if (ticketTypes.length === 0) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-zinc-50 px-4">
-        <div className="max-w-md rounded-2xl border border-zinc-200 bg-white p-8 text-center shadow-sm">
-          <p className="text-zinc-600">Sự kiện chưa mở bán vé.</p>
+      <main className="flex min-h-screen items-center justify-center bg-background px-4">
+        <div className="max-w-md rounded-2xl border border-border bg-card p-8 text-center shadow-sm">
+          <p className="text-muted-foreground">Sự kiện chưa mở bán vé.</p>
           <Button asChild className="mt-4 rounded-xl">
             <Link href={`/events/${id}`}>Quay lại sự kiện</Link>
           </Button>

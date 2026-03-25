@@ -107,14 +107,14 @@ export default function EventDetailContent({
   ];
 
   const SectionHeading = ({ children }: { children: React.ReactNode }) => (
-    <h2 className="flex items-center gap-2 text-lg font-bold text-zinc-900 mb-4">
-      <span className="h-5 w-1 rounded-full bg-[#FF8A3D]" />
+    <h2 className="flex items-center gap-2 text-lg font-bold text-foreground mb-4">
+      <span className="h-5 w-1 rounded-full bg-primary" />
       {children}
     </h2>
   );
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-7xl px-4 py-4 md:py-6 sm:px-6 lg:px-8">
       <div className="grid gap-8 lg:grid-cols-12">
         {/* Left: Main Content */}
         <div className="lg:col-span-8 space-y-12">
@@ -123,15 +123,15 @@ export default function EventDetailContent({
             {quickInfoItems.map((item) => (
               <div
                 key={item.label}
-                className="rounded-2xl border border-zinc-100 bg-white p-4 shadow-sm"
+                className="rounded-2xl border border-border bg-card p-4 shadow-sm"
               >
-                <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-zinc-50 text-zinc-500">
+                <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-muted text-muted-foreground">
                   <item.icon className="h-5 w-5" />
                 </div>
-                <p className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70">
                   {item.label}
                 </p>
-                <p className={`mt-0.5 text-sm font-bold ${item.label === "Trạng thái" ? "text-primary" : "text-zinc-900"}`}>
+                <p className={`mt-0.5 text-sm font-bold ${item.label === "Trạng thái" ? "text-primary" : "text-foreground"}`}>
                   {item.value}
                 </p>
               </div>
@@ -142,22 +142,22 @@ export default function EventDetailContent({
           <section id="event-map" className="space-y-6">
             <SectionHeading>Địa điểm</SectionHeading>
             <div className="space-y-4">
-              <div className="rounded-2xl border border-zinc-200 bg-zinc-50/50 p-6">
+              <div className="rounded-2xl border border-border bg-muted/30 p-6">
                 <div className="flex items-start gap-4">
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white shadow-sm border border-zinc-100 text-[#FF8A3D]">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-card shadow-sm border border-border text-primary">
                     <MapPin className="h-6 w-6" />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-xl font-bold text-zinc-900 leading-tight">
+                    <p className="text-xl font-bold text-foreground leading-tight">
                       {event.locations?.[0]?.name || "Địa điểm chưa xác định"}
                     </p>
-                    <p className="mt-2 text-base text-zinc-500 leading-relaxed">
+                    <p className="mt-2 text-base text-muted-foreground leading-relaxed">
                       {event.locations?.[0]?.address || "Thông tin địa chỉ đang được cập nhật"}
                     </p>
                   </div>
                 </div>
               </div>
-              <div className="rounded-2xl border border-zinc-200 overflow-hidden shadow-md h-[400px]">
+              <div className="rounded-2xl border border-border overflow-hidden shadow-md h-[400px]">
                 <EventLocation event={event} />
               </div>
             </div>
@@ -166,14 +166,14 @@ export default function EventDetailContent({
           {/* Description Section */}
           <section>
             <SectionHeading>Về sự kiện</SectionHeading>
-            <div className="prose prose-zinc max-w-none">
-              <p className="whitespace-pre-line text-sm leading-relaxed text-zinc-600">
+            <div className="prose prose-zinc dark:prose-invert max-w-none">
+              <p className="whitespace-pre-line text-sm leading-relaxed text-muted-foreground">
                 {event.description}
               </p>
             </div>
             {event.subtitle && (
-              <div className="mt-4 rounded-xl border border-amber-100 bg-amber-50/50 px-4 py-3">
-                <p className="text-xs font-medium text-zinc-700">{event.subtitle}</p>
+              <div className="mt-4 rounded-xl border border-amber-500/20 bg-amber-500/10 px-4 py-3">
+                <p className="text-xs font-medium text-foreground/80">{event.subtitle}</p>
               </div>
             )}
             {event.tags && event.tags.length > 0 && (
@@ -181,7 +181,7 @@ export default function EventDetailContent({
                 {event.tags.map((tag, i) => (
                   <span
                     key={`${tag.tagName}-${i}`}
-                    className="rounded-lg border border-zinc-100 bg-zinc-50 px-2.5 py-1 text-xs font-medium text-zinc-500"
+                    className="rounded-lg border border-border bg-muted/50 px-2.5 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted"
                   >
                     #{tag.tagName}
                   </span>
@@ -195,29 +195,29 @@ export default function EventDetailContent({
             <SectionHeading>Nhà tổ chức</SectionHeading>
             <Link
               href={`/organizers/${event.organizer?.id || ""}`}
-              className="flex items-center gap-4 rounded-xl border border-zinc-200 bg-white p-4 transition-shadow hover:shadow-md group"
+              className="flex items-center gap-4 rounded-xl border border-border bg-card p-4 transition-all hover:shadow-md hover:border-primary/20 group"
             >
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-zinc-50 text-zinc-500">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary transition-colors">
                 <Building2 className="h-6 w-6" />
               </div>
               <div className="min-w-0 flex-1">
-                <h3 className="text-sm font-bold text-zinc-900 group-hover:text-primary transition-colors">
+                <h3 className="text-sm font-bold text-foreground group-hover:text-primary transition-colors">
                   {organizer?.name || event.organizer?.name || "Nhà tổ chức"}
                 </h3>
-                <p className="mt-0.5 line-clamp-1 text-xs text-zinc-500 italic">
+                <p className="mt-0.5 line-clamp-1 text-xs text-muted-foreground italic">
                   {organizer?.description || "Bấm để xem thêm thông tin về nhà tổ chức"}
                 </p>
               </div>
-              <ArrowUpRight className="h-4 w-4 shrink-0 text-zinc-300 group-hover:text-primary transition-colors" />
+              <ArrowUpRight className="h-4 w-4 shrink-0 text-muted-foreground/50 group-hover:text-primary transition-all translate-x-0 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
             </Link>
           </section>
         </div>
 
         {/* Right: Sidebar */}
-        <aside className="lg:col-span-4">
+        <aside className="lg:col-span-4 mt-8 lg:mt-0">
           <div className="sticky top-24 space-y-8">
             {/* Ticket Card */}
-            <div className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
+            <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
               {/* <div className="mb-4">
                 <span className="text-xs font-bold uppercase tracking-wider text-zinc-400">Giá vé từ</span>
                 <div className="mt-1 flex items-baseline gap-1">
@@ -242,17 +242,17 @@ export default function EventDetailContent({
                     const sold = total - available;
                     const pct = total > 0 ? Math.round((sold / total) * 100) : 0;
                     return (
-                      <div key={tt.id} className="rounded-lg border border-zinc-100 bg-zinc-50/50 px-3 py-2">
+                      <div key={tt.id} className="rounded-lg border border-border bg-muted/50 px-3 py-2">
                         <div className="flex items-center justify-between gap-2">
                           <div className="min-w-0">
-                            <p className="text-sm font-semibold text-zinc-900 truncate">{tt.name}</p>
-                            <p className="text-xs text-zinc-500">
+                            <p className="text-sm font-semibold text-foreground truncate">{tt.name}</p>
+                            <p className="text-xs text-muted-foreground">
                               {Number(tt.price ?? 0) === 0 ? "Miễn phí" : `${Number(tt.price).toLocaleString("vi-VN")}₫`}
                             </p>
                           </div>
-                          <span className="text-xs font-bold text-zinc-900 shrink-0">{sold}/{total}</span>
+                          <span className="text-xs font-bold text-foreground shrink-0">{sold}/{total}</span>
                         </div>
-                        <div className="mt-1.5 h-1 w-full bg-zinc-200 rounded-full overflow-hidden">
+                        <div className="mt-1.5 h-1 w-full bg-muted rounded-full overflow-hidden">
                           <div
                             className="h-full bg-primary rounded-full transition-all duration-300"
                             style={{ width: `${pct}%` }}
@@ -262,8 +262,8 @@ export default function EventDetailContent({
                     );
                   })}
                   <div className="flex justify-between items-end pt-1">
-                    <span className="text-xs font-medium text-zinc-500">Đã bán {totalTickets > 0 ? Math.round((soldTickets / totalTickets) * 100) : 0}%</span>
-                    <span className="text-xs font-bold text-zinc-900">{soldTickets}/{totalTickets}</span>
+                    <span className="text-xs font-medium text-muted-foreground">Đã bán {totalTickets > 0 ? Math.round((soldTickets / totalTickets) * 100) : 0}%</span>
+                    <span className="text-xs font-bold text-foreground">{soldTickets}/{totalTickets}</span>
                   </div>
                 </div>
               )}
@@ -291,8 +291,8 @@ export default function EventDetailContent({
                     </Button>
                   )
                 ) : (
-                  <div className="flex h-12 w-full items-center justify-center rounded-xl border border-zinc-200 bg-zinc-50 text-center">
-                    <p className="text-sm font-medium text-zinc-500">
+                  <div className="flex h-12 w-full items-center justify-center rounded-xl border border-border bg-muted text-center">
+                    <p className="text-sm font-medium text-muted-foreground">
                       {event.status === EventStatus.PUBLISHED
                         ? "Chưa mở bán vé"
                         : event.status === EventStatus.CLOSED
@@ -302,19 +302,19 @@ export default function EventDetailContent({
                   </div>
                 )
               ) : (
-                <div className="p-4 rounded-lg bg-zinc-50 text-center">
-                  <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest">Chưa mở bán</p>
+                <div className="p-4 rounded-lg bg-muted text-center">
+                  <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Chưa mở bán</p>
                 </div>
               )}
 
               <div className="mt-4 flex gap-2">
-                <Button variant="outline" className="flex-1 h-10 rounded-lg text-xs font-bold hover:bg-zinc-50">
+                <Button variant="outline" className="flex-1 h-10 rounded-lg text-xs font-bold border-border bg-card hover:bg-muted text-foreground">
                   <Heart className="mr-2 h-3.5 w-3.5" />
                   Lưu
                 </Button>
                 <Button
                   variant="outline"
-                  className="flex-1 h-10 rounded-lg text-xs font-bold hover:bg-zinc-50"
+                  className="flex-1 h-10 rounded-lg text-xs font-bold border-border bg-card hover:bg-muted text-foreground"
                   onClick={handleShare}
                 >
                   <Share2 className="mr-2 h-3.5 w-3.5" />
@@ -332,9 +332,9 @@ export default function EventDetailContent({
                     <Link
                       key={ev.id}
                       href={`/events/${ev.id}`}
-                      className="flex gap-4 rounded-xl border border-zinc-100 bg-white p-3 transition-shadow hover:shadow-md group"
+                      className="flex gap-4 rounded-xl border border-border bg-card p-3 transition-all hover:shadow-md hover:border-primary/20 group"
                     >
-                      <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-zinc-100">
+                      <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-muted">
                         <Image
                           src={ev.thumbnailUrl || ev.bannerUrl || FALLBACK_EVENT_IMAGE}
                           alt={ev.name}
@@ -343,10 +343,10 @@ export default function EventDetailContent({
                         />
                       </div>
                       <div className="min-w-0 flex-1 py-1">
-                        <h4 className="text-sm font-bold text-zinc-900 line-clamp-2 leading-tight group-hover:text-primary transition-colors">
+                        <h4 className="text-sm font-bold text-foreground line-clamp-2 leading-tight group-hover:text-primary transition-colors">
                           {ev.name}
                         </h4>
-                        <div className="mt-2 flex items-center gap-2 text-[10px] font-medium text-zinc-400">
+                        <div className="mt-2 flex items-center gap-2 text-[10px] font-medium text-muted-foreground">
                           <CalendarDays className="h-3 w-3" />
                           {format(new Date(ev.startTime), "dd/MM/yyyy", { locale: vi })}
                         </div>

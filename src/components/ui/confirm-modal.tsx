@@ -40,18 +40,18 @@ export function ConfirmModal({
   };
 
   const variantStyles = {
-    default: "bg-zinc-900 hover:bg-zinc-800 text-white",
+    default: "bg-primary hover:bg-primary/90 text-primary-foreground",
     danger: "bg-rose-600 hover:bg-rose-700 text-white",
     success: "bg-emerald-600 hover:bg-emerald-700 text-white",
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="rounded-[24px] border-zinc-200 max-w-md">
+      <DialogContent className="rounded-[24px] border border-border max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-lg font-bold text-zinc-900">{title}</DialogTitle>
+          <DialogTitle className="text-lg font-bold text-foreground">{title}</DialogTitle>
           <DialogDescription asChild>
-            <div className="text-sm text-zinc-500 leading-relaxed whitespace-pre-line mt-2">
+            <div className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line mt-2">
               {description}
             </div>
           </DialogDescription>
@@ -61,7 +61,7 @@ export function ConfirmModal({
             variant="outline"
             onClick={() => onOpenChange(false)}
             disabled={isLoading}
-            className="rounded-full border-zinc-200"
+            className="rounded-full border-border"
           >
             {cancelLabel}
           </Button>

@@ -58,6 +58,7 @@ interface BaseFilterProps {
 }
 
 export default function BaseFilter({ filters, onFilterChange }: BaseFilterProps) {
+    const [showMobileFilters, setShowMobileFilters] = useState(false)
     const router = useRouter()
     const pathname = usePathname()
     const searchParams = useSearchParams()
@@ -161,8 +162,28 @@ export default function BaseFilter({ filters, onFilterChange }: BaseFilterProps)
     }
 
     return (
-        <div className="bg-card p-4 rounded-xl shadow-sm mb-6 border border-border flex flex-col lg:flex-row items-end gap-4">
-            <div className="flex flex-col sm:flex-row flex-1 w-full gap-4">
+        <div className="bg-card p-4 rounded-xl shadow-sm mb-6 border border-border">
+            <div className="flex flex-col lg:flex-row items-end gap-4">
+                {/* Mobile Filter Toggle */}
+                <div className="flex lg:hidden w-full items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                        <SlidersHorizontal className="h-4 w-4 text-primary" />
+                        <span className="text-sm font-bold uppercase tracking-wider">Bộ lọc</span>
+                    </div>
+                    <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={() => setShowMobileFilters(!showMobileFilters)}
+                        className="text-primary font-bold text-xs"
+                    >
+                        {showMobileFilters ? "Thu gọn" : "Mở bộ lọc"}
+                    </Button>
+                </div>
+
+                <div className={cn(
+                    "flex-1 w-full gap-4",
+                    showMobileFilters ? "flex flex-col sm:grid sm:grid-cols-2 lg:flex lg:flex-row" : "hidden lg:flex lg:flex-row"
+                )}>
                 {filters.map((filter) => {
                     if (filter.type === 'numberRange' && filter.rangeKeys) {
                         const [fromKey, toKey] = filter.rangeKeys
@@ -399,13 +420,17 @@ export default function BaseFilter({ filters, onFilterChange }: BaseFilterProps)
                 })}
             </div>
 
-            <Button
-                variant="secondary"
-                onClick={clearFilters}
-                className="lg:ml-auto shrink-0"
-            >
-                Xóa bộ lọc
-            </Button>
+                <Button
+                    variant="secondary"
+                    onClick={clearFilters}
+                    className={cn(
+                        "transition-all",
+                        showMobileFilters ? "w-full lg:w-auto mt-4 lg:mt-0" : "hidden lg:flex lg:ml-auto"
+                    )}
+                >
+                    Xóa bộ lọc
+                </Button>
+            </div>
         </div>
     )
 }

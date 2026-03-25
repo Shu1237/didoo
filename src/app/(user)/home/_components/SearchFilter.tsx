@@ -38,24 +38,24 @@ export default function SearchFilter({ categories = [] }: SearchFilterProps) {
 
   return (
     <div className="relative z-20 max-w-4xl mx-auto px-4 -mt-16 sm:-mt-12">
-      <div className="rounded-2xl border border-zinc-200 bg-white/95 backdrop-blur-md shadow-xl p-4 sm:p-5">
+      <div className="rounded-2xl border border-border bg-card/95 backdrop-blur-md shadow-xl p-4 sm:p-5">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
           <div className="md:col-span-4 relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <input
               type="text"
               value={keyword}
               onChange={(e) => setKeyword(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
               placeholder="Tìm sự kiện, nghệ sĩ..."
-              className="flex h-12 w-full pl-11 pr-4 rounded-xl border border-zinc-200 bg-zinc-50 text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+              className="flex h-12 w-full pl-11 pr-4 rounded-xl border border-border bg-muted text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
             />
           </div>
 
           <div className="md:col-span-3">
             <Select value={categoryId} onValueChange={setCategoryId}>
-              <SelectTrigger className="h-12 rounded-xl border-zinc-200 bg-zinc-50">
-                <Tag className="h-4 w-4 text-zinc-400 mr-2" />
+              <SelectTrigger className="h-12 rounded-xl border border-border bg-muted">
+                <Tag className="h-4 w-4 text-muted-foreground mr-2" />
                 <SelectValue placeholder="Danh mục" />
               </SelectTrigger>
               <SelectContent>
@@ -75,11 +75,11 @@ export default function SearchFilter({ categories = [] }: SearchFilterProps) {
                 <Button
                   variant="outline"
                   className={cn(
-                    "w-full h-12 justify-start rounded-xl border-zinc-200 bg-zinc-50 font-normal",
-                    !date && "text-zinc-500"
+                    "w-full h-12 justify-start rounded-xl border border-border bg-muted font-normal",
+                    !date && "text-muted-foreground"
                   )}
                 >
-                  <CalendarIcon className="h-4 w-4 mr-2 text-zinc-400" />
+                  <CalendarIcon className="h-4 w-4 mr-2 text-muted-foreground" />
                   {date ? format(date, "dd/MM/yyyy", { locale: vi }) : "Chọn ngày"}
                 </Button>
               </PopoverTrigger>

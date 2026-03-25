@@ -36,7 +36,7 @@ export default function EventsGrid({
             <span>{title}</span>
           </div>
           {description && (
-            <p className="text-sm text-zinc-600 mt-2">{description}</p>
+            <p className="text-sm text-muted-foreground mt-2">{description}</p>
           )}
         </div>
         <Button variant="outline" size="sm" asChild className="rounded-xl w-fit">
@@ -64,7 +64,7 @@ export default function EventsGrid({
           >
             <Link
               href={`/events/${event.id}`}
-              className="block relative h-[360px] rounded-2xl overflow-hidden group border border-zinc-200 bg-white shadow-sm hover:shadow-xl transition-all duration-300"
+              className="block relative h-[360px] rounded-2xl overflow-hidden group border border-border bg-card shadow-sm hover:shadow-xl transition-all duration-300"
             >
               <Image
                 src={
@@ -76,7 +76,7 @@ export default function EventsGrid({
                 fill
                 className="object-cover transition-transform duration-500 group-hover:scale-105"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-zinc-900/95 via-zinc-900/40 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-foreground/95 via-foreground/40 to-transparent" />
 
               <div className="absolute inset-0 p-5 flex flex-col justify-end">
                 <span className="inline-flex w-fit px-2.5 py-1 rounded-lg bg-white/20 backdrop-blur-sm text-white text-xs font-medium mb-3">
@@ -85,7 +85,7 @@ export default function EventsGrid({
                 <h3 className="text-lg font-bold text-white leading-tight line-clamp-2 mb-3">
                   {event.name}
                 </h3>
-                <div className="flex flex-col gap-1.5 text-zinc-300 text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="flex flex-col gap-1.5 text-muted-foreground text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity">
                   <div className="flex items-center gap-2">
                     <CalendarDays className="w-3.5 h-3.5 shrink-0" />
                     {format(new Date(event.startTime), "dd MMM yyyy", { locale: vi })}

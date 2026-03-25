@@ -63,9 +63,9 @@ export function CreateUserForm() {
   const gender = watch("Gender");
 
   return (
-    <Card className="border-zinc-200">
+    <Card className="border-border bg-card">
       <CardHeader>
-        <h2 className="text-lg font-semibold text-zinc-900">Thông tin người dùng</h2>
+        <h2 className="text-lg font-semibold text-foreground">Thông tin người dùng</h2>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">

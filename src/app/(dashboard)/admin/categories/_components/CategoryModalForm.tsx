@@ -82,22 +82,22 @@ export function CategoryModalForm({
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <DialogHeader>
-        <DialogTitle>{mode === "create" ? "Tạo danh mục" : "Cập nhật danh mục"}</DialogTitle>
-        <DialogDescription>
+        <DialogTitle className="text-foreground">{mode === "create" ? "Tạo danh mục" : "Cập nhật danh mục"}</DialogTitle>
+        <DialogDescription className="text-muted-foreground">
           {mode === "create"
             ? "Điền thông tin để tạo danh mục mới"
             : "Cập nhật thông tin danh mục"}
         </DialogDescription>
       </DialogHeader>
 
-      <div className="max-h-[60vh] space-y-4 overflow-y-auto px-2">
+      <div className="max-h-[60vh] space-y-4 overflow-y-auto px-2 scrollbar-thin scrollbar-thumb-border">
         <div className="space-y-2">
           <Label htmlFor="Name">Tên danh mục *</Label>
           <Input
             id="Name"
             placeholder="Ví dụ: Âm nhạc"
             {...register("Name")}
-            className={errors.Name ? "border-destructive" : ""}
+            className={errors.Name ? "border-destructive" : "border-border"}
           />
           {errors.Name && <p className="text-sm text-destructive">{errors.Name.message}</p>}
         </div>
@@ -108,7 +108,7 @@ export function CategoryModalForm({
             id="Slug"
             placeholder="am-nhac"
             {...register("Slug")}
-            className={errors.Slug ? "border-destructive" : ""}
+            className={errors.Slug ? "border-destructive" : "border-border"}
           />
           {errors.Slug && <p className="text-sm text-destructive">{errors.Slug.message}</p>}
         </div>
@@ -120,7 +120,7 @@ export function CategoryModalForm({
             placeholder="Mô tả ngắn về danh mục"
             {...register("Description")}
             rows={3}
-            className={errors.Description ? "border-destructive" : ""}
+            className={errors.Description ? "border-destructive" : "border-border"}
           />
           {errors.Description && <p className="text-sm text-destructive">{errors.Description.message}</p>}
         </div>
@@ -132,7 +132,7 @@ export function CategoryModalForm({
             type="url"
             placeholder="https://..."
             {...register("IconUrl")}
-            className={errors.IconUrl ? "border-destructive" : ""}
+            className={errors.IconUrl ? "border-destructive" : "border-border"}
           />
           {errors.IconUrl && <p className="text-sm text-destructive">{errors.IconUrl.message}</p>}
         </div>
