@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useGetMe } from "@/hooks/useAuth";
-import { useGetBookings, useGetResaleTransactions } from "@/hooks/useBooking";
+import { useGetBookings } from "@/hooks/useBooking";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import type { Booking } from "@/types/booking";
@@ -40,10 +40,10 @@ function HistoryRow({ booking }: { booking: Booking }) {
   const bookingType = getBookingTypeStyle(booking.bookingType);
   const dateStr = booking.createdAt
     ? new Date(booking.createdAt).toLocaleDateString("vi-VN", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-      })
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    })
     : "--";
 
   return (
@@ -86,13 +86,15 @@ export default function DashboardHistoryContent() {
   const user = meRes?.data;
 
   const { data: bookingsRes } = useGetBookings(
-    { userId: user?.id, pageNumber: 1, pageSize: 50, isDescending: true },
+    { userId: user?.id, pageNumber: 1, pageSize: 50, isDescending: true, bookingType: BookingTypeStatus.NORMAL },
     { enabled: !!user?.id }
   );
-  const { data: resaleTransactionsRes } = useGetResaleTransactions(
-    { buyerUserId: user?.id, pageNumber: 1, pageSize: 20, isDescending: true },
+  const { data: resaleTransactionsRes } = useGetBookings(
+    { userId: user?.id, pageNumber: 1, pageSize: 50, isDescending: true, bookingType: BookingTypeStatus.TRADE_PURCHASE },
     { enabled: !!user?.id }
   );
+
+
   const bookings = bookingsRes?.data.items || [];
   const resaleTransactions = resaleTransactionsRes?.data.items || [];
 
@@ -137,7 +139,7 @@ export default function DashboardHistoryContent() {
                 <p className="text-sm text-muted-foreground font-medium">{transaction.status}</p>
               </div>
               <p className="font-bold text-foreground">
-                {Number(transaction.cost || 0).toLocaleString("vi-VN")}đ
+                {Number(transaction.totalPrice || 0).toLocaleString("vi-VN")}đ
               </p>
             </div>
           ))}
