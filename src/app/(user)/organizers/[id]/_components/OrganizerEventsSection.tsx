@@ -2,46 +2,44 @@
 
 import { useState, useMemo } from "react";
 import { Ticket } from "lucide-react";
-import { OrganizerEventCard } from "./OrganizerEventCard";
 import type { Event } from "@/types/event";
 import { EventStatus } from "@/utils/enum";
+import { OrganizerEventCard } from "./OrganizerEventCard";
 
 interface OrganizerEventsSectionProps {
   events: Event[];
   isLoading?: boolean;
 }
 
-type EventTab = "upcoming" | "opened" | "past";
+type EventTab = EventStatus.OPENED | EventStatus.PUBLISHED | EventStatus.CLOSED;
 
 export function OrganizerEventsSection({
   events,
   isLoading = false,
 }: OrganizerEventsSectionProps) {
-  const [eventTab, setEventTab] = useState<EventTab>("upcoming");
+  const [eventTab, setEventTab] = useState<EventTab>(EventStatus.PUBLISHED);
 
-  const displayEvents = useMemo(() => {
-    const now = new Date().getTime();
-    if (eventTab === "upcoming") return events.filter((e) => new Date(e.startTime).getTime() >= now);
-    if (eventTab === "opened") return events.filter((e) => (e.status as number) === EventStatus.OPENED);
-    return events.filter((e) => new Date(e.startTime).getTime() < now);
+ 
+  const filteredEvents = useMemo(() => {
+    return events.filter((event) => event.status === eventTab);
   }, [events, eventTab]);
 
   const getEmptyMessage = () => {
-    if (eventTab === "upcoming") return "Chưa có sự kiện sắp diễn ra";
-    if (eventTab === "opened") return "Chưa có sự kiện đang mở bán vé";
+    if (eventTab === EventStatus.PUBLISHED) return "Chưa có sự kiện sắp diễn ra";
+    if (eventTab === EventStatus.OPENED) return "Chưa có sự kiện đang mở bán vé";
     return "Chưa có sự kiện đã qua";
   };
 
   return (
-    <section className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+    <section className="rounded-2xl border border-border bg-card p-6 shadow-sm mb-10">
       <div className="flex flex-col gap-4 border-b border-border pb-4 sm:flex-row sm:items-center sm:justify-between">
         <h2 className="text-lg font-bold text-foreground">Sự kiện</h2>
-        <div className="flex gap-1 rounded-xl bg-muted p-1 overflow-x-auto">
+        <div className="flex gap-1 rounded-xl bg-muted p-1 overflow-x-auto selection:bg-none">
           <button
             type="button"
-            onClick={() => setEventTab("upcoming")}
+            onClick={() => setEventTab(EventStatus.PUBLISHED)}
             className={`shrink-0 rounded-lg px-4 py-2 text-sm font-semibold transition min-h-[40px] min-w-[20px] ${
-              eventTab === "upcoming"
+              eventTab === EventStatus.PUBLISHED
                 ? "bg-background text-foreground shadow-sm"
                 : "text-muted-foreground hover:text-foreground"
             }`}
@@ -50,9 +48,9 @@ export function OrganizerEventsSection({
           </button>
           <button
             type="button"
-            onClick={() => setEventTab("opened")}
+            onClick={() => setEventTab(EventStatus.OPENED)}
             className={`shrink-0 rounded-lg px-4 py-2 text-sm font-semibold transition min-h-[40px] min-w-[20px] ${
-              eventTab === "opened"
+              eventTab === EventStatus.OPENED
                 ? "bg-background text-foreground shadow-sm"
                 : "text-muted-foreground hover:text-foreground"
             }`}
@@ -61,9 +59,9 @@ export function OrganizerEventsSection({
           </button>
           <button
             type="button"
-            onClick={() => setEventTab("past")}
+            onClick={() => setEventTab(EventStatus.CLOSED)}
             className={`shrink-0 rounded-lg px-4 py-2 text-sm font-semibold transition min-h-[40px] min-w-[20px] ${
-              eventTab === "past"
+              eventTab === EventStatus.CLOSED
                 ? "bg-background text-foreground shadow-sm"
                 : "text-muted-foreground hover:text-foreground"
             }`}
@@ -82,9 +80,9 @@ export function OrganizerEventsSection({
             />
           ))}
         </div>
-      ) : displayEvents.length > 0 ? (
+      ) : filteredEvents.length > 0 ? (
         <div className="mt-6 grid gap-6 sm:grid-cols-2">
-          {displayEvents.map((event) => (
+          {filteredEvents.map((event) => (
             <OrganizerEventCard key={event.id} event={event} />
           ))}
         </div>

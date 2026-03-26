@@ -186,7 +186,7 @@ export function CreateResaleContent({
                           return (
                             <label
                               key={ticket.id}
-                              className={`flex cursor-pointer items-center gap-4 rounded-xl border p-3 transition-all hover:shadow-sm ${checked ? "border-primary bg-primary/5" : "border-zinc-200 bg-white hover:border-zinc-300"}`}
+                              className={`flex cursor-pointer items-center gap-4 rounded-xl border p-3 transition-all hover:shadow-sm ${checked ? "border-primary bg-primary/5 dark:bg-primary/10" : "border-border bg-card hover:border-muted-foreground/30"}`}
                             >
                               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-emerald-500 text-white">
                                 <TicketIcon className="h-5 w-5" />
@@ -234,7 +234,7 @@ export function CreateResaleContent({
                           return (
                             <label
                               key={ticket.id}
-                              className={`flex cursor-pointer items-center gap-4 rounded-xl border p-3 transition-all hover:shadow-sm ${checked ? "border-primary bg-primary/5" : "border-zinc-200 bg-white hover:border-zinc-300"}`}
+                              className={`flex cursor-pointer items-center gap-4 rounded-xl border p-3 transition-all hover:shadow-sm ${checked ? "border-primary bg-primary/5 dark:bg-primary/10" : "border-border bg-card hover:border-muted-foreground/30"}`}
                             >
                               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary text-white">
                                 <TicketIcon className="h-5 w-5" />

@@ -12,8 +12,8 @@ export default function DashboardTicketsContent() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-zinc-900">Vé của tôi</h1>
-          <p className="mt-1 text-zinc-600">Quản lý vé đã đặt</p>
+          <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">Vé của tôi</h1>
+          <p className="mt-1 text-zinc-600 dark:text-zinc-400">Quản lý vé đã đặt</p>
         </div>
         <div className="flex w-full items-center gap-3 lg:w-auto">
           <Select value={statusFilter} onValueChange={setStatusFilter}>

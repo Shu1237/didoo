@@ -136,83 +136,100 @@ function TicketCard({ ticket }: { ticket: TicketCardView }) {
   const eventDate = event?.startTime ? new Date(event.startTime) : new Date();
 
   return (
-    <article className="group overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all hover:border-primary/30 hover:shadow-md">
+    <article className="group relative overflow-hidden rounded-2xl border border-border/50 bg-card shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-xl dark:bg-zinc-900/40 dark:backdrop-blur-sm">
       <div className="relative aspect-[16/9] overflow-hidden">
         <Image
           src={event?.thumbnailUrl || event?.bannerUrl || FALLBACK_IMAGE}
           alt={event?.name || "Sự kiện"}
           fill
-          className="object-cover transition duration-300 group-hover:scale-105"
+          className="object-cover transition duration-700 group-hover:scale-110"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" />
-        <Badge variant="outline" className={`absolute right-4 top-4 border-0 ${status.className}`}>
-          {status.label}
-        </Badge>
+        <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/90 via-zinc-950/20 to-transparent" />
+        
+        <div className="absolute right-4 top-4">
+          <Badge variant="outline" className={`border-0 shadow-sm backdrop-blur-md font-bold ${status.className} dark:bg-opacity-20`}>
+            {status.label}
+          </Badge>
+        </div>
+
         <div className="absolute inset-x-0 bottom-0 p-4">
-          <h3 className="line-clamp-2 font-bold text-white drop-shadow-sm">{event?.name || "Sự kiện"}</h3>
-          <p className="mt-1 flex items-center gap-1.5 text-sm text-white/90">
-            <CalendarDays className="h-4 w-4 shrink-0" />
-            {format(eventDate, "EEEE, d MMM yyyy", { locale: vi })}
-          </p>
+          <h3 className="line-clamp-2 text-lg font-bold text-white drop-shadow-md">{event?.name || "Sự kiện"}</h3>
+          <div className="mt-2 flex items-center gap-3">
+            <p className="flex items-center gap-1.5 text-xs font-semibold text-white/90">
+              <CalendarDays className="h-3.5 w-3.5 shrink-0 text-primary-foreground" />
+              {format(eventDate, "EEEE, d MMM yyyy", { locale: vi })}
+            </p>
+          </div>
         </div>
       </div>
 
-      <div className="flex items-center justify-center gap-4 border-y border-dashed border-border bg-muted/50 py-3">
-        <div className="h-px flex-1 bg-border" />
-        <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">
+      <div className="relative flex items-center justify-center gap-4 bg-muted/30 px-4 py-3 dark:bg-zinc-800/30">
+        <div className="h-px flex-1 bg-border/50" />
+        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/80">
           {ticket.ticketType?.name || "Vé điện tử"}
         </span>
-        <div className="h-px flex-1 bg-border" />
+        <div className="h-px flex-1 bg-border/50" />
+        
+        {/* Ticket punches effect */}
+        <div className="absolute -left-2 top-1/2 h-4 w-4 -translate-y-1/2 rounded-full border border-border bg-background" />
+        <div className="absolute -right-2 top-1/2 h-4 w-4 -translate-y-1/2 rounded-full border border-border bg-background" />
       </div>
 
       <div className="p-5">
-        <div className="space-y-3">
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-muted-foreground">Mã vé</span>
-            <span className="font-mono font-semibold text-foreground">#{ticket.id?.substring(0, 8).toUpperCase()}</span>
-          </div>
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Clock className="h-4 w-4 shrink-0 text-muted-foreground/50" />
-            <span>
-              {event?.openTime || "Sẽ cập nhật"} - {event?.closedTime || "Sẽ cập nhật"}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-muted-foreground">Mã vé</span>
+            <span className="font-mono text-sm font-bold tracking-wider text-foreground">
+              #{ticket.id?.substring(0, 8).toUpperCase()}
             </span>
           </div>
-          <div className="flex items-center justify-between border-t border-border pt-3">
-            <span className="text-sm text-muted-foreground">Giá vé</span>
-            <span className="font-bold text-foreground">{ticket.totalPrice === 0 ? "Miễn phí" : `${Number(ticket.totalPrice).toLocaleString("vi-VN")}đ`}</span>
+
+          <div className="flex items-center gap-3 rounded-lg bg-muted/20 p-2.5 dark:bg-zinc-800/20">
+            <Clock className="h-4 w-4 shrink-0 text-primary/70" />
+            <span className="text-sm font-medium text-foreground/90">
+              {event?.openTime || "Sẽ cập nhật"} - {event?.closedTime || "00:00"}
+            </span>
+          </div>
+
+          <div className="flex items-center justify-between border-t border-border/50 pt-4">
+            <span className="text-sm font-medium text-muted-foreground">Giá vé</span>
+            <span className="text-lg font-black text-primary dark:text-primary-foreground">
+              {ticket.totalPrice === 0 ? "Miễn phí" : `${Number(ticket.totalPrice).toLocaleString("vi-VN")}đ`}
+            </span>
           </div>
         </div>
 
         {showBarcode && (
-          <div className="mt-4 rounded-xl border border-border bg-white p-4 dark:bg-zinc-200">
-            <div className="mb-2 flex justify-center grayscale">
-              <Barcode
-                value={ticket.id || "000000"}
-                width={1.4}
-                height={40}
-                displayValue={false}
-                background="transparent"
-                lineColor="#18181b"
-                margin={0}
-              />
+          <div className="mt-6 animate-in fade-in zoom-in duration-300">
+            <div className="rounded-xl border border-border/50 bg-white p-4 shadow-inner dark:bg-zinc-100">
+              <div className="mb-2 flex justify-center grayscale transition-all hover:grayscale-0">
+                <Barcode
+                  value={ticket.id || "000000"}
+                  width={1.6}
+                  height={50}
+                  displayValue={false}
+                  background="transparent"
+                  lineColor="#000"
+                  margin={0}
+                />
+              </div>
+              <p className="break-all text-center font-mono text-[9px] font-medium text-zinc-500">{ticket.id}</p>
             </div>
-            <p className="break-all text-center font-mono text-[10px] text-zinc-600">{ticket.id}</p>
           </div>
         )}
 
-        <div className="mt-5 space-y-3">
-          <div className="flex gap-3">
-            <Button asChild variant="outline" size="sm" className="flex-1 rounded-xl">
-              <Link href={`/events/${ticket.eventId}`}>Chi tiết sự kiện</Link>
-            </Button>
-          </div>
+        <div className="mt-6 grid gap-3">
+          <Button asChild variant="default" className="w-full rounded-xl font-bold shadow-lg shadow-primary/20 transition-all hover:shadow-primary/40">
+            <Link href={`/events/${ticket.eventId}`}>Chi tiết sự kiện</Link>
+          </Button>
+          
           <Button
             type="button"
-            variant="ghost"
+            variant="outline"
             onClick={() => setShowBarcode(!showBarcode)}
-            className="w-full justify-center gap-2 rounded-xl text-sm text-muted-foreground hover:bg-muted hover:text-foreground"
+            className="w-full justify-center gap-2 rounded-xl text-xs border-border/60 font-semibold text-muted-foreground transition-all hover:bg-muted hover:text-foreground active:scale-95"
           >
-            <QrCode className="h-4 w-4" />
+            <QrCode className="h-3.5 w-3.5" />
             {showBarcode ? "Ẩn mã vạch" : "Hiện mã vạch"}
           </Button>
         </div>
