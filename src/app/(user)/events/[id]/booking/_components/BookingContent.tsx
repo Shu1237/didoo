@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowUpRight, ChevronLeft, HelpCircle, Minus, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Event } from "@/types/event";
@@ -212,6 +213,33 @@ export function BookingContent({
     </>
   );
 
+  const hasMap = !!(event.ticketMapUrl || (event as any).TicketMapUrl);
+
+  const TicketList = () => (
+    <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm h-fit">
+      <h2 className="text-xl font-bold text-zinc-900">Loại vé</h2>
+      <div className="mt-4 space-y-4">
+        {ticketTypes.map((tt) => {
+          const avail = realtimeAvailability[tt.id] ?? Math.max(0, Number(tt.availableQuantity ?? 0));
+          const soldOut = avail <= 0;
+          const isSelected = selected?.ticketTypeId === tt.id;
+          const limit = maxAllowed(tt);
+          const ownedCount = ownedCountByTicketType.get(tt.id) ?? 0;
+          return (
+            <TicketCard
+              key={tt.id}
+              tt={tt}
+              soldOut={soldOut}
+              isSelected={isSelected}
+              limit={limit}
+              ownedCount={ownedCount}
+            />
+          );
+        })}
+      </div>
+    </div>
+  );
+
   return (
     <main className="min-h-screen bg-zinc-50 px-4 pb-16 pt-28">
       <div className="mx-auto max-w-6xl">
@@ -224,36 +252,42 @@ export function BookingContent({
         </Link>
 
         <div className="grid gap-6 lg:grid-cols-12">
-          <div className="lg:col-span-7">
-            <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
-              <h2 className="text-xl font-bold text-zinc-900">Loại vé</h2>
-              <div className="mt-4 space-y-4">
-                {ticketTypes.map((tt) => {
-                  const avail = realtimeAvailability[tt.id] ?? Math.max(0, Number(tt.availableQuantity ?? 0));
-                  const soldOut = avail <= 0;
-                  const isSelected = selected?.ticketTypeId === tt.id;
-                  const limit = maxAllowed(tt);
-                  const ownedCount = ownedCountByTicketType.get(tt.id) ?? 0;
-                  return (
-                    <TicketCard
-                      key={tt.id}
-                      tt={tt}
-                      soldOut={soldOut}
-                      isSelected={isSelected}
-                      limit={limit}
-                      ownedCount={ownedCount}
+          {hasMap ? (
+            <>
+              <div className="lg:col-span-7">
+                <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
+                  <h2 className="text-xl font-bold text-zinc-900 mb-4">Sơ đồ ghế</h2>
+                  <div className="relative aspect-[16/9] w-full overflow-hidden rounded-xl border border-zinc-100 bg-zinc-50">
+                    <Image
+                      src={event.ticketMapUrl || (event as any).TicketMapUrl || ""}
+                      alt="Sơ đồ ghế"
+                      fill
+                      className="object-contain"
                     />
-                  );
-                })}
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
 
-          <div className="lg:col-span-5">
-            <div className="sticky top-24 rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
-              <SidebarContent />
-            </div>
-          </div>
+              <div className="lg:col-span-5 space-y-6">
+                <TicketList />
+                <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
+                  <SidebarContent />
+                </div>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="lg:col-span-7">
+                <TicketList />
+              </div>
+
+              <div className="lg:col-span-5">
+                <div className="sticky top-24 rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
+                  <SidebarContent />
+                </div>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </main>

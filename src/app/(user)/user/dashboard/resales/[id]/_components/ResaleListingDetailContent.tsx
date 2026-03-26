@@ -30,10 +30,11 @@ export function ResaleListingDetailContent({ id }: { id: string }) {
   const { data: ticketTypeRes } = useGetTicketType(firstTicketTypeId);
   const ticketType = ticketTypeRes?.data;
 
-  const { data: bookingRes } = useGetBooking(listing?.bookingId || "");
+  const { data: bookingRes } = useGetBooking(listing?.bookingId || (listing as any)?.BookingId || "");
   const booking = bookingRes?.data;
 
-  const { data: eventRes } = useGetEvent(listing?.eventId || booking?.eventId || "");
+  const eventId = listing?.eventId || (listing as any)?.EventId || listing?.event?.id || booking?.eventId || (booking as any)?.EventId || "";
+  const { data: eventRes } = useGetEvent(eventId);
   const event = eventRes?.data;
 
   if (isLoading) return null;

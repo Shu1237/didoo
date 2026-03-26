@@ -190,6 +190,23 @@ export default function EventDetailContent({
             )}
           </section>
 
+          {/* Ticket Map Section */}
+          {(event.ticketMapUrl || (event as any).TicketMapUrl) && (
+            <section>
+              <SectionHeading>Sơ đồ vé</SectionHeading>
+              <div className="rounded-2xl border border-border bg-card p-4 shadow-sm overflow-hidden">
+                <div className="relative aspect-[16/9] w-full bg-muted/30 rounded-xl overflow-hidden">
+                  <Image
+                    src={event.ticketMapUrl || (event as any).TicketMapUrl}
+                    alt="Sơ đồ vé"
+                    fill
+                    className="object-contain"
+                  />
+                </div>
+              </div>
+            </section>
+          )}
+
           {/* Organizer Section */}
           <section>
             <SectionHeading>Nhà tổ chức</SectionHeading>

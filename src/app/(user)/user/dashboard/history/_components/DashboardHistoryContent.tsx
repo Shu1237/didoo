@@ -1,14 +1,17 @@
 "use client";
 
+
 import Image from "next/image";
-import Link from "next/link";
 import { useGetMe } from "@/hooks/useAuth";
 import { useGetBookings } from "@/hooks/useBooking";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { Booking } from "@/types/booking";
 import { useGetEvent } from "@/hooks/useEvent";
 import { BookingTypeStatus } from "@/utils/enum";
+import { Link } from "lucide-react";
+
 
 const FALLBACK_IMAGE =
   "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=2070&auto=format&fit=crop";
@@ -47,8 +50,7 @@ function HistoryRow({ booking }: { booking: Booking }) {
     : "--";
 
   return (
-    <Link
-      href={`/events/${booking.eventId}/booking/confirm?bookingId=${booking.id}`}
+    <div
       className="flex flex-col sm:flex-row gap-4 rounded-2xl border border-border bg-card p-4 shadow-sm transition-all hover:border-primary/30 hover:shadow-md"
     >
       <div className="relative h-24 w-full shrink-0 overflow-hidden rounded-xl bg-muted sm:h-20 sm:w-32">
@@ -77,7 +79,7 @@ function HistoryRow({ booking }: { booking: Booking }) {
           {Number(booking.totalPrice || 0).toLocaleString("vi-VN")}đ
         </p>
       </div>
-    </Link>
+    </div>
   );
 }
 
@@ -100,51 +102,66 @@ export default function DashboardHistoryContent() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight text-foreground">Lịch sử mua hàng</h1>
-        <p className="mt-1 text-muted-foreground font-medium">Xem tất cả đơn hàng đã đặt</p>
-      </div>
-
-      {bookings.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-border bg-card p-16 text-center shadow-sm">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-muted">
-            <span className="text-2xl">📋</span>
-          </div>
-          <h3 className="text-lg font-semibold text-foreground">Chưa có đơn hàng</h3>
-          <p className="mt-2 max-w-sm mx-auto text-muted-foreground font-medium">
-            Đặt vé sự kiện để xem lịch sử mua hàng tại đây.
-          </p>
-          <Button asChild className="mt-6 rounded-xl">
-            <Link href="/events">Khám phá sự kiện</Link>
-          </Button>
+      <div className="flex flex-col gap-4">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">Lịch sử mua hàng</h1>
+          <p className="mt-1 text-muted-foreground font-medium">Xem tất cả đơn hàng đã đặt</p>
         </div>
-      ) : (
-        <div className="space-y-4">
-          {bookings.map((booking) => (
-            <HistoryRow key={booking.id} booking={booking} />
-          ))}
-        </div>
-      )}
 
-      {resaleTransactions.length > 0 && (
-        <div className="space-y-3">
-          <h2 className="text-xl font-semibold text-foreground">Giao dịch mua lại</h2>
-          {resaleTransactions.map((transaction) => (
-            <div
-              key={transaction.id}
-              className="flex items-center justify-between rounded-2xl border border-border bg-card p-4 shadow-sm"
-            >
-              <div>
-                <p className="font-semibold text-foreground">#{transaction.id.substring(0, 8).toUpperCase()}</p>
-                <p className="text-sm text-muted-foreground font-medium">{transaction.status}</p>
-              </div>
-              <p className="font-bold text-foreground">
-                {Number(transaction.totalPrice || 0).toLocaleString("vi-VN")}đ
-              </p>
+        <Tabs defaultValue="bookings" className="space-y-6">
+          <TabsList>
+            <TabsTrigger value="bookings">
+              Trực tiếp ({bookings.length})
+            </TabsTrigger>
+            <TabsTrigger value="transactions">
+              Mua lại ({resaleTransactions.length})
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="bookings">
+            <div className="space-y-4">
+              {bookings.length === 0 ? (
+                <div className="rounded-2xl border border-dashed border-border bg-card p-16 text-center shadow-sm">
+                  <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-muted">
+                    <span className="text-2xl">📋</span>
+                  </div>
+                  <h3 className="text-lg font-semibold text-foreground">Chưa có đơn hàng</h3>
+                  <p className="mt-2 max-w-sm mx-auto text-muted-foreground font-medium">
+                    Đặt vé sự kiện để xem lịch sử mua hàng tại đây.
+                  </p>
+                  <Button asChild className="mt-6 rounded-xl">
+                    <Link href="/events">Khám phá sự kiện</Link>
+                  </Button>
+                </div>
+              ) : (
+                bookings.map((booking) => (
+                  <HistoryRow key={booking.id} booking={booking} />
+                ))
+              )}
             </div>
-          ))}
-        </div>
-      )}
+          </TabsContent>
+
+          <TabsContent value="transactions">
+            <div className="space-y-4">
+              {resaleTransactions.length === 0 ? (
+                <div className="rounded-2xl border border-dashed border-border bg-card p-16 text-center shadow-sm">
+                  <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-muted">
+                    <span className="text-2xl">📋</span>
+                  </div>
+                  <h3 className="text-lg font-semibold text-foreground">Chưa có giao dịch</h3>
+                  <p className="mt-2 max-w-sm mx-auto text-muted-foreground font-medium">
+                    Sẽ hiển thị các giao dịch mua lại tại đây.
+                  </p>
+                </div>
+              ) : (
+                resaleTransactions.map((transaction) => (
+                  <HistoryRow key={transaction.id} booking={transaction} />
+                ))
+              )}
+            </div>
+          </TabsContent>
+        </Tabs>
+      </div>
     </div>
   );
 }
