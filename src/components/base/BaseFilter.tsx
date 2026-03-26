@@ -170,9 +170,9 @@ export default function BaseFilter({ filters, onFilterChange }: BaseFilterProps)
                         <SlidersHorizontal className="h-4 w-4 text-primary" />
                         <span className="text-sm font-bold uppercase tracking-wider">Bộ lọc</span>
                     </div>
-                    <Button 
-                        variant="ghost" 
-                        size="sm" 
+                    <Button
+                        variant="ghost"
+                        size="sm"
                         onClick={() => setShowMobileFilters(!showMobileFilters)}
                         className="text-primary font-bold text-xs"
                     >
@@ -181,255 +181,262 @@ export default function BaseFilter({ filters, onFilterChange }: BaseFilterProps)
                 </div>
 
                 <div className={cn(
-                    "flex-1 w-full gap-4",
-                    showMobileFilters ? "flex flex-col sm:grid sm:grid-cols-2 lg:flex lg:flex-row" : "hidden lg:flex lg:flex-row"
+                    "flex-1 w-full flex flex-wrap gap-4",
+                    !showMobileFilters && "hidden lg:flex"
                 )}>
-                {filters.map((filter) => {
-                    if (filter.type === 'numberRange' && filter.rangeKeys) {
-                        const [fromKey, toKey] = filter.rangeKeys
-                        const variant = filter.numberRangeVariant ?? 'inputs'
-                        const min = filter.rangeMin ?? 0
-                        const max = filter.rangeMax ?? 10_000_000
-                        const step = filter.rangeStep ?? 10_000
+                    {filters.map((filter) => {
+                        const isSeparateDate = filter.type === 'dateRange' && filter.dateRangeVariant === 'separate';
+                        // Basis for 5 columns on lg: calc(20% - gap_offset)
+                        // Basis for separate date range (2 columns): calc(40% - gap_offset)
+                        const flexClass = isSeparateDate 
+                            ? "lg:basis-[calc(40%-1rem)]" 
+                            : "lg:basis-[calc(20%-1rem)]";
 
-                        const fromVal = localState[fromKey] ?? searchParams.get(fromKey) ?? ''
-                        const toVal = localState[toKey] ?? searchParams.get(toKey) ?? ''
-                        const fromNum = Math.min(max, Math.max(min, Number(fromVal) || min))
-                        const toNum = Math.min(max, Math.max(min, Number(toVal) || max))
-                        const sliderValue: [number, number] = [fromNum, toNum]
+                        if (filter.type === 'numberRange' && filter.rangeKeys) {
+                            const [fromKey, toKey] = filter.rangeKeys
+                            const variant = filter.numberRangeVariant ?? 'inputs'
+                            const min = filter.rangeMin ?? 0
+                            const max = filter.rangeMax ?? 10_000_000
+                            const step = filter.rangeStep ?? 10_000
 
-                        if (variant === 'slider') {
-                            const hasFilter = (fromVal && Number(fromVal) > min) || (toVal && Number(toVal) < max)
+                            const fromVal = localState[fromKey] ?? searchParams.get(fromKey) ?? ''
+                            const toVal = localState[toKey] ?? searchParams.get(toKey) ?? ''
+                            const fromNum = Math.min(max, Math.max(min, Number(fromVal) || min))
+                            const toNum = Math.min(max, Math.max(min, Number(toVal) || max))
+                            const sliderValue: [number, number] = [fromNum, toNum]
+
+                            if (variant === 'slider') {
+                                const hasFilter = (fromVal && Number(fromVal) > min) || (toVal && Number(toVal) < max)
+                                return (
+                                    <div key={filter.key} className={cn("flex-grow space-y-2 min-w-[180px]", flexClass, filter.className)}>
+                                        <Label className="text-sm font-medium text-foreground">{filter.label}</Label>
+                                        <Popover>
+                                            <PopoverTrigger asChild>
+                                                <Button
+                                                    variant="outline"
+                                                    className={cn(
+                                                        "w-full justify-start text-left font-normal min-h-[40px]",
+                                                        !hasFilter && "text-muted-foreground"
+                                                    )}
+                                                >
+                                                    <SlidersHorizontal className="h-4 w-4 shrink-0" />
+                                                    <span className="ml-2 truncate">
+                                                        {hasFilter
+                                                            ? `${sliderValue[0].toLocaleString('vi-VN')}đ - ${sliderValue[1].toLocaleString('vi-VN')}đ`
+                                                            : filter.label}
+                                                    </span>
+                                                </Button>
+                                            </PopoverTrigger>
+                                            <PopoverContent className="w-80 p-4" align="start">
+                                                <div className="space-y-4">
+                                                    <div className="flex items-center justify-between gap-2">
+                                                        <Label className="text-sm font-medium text-foreground">{filter.label}</Label>
+                                                        <span className="text-sm text-muted-foreground">
+                                                            {sliderValue[0].toLocaleString('vi-VN')}đ - {sliderValue[1].toLocaleString('vi-VN')}đ
+                                                        </span>
+                                                    </div>
+                                                    <Slider
+                                                        value={sliderValue}
+                                                        onValueChange={([a, b]) => {
+                                                            setLocalState(prev => ({
+                                                                ...prev,
+                                                                [fromKey]: String(a),
+                                                                [toKey]: String(b),
+                                                            }))
+                                                        }}
+                                                        min={min}
+                                                        max={max}
+                                                        step={step}
+                                                        className="w-full"
+                                                    />
+                                                </div>
+                                            </PopoverContent>
+                                        </Popover>
+                                    </div>
+                                )
+                            }
+
+                            const [fromLabel, toLabel] = filter.rangeLabels ?? ['Từ', 'Đến']
                             return (
-                                <div key={filter.key} className={cn("flex-1 space-y-2 min-w-[140px]", filter.className)}>
-                                    <Label className="text-sm font-medium text-foreground">{filter.label}</Label>
-                                    <Popover>
-                                        <PopoverTrigger asChild>
-                                            <Button
-                                                variant="outline"
-                                                className={cn(
-                                                    "w-full justify-start text-left font-normal min-h-[40px]",
-                                                    !hasFilter && "text-muted-foreground"
-                                                )}
-                                            >
-                                            <SlidersHorizontal className="h-4 w-4 shrink-0" />
-                                            <span className="ml-2 truncate">
-                                                {hasFilter
-                                                    ? `${sliderValue[0].toLocaleString('vi-VN')}đ - ${sliderValue[1].toLocaleString('vi-VN')}đ`
-                                                    : filter.label}
-                                            </span>
-                                        </Button>
-                                    </PopoverTrigger>
-                                    <PopoverContent className="w-80 p-4" align="start">
-                                        <div className="space-y-4">
-                                            <div className="flex items-center justify-between gap-2">
-                                                <Label className="text-sm font-medium text-foreground">{filter.label}</Label>
-                                                <span className="text-sm text-muted-foreground">
-                                                    {sliderValue[0].toLocaleString('vi-VN')}đ - {sliderValue[1].toLocaleString('vi-VN')}đ
-                                                </span>
-                                            </div>
-                                            <Slider
-                                                value={sliderValue}
-                                                onValueChange={([a, b]) => {
-                                                    setLocalState(prev => ({
-                                                        ...prev,
-                                                        [fromKey]: String(a),
-                                                        [toKey]: String(b),
-                                                    }))
+                                <div key={filter.key} className={cn("flex flex-col sm:flex-row gap-4 flex-grow min-w-[140px]", flexClass, filter.className)}>
+                                    <div className="flex-1 space-y-2 min-w-[140px]">
+                                        <Label className="text-sm font-medium text-foreground">{fromLabel}</Label>
+                                        <Input
+                                            type="number"
+                                            placeholder="0"
+                                            value={fromVal}
+                                            onChange={(e) => handleValuesChange(fromKey, e.target.value)}
+                                            className="w-full"
+                                            min={0}
+                                        />
+                                    </div>
+                                    <div className="flex-1 space-y-2 min-w-[140px]">
+                                        <Label className="text-sm font-medium text-foreground">{toLabel}</Label>
+                                        <Input
+                                            type="number"
+                                            placeholder="0"
+                                            value={toVal}
+                                            onChange={(e) => handleValuesChange(toKey, e.target.value)}
+                                            className="w-full"
+                                            min={0}
+                                        />
+                                    </div>
+                                </div>
+                            )
+                        }
+
+                        if (filter.type === 'dateRange' && filter.rangeKeys) {
+                            const [startKey, endKey] = filter.rangeKeys
+                            const variant = filter.dateRangeVariant ?? 'range'
+                            const startVal = searchParams.get(startKey) ?? ''
+                            const endVal = searchParams.get(endKey) ?? ''
+
+                            if (variant === 'separate') {
+                                return (
+                                    <div key={filter.key} className={cn("flex flex-col sm:flex-row gap-4 flex-grow", flexClass, filter.className)}>
+                                        <div className="flex-1 space-y-2 min-w-[140px]">
+                                            <Label className="text-sm font-medium text-foreground">Từ ngày</Label>
+                                            <Input
+                                                type="date"
+                                                value={startVal}
+                                                onChange={(e) => {
+                                                    const newParams = new URLSearchParams(searchParams.toString())
+                                                    if (e.target.value) newParams.set(startKey, e.target.value)
+                                                    else newParams.delete(startKey)
+                                                    newParams.set('pageNumber', '1')
+                                                    router.push(pathname + '?' + newParams.toString())
                                                 }}
-                                                min={min}
-                                                max={max}
-                                                step={step}
                                                 className="w-full"
                                             />
                                         </div>
-                                    </PopoverContent>
-                                </Popover>
-                                </div>
-                            )
-                        }
+                                        <div className="flex-1 space-y-2 min-w-[140px]">
+                                            <Label className="text-sm font-medium text-foreground">Đến ngày</Label>
+                                            <Input
+                                                type="date"
+                                                value={endVal}
+                                                onChange={(e) => {
+                                                    const newParams = new URLSearchParams(searchParams.toString())
+                                                    if (e.target.value) newParams.set(endKey, e.target.value)
+                                                    else newParams.delete(endKey)
+                                                    newParams.set('pageNumber', '1')
+                                                    router.push(pathname + '?' + newParams.toString())
+                                                }}
+                                                className="w-full"
+                                            />
+                                        </div>
+                                    </div>
+                                )
+                            }
 
-                        const [fromLabel, toLabel] = filter.rangeLabels ?? ['Từ', 'Đến']
-                        return (
-                            <div key={filter.key} className={cn("flex flex-col sm:flex-row gap-4 flex-1 min-w-[140px]", filter.className)}>
-                                <div className="flex-1 space-y-2 min-w-[140px]">
-                                    <Label className="text-sm font-medium text-foreground">{fromLabel}</Label>
-                                    <Input
-                                        type="number"
-                                        placeholder="0"
-                                        value={fromVal}
-                                        onChange={(e) => handleValuesChange(fromKey, e.target.value)}
-                                        className="w-full"
-                                        min={0}
-                                    />
-                                </div>
-                                <div className="flex-1 space-y-2 min-w-[140px]">
-                                    <Label className="text-sm font-medium text-foreground">{toLabel}</Label>
-                                    <Input
-                                        type="number"
-                                        placeholder="0"
-                                        value={toVal}
-                                        onChange={(e) => handleValuesChange(toKey, e.target.value)}
-                                        className="w-full"
-                                        min={0}
-                                    />
-                                </div>
-                            </div>
-                        )
-                    }
+                            const rangeValue: DateRange | undefined =
+                                startVal && endVal
+                                    ? { from: new Date(startVal), to: new Date(endVal) }
+                                    : startVal
+                                        ? { from: new Date(startVal), to: undefined }
+                                        : undefined
 
-                    if (filter.type === 'dateRange' && filter.rangeKeys) {
-                        const [startKey, endKey] = filter.rangeKeys
-                        const variant = filter.dateRangeVariant ?? 'range'
-                        const startVal = searchParams.get(startKey) ?? ''
-                        const endVal = searchParams.get(endKey) ?? ''
+                            const handleRangeChange = (r: DateRange | undefined) => {
+                                const newParams = new URLSearchParams(searchParams.toString())
+                                if (r?.from) {
+                                    newParams.set(startKey, format(r.from, 'yyyy-MM-dd'))
+                                } else {
+                                    newParams.delete(startKey)
+                                }
+                                if (r?.to) {
+                                    newParams.set(endKey, format(r.to, 'yyyy-MM-dd'))
+                                } else {
+                                    newParams.delete(endKey)
+                                }
+                                newParams.set('pageNumber', '1')
+                                router.push(pathname + '?' + newParams.toString())
+                            }
 
-                        if (variant === 'separate') {
                             return (
-                                <div key={filter.key} className={cn("flex flex-col sm:flex-row gap-4 flex-1", filter.className)}>
-                                    <div className="flex-1 space-y-2 min-w-[140px]">
-                                        <Label className="text-sm font-medium text-foreground">Từ ngày</Label>
-                                        <Input
-                                            type="date"
-                                            value={startVal}
-                                            onChange={(e) => {
-                                                const newParams = new URLSearchParams(searchParams.toString())
-                                                if (e.target.value) newParams.set(startKey, e.target.value)
-                                                else newParams.delete(startKey)
-                                                newParams.set('pageNumber', '1')
-                                                router.push(pathname + '?' + newParams.toString())
-                                            }}
-                                            className="w-full"
-                                        />
-                                    </div>
-                                    <div className="flex-1 space-y-2 min-w-[140px]">
-                                        <Label className="text-sm font-medium text-foreground">Đến ngày</Label>
-                                        <Input
-                                            type="date"
-                                            value={endVal}
-                                            onChange={(e) => {
-                                                const newParams = new URLSearchParams(searchParams.toString())
-                                                if (e.target.value) newParams.set(endKey, e.target.value)
-                                                else newParams.delete(endKey)
-                                                newParams.set('pageNumber', '1')
-                                                router.push(pathname + '?' + newParams.toString())
-                                            }}
-                                            className="w-full"
-                                        />
-                                    </div>
+                                <div key={filter.key} className={cn("flex-grow space-y-2 min-w-[200px]", flexClass, filter.className)}>
+                                    <Label className="text-sm font-medium text-foreground">{filter.label}</Label>
+                                    <DateRangePicker
+                                        value={rangeValue}
+                                        onChange={handleRangeChange}
+                                        placeholder={filter.placeholder ?? "Từ ngày - Đến ngày"}
+                                    />
                                 </div>
                             )
                         }
 
-                        const rangeValue: DateRange | undefined =
-                            startVal && endVal
-                                ? { from: new Date(startVal), to: new Date(endVal) }
-                                : startVal
-                                    ? { from: new Date(startVal), to: undefined }
-                                    : undefined
-
-                        const handleRangeChange = (r: DateRange | undefined) => {
-                            const newParams = new URLSearchParams(searchParams.toString())
-                            if (r?.from) {
-                                newParams.set(startKey, format(r.from, 'yyyy-MM-dd'))
-                            } else {
-                                newParams.delete(startKey)
-                            }
-                            if (r?.to) {
-                                newParams.set(endKey, format(r.to, 'yyyy-MM-dd'))
-                            } else {
-                                newParams.delete(endKey)
-                            }
-                            newParams.set('pageNumber', '1')
-                            router.push(pathname + '?' + newParams.toString())
-                        }
+                        const paramValue = searchParams.get(filter.key)
+                        const value = (filter.type === 'text' || filter.type === 'number')
+                            ? (localState[filter.key] !== undefined ? localState[filter.key] : (paramValue || ''))
+                            : (paramValue ?? filter.defaultValue ?? '')
 
                         return (
-                            <div key={filter.key} className={cn("flex-1 space-y-2 min-w-[200px]", filter.className)}>
+                            <div key={filter.key} className={cn("flex-grow space-y-2 min-w-[140px]", flexClass, filter.className)}>
                                 <Label className="text-sm font-medium text-foreground">{filter.label}</Label>
-                                <DateRangePicker
-                                    value={rangeValue}
-                                    onChange={handleRangeChange}
-                                    placeholder={filter.placeholder ?? "Từ ngày - Đến ngày"}
-                                />
+
+                                {filter.type === 'text' && (
+                                    <Input
+                                        type="text"
+                                        placeholder={filter.placeholder}
+                                        value={value}
+                                        onChange={(e) => handleValuesChange(filter.key, e.target.value)}
+                                        className="w-full"
+                                    />
+                                )}
+
+                                {filter.type === 'select' && (
+                                    <Select
+                                        value={value === '' || value === undefined ? 'all' : String(value)}
+                                        onValueChange={(v) => handleValuesChange(filter.key, v === 'all' ? '' : v)}
+                                    >
+                                        <SelectTrigger className="w-full">
+                                            <SelectValue placeholder="Tất cả" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {filter.options?.map((opt) => (
+                                                <SelectItem
+                                                    key={String(opt.value)}
+                                                    value={opt.value === '' || opt.value === undefined ? 'all' : String(opt.value)}
+                                                >
+                                                    {opt.label}
+                                                    </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                )}
+
+                                {filter.type === 'date' && (
+                                    <Input
+                                        type="date"
+                                        value={value}
+                                        onChange={(e) => handleValuesChange(filter.key, e.target.value)}
+                                        className="w-full"
+                                    />
+                                )}
+
+                                {filter.type === 'number' && (
+                                    <Input
+                                        type="number"
+                                        placeholder={filter.placeholder}
+                                        value={value}
+                                        onChange={(e) => handleValuesChange(filter.key, e.target.value)}
+                                        className="w-full"
+                                        min={0}
+                                    />
+                                )}
                             </div>
                         )
-                    }
+                    })}
 
-                    const paramValue = searchParams.get(filter.key)
-                    const value = (filter.type === 'text' || filter.type === 'number')
-                        ? (localState[filter.key] !== undefined ? localState[filter.key] : (paramValue || ''))
-                        : (paramValue ?? filter.defaultValue ?? '')
-
-                    return (
-                        <div key={filter.key} className={cn("flex-1 space-y-2 min-w-[140px]", filter.className)}>
-                            <Label className="text-sm font-medium text-foreground">{filter.label}</Label>
-
-                            {filter.type === 'text' && (
-                                <Input
-                                    type="text"
-                                    placeholder={filter.placeholder}
-                                    value={value}
-                                    onChange={(e) => handleValuesChange(filter.key, e.target.value)}
-                                    className="w-full"
-                                />
-                            )}
-
-                            {filter.type === 'select' && (
-                                <Select
-                                    value={value === '' || value === undefined ? 'all' : String(value)}
-                                    onValueChange={(v) => handleValuesChange(filter.key, v === 'all' ? '' : v)}
-                                >
-                                    <SelectTrigger className="w-full">
-                                        <SelectValue placeholder="Tất cả" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {filter.options?.map((opt) => (
-                                            <SelectItem
-                                                key={String(opt.value)}
-                                                value={opt.value === '' || opt.value === undefined ? 'all' : String(opt.value)}
-                                            >
-                                                {opt.label}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            )}
-
-                            {filter.type === 'date' && (
-                                <Input
-                                    type="date"
-                                    value={value}
-                                    onChange={(e) => handleValuesChange(filter.key, e.target.value)}
-                                    className="w-full"
-                                />
-                            )}
-
-                            {filter.type === 'number' && (
-                                <Input
-                                    type="number"
-                                    placeholder={filter.placeholder}
-                                    value={value}
-                                    onChange={(e) => handleValuesChange(filter.key, e.target.value)}
-                                    className="w-full"
-                                    min={0}
-                                />
-                            )}
-                        </div>
-                    )
-                })}
-            </div>
-
-                <Button
-                    variant="secondary"
-                    onClick={clearFilters}
-                    className={cn(
-                        "transition-all",
-                        showMobileFilters ? "w-full lg:w-auto mt-4 lg:mt-0" : "hidden lg:flex lg:ml-auto"
-                    )}
-                >
-                    Xóa bộ lọc
-                </Button>
+                    <Button
+                        variant="secondary"
+                        onClick={clearFilters}
+                        className={cn(
+                            "lg:basis-[calc(20%-1rem)] flex-grow h-[40px] mt-auto transition-all",
+                            showMobileFilters ? "w-full" : "hidden lg:flex"
+                        )}
+                    >
+                        Xóa bộ lọc
+                    </Button>
+                </div>
             </div>
         </div>
     )

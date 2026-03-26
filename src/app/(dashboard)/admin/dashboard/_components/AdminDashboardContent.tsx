@@ -226,7 +226,7 @@ export function AdminDashboardContent() {
         {/* Revenue Trend */}
         <Card className="min-w-0 border-border">
           <CardHeader>
-            <CardTitle className="text-foreground">Xu hướng doanh thu</CardTitle>
+            <CardTitle className="text-foreground ">Xu hướng doanh thu</CardTitle>
             <CardDescription className="text-muted-foreground">30 ngày qua</CardDescription>
           </CardHeader>
           <CardContent className="min-w-0">
@@ -239,15 +239,15 @@ export function AdminDashboardContent() {
                       <stop offset="100%" stopColor="#EA580C" stopOpacity={0} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
                   <XAxis
                     dataKey="date"
                     tickLine={false}
                     axisLine={false}
-                    stroke="hsl(var(--muted-foreground))"
+                    stroke="var(--muted-foreground)"
                     tickFormatter={(v) => new Date(v).toLocaleDateString("vi-VN", { day: "2-digit", month: "short" })}
                   />
-                  <YAxis tickLine={false} axisLine={false} stroke="hsl(var(--muted-foreground))" tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} />
+                  <YAxis tickLine={false} axisLine={false} stroke="var(--muted-foreground)" tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} />
                   <Tooltip
                     content={({ active, payload, label }) =>
                       active && payload?.[0] ? (

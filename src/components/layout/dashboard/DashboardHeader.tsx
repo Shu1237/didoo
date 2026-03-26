@@ -14,6 +14,8 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { LogOut, User, ChevronDown } from "lucide-react";
 
+import { ModeToggle } from "@/components/layout/buttonMode";
+
 const pathLabels: Record<string, string> = {
   "/admin/dashboard": "Tổng quan",
   "/admin/users": "Người dùng",
@@ -58,22 +60,24 @@ export default function DashboardHeader() {
   };
 
   return (
-    <header className="flex h-14 shrink-0 items-center justify-between border-b border-border px-6 bg-card">
+    <header className="flex h-14 shrink-0 items-center justify-between border-b border-border px-6 bg-card dashboard-header">
       <nav className="flex items-center gap-2 text-sm text-muted-foreground">
         
       </nav> 
 
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" className="flex items-center gap-2 rounded-xl">
-            <Avatar className="h-8 w-8 border border-border">
-              <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.FullName}`} />
-              <AvatarFallback className="bg-muted text-foreground text-sm">{user?.FullName?.[0] || "U"}</AvatarFallback>
-            </Avatar>
-            <span className="hidden sm:inline text-sm font-medium text-foreground">{user?.FullName}</span>
-            <ChevronDown className="h-4 w-4 text-muted-foreground" />
-          </Button>
-        </DropdownMenuTrigger>
+      <div className="flex items-center gap-3">
+        <ModeToggle />
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="flex items-center gap-2 rounded-xl h-10 px-3">
+              <Avatar className="h-8 w-8 border border-border">
+                <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.FullName}`} />
+                <AvatarFallback className="bg-muted text-foreground text-sm">{user?.FullName?.[0] || "U"}</AvatarFallback>
+              </Avatar>
+              <span className="hidden sm:inline text-sm font-medium text-foreground">{user?.FullName}</span>
+              <ChevronDown className="h-4 w-4 text-muted-foreground" />
+            </Button>
+          </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-48 rounded-xl border border-border bg-popover text-popover-foreground mt-2">
           <DropdownMenuItem asChild>
             <Link href="/home" className="flex items-center gap-2">
@@ -87,6 +91,7 @@ export default function DashboardHeader() {
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
+      </div>
     </header>
   );
 }

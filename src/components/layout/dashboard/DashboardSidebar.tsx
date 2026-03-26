@@ -51,7 +51,7 @@ export default function DashboardSidebar({ role }: { role: Role }) {
   return (
     <aside
       className={cn(
-        "flex h-full flex-col rounded-2xl border border-border bg-card p-3 shadow-sm transition-all duration-200",
+        "flex h-full flex-col rounded-2xl border border-border bg-card p-3 shadow-sm transition-all duration-200 dashboard-sidebar",
         collapsed ? "w-[88px]" : "w-[260px]"
       )}
     >

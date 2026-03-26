@@ -40,7 +40,7 @@ export default function DashboardShell({ userRole, children }: DashboardShellPro
       <div className="shrink-0">
         <DashboardSidebar role={role} />
       </div>
-      <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-3xl border border-border bg-card shadow-sm">
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-3xl border border-border bg-card shadow-sm dashboard-card">
         <DashboardHeader />
         <main className="min-h-0 flex-1 overflow-auto bg-muted/40 p-6 lg:p-8">
           {children}

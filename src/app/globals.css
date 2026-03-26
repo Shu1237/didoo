@@ -185,10 +185,28 @@
   --sidebar-foreground: #F8FAFC;
   --sidebar-primary: #F97316;
   --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: #431407;
-  --sidebar-accent-foreground: #FDBA74;
-  --sidebar-border: #334155;
+  --sidebar-accent: #1E293B;
+  --sidebar-accent-foreground: #F1F5F9;
+  --sidebar-border: #1E293B;
   --sidebar-ring: #F97316;
+
+  /* Premium Dashboard Dark Tweak */
+  --dashboard-outer: #0F172A;
+  --dashboard-inner: #162032;
+}
+
+/* Dashboard specific dark mode refinements */
+.dark .dashboard-card {
+  @apply bg-slate-900/40 border-slate-800/60 backdrop-blur-sm shadow-xl;
+}
+
+.dark .dashboard-sidebar {
+  background: linear-gradient(to bottom, #0F172A, #0B1220);
+  @apply border-slate-800/80;
+}
+
+.dark .dashboard-header {
+  @apply bg-slate-900/80 border-slate-800/60 backdrop-blur-md;
 }
 
 @layer base {
