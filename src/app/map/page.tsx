@@ -60,6 +60,7 @@ export default function MapPage() {
   const pageSize = Number(searchParams.get("pageSize") ?? 10);
   const startTime = searchParams.get("startTime") ?? "";
   const endTime = searchParams.get("endTime") ?? "";
+  const status = searchParams.get("status") ?? "";
 
   const query = useMemo(() => {
     const q: Record<string, string | number | boolean> = {
@@ -70,15 +71,15 @@ export default function MapPage() {
       hasLocations: true,
       isDeleted: false,
       isDescending: false,
-      status: EventStatus.PUBLISHED,
     };
     if (name) q.name = name;
     if (categoryId) q.categoryId = categoryId;
     if (startTime) q.startTime = startTime;
     if (endTime) q.endTime = endTime;
+    if (status) q.status = Number(status);
     if (sortBy === "date") q.isDescending = false;
     return q;
-  }, [pageNumber, pageSize, name, categoryId, sortBy, startTime, endTime]);
+  }, [pageNumber, pageSize, name, categoryId, sortBy, startTime, endTime, status]);
 
   const { data, isLoading } = useGetEvents(query);
 
@@ -88,7 +89,9 @@ export default function MapPage() {
 
   const filteredEvents = useMemo(() => {
     let result = events.filter((e) => {
-      const isVisible = e.status === EventStatus.PUBLISHED
+      const isVisible = status
+        ? e.status === Number(status)
+        : e.status === EventStatus.PUBLISHED || e.status === EventStatus.OPENED;
       const hasLocation =
         e.locations?.[0]?.latitude != null && e.locations?.[0]?.longitude != null;
       return isVisible && hasLocation;
@@ -134,7 +137,7 @@ export default function MapPage() {
         initial={{ x: -460 }}
         animate={{ x: isSidebarOpen ? 0 : -460 }}
         transition={{ type: "spring", stiffness: 200, damping: 25 }}
-        className="absolute top-24 left-4 w-[90%] md:w-[420px] bottom-4 z-10 pointer-events-none"
+        className="absolute top-24 left-4 w-[90%] md:w-105 bottom-4 z-10 pointer-events-none"
       >
         <div className="relative flex flex-col h-full bg-background/60 backdrop-blur-xl border border-white/20 shadow-2xl rounded-[2rem] p-5 pointer-events-auto">
           <div className="flex items-center gap-2 mb-4 px-1">
