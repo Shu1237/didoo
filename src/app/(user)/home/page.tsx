@@ -55,7 +55,11 @@ export default function Home() {
 
       <CategorySection openedEvents={openedEvents.slice(0, 6)} />
 
-      <SpecialEvents events={publishedEvents} />
+      {
+        publishedEvents.length > 0 && (
+            <SpecialEvents events={publishedEvents} />
+        )
+      }
       <AboutSection categories={categories} />
       <TrendingEvents organizers={organizers} />
       <MonthOverview categories={categories} />
