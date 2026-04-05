@@ -132,10 +132,7 @@ export function AdminDashboardContent() {
               Hiệu suất và thống kê thời gian thực — {new Date().toLocaleDateString("vi-VN", { dateStyle: "long" })}
             </CardDescription>
           </div>
-          <Button size="sm" className="w-fit bg-primary hover:bg-primary/90 text-primary-foreground">
-            <Download className="mr-2 h-4 w-4" />
-            Xuất báo cáo
-          </Button>
+         <div></div>
         </CardHeader>
         <CardContent>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
