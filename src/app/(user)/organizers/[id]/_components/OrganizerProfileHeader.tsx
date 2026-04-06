@@ -1,22 +1,19 @@
 "use client";
 
 import Image from "next/image";
-import { BadgeCheck, Share2 } from "lucide-react";
+import { BadgeCheck } from "lucide-react";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
-import { Button } from "@/components/ui/button";
 import type { Organizer } from "@/types/event";
 
 const FALLBACK_LOGO = "https://i.pravatar.cc/240?u=organizer";
 
 interface OrganizerProfileHeaderProps {
   organizer: Organizer;
-  onShare: () => void;
 }
 
 export function OrganizerProfileHeader({
   organizer,
-  onShare,
 }: OrganizerProfileHeaderProps) {
   const joinedLabel = organizer.createdAt
     ? `Tham gia ${format(new Date(organizer.createdAt), "MMM yyyy", { locale: vi })}`
@@ -50,17 +47,6 @@ export function OrganizerProfileHeader({
             {joinedLabel}
           </p>
         </div>
-      </div>
-      <div className="flex items-center gap-3 w-full sm:w-auto">
-        <Button className="flex-1 sm:flex-initial rounded-xl font-bold h-11 px-8">Theo dõi</Button>
-        <button
-          type="button"
-          onClick={onShare}
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-border bg-card text-muted-foreground transition hover:bg-muted hover:text-foreground shadow-sm"
-          aria-label="Chia sẻ"
-        >
-          <Share2 className="h-5 w-5" />
-        </button>
       </div>
     </div>
   );

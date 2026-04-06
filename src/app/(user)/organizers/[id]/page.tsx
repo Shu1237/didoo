@@ -6,7 +6,6 @@ import Loading from "@/components/loading";
 import { Button } from "@/components/ui/button";
 import { EventStatus } from "@/utils/enum";
 import { useGetEvents, useGetOrganizer } from "@/hooks/useEvent";
-import { toast } from "sonner";
 import { OrganizerBanner } from "./_components/OrganizerBanner";
 import { OrganizerProfileHeader } from "./_components/OrganizerProfileHeader";
 import { OrganizerStats } from "./_components/OrganizerStats";
@@ -39,23 +38,6 @@ export default function OrganizerProfilePage({
     (e) => (e.status as number) !== EventStatus.DRAFT
   );
 
-  const handleShare = async () => {
-    try {
-      if (navigator.share) {
-        await navigator.share({
-          title: organizer?.name,
-          url: window.location.href,
-        });
-        toast.success("Đã chia sẻ");
-      } else {
-        await navigator.clipboard.writeText(window.location.href);
-        toast.success("Đã sao chép link");
-      }
-    } catch {
-      toast.info("Đã hủy chia sẻ");
-    }
-  };
-
   if (isOrganizerLoading) return <Loading />;
 
   if (!organizer) {
@@ -84,7 +66,7 @@ export default function OrganizerProfilePage({
       />
 
       <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-        <OrganizerProfileHeader organizer={organizer} onShare={handleShare} />
+        <OrganizerProfileHeader organizer={organizer} />
         <OrganizerStats eventCount={allEvents.length} />
 
         <div className="mt-12 grid gap-10 lg:grid-cols-12 lg:gap-12">
