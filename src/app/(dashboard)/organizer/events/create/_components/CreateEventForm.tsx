@@ -130,7 +130,8 @@ export function CreateEventForm() {
       const payload: EventCreateBody = {
         ...data,
         OrganizerId: organizerId,
-  
+        Slug: data.Slug?.trim(),
+
         StartTime:
           data.StartTime instanceof Date
             ? data.StartTime
@@ -143,6 +144,12 @@ export function CreateEventForm() {
   
         OpenTime: formatTime(data.OpenTime),
         ClosedTime: formatTime(data.ClosedTime),
+
+        // Strip name from locations - BE doesn't have this field
+        Locations: (data.Locations ?? []).map((loc: any) => {
+          const { Name: _n, ...rest } = loc;
+          return rest;
+        }),
       };
   
       const event = (await create.mutateAsync(payload)) as { id?: string };
@@ -465,16 +472,6 @@ export function CreateEventForm() {
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
-                )}
-              </div>
-              <div className="space-y-2">
-                <Label>Tên địa điểm (Ví dụ: Trung tâm triển lãm, White Palace...)</Label>
-                <Input
-                  placeholder="Nhập tên địa điểm"
-                  {...register(`Locations.${i}.Name`)}
-                />
-                {errors.Locations?.[i]?.Name && (
-                  <p className="text-sm text-destructive">{String(errors.Locations[i]?.Name?.message ?? "")}</p>
                 )}
               </div>
               <div className="space-y-2">

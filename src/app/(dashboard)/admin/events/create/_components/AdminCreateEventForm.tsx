@@ -133,6 +133,9 @@ export function AdminCreateEventForm() {
         EndTime: data.EndTime instanceof Date ? data.EndTime : new Date(data.EndTime as string),
         OpenTime: formatTime(data.OpenTime),
         ClosedTime: formatTime(data.ClosedTime),
+
+        // Strip Name from locations - BE doesn't have this field
+        Locations: (data.Locations ?? []).map(({ Name: _name, ...loc }) => loc),
       };
       const event = await create.mutateAsync(payload) as { id?: string };
       const eventId = event?.id;
