@@ -15,6 +15,7 @@ import {
   YAxis,
 } from "recharts";
 import { useGetMe } from "@/hooks/useAuth";
+import { useGetEvents } from "@/hooks/useEvent";
 import { useGetOrganizerOverview } from "@/hooks/useOperation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -58,8 +59,17 @@ export function OrganizerDashboardContent() {
     { organizerId, period: "30d" },
     { enabled: !!organizerId }
   );
+
+  const { data: eventsRes } = useGetEvents(
+    { organizerId, pageSize: 200, isDeleted: false },
+    Boolean(organizerId)
+  );
   
   const overview = overviewRes?.data;
+  const eventImageMap = useMemo(() => {
+    const events = eventsRes?.data?.items ?? [];
+    return new Map(events.map((event) => [event.id, event.thumbnailUrl || event.bannerUrl || FALLBACK_IMAGE]));
+  }, [eventsRes?.data?.items]);
 
   const kpiCards = useMemo(
     () => [
@@ -97,6 +107,10 @@ export function OrganizerDashboardContent() {
 
   const chartData = overview?.chartData || [];
   const recentEvents = overview?.recentEvents || [];
+  const displayRecentEvents = useMemo(
+    () => recentEvents.filter((event) => eventImageMap.has(event.id)),
+    [recentEvents, eventImageMap]
+  );
 
   if (isLoading || !organizerId) {
     return (
@@ -278,8 +292,8 @@ export function OrganizerDashboardContent() {
         </CardHeader>
         <CardContent>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {recentEvents.length > 0 ? (
-              recentEvents.map((e) => {
+            {displayRecentEvents.length > 0 ? (
+              displayRecentEvents.map((e) => {
                 let statusBadge = "SẮP DIỄN RA";
                 const now = new Date();
                 const startTime = e.startTime ? new Date(e.startTime) : null;
@@ -301,7 +315,7 @@ export function OrganizerDashboardContent() {
                 >
                   <div className="relative aspect-[4/3] w-full bg-muted">
                     <Image
-                      src={FALLBACK_IMAGE}
+                      src={eventImageMap.get(e.id) || FALLBACK_IMAGE}
                       alt={e.name}
                       fill
                       className="object-cover transition group-hover:scale-105"
@@ -334,22 +348,6 @@ export function OrganizerDashboardContent() {
                       <Calendar className="h-3.5 w-3.5" />
                       {formatDate(e.startTime)}
                     </p>
-                    <div className="mt-2 flex items-center justify-between gap-2">
-                      <div className="flex flex-1 items-center gap-2">
-                        <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-muted">
-                          <div
-                            className="h-full rounded-full bg-primary"
-                            style={{ width: `${e.occupancyPercent}%` }}
-                          />
-                        </div>
-                        <span className="text-xs font-bold text-muted-foreground">
-                          {e.occupancyPercent}%
-                        </span>
-                      </div>
-                      <span className="text-sm font-bold text-foreground">
-                        {formatCurrency(e.revenue)}
-                      </span>
-                    </div>
                   </div>
                 </Link>
                 );
