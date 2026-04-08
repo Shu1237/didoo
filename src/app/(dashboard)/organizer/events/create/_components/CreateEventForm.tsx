@@ -145,7 +145,7 @@ export function CreateEventForm() {
         OpenTime: formatTime(data.OpenTime),
         ClosedTime: formatTime(data.ClosedTime),
 
-        // Strip Name from locations - BE doesn't have this field
+        // Strip name from locations - BE doesn't have this field
         Locations: (data.Locations ?? []).map((loc: any) => {
           const { Name: _n, ...rest } = loc;
           return rest;

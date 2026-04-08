@@ -7,6 +7,7 @@ export const tagSchema = z.object({
 });
 
 export const locationSchema = z.object({
+    Name: z.string().optional(),
     Id: z.string().optional(),
     Address: z.string().min(1, "Địa chỉ là bắt buộc"),
     Province: z.string().optional().or(z.literal("")),
