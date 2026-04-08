@@ -16,6 +16,7 @@ import {
 import { BasePagination } from "@/components/base/BasePagination";
 import { Badge } from "@/components/ui/badge";
 import { BookingStatus } from "@/utils/enum";
+import { OrganizerEarningsFilters } from "./OrganizerEarningsFilters";
 
 function formatCurrency(n: number) {
   return new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(n);
@@ -46,19 +47,20 @@ export function OrganizerEarningsContent({
   const searchParams = useSearchParams();
   const { data: meRes } = useGetMe();
   const organizerId = meRes?.data?.organizerId ?? undefined;
-  const eventId = typeof params.eventId === "string" ? params.eventId : undefined;
+  const eventIdParam = typeof params.eventId === "string" ? params.eventId : undefined;
   const pageNumber = Number(params.pageNumber ?? params.page ?? 1) || 1;
   const pageSize = Number(params.pageSize) || 20;
+  const isDescending = params.isDescending !== "false";
 
   const { data: eventsRes } = useGetEvents({ organizerId: organizerId ?? "", pageSize: 200 });
   const events = eventsRes?.data?.items ?? [];
   const eventIds = events.map((e) => e.id);
   const eventMap = new Map(events.map((e) => [e.id, e.name]));
-  const effectiveEventId = eventId || eventIds[0];
+  const effectiveEventId = eventIdParam && eventIds.includes(eventIdParam) ? eventIdParam : eventIds[0];
 
   const { data: bookingsRes, isLoading } = useGetBookings(
     effectiveEventId
-      ? { eventId: effectiveEventId, status: BookingStatus.PAID, pageNumber, pageSize, isDescending: true }
+      ? { eventId: effectiveEventId, status: BookingStatus.PAID, pageNumber, pageSize, isDescending }
       : { pageNumber: 1, pageSize: 1 }
   );
 
@@ -97,7 +99,7 @@ export function OrganizerEarningsContent({
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <Card className="border-zinc-200">
           <CardHeader className="pb-2">
-            <p className="text-sm font-medium text-zinc-500">Tổng thu (trang)</p>
+            <p className="text-sm font-medium text-zinc-500">Tổng thu </p>
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-semibold text-zinc-900">{formatCurrency(totalRevenue)}</p>
@@ -112,6 +114,8 @@ export function OrganizerEarningsContent({
           </CardContent>
         </Card>
       </div>
+
+      <OrganizerEarningsFilters organizerId={organizerId} />
 
       <Card className="border-zinc-200">
         <CardHeader>
