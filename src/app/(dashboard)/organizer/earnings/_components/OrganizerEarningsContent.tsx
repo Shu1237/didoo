@@ -117,53 +117,43 @@ export function OrganizerEarningsContent({
 
       <OrganizerEarningsFilters organizerId={organizerId} />
 
-      <Card className="border-zinc-200">
-        <CardHeader>
-          <h2 className="text-lg font-semibold text-zinc-900">Giao dịch</h2>
-          {effectiveEventId && (
-            <p className="text-sm text-zinc-500">Sự kiện: {eventMap.get(effectiveEventId) ?? effectiveEventId}</p>
-          )}
-        </CardHeader>
-        <CardContent>
-          <div className="rounded-2xl border border-zinc-200 overflow-hidden">
-            <Table>
-              <TableHeader>
-                <TableRow className="border-zinc-200 hover:bg-transparent">
-                  <TableHead>Khách hàng</TableHead>
-                  <TableHead>Số lượng</TableHead>
-                  <TableHead>Tổng tiền</TableHead>
-                  <TableHead>Ngày thanh toán</TableHead>
-                  <TableHead>Trạng thái</TableHead>
+      <section className="space-y-4">
+        <div className="rounded-2xl border border-zinc-200 bg-white overflow-hidden">
+          <Table>
+            <TableHeader>
+              <TableRow className="border-zinc-200 hover:bg-transparent">
+                <TableHead>Khách hàng</TableHead>
+                <TableHead>Số lượng</TableHead>
+                <TableHead>Tổng tiền</TableHead>
+                <TableHead>Ngày thanh toán</TableHead>
+                <TableHead>Trạng thái</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {items.map((b) => (
+                <TableRow key={b.id} className="border-zinc-100">
+                  <TableCell className="font-medium">{b.fullname}</TableCell>
+                  <TableCell className="text-zinc-600">{b.amount}</TableCell>
+                  <TableCell className="font-medium">{formatCurrency(b.totalPrice)}</TableCell>
+                  <TableCell className="text-zinc-600">{formatDate(b.paidAt ?? b.createdAt)}</TableCell>
+                  <TableCell>
+                    <Badge variant="default">{b.status}</Badge>
+                  </TableCell>
                 </TableRow>
-              </TableHeader>
-              <TableBody>
-                {items.map((b) => (
-                  <TableRow key={b.id} className="border-zinc-100">
-                    <TableCell className="font-medium">{b.fullname}</TableCell>
-                    <TableCell className="text-zinc-600">{b.amount}</TableCell>
-                    <TableCell className="font-medium">{formatCurrency(b.totalPrice)}</TableCell>
-                    <TableCell className="text-zinc-600">{formatDate(b.paidAt ?? b.createdAt)}</TableCell>
-                    <TableCell>
-                      <Badge variant="default">{b.status}</Badge>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
 
-          <div className="mt-4">
-            <BasePagination
-              currentPage={pageNumber}
-              totalPages={totalPages}
-              totalItems={totalItems}
-              itemsPerPage={pageSize}
-              onPageChange={(p) => updateParam("pageNumber", String(p))}
-              onPageSizeChange={(s) => updateParam("pageSize", String(s))}
-            />
-          </div>
-        </CardContent>
-      </Card>
+        <BasePagination
+          currentPage={pageNumber}
+          totalPages={totalPages}
+          totalItems={totalItems}
+          itemsPerPage={pageSize}
+          onPageChange={(p) => updateParam("pageNumber", String(p))}
+          onPageSizeChange={(s) => updateParam("pageSize", String(s))}
+        />
+      </section>
     </div>
   );
 }
