@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(ls -laR \"e:\\\\Github\\\\Shu\\\\didoo_fix\\\\didoo\\\\src\\\\app\\\\\\(user\\)\")",
-      "Bash(ls -laR \"e:\\\\Github\\\\Shu\\\\didoo_fix\\\\didoo\\\\src\\\\app\\\\\\(organizer\\)\")"
+      "Bash(ls -laR \"e:\\\\Github\\\\Shu\\\\didoo_fix\\\\didoo\\\\src\\\\app\\\\\\(organizer\\)\")",
+      "Read(//Users/Minh/vela/event-point/**)"
     ]
   }
 }

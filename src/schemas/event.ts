@@ -3,12 +3,11 @@ import { EventStatus } from "@/utils/enum";
 import { CategoryStatus } from "@/utils/enum";
 import { OrganizerStatus } from "@/utils/enum";
 export const tagSchema = z.object({
-    Name: z.string().min(1, "Tên tag là bắt buộc"),
+    TagName: z.string().min(1, "Tên tag là bắt buộc"),
 });
 
 export const locationSchema = z.object({
     Id: z.string().optional(),
-    Name: z.string().optional().or(z.literal("")),
     Address: z.string().min(1, "Địa chỉ là bắt buộc"),
     Province: z.string().optional().or(z.literal("")),
     District: z.string().optional().or(z.literal("")),

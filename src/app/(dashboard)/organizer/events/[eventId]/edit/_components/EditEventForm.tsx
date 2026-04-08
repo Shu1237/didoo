@@ -222,7 +222,7 @@ export function EditEventForm({ eventId }: { eventId: string }) {
         AgeRestriction: data.AgeRestriction,
         CategoryId: data.CategoryId,
         OrganizerId: organizerId,
-        Locations: data.Locations,
+        Locations: (data.Locations ?? []).map(({ Name: _name, ...loc }) => loc),
       };
       await update.mutateAsync({ id: eventId, body: payload });
       router.push("/organizer/events");

@@ -17,7 +17,6 @@ import {
   ChevronLeft,
   ChevronRight,
   Wallet,
-  ShoppingBag,
   UserCircle,
 } from "lucide-react";
 
@@ -34,7 +33,6 @@ const organizerNavItems = [
   { title: "Bảng điều khiển", href: "/organizer/dashboard", icon: LayoutDashboard },
   { title: "Sự kiện", href: "/organizer/events", icon: Calendar },
   { title: "Ví & Doanh thu", href: "/organizer/earnings", icon: Wallet },
-  { title: "Đơn hàng", href: "/organizer/orders", icon: ShoppingBag },
   { title: "Hồ sơ", href: "/organizer/profile", icon: UserCircle },
 ];
 
